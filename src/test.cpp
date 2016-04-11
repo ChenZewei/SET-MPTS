@@ -11,9 +11,9 @@ int main()
 	
 	taskset.add_task(1,2);
 	taskset.add_task(2,3);
-	taskset.add_task(1,5);
-	taskset.add_task(1,4);
-	taskset.add_task(5,10);
+	taskset.add_task(1,5,3);
+	taskset.add_task(1,4,3);
+	taskset.add_task(5,10,9);
 	taskset.add_task(1,2);
 	
 	cout<<"Implicit:"<<taskset.is_implicit_deadline()<<endl;
