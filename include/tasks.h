@@ -4,8 +4,9 @@
 #include <math.h>
 #include <vector>
 #include <algorithm>
-
+#include <iostream>
 #include "types.h"
+using namespace std;
 
 class Task
 {
@@ -49,7 +50,7 @@ class Task
 	
 };
 
-typedef std::vector<Task> Tasks;
+typedef vector<Task> Tasks;
 
 #define foreach(tasks, condition) \
 		for(int i; i < tasks.size(); i++)	\
@@ -69,16 +70,20 @@ class TaskSet
 		fraction_t density_max;
 	public:
 		TaskSet();
-		TaskSet(Tasks tasks);
-		~TaskSet();
-		void add_task(uint wcet, uint period, uint deadline)
+		void add_task(uint wcet, uint period, uint deadline = 0)
 		{
 			fraction_t utilization_new = wcet, density_new = wcet;
 			utilization_new /= period;
-			density_new /= std::min(deadline, period);
+			if(0 == deadline)
+				density_new /= period;
+			else
+				density_new /= min(deadline, period);
+
 			tasks.push_back(Task(wcet, period, deadline));
+
 			utilization_sum += utilization_new;
 			density_sum += density_new;
+
 			if(utilization_max < utilization_new)
 				utilization_max = utilization_new;
 			if(density_max < density_new)
@@ -99,10 +104,15 @@ class TaskSet
 			return !(is_implicit_deadline())&&!(is_constraint_deadline());
 		}
 		
+		fraction_t get_utilization_sum();
+		fraction_t get_utilization_max();
+		fraction_t get_density_sum();
+		fraction_t get_density_max();
 		void get_utilization_sum(fraction_t &utilization_sum);
 		void get_utilization_max(fraction_t &utilization_max);
 		void get_density_sum(fraction_t &density_sum);
 		void get_density_max(fraction_t &density_max);
+
 		uint DBF(uint time);
 };
 #endif

@@ -63,6 +63,27 @@ TaskSet::TaskSet()
 	density_max = 0;
 }
 
+fraction_t TaskSet::get_utilization_sum()
+{
+	return utilization_sum;
+}
+
+fraction_t TaskSet::get_utilization_max()
+{
+	return utilization_max;
+}
+
+fraction_t TaskSet::get_density_sum()
+{
+	return density_sum;
+}
+
+fraction_t TaskSet::get_density_max()
+{
+	return utilization_max;
+}
+
+
 void TaskSet::get_utilization_sum(fraction_t &utilization_sum)
 {
 	fraction_t temp;
