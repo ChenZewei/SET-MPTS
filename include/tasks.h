@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <vector>
+#include <algorithm>
 
 #include "types.h"
 
@@ -23,8 +24,10 @@ class Task
 			uint priority = 0)
 		{
 			this->wcet = wcet;
-			if(deadline)
+			if(0 == deadline)
 				this->deadline = period;
+			else
+				this->deadline = deadline;
 			this->period = period;
 			this->priority = priority;
 			utilization = this->wcet;
@@ -55,14 +58,21 @@ class Task
 		
 		uint DBF(uint time);//Demand Bound Function
 		void DBF();
-		fraction_t get_utilization();
-		fraction_t get_density();
+		fraction_t get_utilization()
+		{
+			return utilization;
+		}
+
+		fraction_t get_density()
+		{
+			return density;
+		}
 		void get_utilization(fraction_t &utilization);
 		void get_density(fraction_t &density);
 	
-}
+};
 
-typedef Vector<Task> Tasks;
+typedef std::vector<Task> Tasks;
 
 #define foreach(tasks, condition) \
 		for(int i; i < tasks.size(); i++)	\
@@ -88,8 +98,8 @@ class TaskSet
 		{
 			fraction_t utilization_new = wcet, density_new = wcet;
 			utilization_new /= period;
-			density_new /= min(deadline, period);
-			tasks.pushback(Task(wcet, period, deadline));
+			density_new /= std::min(deadline, period);
+			tasks.push_back(Task(wcet, period, deadline));
 			utilization_sum += utilization_new;
 			density_sum += density_new;
 			if(utilization_max < utilization_new)
@@ -117,5 +127,5 @@ class TaskSet
 		void get_density_sum(fraction_t &density_sum);
 		void get_density_max(fraction_t &density_max);
 		uint DBF(uint time);
-}
+};
 #endif

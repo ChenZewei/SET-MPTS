@@ -11,5 +11,4 @@
 
 typedef mpz_class int_t;		//multiple precision integer
 typedef mpq_class fraction_t;		//multiple precision rational number
-typedef mpf_class float_t;		//multiple precision floating number
 #endif
