@@ -78,12 +78,9 @@ class TaskSet
 				density_new /= period;
 			else
 				density_new /= min(deadline, period);
-
 			tasks.push_back(Task(wcet, period, deadline));
-
 			utilization_sum += utilization_new;
 			density_sum += density_new;
-
 			if(utilization_max < utilization_new)
 				utilization_max = utilization_new;
 			if(density_max < density_new)

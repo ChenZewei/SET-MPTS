@@ -80,7 +80,7 @@ fraction_t TaskSet::get_density_sum()
 
 fraction_t TaskSet::get_density_max()
 {
-	return utilization_max;
+	return density_max;
 }
 
 

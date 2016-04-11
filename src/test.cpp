@@ -4,17 +4,35 @@
 
 using namespace std;
 
-int main()
+int main(int argc,char** argv)
 {
-	fraction_t u,d;
-	TaskSet taskset = TaskSet();
+	if(1 == argc)
+	{
+		cout<<"Usage: ./test [positive task number]"<<endl;
+		return 0;
+	}
 	
-	taskset.add_task(1,2);
+	int_t num = atoi(argv[1]);
+
+	if(0 >= num)
+	{
+		cout<<"Usage: ./test [positive task number]"<<endl;
+		return 0;
+	}
+	TaskSet taskset = TaskSet();
+
+	for(int i = 1; i <= num; i++)
+	{
+		taskset.add_task(1,i);	
+	}
+	/*
+	taskset.add_task(1,2,1);
 	taskset.add_task(2,3);
 	taskset.add_task(1,5,3);
 	taskset.add_task(1,4,3);
 	taskset.add_task(5,10,9);
 	taskset.add_task(1,2);
+	*/
 	
 	cout<<"Implicit:"<<taskset.is_implicit_deadline()<<endl;
 	cout<<"Constraint:"<<taskset.is_constraint_deadline()<<endl;
