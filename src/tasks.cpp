@@ -2,6 +2,27 @@
 
 ////////////////////////////Task//////////////////////////////
 
+Task::Task(uint wcet, 
+   	uint period,
+   	uint deadline,
+    	uint priority)
+{
+	this->wcet = wcet;
+	if(0 == deadline)
+		this->deadline = period;
+	else
+		this->deadline = deadline;
+	this->period = period;
+	this->priority = priority;
+	utilization = this->wcet;
+	utilization /= this->period;
+	density = this->wcet;
+	if (this->deadline <= this->period)
+		density /= this->deadline;
+	else
+		density /= this->period;
+}
+
 uint Task::DBF(uint time)
 {
 	if(time >= deadline)
@@ -10,9 +31,15 @@ uint Task::DBF(uint time)
 		return 0;
 }
 
+fraction_t Task::get_utilization()
+{
+	return utilization;
+}
 
- 
-
+fraction_t Task::get_density()
+{
+	return density;
+}
 
 void Task::get_utilization(fraction_t &utilization)
 {

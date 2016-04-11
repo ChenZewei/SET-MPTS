@@ -21,23 +21,7 @@ class Task
 		Task(uint wcet, 
 			uint period,
 			uint deadline = 0,
-			uint priority = 0)
-		{
-			this->wcet = wcet;
-			if(0 == deadline)
-				this->deadline = period;
-			else
-				this->deadline = deadline;
-			this->period = period;
-			this->priority = priority;
-			utilization = this->wcet;
-			utilization /= this->period;
-			density = this->wcet;
-			if (this->deadline <= this->period)
-				density /= this->deadline;
-			else
-				density /= this->period;
-		}
+			uint priority = 0);
 		
 		uint get_wcet()
 		{
@@ -58,15 +42,8 @@ class Task
 		
 		uint DBF(uint time);//Demand Bound Function
 		void DBF();
-		fraction_t get_utilization()
-		{
-			return utilization;
-		}
-
-		fraction_t get_density()
-		{
-			return density;
-		}
+		fraction_t get_utilization();
+		fraction_t get_density();
 		void get_utilization(fraction_t &utilization);
 		void get_density(fraction_t &density);
 	
