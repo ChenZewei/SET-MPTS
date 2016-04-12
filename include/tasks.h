@@ -8,6 +8,8 @@
 #include "types.h"
 using namespace std;
 
+typedef vector<fraction_t> Ratio;
+
 class Task
 {
 	private:
@@ -17,7 +19,7 @@ class Task
 		uint priority;
 		fraction_t utilization;
 		fraction_t density;
-		
+		Ratio ratio;//for heterogeneous platform
 	public:
 		Task(uint wcet, 
 			uint period,
@@ -99,6 +101,10 @@ class TaskSet
 		bool is_arbitary_deadline()
 		{
 			return !(is_implicit_deadline())&&!(is_constraint_deadline());
+		}
+		uint get_taskset_size()
+		{
+			return tasks.size();
 		}
 		
 		fraction_t get_utilization_sum();
