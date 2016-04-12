@@ -13,6 +13,7 @@ typedef vector<fraction_t> Ratio;
 class Task
 {
 	private:
+		uint id;
 		uint wcet;
 		uint deadline;
 		uint period;
@@ -21,11 +22,16 @@ class Task
 		fraction_t density;
 		Ratio ratio;//for heterogeneous platform
 	public:
-		Task(uint wcet, 
+		Task(uint id,
+			uint wcet, 
 			uint period,
 			uint deadline = 0,
 			uint priority = 0);
 		
+		uint get_id()
+		{
+			return id;
+		}
 		uint get_wcet()
 		{
 			return wcet;
@@ -80,7 +86,7 @@ class TaskSet
 				density_new /= period;
 			else
 				density_new /= min(deadline, period);
-			tasks.push_back(Task(wcet, period, deadline));
+			tasks.push_back(Task(tasks.size(), wcet, period, deadline));
 			utilization_sum += utilization_new;
 			density_sum += density_new;
 			if(utilization_max < utilization_new)
@@ -105,6 +111,15 @@ class TaskSet
 		uint get_taskset_size()
 		{
 			return tasks.size();
+		}
+
+		fraction_t get_task_utilization(uint index)
+		{
+			return tasks[index].get_utilization();
+		}
+		fraction_t get_task_density(uint index)
+		{
+			return tasks[index].get_density();
 		}
 		
 		fraction_t get_utilization_sum();

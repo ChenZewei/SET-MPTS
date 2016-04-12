@@ -2,11 +2,13 @@
 
 ////////////////////////////Task//////////////////////////////
 
-Task::Task(uint wcet, 
+Task::Task(uint id,
+	uint wcet, 
    	uint period,
    	uint deadline,
     	uint priority)
 {
+	this->id = id;
 	this->wcet = wcet;
 	if(0 == deadline)
 		this->deadline = period;
