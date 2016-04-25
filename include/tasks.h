@@ -58,14 +58,47 @@ class Task
 	
 };
 
+typedef vector<uint> Jobs;//wcet
+
+struct Edge//job m can be excuted only if job v is completed
+{
+	uint v;
+	uint m;
+};
+
+typedef vector<struct Edge> Edges;
+
+typedef struct
+{
+	Jobs jobs;
+	Edges edges;
+}Graph;
+
+
+class DAG_Task: class Task
+{
+	private:
+		Graph graph;
+		uint vol;//total wcet of the jobs in graph
+	public:
+		void update_vol();
+		bool is_acyclic();
+		uint DBF(uint time);//Demand Bound Function
+		void DBF();
+		fraction_t get_utilization();
+		fraction_t get_density();
+		void get_utilization(fraction_t &utilization);
+		void get_density(fraction_t &density);	
+}
+
 typedef vector<Task> Tasks;
 
-#define foreach(tasks, condition) \
-		for(int i; i < tasks.size(); i++)	\
-		{									\
-			if(condition)					\
-				return false;				\
-		}
+#define foreach(tasks, condition) 		\
+	for(int i; i < tasks.size(); i++)	\
+	{					\
+		if(condition)			\
+			return false;		\
+	}
 
 class TaskSet
 {
@@ -133,4 +166,6 @@ class TaskSet
 
 		uint DBF(uint time);
 };
+
+
 #endif
