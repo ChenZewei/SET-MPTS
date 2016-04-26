@@ -29,8 +29,10 @@ int main(int argc,char** argv)
 	
 	for(int i = 1; i <= task_num; i++)
 	{
-		int wcet = int(exponential_gen(3.5)*100);
-		int period = 1000;
+		int wcet = int(exponential_gen(5)*100);
+		if(0 == wcet)
+			wcet++;
+		int period = 500;
 		taskset.add_task(wcet,period);	
 	}
 
@@ -40,6 +42,6 @@ int main(int argc,char** argv)
 	}
 	cout << fixed;
 	cout << "Total utilization:" << taskset.get_utilization_sum().get_d() << endl;
-	cout << "RM schedulability:" << (rms.is_RM_schedulable(taskset)) << endl;
+	cout << "RM schedulability:" << (rms.is_RM_schedulable(taskset)?"true":"false") << endl;
 
 }
