@@ -75,7 +75,7 @@ typedef struct
 }Graph;
 
 
-class DAG_Task: class Task
+class DAG_Task:public Task
 {
 	private:
 		Graph graph;
@@ -89,7 +89,7 @@ class DAG_Task: class Task
 		fraction_t get_density();
 		void get_utilization(fraction_t &utilization);
 		void get_density(fraction_t &density);	
-}
+};
 
 typedef vector<Task> Tasks;
 

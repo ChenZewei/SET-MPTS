@@ -1,15 +1,15 @@
 
-test:test.o tasks.o RMS.o processors.o
-	g++ -o test test.o tasks.o RMS.o processors.o -lgmpxx -lgmp
+stest:scheduling_test.o tasks.o RMS.o processors.o
+	g++ -std=c++11 -o stest scheduling_test.o tasks.o RMS.o processors.o -lgmpxx -lgmp
 
-test.o:test.cpp
-	g++ -c test.cpp
+scheduling_test.o:scheduling_test.cpp
+	g++ -std=c++11 -c scheduling_test.cpp
 
 tasks.o:tasks.cpp
-	g++ -c tasks.cpp
+	g++ -std=c++11 -c tasks.cpp
 
 RMS.o:./SchedTest/RMS.cpp
-	g++ -c ./SchedTest/RMS.cpp
+	g++ -std=c++11 -c ./SchedTest/RMS.cpp
 
 processors.o:processors.cpp
-	g++ -c processors.cpp
+	g++ -std=c++11 -c processors.cpp
