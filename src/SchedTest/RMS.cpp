@@ -25,7 +25,7 @@ fraction_t RMS::get_utilization_bound(TaskSet taskset)
 	return bound;
 }
 
-bool RMS::is_RM_schedulable(TaskSet taskset)
+bool RMS::is_RM_schedulable(TaskSet taskset)//for identical multiprocessor platform
 {
 	if(is_uniprocessor())
 	{
@@ -38,6 +38,22 @@ bool RMS::is_RM_schedulable(TaskSet taskset)
 		else
 			return false;
 	}
+	else
+	{
+		if(taskset.is_implicit_deadline())
+		{
+			fraction_t u_sum = taskset.get_utilization_sum();
+			fraction_t u_max = taskset.get_utilization_max();
+			if(u_sum <= processor_num*(1-u_max)/2+u_max)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+
+		}
+        }
 }
 
 bool RMS::is_RM_schedulable(TaskSet taskset, Task task)

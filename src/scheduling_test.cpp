@@ -9,24 +9,25 @@ using namespace std;
 
 int main(int argc,char** argv)
 {
-	if(3 != argc)
+	if(4 != argc)
 	{
-		cout<<"Usage: ./test [positive task number] [positive experiment times]"<<endl;
+		cout<<"Usage: ./RMtest [positive processor number] [positive task number] [positive experiment times]"<<endl;
 		return 0;
 	}
 	
-	uint task_num = atoi(argv[1]);
-	uint exp_t = atoi(argv[2]);
+	uint processor_num = atoi(argv[1]);
+	uint task_num = atoi(argv[2]);
+	uint exp_t = atoi(argv[3]);
 
-	if(0 >= task_num || 0 >= exp_t)
+	if(0 >= task_num || 0 >= exp_t || 0 >= processor_num)
 	{
-		cout<<"Usage: ./test [positive task number] [positive experiment times]"<<endl;
+		cout<<"Usage: ./RMtest [positive processor number] [positive task number] [positive experiment times]"<<endl;
 		return 0; 
 	}
 
 	//ProcessorSet processorset = ProcessorSet(processor_num);
 	
-	RMS rms = RMS(1);//uniprocessor
+	RMS rms = RMS(processor_num);//uniprocessor
 	uint j = 0;
 	uint success = 0;
 	while(j++ < exp_t)
