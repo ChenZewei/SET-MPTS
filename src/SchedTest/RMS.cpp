@@ -33,7 +33,6 @@ bool RMS::is_RM_schedulable(TaskSet taskset)
 		temp /= t_num;
 		bound = t_num;
 		bound *= pow(2,temp.get_d())-1;
-		cout << "Bound: " << bound.get_d() << endl;
 		if(taskset.get_utilization_sum() <= bound)
 			return true;
 		else

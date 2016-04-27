@@ -111,6 +111,10 @@ class TaskSet
 		fraction_t density_max;
 	public:
 		TaskSet();
+		~TaskSet()
+		{
+			tasks.clear();
+		}
 		void add_task(uint wcet, uint period, uint deadline = 0)
 		{
 			fraction_t utilization_new = wcet, density_new = wcet;

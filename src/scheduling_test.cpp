@@ -9,39 +9,42 @@ using namespace std;
 
 int main(int argc,char** argv)
 {
-	if(2 != argc)
+	if(3 != argc)
 	{
-		cout<<"Usage: ./test [positive task number]"<<endl;
+		cout<<"Usage: ./test [positive task number] [positive experiment times]"<<endl;
 		return 0;
 	}
 	
 	uint task_num = atoi(argv[1]);
+	uint exp_t = atoi(argv[2]);
 
-	if(0 >= task_num)
+	if(0 >= task_num || 0 >= exp_t)
 	{
-		cout<<"Usage: ./test [positive task number]"<<endl;
+		cout<<"Usage: ./test [positive task number] [positive experiment times]"<<endl;
 		return 0; 
 	}
 
 	//ProcessorSet processorset = ProcessorSet(processor_num);
-	TaskSet taskset = TaskSet();
-	RMS rms = RMS(1);//uniprocessor
 	
-	for(int i = 1; i <= task_num; i++)
+	RMS rms = RMS(1);//uniprocessor
+	uint j = 0;
+	uint success = 0;
+	while(j++ < exp_t)
 	{
-		int wcet = int(exponential_gen(5)*100);
-		if(0 == wcet)
-			wcet++;
-		int period = 500;
-		taskset.add_task(wcet,period);	
+		TaskSet taskset = TaskSet();
+		for(int i = 1; i <= task_num; i++)
+		{
+			int wcet = int(exponential_gen(5)*100);
+			if(0 == wcet)
+				wcet++;
+			int period = 500;
+			taskset.add_task(wcet,period);	
+		}
+		if(rms.is_RM_schedulable(taskset))
+			success++;
 	}
-
-	for(int i = 0; i < task_num; i++)
-	{
-		cout << "Task " << i << ": Utilization: "<< taskset.get_task_utilization(i) << endl;
-	}
-	cout << fixed;
-	cout << "Total utilization:" << taskset.get_utilization_sum().get_d() << endl;
-	cout << "RM schedulability:" << (rms.is_RM_schedulable(taskset)?"true":"false") << endl;
+	fraction_t rate(success, exp_t);
+	
+	cout << "RM schedulability rate:" << rate << endl;
 
 }
