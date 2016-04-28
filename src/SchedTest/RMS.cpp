@@ -2,9 +2,9 @@
 #include "../../include/SchedTest/RMS.h"
 using namespace std;
 
-RMS::RMS(uint p_num)
+RMS::RMS(ProcessorSet &p)
 {
-	processor_num = p_num;
+	processors = p;
 }
 
 bool RMS::is_uniprocessor()
