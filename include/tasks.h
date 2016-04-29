@@ -158,6 +158,18 @@ class TaskSet
 		{
 			return tasks[index].get_density();
 		}
+		uint get_task_wcet(uint index)
+		{
+			return tasks[index].get_wcet();
+		}
+		uint get_task_deadline(uint index)
+		{
+			return tasks[index].get_deadline();
+		}
+		uint get_task_period(uint index)
+		{
+			return tasks[index].get_period();
+		}
 		
 		fraction_t get_utilization_sum();
 		fraction_t get_utilization_max();

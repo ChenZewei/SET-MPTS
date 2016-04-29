@@ -3,6 +3,7 @@
 #include "../include/tasks.h"
 #include "../include/SchedTest/RMS.h"
 #include "../include/SchedTest/partitioned_sched.h"
+#include "../include/SchedTest/schedulability_test.h"
 #include "../include/processors.h"
 #include "../include/random_gen.h"
 
@@ -35,10 +36,13 @@ int main(int argc,char** argv)
 		TaskSet taskset = TaskSet();
 		for(int i = 1; i <= task_num; i++)
 		{
-			int wcet = int(exponential_gen(5)*100);
+			int period = uniform_integral_gen(100,500);
+			fraction_t u = exponential_gen(10);
+			int wcet = int(period*u.get_d());
 			if(0 == wcet)
 				wcet++;
-			int period = 500;
+			else if(wcet > period)
+				wcet = period;
 			taskset.add_task(wcet,period);	
 		}
 		if(is_RM_schedulable(taskset, processorset))
