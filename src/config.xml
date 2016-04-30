@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+	<experiment_times>1000</experiment_times>
+	<lambda>
+		<data>10</data>
+	</lambda>
+	<step>
+		<data>0.05</data>
+	</step>
+	<init_utilization_range>
+		<data>
+			<min>0.2</min>
+			<max>4</max>
+		</data>
+	</init_utilization_range>
+	<processor_num>
+		<data>4</data>	
+	</processor_num>
+	<period_range>
+		<data>
+			<min>100</min>
+			<max>200</max>
+		</data>
+		<data>
+			<min>200</min>
+			<max>400</max>
+		</data>
+	</period_range>
+</parameters>
