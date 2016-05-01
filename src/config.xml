@@ -5,12 +5,12 @@
 		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.05</data>
+		<data>0.1</data>
 	</step>
 	<init_utilization_range>
 		<data>
 			<min>0.2</min>
-			<max>4</max>
+			<max>3</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>

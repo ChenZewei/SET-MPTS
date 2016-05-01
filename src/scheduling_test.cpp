@@ -16,6 +16,8 @@
 
 using namespace std;
 
+string output_filename(int lambda, double step, int p_num, range u_range, range p_range);
+
 int main(int argc,char** argv)
 {
 	if(2 != argc)
@@ -52,14 +54,14 @@ int main(int argc,char** argv)
 					for(int m = 0; m < p_ranges.size(); m++)
 					{
 						fstream fs;
-						fs.open(path, fstream::in|fstream::out|fstream::app);
+						string file_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + path;
+						fs.open(file_name, fstream::in|fstream::out|fstream::app);
 						fraction_t u_ceil = u_ranges[k].min;
 
 						do
 						{
 							int x = 0;
 							uint success = 0;
-							char *buffer = new char[MAX_LEN];
 							while(x++ < exp_t)
 							{
 								TaskSet taskset = TaskSet();
@@ -87,22 +89,22 @@ int main(int argc,char** argv)
 								if(is_Partitioned_EDF_Schedulable(taskset, processorset))
 									success++;
 							}
-							fraction_t ratio(success, exp_t);	
-							//int i = sprintf(buffer,"lambda:%d\tstep:%s\tutilization range:[%s,%s]\tprocessor number:%d\tperiod range:[%d,%d]\tschedulability ratio:%s",&lambdas[i],&steps[j].get_str(),&u_ranges[k].min.get_str(),&u_ranges[k].max.get_str(),&processors[l],&p_ranges[m].min.get_str(),&p_ranges[m].max.get_str(),&ratio.get_str());
-							//cout<<lambdas[i]<<endl;
-							cout<<"Lambda:"<<lambdas[i]<<" processor number:"<<processors[l]<<" step:"<<steps[j]<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"] U:"<<u_ceil.get_d()<<" ratio:"<<ratio<<endl;
-/*				
+							fraction_t ratio(success, exp_t);
+							//cout<<"Lambda:"<<lambdas[i]<<" processor number:"<<processors[l]<<" step:"<<steps[j]<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"] U:"<<u_ceil.get_d()<<" ratio:"<<ratio<<endl; 
 							stringstream buf;
-							buf<<"lambda2:"<<lambdas[i];
-							string str;buf >> str;							
-							cout<<str<<endl;
-							fs.write(buffer,i);
-*/
-							delete[] buffer;
+							string str;
+							buf<<"Lambda:"<<lambdas[i]<<" ";					
+							buf<<" processor number:"<<processors[l]<<" ";
+							buf<<" step:"<<steps[j]<<" ";
+							buf<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] ";
+							buf<<"period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"] ";
+							buf<<"U:"<<u_ceil.get_d()<<" ";	
+							buf<<" ratio:"<<ratio<<"\n";					
+							fs.write(buf.str().data(),buf.str().length());
+							buf.flush();
+
 
 						}while((u_ceil += steps[j]) < u_ranges[k].max);
-
-
 
 						fs.close();
 					}
@@ -111,4 +113,11 @@ int main(int argc,char** argv)
 		}
 	}
 
+}
+
+string output_filename(int lambda, double step, int p_num, range u_range, range p_range)
+{
+	stringstream buf;
+	buf<<"l:"<<lambda<<"-"<<"s:"<<step<<"-"<<"P:"<<p_num<<"-"<<"u:["<<u_range.min<<","<<u_range.max<<"]-"<<"p:["<<p_range.min<<","<<p_range.max<<"]-";
+	return buf.str();
 }
