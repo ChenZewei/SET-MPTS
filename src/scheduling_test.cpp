@@ -53,11 +53,18 @@ int main(int argc,char** argv)
 				{
 					for(int m = 0; m < p_ranges.size(); m++)
 					{
-						fstream fs;
+						
 						string file_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + path;
-						fs.open(file_name, fstream::in|fstream::out|fstream::app);
+						ofstream output_file (file_name);
 						fraction_t u_ceil = u_ranges[k].min;
-
+						stringstream buf;
+						output_file<<"Lambda:"<<lambdas[i]<<" ";					
+						output_file<<" processor number:"<<processors[l]<<" ";
+						output_file<<" step:"<<steps[j]<<" ";
+						output_file<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] ";
+						output_file<<"period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"]\n";
+						//fs.write(buf.str().data(),buf.str().length());
+						output_file.flush();
 						do
 						{
 							int x = 0;
@@ -86,27 +93,20 @@ int main(int argc,char** argv)
 									}
 									taskset.add_task(wcet,period);	
 								}
-								if(is_Partitioned_EDF_Schedulable(taskset, processorset))
+								if(is_schedulable(taskset, processorset,BCL_EDF))
 									success++;
 							}
 							fraction_t ratio(success, exp_t);
 							//cout<<"Lambda:"<<lambdas[i]<<" processor number:"<<processors[l]<<" step:"<<steps[j]<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"] U:"<<u_ceil.get_d()<<" ratio:"<<ratio<<endl; 
-							stringstream buf;
-							string str;
-							buf<<"Lambda:"<<lambdas[i]<<" ";					
-							buf<<" processor number:"<<processors[l]<<" ";
-							buf<<" step:"<<steps[j]<<" ";
-							buf<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] ";
-							buf<<"period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"] ";
-							buf<<"U:"<<u_ceil.get_d()<<" ";	
-							buf<<" ratio:"<<ratio<<"\n";					
-							fs.write(buf.str().data(),buf.str().length());
-							buf.flush();
-
+							
+							output_file<<"Utilization:"<<u_ceil.get_d()<<" ";
+							output_file<<"Ratio:"<<ratio<<"\n";					
+							//fs.write(buf.str().data(),buf.str().length());
+							output_file.flush();
+							
 
 						}while((u_ceil += steps[j]) < u_ranges[k].max);
-
-						fs.close();
+						output_file.close();
 					}
 				}
 			}
