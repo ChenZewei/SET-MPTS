@@ -9,12 +9,12 @@
 		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.1</data>
+		<data>0.05</data>
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>0.2</min>
-			<max>3</max>
+			<min>0</min>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
@@ -24,10 +24,6 @@
 		<data>
 			<min>100</min>
 			<max>200</max>
-		</data>
-		<data>
-			<min>200</min>
-			<max>400</max>
 		</data>
 	</period_range>
 </parameters>

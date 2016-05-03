@@ -1,9 +1,9 @@
 
 test:scheduling_test.o tasks.o processors.o tinyxml2.o
-	g++ -std=c++11 -o test scheduling_test.o tasks.o processors.o tinyxml2.o -lgmpxx -lgmp
+	g++ -std=c++11 -o test scheduling_test.o tasks.o processors.o tinyxml2.o -lgmpxx -lgmp -lmgl
 
 scheduling_test.o:scheduling_test.cpp
-	g++ -std=c++11 -c scheduling_test.cpp
+	g++ -std=c++11 -std=gnu++11 -fext-numeric-literals -c scheduling_test.cpp
 
 tasks.o:tasks.cpp
 	g++ -std=c++11 -c tasks.cpp

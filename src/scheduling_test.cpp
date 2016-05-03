@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <string>
 #include <sstream>
+#include <string>
 #include "../include/tasks.h"
 #include "../include/SchedTest/RMS.h"
 #include "../include/SchedTest/partitioned_sched.h"
@@ -10,6 +10,7 @@
 #include "../include/processors.h"
 #include "../include/random_gen.h"
 #include "../include/xml.h"
+#include "mgl2/mgl.h"
 
 #define MAX_LEN 100
 
@@ -53,17 +54,15 @@ int main(int argc,char** argv)
 				{
 					for(int m = 0; m < p_ranges.size(); m++)
 					{
-						
+						double_set r;
 						string file_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + path;
 						ofstream output_file (file_name);
 						fraction_t u_ceil = u_ranges[k].min;
-						stringstream buf;
 						output_file<<"Lambda:"<<lambdas[i]<<" ";					
 						output_file<<" processor number:"<<processors[l]<<" ";
 						output_file<<" step:"<<steps[j]<<" ";
 						output_file<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] ";
 						output_file<<"period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"]\n";
-						//fs.write(buf.str().data(),buf.str().length());
 						output_file.flush();
 						do
 						{
@@ -93,20 +92,44 @@ int main(int argc,char** argv)
 									}
 									taskset.add_task(wcet,period);	
 								}
-								if(is_schedulable(taskset, processorset,BCL_EDF))
+								//if(is_schedulable(taskset, processorset,BCL_EDF))
+									//success++;
+								if(is_Partitioned_EDF_Schedulable(taskset, processorset))
 									success++;
 							}
 							fraction_t ratio(success, exp_t);
 							//cout<<"Lambda:"<<lambdas[i]<<" processor number:"<<processors[l]<<" step:"<<steps[j]<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"] U:"<<u_ceil.get_d()<<" ratio:"<<ratio<<endl; 
 							
 							output_file<<"Utilization:"<<u_ceil.get_d()<<" ";
-							output_file<<"Ratio:"<<ratio<<"\n";					
-							//fs.write(buf.str().data(),buf.str().length());
+							output_file<<"Ratio:"<<ratio<<"\n";
 							output_file.flush();
-							
+							r.push_back(ratio.get_d());
 
 						}while((u_ceil += steps[j]) < u_ranges[k].max);
+
 						output_file.close();
+						
+						mglGraph gr;
+						mglData y(r.size());
+						for(int i = 0; i < r.size(); i++)
+						{
+							y.a[i] = r[i];
+						}
+						
+						//gr.Rotate(50,60);
+						//gr.Light(false);
+						//gr.Surf(dat);
+						//gr.Cont(dat,"y");
+						gr.Title("Partitioned EDF");
+						gr.SetOrigin(0,0);
+						gr.SetRange('x', u_ranges[k].min, u_ranges[k].max);
+						gr.SetRange('y', 0, 1);
+						gr.Label('x',"x: TaskSet Utilization", 0);
+						gr.Label('y',"y: Ratio", 0);
+						gr.Plot(y,"b");
+						gr.Axis();
+						string png_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + ".png";
+						gr.WriteFrame(png_name.data());
 					}
 				}
 			}
