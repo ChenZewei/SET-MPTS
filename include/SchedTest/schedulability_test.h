@@ -6,7 +6,7 @@
 #define BCL_FTP 0
 #define BCL_EDF 1
 
-bool is_schedulable(TaskSet taskset, ProcessorSet processorset, uint TEST_METHOD)
+bool is_schedulable(TaskSet taskset, ProcessorSet processorset, unsigned int TEST_METHOD)
 {
 	bool schedulable;
 	switch(TEST_METHOD)

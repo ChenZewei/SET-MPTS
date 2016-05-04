@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <QApplication>
 #include "../include/tasks.h"
 #include "../include/SchedTest/RMS.h"
 #include "../include/SchedTest/partitioned_sched.h"
@@ -11,6 +12,7 @@
 #include "../include/random_gen.h"
 #include "../include/xml.h"
 #include "mgl2/mgl.h"
+#include "mainwindow.h"
 
 #define MAX_LEN 100
 
@@ -26,13 +28,17 @@ int main(int argc,char** argv)
 		cout<<"Usage: ./test [output file path]"<<endl;
 		return 0;
 	}
-	
+	#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+	QApplication::setGraphicsSystem("raster");
+	#endif
+	QApplication a(argc, argv);
+			
 	string path = argv[1];
 
 	int_set lambdas, processors;
 	double_set steps;
 	range_set p_ranges, u_ranges;
-	uint exp_t;
+	unsigned int exp_t;
 	
 	config.LoadFile("config.xml");
 
@@ -42,7 +48,6 @@ int main(int argc,char** argv)
 	get_period_range(&p_ranges);
 	get_utilization_range(&u_ranges);
 	get_step(&steps);
-
 
 	for(int i = 0; i < lambdas.size(); i++)
 	{
@@ -67,7 +72,7 @@ int main(int argc,char** argv)
 						do
 						{
 							int x = 0;
-							uint success = 0;
+							unsigned int success = 0;
 							while(x++ < exp_t)
 							{
 								TaskSet taskset = TaskSet();
@@ -109,13 +114,26 @@ int main(int argc,char** argv)
 
 						output_file.close();
 						
+						//QCustomPlot
+						QVector<double> qy(r.size());
+						
+						for(int i = 0; i < r.size(); i++)
+						{
+							qy[i] = r[i];
+						}
+						
+						
+						MainWindow w(u_ranges[k], steps[j], qy);
+						w.show();
+
+
+						//mathGL
 						mglGraph gr;
 						mglData y(r.size());
 						for(int i = 0; i < r.size(); i++)
 						{
 							y.a[i] = r[i];
 						}
-						
 						//gr.Rotate(50,60);
 						//gr.Light(false);
 						//gr.Surf(dat);
@@ -130,12 +148,13 @@ int main(int argc,char** argv)
 						gr.Axis();
 						string png_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + ".png";
 						gr.WriteFrame(png_name.data());
+
 					}
 				}
 			}
 		}
-	}
-
+	}							
+	return a.exec();
 }
 
 string output_filename(int lambda, double step, int p_num, range u_range, range p_range)

@@ -20,7 +20,7 @@ bool is_Partitioned_FTP_Schedulable(TaskSet taskset, ProcessorSet processorset)
 
 bool is_Partitioned_EDF_Schedulable(TaskSet taskset, ProcessorSet processorset)//for both implicit and constraint deadline task mode
 {
-	uint processor_num = processorset.get_processor_num();
+	unsigned int processor_num = processorset.get_processor_num();
 	if(taskset.get_density_sum() <= processor_num - (processor_num - 1)*taskset.get_density_max())
 		return true;
 	else

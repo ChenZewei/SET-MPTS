@@ -3,27 +3,16 @@
 
 #include <string>
 #include <iostream>
-#include <vector>
 #include "tinyxml2.h"
 #include "types.h"
 
 using namespace tinyxml2;
 using namespace std;
 
-typedef struct
-{
-	double min;
-	double max;
-}range;
-
-typedef vector<int> int_set;
-typedef vector<double> double_set;
-typedef vector<range> range_set;
-
 
 XMLDocument config;
 
-uint get_experiment_times()
+unsigned int get_experiment_times()
 {
 	const char* content;
 	XMLElement *root = config.RootElement();

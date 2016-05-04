@@ -2,11 +2,11 @@
 
 ////////////////////////////Task//////////////////////////////
 
-Task::Task(uint id,
-	uint wcet, 
-   	uint period,
-   	uint deadline,
-    	uint priority)
+Task::Task(unsigned int id,
+	unsigned int wcet, 
+   	unsigned int period,
+   	unsigned int deadline,
+    	unsigned int priority)
 {
 	this->id = id;
 	this->wcet = wcet;
@@ -25,7 +25,7 @@ Task::Task(uint id,
 		density /= this->period;
 }
 
-uint Task::DBF(uint time)
+unsigned int Task::DBF(unsigned int time)
 {
 	if(time >= deadline)
 		return ((time - deadline)/period+1)*wcet;
@@ -90,7 +90,7 @@ void TaskSet::get_utilization_sum(fraction_t &utilization_sum)
 {
 	fraction_t temp;
 	utilization_sum = 0;
-	for(int i; i < tasks.size(); i++)
+	for(int i = 0; i < tasks.size(); i++)
 	{
 		temp = tasks[i].get_wcet();
 		temp /= tasks[i].get_period();
@@ -108,7 +108,7 @@ void TaskSet::get_density_sum(fraction_t &density_sum)
 {
 	fraction_t temp;
 	density_sum = 0;
-	for(int i; i < tasks.size(); i++)
+	for(int i = 0; i < tasks.size(); i++)
 	{
 		temp = tasks[i].get_wcet();
 		temp /= std::min(tasks[i].get_deadline(),tasks[i].get_period());

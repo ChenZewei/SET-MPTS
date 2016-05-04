@@ -27,7 +27,7 @@ fraction_t Processor::get_density()
 void Processor::update(TaskSet taskset)
 {	
 	utilization = 0;
-	list<uint>::iterator it = queue.begin();
+	list<unsigned int>::iterator it = queue.begin();
 	density = 0;
 	for(; it != queue.end(); it++)
 	{
@@ -36,15 +36,15 @@ void Processor::update(TaskSet taskset)
 	}
 }
 
-void Processor::add_task(TaskSet taskset, uint id)
+void Processor::add_task(TaskSet taskset, unsigned int id)
 {
 	queue.push_back(id);
 	update(taskset);
 }
 
-void Processor::remove_task(TaskSet taskset, uint id)
+void Processor::remove_task(TaskSet taskset, unsigned int id)
 {
-	list<uint>::iterator it = queue.begin();
+	list<unsigned int>::iterator it = queue.begin();
 	for(int i = 0; it != queue.end(); it++, i++)
 	{
 		if(id == *it)
@@ -58,13 +58,13 @@ void Processor::remove_task(TaskSet taskset, uint id)
 
 ///////////////////////////ProcessorSet/////////////////////////////
 
-ProcessorSet::ProcessorSet(uint num)//for identical multiprocessor platform
+ProcessorSet::ProcessorSet(unsigned int num)//for identical multiprocessor platform
 {
 	for(int i = 0; i < num; i++)
 		processors.push_back(Processor());
 }
 
-uint ProcessorSet::get_processor_num()
+unsigned int ProcessorSet::get_processor_num()
 {
 	return processors.size();
 }

@@ -1,13 +1,12 @@
 #ifndef PROCESSORS_H
 #define PROCESSORS_H
-#include <vector>
 #include <list>
 #include "tasks.h"
 #include "types.h"
 
 using namespace std;
 
-typedef list<uint> TaskQueue;//之所以用list是因为list是双向链表，适合增删比较频繁的情况
+typedef list<unsigned int> TaskQueue;//之所以用list是因为list是双向链表，适合增删比较频繁的情况
 
 class Processor
 {
@@ -24,8 +23,8 @@ class Processor
 		fraction_t get_density();
 		void update(TaskSet taskset);
 
-		void add_task(TaskSet taskset, uint id);
-		void remove_task(TaskSet taskset, uint id);
+		void add_task(TaskSet taskset, unsigned int id);
+		void remove_task(TaskSet taskset, unsigned int id);
 		
 	
 };
@@ -37,7 +36,7 @@ class ProcessorSet
 	private:
 		Processors processors;
 	public:
-		ProcessorSet(uint num);//for identical multiprocessor platform
-		uint get_processor_num();
+		ProcessorSet(unsigned int num);//for identical multiprocessor platform
+		unsigned int get_processor_num();
 };
 #endif
