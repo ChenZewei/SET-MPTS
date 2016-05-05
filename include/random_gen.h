@@ -13,9 +13,9 @@ double exponential_gen(double lambda)
 	return distribution(generator);
 }
 
-int uniform_integral_gen(int min, int max)
+int uniform_integral_gen(long min, long max)
 {
-	uniform_int_distribution<int> distribution(min, max);
+	uniform_int_distribution<long> distribution(min, max);
 	return distribution(generator);
 }
 

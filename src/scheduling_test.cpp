@@ -134,9 +134,9 @@ void tast_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil)
 {
 	while(taskset->get_utilization_sum() < u_ceil)//generate tasks
 	{
-		int period = uniform_integral_gen(int(p_range.min),int(p_range.max));
+		long period = uniform_integral_gen(long(p_range.min),long(p_range.max));
 		fraction_t u = exponential_gen(lambda);
-		int wcet = int(period*u.get_d());
+		long wcet = long(period*u.get_d());
 		if(0 == wcet)
 			wcet++;
 		else if(wcet > period)
