@@ -14,83 +14,82 @@ class Task
 {
 	private:
 		uint id;
-		uint wcet;
-		uint wcet_critical_sections
-		uint wcet_non_critical_sections
-		uint spin
-		uint self_suspension
-		uint local_blocking
-		uint total_blocking
-		uint jitter
-		uint deadline;
-		uint period;
+		ulong wcet;
+		ulong wcet_critical_sections;
+		ulong wcet_non_critical_sections;
+		ulong spin;
+		ulong self_suspension;
+		ulong local_blocking;
+		ulong total_blocking;
+		ulong jitter;
+		ulong response_time;
+		ulong deadline;
+		ulong period;
 		uint priority;
+		uint partition;
+		bool independent;
 		fraction_t utilization;
 		fraction_t density;
 		Ratio ratio;//for heterogeneous platform
 	public:
 		Task(uint id,
-			uint wcet, 
-			uint period,
-			uint deadline = 0,
+			ulong wcet, 
+			ulong period,
+			ulong deadline = 0,
 			uint priority = 0);
 		
-		uint get_id()
-		{
-			return id;
-		}
-		uint get_wcet()
-		{
-			return wcet;
-		}
-		uint get_wcet_critical_sections()
-		{
-			return wcet_critical_sections;
-		}
-		uint get_wcet_non_critical_sections()
-		{
-			return wcet_non_critical_sections;
-		}
-		uint get_spin()
-		{
-			return spin;
-		}
-		uint get_local_blocking()
-		{
-			return local_blocking;
-		}
-		uint get_total_blocking()
-		{
-			return total_blocking;
-		}
-		uint get_self_suspension()
-		{
-			return self_suspension;
-		}
-		uint get_jitter()
-		{
-			return jitter;
-		}
-		uint get_deadline()
-		{
-			return deadline;
-		}
-		uint get_period()
-		{
-			return period;
-		}
-		bool is_feasible()
+		uint get_id() const { return id; }
+		ulong get_wcet() const	{ return wcet; }
+		ulong get_wcet_critical_sections() const { return wcet_critical_sections; }
+		ulong get_wcet_non_critical_sections() const {	return wcet_non_critical_sections; }
+		ulong get_spin() const	{ return spin; }
+		ulong get_local_blocking() const { return local_blocking; }
+		ulong get_total_blocking() const { return total_blocking; }
+		ulong get_self_suspension() const { return self_suspension; }
+		ulong get_jitter() const { return jitter; }
+		ulong get_response_time() const { return response_time; }
+		ulong get_deadline() const { return deadline; }
+		ulong get_period() const { return period; }
+		uint get_priority() const { return priority; }
+		uint get_partition() const { return partition; }
+		bool is_independent() const { return independent; }
+		bool is_feasible() const 
 		{
 			return deadline >= wcet && period >= wcet && wcet > 0;
 		}
 		
-		uint DBF(uint time);//Demand Bound Function
+		ulong DBF(ulong interval);//Demand Bound Function
+		uint get_max_num_jobs(ulong interval);//max number of jobs in an arbitrary length of interval
 		void DBF();
 		fraction_t get_utilization();
 		fraction_t get_density();
 		void get_utilization(fraction_t &utilization);
 		void get_density(fraction_t &density);
 	
+};
+
+class Request
+{
+private:
+	uint resource_id;
+	uint num_requests;
+	ulong max_length;
+	ulong total_length;
+	const Task*    task;
+
+public:
+	Request(uint res_id,
+		uint num,
+		ulong max_len,
+		ulong total_len,
+		const Task* tsk);
+
+	uint get_resource_id() const { return resource_id; }
+	uint get_num_requests() const { return num_requests; }
+	ulong get_max_length() const { return max_length; }
+	ulong get_total_length() const { return total_length; }
+	const Task* get_task() const { return task; }
+	ulong get_max_num_requests(ulong interval) const;
 };
 
 typedef vector<uint> Jobs;//wcet
