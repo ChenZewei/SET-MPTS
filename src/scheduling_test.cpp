@@ -18,7 +18,8 @@
 using namespace std;
 
 string output_filename(int lambda, double step, int p_num, range u_range, range p_range);
-void tast_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil);
+void task_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil);
+void requests_gen();
 
 int main(int argc,char** argv)
 {
@@ -75,7 +76,7 @@ int main(int argc,char** argv)
 								TaskSet taskset = TaskSet();
 								ProcessorSet processorset = ProcessorSet(processors[l]);
 								
-								tast_gen(&taskset, lambdas[i], p_ranges[m], u_ceil.get_d());
+								task_gen(&taskset, lambdas[i], p_ranges[m], u_ceil.get_d());
 					
 								//if(is_schedulable(taskset, processorset,BCL_EDF))
 									//success++;
@@ -130,12 +131,13 @@ string output_filename(int lambda, double step, int p_num, range u_range, range 
 	return buf.str();
 }
 
-void tast_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil)
+void task_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil)
 {
 	while(taskset->get_utilization_sum() < u_ceil)//generate tasks
 	{
 		long period = uniform_integral_gen(long(p_range.min),long(p_range.max));
 		fraction_t u = exponential_gen(lambda);
+		requests_gen();
 		long wcet = long(period*u.get_d());
 		if(0 == wcet)
 			wcet++;
@@ -151,4 +153,9 @@ void tast_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil)
 		}
 		taskset->add_task(wcet,period);	
 	}
+}
+
+void requests_gen()
+{
+
 }
