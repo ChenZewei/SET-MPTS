@@ -78,7 +78,14 @@ class Task
 		uint get_partition() const { return partition; }
 		const Resource_Requests& get_requests() const {	return requests; }
 		bool is_independent() const { return independent; }
-		bool is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }		
+		bool is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
+
+		void add_request(uint res_id, uint num,
+				 ulong max_len, ulong total_len)
+		{
+			requests.push_back(Request(res_id, num, max_len, total_len));
+		}
+	
 		
 		uint get_max_num_jobs(ulong interval); //max number of jobs in an arbitrary length of interval
 		ulong DBF(ulong interval);//Demand Bound Function
