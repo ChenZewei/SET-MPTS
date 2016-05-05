@@ -3,13 +3,13 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "../include/tasks.h"
-#include "../include/SchedTest/RMS.h"
-#include "../include/SchedTest/partitioned_sched.h"
-#include "../include/SchedTest/schedulability_test.h"
-#include "../include/processors.h"
-#include "../include/random_gen.h"
-#include "../include/xml.h"
+#include "tasks.h"
+#include "RMS.h"
+#include "partitioned_sched.h"
+#include "schedulability_test.h"
+#include "processors.h"
+#include "random_gen.h"
+#include "xml.h"
 #include "mgl2/mgl.h"
 
 #define MAX_LEN 100
@@ -18,9 +18,11 @@
 using namespace std;
 
 string output_filename(int lambda, double step, int p_num, range u_range, range p_range);
+void tast_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil);
 
 int main(int argc,char** argv)
 {
+	/*
 	if(2 != argc)
 	{
 		cout<<"Usage: ./test [output file path]"<<endl;
@@ -28,7 +30,7 @@ int main(int argc,char** argv)
 	}
 	
 	string path = argv[1];
-
+	*/
 	int_set lambdas, processors;
 	double_set steps;
 	range_set p_ranges, u_ranges;
@@ -55,7 +57,7 @@ int main(int argc,char** argv)
 					for(int m = 0; m < p_ranges.size(); m++)
 					{
 						double_set r;
-						string file_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + path;
+						string file_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + ".csv";
 						ofstream output_file (file_name);
 						fraction_t u_ceil = u_ranges[k].min;
 						output_file<<"Lambda:"<<lambdas[i]<<" ";					
@@ -73,25 +75,8 @@ int main(int argc,char** argv)
 								TaskSet taskset = TaskSet();
 								ProcessorSet processorset = ProcessorSet(processors[l]);
 								
-								while(taskset.get_utilization_sum() < u_ceil)//generate tasks
-								{
-									int period = uniform_integral_gen(int(p_ranges[m].min),int(p_ranges[m].max));
-									fraction_t u = exponential_gen(lambdas[i]);
-									int wcet = int(period*u.get_d());
-									if(0 == wcet)
-										wcet++;
-									else if(wcet > period)
-										wcet = period;
-									fraction_t temp(wcet, period);
-									if(taskset.get_utilization_sum() + temp > u_ceil)
-									{
-										temp = u_ceil - taskset.get_utilization_sum();
-										wcet = floor(temp.get_d()*period);
-										taskset.add_task(wcet, period);
-										break;
-									}
-									taskset.add_task(wcet,period);	
-								}
+								tast_gen(&taskset, lambdas[i], p_ranges[m], u_ceil.get_d());
+					
 								//if(is_schedulable(taskset, processorset,BCL_EDF))
 									//success++;
 								if(is_Partitioned_EDF_Schedulable(taskset, processorset))
@@ -100,7 +85,7 @@ int main(int argc,char** argv)
 							fraction_t ratio(success, exp_t);
 							//cout<<"Lambda:"<<lambdas[i]<<" processor number:"<<processors[l]<<" step:"<<steps[j]<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"] U:"<<u_ceil.get_d()<<" ratio:"<<ratio<<endl; 
 							
-							output_file<<"Utilization:"<<u_ceil.get_d()<<" ";
+							output_file<<"Utilization:"<<u_ceil.get_d()<<",";
 							output_file<<"Ratio:"<<ratio<<"\n";
 							output_file.flush();
 							r.push_back(ratio.get_d());
@@ -143,4 +128,27 @@ string output_filename(int lambda, double step, int p_num, range u_range, range 
 	stringstream buf;
 	buf<<"l:"<<lambda<<"-"<<"s:"<<step<<"-"<<"P:"<<p_num<<"-"<<"u:["<<u_range.min<<","<<u_range.max<<"]-"<<"p:["<<p_range.min<<","<<p_range.max<<"]-";
 	return buf.str();
+}
+
+void tast_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil)
+{
+	while(taskset->get_utilization_sum() < u_ceil)//generate tasks
+	{
+		int period = uniform_integral_gen(int(p_range.min),int(p_range.max));
+		fraction_t u = exponential_gen(lambda);
+		int wcet = int(period*u.get_d());
+		if(0 == wcet)
+			wcet++;
+		else if(wcet > period)
+			wcet = period;
+		fraction_t temp(wcet, period);
+		if(taskset->get_utilization_sum() + temp > u_ceil)
+		{
+			temp = u_ceil - taskset->get_utilization_sum();
+			wcet = floor(temp.get_d()*period);
+			taskset->add_task(wcet, period);
+			break;
+		}
+		taskset->add_task(wcet,period);	
+	}
 }

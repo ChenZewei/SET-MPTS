@@ -19,10 +19,4 @@ int uniform_integral_gen(int min, int max)
 	return distribution(generator);
 }
 
-
-
-
-
-
-
 #endif

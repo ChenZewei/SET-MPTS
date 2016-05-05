@@ -123,3 +123,15 @@ void TaskSet::get_density_max(fraction_t &density_max)
 			density_max = tasks[i].get_density();
 }
 
+/////////////////////////////Others///////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
