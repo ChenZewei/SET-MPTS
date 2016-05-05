@@ -1,11 +1,12 @@
 #include "../include/tasks.h"
+#include "math-helper.h"
 
 ////////////////////////////Task//////////////////////////////
 
 Task::Task(uint id,
-	uint wcet, 
-   	uint period,
-   	uint deadline,
+	ulong wcet, 
+   	ulong period,
+   	ulong deadline,
     	uint priority)
 {
 	this->id = id;
@@ -25,12 +26,19 @@ Task::Task(uint id,
 		density /= this->period;
 }
 
-uint Task::DBF(uint time)
+ulong Task::DBF(ulong time)
 {
 	if(time >= deadline)
 		return ((time - deadline)/period+1)*wcet;
 	else 
 		return 0;
+}
+
+uint Task::get_max_num_jobs(ulong interval)
+{
+	uint num_jobs;
+	num_jobs = ceiling(interval + get_response_time(), get_period());
+	return num_jobs;
 }
 
 fraction_t Task::get_utilization()
