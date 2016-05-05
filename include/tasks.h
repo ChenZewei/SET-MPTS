@@ -20,7 +20,7 @@ class Task
 		uint spin
 		uint self_suspension
 		uint local_blocking
-		uint blocking
+		uint total_blocking
 		uint jitter
 		uint deadline;
 		uint period;
@@ -59,9 +59,9 @@ class Task
 		{
 			return local_blocking;
 		}
-		uint get_blocking()
+		uint get_total_blocking()
 		{
-			return blocking;
+			return total_blocking;
 		}
 		uint get_self_suspension()
 		{
