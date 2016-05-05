@@ -5,10 +5,33 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-#include "types.h"
+#include "math-helper.h"
 using namespace std;
 
 typedef vector<fraction_t> Ratio;
+
+
+class Request
+{
+	private:
+		uint resource_id;
+		uint num_requests;
+		ulong max_length;
+		ulong total_length;
+
+	public:
+		Request(uint resource_id = 0,
+			uint num_requests = 0,
+			ulong max_length = 0,
+			ulong total_length = 0);
+
+		uint get_resource_id() const { return resource_id; }
+		uint get_num_requests() const { return num_requests; }
+		ulong get_max_length() const { return max_length; }
+		ulong get_total_length() const { return total_length; }
+};
+
+typedef vector<Request> Resource_Requests;
 
 class Task
 {
@@ -31,6 +54,7 @@ class Task
 		fraction_t utilization;
 		fraction_t density;
 		Ratio ratio;//for heterogeneous platform
+		Resource_Requests requests; 
 	public:
 		Task(uint id,
 			ulong wcet, 
@@ -52,44 +76,17 @@ class Task
 		ulong get_period() const { return period; }
 		uint get_priority() const { return priority; }
 		uint get_partition() const { return partition; }
+		const Resource_Requests& get_requests() const {	return requests; }
 		bool is_independent() const { return independent; }
-		bool is_feasible() const 
-		{
-			return deadline >= wcet && period >= wcet && wcet > 0;
-		}
+		bool is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }		
 		
+		uint get_max_num_jobs(ulong interval); //max number of jobs in an arbitrary length of interval
 		ulong DBF(ulong interval);//Demand Bound Function
-		uint get_max_num_jobs(ulong interval);//max number of jobs in an arbitrary length of interval
 		void DBF();
 		fraction_t get_utilization();
 		fraction_t get_density();
 		void get_utilization(fraction_t &utilization);
-		void get_density(fraction_t &density);
-	
-};
-
-class Request
-{
-private:
-	uint resource_id;
-	uint num_requests;
-	ulong max_length;
-	ulong total_length;
-	const Task*    task;
-
-public:
-	Request(uint res_id,
-		uint num,
-		ulong max_len,
-		ulong total_len,
-		const Task* tsk);
-
-	uint get_resource_id() const { return resource_id; }
-	uint get_num_requests() const { return num_requests; }
-	ulong get_max_length() const { return max_length; }
-	ulong get_total_length() const { return total_length; }
-	const Task* get_task() const { return task; }
-	ulong get_max_num_requests(ulong interval) const;
+		void get_density(fraction_t &density);	
 };
 
 typedef vector<uint> Jobs;//wcet
