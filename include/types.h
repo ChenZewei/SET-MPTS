@@ -19,10 +19,18 @@ typedef struct
 {
 	double min;
 	double max;
-}range;
+}Range;
 
-typedef vector<int> int_set;
-typedef vector<double> double_set;
-typedef vector<range> range_set;
+typedef struct
+{
+	double x;
+	double y;
+}Result;
+
+typedef vector<int> Int_Set;
+typedef vector<double> Double_Set;
+typedef vector<Range> Range_Set;
+typedef vector<Result> Result_Set;
+
 
 #endif

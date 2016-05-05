@@ -20,7 +20,7 @@ uint get_experiment_times()
 	return atoi(title->GetText());
 }
 
-void get_lambda(int_set *i_set)
+void get_lambda(Int_Set *i_set)
 {
 	const char* content;
 	XMLElement *root = config.RootElement();
@@ -34,7 +34,7 @@ void get_lambda(int_set *i_set)
 	}
 }
 
-void get_period_range(range_set *r_set)
+void get_period_range(Range_Set *r_set)
 {
 	const char* content;
 	XMLElement *root = config.RootElement();
@@ -42,7 +42,7 @@ void get_period_range(range_set *r_set)
 	XMLElement *subtitle = title->FirstChildElement("data");
 	while(subtitle)
 	{
-		range temp;
+		Range temp;
 		XMLElement *SSubtitle = subtitle->FirstChildElement("min");
 		content = SSubtitle->GetText();
 		fraction_t data(content);
@@ -56,7 +56,7 @@ void get_period_range(range_set *r_set)
 	}
 }
 
-void get_utilization_range(range_set *r_set)
+void get_utilization_range(Range_Set *r_set)
 {
 	const char* content;
 	XMLElement *root = config.RootElement();
@@ -64,7 +64,7 @@ void get_utilization_range(range_set *r_set)
 	XMLElement *subtitle = title->FirstChildElement("data");
 	while(subtitle)
 	{
-		range temp;
+		Range temp;
 		XMLElement *SSubtitle = subtitle->FirstChildElement("min");
 		content = SSubtitle->GetText();
 		floating_t data(content);
@@ -78,7 +78,7 @@ void get_utilization_range(range_set *r_set)
 	}
 }
 
-void get_step(double_set *d_set)
+void get_step(Double_Set *d_set)
 {
 	const char* content;
 	XMLElement *root = config.RootElement();
@@ -93,7 +93,7 @@ void get_step(double_set *d_set)
 	}
 }
 
-void get_processor_num(int_set *i_set)
+void get_processor_num(Int_Set *i_set)
 {
 	const char* content;
 	XMLElement *root = config.RootElement();
