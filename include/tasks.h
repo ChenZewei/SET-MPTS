@@ -15,6 +15,13 @@ class Task
 	private:
 		uint id;
 		uint wcet;
+		uint wcet_critical_sections
+		uint wcet_non_critical_sections
+		uint spin
+		uint self_suspension
+		uint local_blocking
+		uint blocking
+		uint jitter
 		uint deadline;
 		uint period;
 		uint priority;
@@ -35,6 +42,34 @@ class Task
 		uint get_wcet()
 		{
 			return wcet;
+		}
+		uint get_wcet_critical_sections()
+		{
+			return wcet_critical_sections;
+		}
+		uint get_wcet_non_critical_sections()
+		{
+			return wcet_non_critical_sections;
+		}
+		uint get_spin()
+		{
+			return spin;
+		}
+		uint get_local_blocking()
+		{
+			return local_blocking;
+		}
+		uint get_blocking()
+		{
+			return blocking;
+		}
+		uint get_self_suspension()
+		{
+			return self_suspension;
+		}
+		uint get_jitter()
+		{
+			return jitter;
 		}
 		uint get_deadline()
 		{
