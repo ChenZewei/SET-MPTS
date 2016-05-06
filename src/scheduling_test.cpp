@@ -17,10 +17,8 @@
 
 using namespace std;
 
-
 void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
-void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil);
 Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD = 0);
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
@@ -126,49 +124,47 @@ Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, 
 	return results;
 }
 
-/*
-void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...)//up to 6
+Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD)
 {
-	va_list arg_ptr;
-	va_start (arg_ptr,n);
-	vector<Result_Set> result_sets;
-	for(int i = 0; i < n; i++)
-	{	
-		Result_Set temp = va_arg(arg_ptr,Result_Set);
-		result_sets.push_back(temp);
-	}
-	va_end(arg_ptr);
-	const char *line_style[] = {"r*","bo","g+","cs","yd","m^"};
-	mglGraph gr;	
-	gr.SetSize(1280,800);
-	gr.SetQuality(3);
-	mglData y[2];
-	y[0] = mglData(result_sets[0].size());
-	y[1] = mglData(result_sets[1].size());
-	char color[] = {'r','g','b'};
-	char dot[] = {'o','+','x'};
-	gr.Title(title);
-	gr.SetOrigin(0,0,0);
-	gr.SetRange('x', min, max + 0.2);
-	gr.SetTicks('x', 1, 4);
-	gr.SetRange('y', 0, 1.2);	
+	Result_Set results;
+	double utilization = u_range.min;
 	
-	for(int i = 0; i < result_sets.size(); i++)
-	{
-		for(int j = 0; j < result_sets[i].size(); j++)
+	do
+	{	
+		Result result;
+		result.x = utilization;
+		int success = 0;
+		for(int i = 0; i < exp_times; i++)
 		{
-			y[i].a[j] = result_sets[i][j].y;
-		}
-		gr.Plot(y[i],line_style[i]);
-		gr.AddLegend(names[i],line_style[i]);
-	}
+			TaskSet taskset = TaskSet();
+			
+			ProcessorSet processorset = ProcessorSet(p_num);
+			
+			tast_gen(&taskset, lambda, p_range, utilization);
 
-	gr.Box();
-	gr.Label('x',"x: TaskSet Utilization", 0);
-	gr.Label('y',"y: Ratio", 0);
-	gr.Legend();
-	gr.Axis("xy");
-	gr.WritePNG(path);
+			//if(is_schedulable(taskset, processorset,BCL_EDF))
+				//success++;
+			switch(TEST_METHOD)
+			{
+				case 0:
+					if(is_Partitioned_EDF_Schedulable(taskset, processorset))
+						success++;
+					break;
+				case 1:
+					if(is_schedulable(taskset, processorset, 1))
+						success++;
+					break;
+			}
+			
+		}
+
+		fraction_t ratio(success, exp_times);
+		result.y = ratio.get_d();
+		results.push_back(result);
+	}while((utilization += step) < u_range.max);
+	
+	return results;
 }
-*/
+
+
 

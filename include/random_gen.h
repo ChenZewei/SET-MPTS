@@ -11,5 +11,4 @@ double exponential_gen(double lambda);
 
 int uniform_integral_gen(int min, int max);
 
-
 #endif
