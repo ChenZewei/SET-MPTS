@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <iostream>
 #include "math-helper.h"
+#include "iteration-helper.h"
+
 using namespace std;
 
 typedef vector<fraction_t> Ratio;
@@ -137,13 +139,6 @@ class DAG_Task:public Task
 };
 
 typedef vector<Task> Tasks;
-
-#define foreach(tasks, condition) 		\
-	for(int i; i < tasks.size(); i++)	\
-	{					\
-		if(condition)			\
-			return false;		\
-	}
 
 class TaskSet
 {
