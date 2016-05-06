@@ -108,22 +108,22 @@ void get_processor_num(Int_Set *i_set)
 }
 
 // To be implemented
-void get_resource_num(int_set *i_set)
+void get_resource_num(Int_Set *i_set)
 {
 
 }
 
-void get_fixed_critical_section_length_range(range_set *r_set)
+void get_fixed_critical_section_length_range(Range_Set *r_set)
 {
 
 }
 
-void get_critical_section_length_range_by_ratio(range_set *r_set)
+void get_critical_section_length_range_by_ratio(Range_Set *r_set)
 {
 
 }
 
-void get_access_posibility(double_set *d_set)
+void get_access_posibility(Double_Set *d_set)
 {
 
 }

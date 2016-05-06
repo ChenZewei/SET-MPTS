@@ -22,7 +22,7 @@ void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
 void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil);
 Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD = 0);
-void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);W
+void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
 {
@@ -77,31 +77,6 @@ string output_filename(int lambda, double step, int p_num, Range u_range, Range 
 	stringstream buf;
 	buf<<"l:"<<lambda<<"-"<<"s:"<<step<<"-"<<"P:"<<p_num<<"-"<<"u:["<<u_range.min<<","<<u_range.max<<"]-"<<"p:["<<p_range.min<<","<<p_range.max<<"]-";
 	return buf.str();
-}
-
-
-void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil)
-{
-	while(taskset->get_utilization_sum() < u_ceil)//generate tasks
-	{
-		long period = uniform_integral_gen(long(p_range.min),long(p_range.max));
-		fraction_t u = exponential_gen(lambda);
-		requests_gen();
-		long wcet = long(period*u.get_d());
-		if(0 == wcet)
-			wcet++;
-		else if(wcet > period)
-			wcet = period;
-		fraction_t temp(wcet, period);
-		if(taskset->get_utilization_sum() + temp > u_ceil)
-		{
-			temp = u_ceil - taskset->get_utilization_sum();
-			wcet = floor(temp.get_d()*period);
-			taskset->add_task(wcet, period);
-			break;
-		}
-		taskset->add_task(wcet,period);	
-	}
 }
 
 void requests_gen()
