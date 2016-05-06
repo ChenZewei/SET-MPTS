@@ -5,9 +5,14 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+<<<<<<< HEAD
 #include "math-helper.h"
 #include "iteration-helper.h"
 
+=======
+#include "types.h"
+#include "random_gen.h"
+>>>>>>> implement class Chart to draw line plot using mathGL.
 using namespace std;
 
 typedef vector<fraction_t> Ratio;
@@ -155,22 +160,8 @@ class TaskSet
 		{
 			tasks.clear();
 		}
-		void add_task(uint wcet, uint period, uint deadline = 0)
-		{
-			fraction_t utilization_new = wcet, density_new = wcet;
-			utilization_new /= period;
-			if(0 == deadline)
-				density_new /= period;
-			else
-				density_new /= min(deadline, period);
-			tasks.push_back(Task(tasks.size(), wcet, period, deadline));
-			utilization_sum += utilization_new;
-			density_sum += density_new;
-			if(utilization_max < utilization_new)
-				utilization_max = utilization_new;
-			if(density_max < density_new)
-				density_max = density_new;
-		}
+		void add_task(uint wcet, uint period, uint deadline = 0);
+
 		bool is_implicit_deadline()
 		{
 			foreach(tasks,tasks[i].get_deadline() != tasks[i].get_period());
@@ -223,6 +214,6 @@ class TaskSet
 		uint DBF(uint time);
 };
 
-
+void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil);
 
 #endif

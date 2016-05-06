@@ -93,6 +93,22 @@ fraction_t TaskSet::get_density_max()
 	return density_max;
 }
 
+void TaskSet::add_task(uint wcet, uint period, uint deadline)
+{
+	fraction_t utilization_new = wcet, density_new = wcet;
+	utilization_new /= period;
+	if(0 == deadline)
+		density_new /= period;
+	else
+		density_new /= min(deadline, period);
+	tasks.push_back(Task(tasks.size()+1, wcet, period, deadline));
+	utilization_sum += utilization_new;
+	density_sum += density_new;
+	if(utilization_max < utilization_new)
+		utilization_max = utilization_new;
+	if(density_max < density_new)
+		density_max = density_new;
+}
 
 void TaskSet::get_utilization_sum(fraction_t &utilization_sum)
 {
@@ -133,7 +149,28 @@ void TaskSet::get_density_max(fraction_t &density_max)
 
 /////////////////////////////Others///////////////////////////////
 
-
+void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil)
+{
+	while(taskset->get_utilization_sum() < u_ceil)//generate tasks
+	{
+		int period = uniform_integral_gen(int(p_range.min),int(p_range.max));
+		fraction_t u = exponential_gen(lambda);
+		int wcet = int(period*u.get_d());
+		if(0 == wcet)
+			wcet++;
+		else if(wcet > period)
+			wcet = period;
+		fraction_t temp(wcet, period);
+		if(taskset->get_utilization_sum() + temp > u_ceil)
+		{
+			temp = u_ceil - taskset->get_utilization_sum();
+			wcet = floor(temp.get_d()*period);
+			taskset->add_task(wcet, period);
+			break;
+		}
+		taskset->add_task(wcet,period);	
+	}
+}
 
 
 
