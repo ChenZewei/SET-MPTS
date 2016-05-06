@@ -246,7 +246,7 @@ void Export_Chart(const char* path, const char* title, double min, double max, d
 		result_sets.push_back(temp);
 	}
 	va_end(arg_ptr);
-	const char *line_style[] = {"r*","go","b+","cs","yd"};
+	const char *line_style[] = {"r*","bo","g+","cs","yd"};
 	mglGraph gr;	
 	gr.SetSize(1280,800);
 	gr.SetQuality(3);

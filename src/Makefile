@@ -28,8 +28,9 @@ CHK_DIR_EXISTS= test -d
 MKDIR         = mkdir -p
 TARGET	      = test
 
+
 test:scheduling_test.o tasks.o processors.o tinyxml2.o
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o $(LIBS)
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o $(LFLAGS) $(LIBS)
 
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
