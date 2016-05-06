@@ -10,6 +10,7 @@ using namespace std;
 
 typedef vector<fraction_t> Ratio;
 
+class Task;
 
 class Request
 {
@@ -18,17 +19,20 @@ class Request
 		uint num_requests;
 		ulong max_length;
 		ulong total_length;
+		const Task* task;
 
 	public:
-		Request(uint resource_id = 0,
-			uint num_requests = 0,
-			ulong max_length = 0,
-			ulong total_length = 0);
+		Request(uint resource_id,
+			uint num_requests,
+			ulong max_length,
+			ulong total_length,
+			const Task* task);
 
 		uint get_resource_id() const { return resource_id; }
 		uint get_num_requests() const { return num_requests; }
 		ulong get_max_length() const { return max_length; }
 		ulong get_total_length() const { return total_length; }
+		const Task* get_task() const { return task; }
 };
 
 typedef vector<Request> Resource_Requests;
@@ -80,12 +84,10 @@ class Task
 		bool is_independent() const { return independent; }
 		bool is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
 
-		void add_request(uint res_id, uint num,
-				 ulong max_len, ulong total_len)
+		void add_request(uint res_id, uint num, ulong max_len, ulong total_len)
 		{
-			requests.push_back(Request(res_id, num, max_len, total_len));
-		}
-	
+			requests.push_back(Request(res_id, num, max_len, total_len, this));
+		}	
 		
 		uint get_max_num_jobs(ulong interval); //max number of jobs in an arbitrary length of interval
 		ulong DBF(ulong interval);//Demand Bound Function
