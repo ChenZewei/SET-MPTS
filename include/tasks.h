@@ -36,6 +36,7 @@ class Request
 };
 
 typedef vector<Request> Resource_Requests;
+typedef vector<uint> CPU_Set;
 
 class Task
 {
@@ -54,6 +55,8 @@ class Task
 		ulong period;
 		uint priority;
 		uint partition;
+		uint cluster;
+		CPU_Set affinity;
 		bool independent;
 		fraction_t utilization;
 		fraction_t density;
@@ -80,6 +83,8 @@ class Task
 		ulong get_period() const { return period; }
 		uint get_priority() const { return priority; }
 		uint get_partition() const { return partition; }
+		uint get_cluster() const { return cluster; }
+		const CPU_Set& get_affinity() const { return affinity; }
 		const Resource_Requests& get_requests() const {	return requests; }
 		bool is_independent() const { return independent; }
 		bool is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
