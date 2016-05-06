@@ -10,30 +10,15 @@
 
 using namespace std;
 
-ulong interf_standard(const Task &taskh, ulong interval)
+ulong interf_standard(const TaskSet tasks, uint t_id, ulong interval)
 {
-	return taskh.get_wcet() * int(ceiling((interval + taskh.get_response_time() - taskh.get_wcet()) / task.get_period()))
+	return tasks[t_id].get_wcet() * int(ceiling((interval + tasks[t_id].get_response_time() - tasks[t_id].get_wcet()) / tasks[t_id].get_period()))
 }
 
-ulong rta_standard(const TaskSet &taskset, const Task &task)
+ulong rta_standard(const TaskSet tasks, uint t_id)
 {
-	test_end = task.get_deadline();
-	test_start = task.get_total_blocking() + task.get_jitter() + task.get_wcet();
+	test_end = tasks[t_id].get_deadline();
+	test_start = tasks[t_id].get_total_blocking() + tasks[t_id].get_jitter() + tasks[t_id].get_wcet();
 
-    # see if we find a point where the demand is satisfied
-    time = sum([t.cost for t in higher_prio]) + own_demand
-    while time <= test_end:
-        demand = sum([fp_demand(t, time) for t in higher_prio]) \
-            + own_demand
-        if demand == time:
-            # yep, demand will be met by time
-            task.response_time = time
-            return True
-        else:
-            # try again
-            time = demand
-
-    # if we get here, we didn't converge
-    return False	
 }
 #endif

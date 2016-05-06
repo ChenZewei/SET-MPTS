@@ -23,20 +23,17 @@ class Request
 		uint num_requests;
 		ulong max_length;
 		ulong total_length;
-		const Task* task;
 
 	public:
 		Request(uint resource_id,
 			uint num_requests,
 			ulong max_length,
-			ulong total_length,
-			const Task* task);
+			ulong total_length);
 
 		uint get_resource_id() const { return resource_id; }
 		uint get_num_requests() const { return num_requests; }
 		ulong get_max_length() const { return max_length; }
 		ulong get_total_length() const { return total_length; }
-		const Task* get_task() const { return task; }
 };
 
 typedef vector<Request> Resource_Requests;
@@ -95,7 +92,7 @@ class Task
 
 		void add_request(uint res_id, uint num, ulong max_len, ulong total_len)
 		{
-			requests.push_back(Request(res_id, num, max_len, total_len, this));
+			requests.push_back(Request(res_id, num, max_len, total_len));
 		}	
 		
 		uint get_max_num_jobs(ulong interval); //max number of jobs in an arbitrary length of interval
