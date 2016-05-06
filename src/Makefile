@@ -46,13 +46,9 @@ random_gen.o:random_gen.cpp
 tinyxml2.o:tinyxml2.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c tinyxml2.cpp $(LIBS)
 
-<<<<<<< HEAD
-clean:
-	rm -f *.o ${ALL}	
-=======
 mgl_chart.o:mathGL/mgl_chart.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c mathGL/mgl_chart.cpp $(LIBS)
 
+clean:
+	rm -f *.o ${ALL}	
 
-
->>>>>>> implement class Chart to draw line plot using mathGL.

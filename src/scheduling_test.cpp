@@ -17,16 +17,12 @@
 
 using namespace std;
 
-<<<<<<< HEAD
-string output_filename(int lambda, double step, int p_num, range u_range, range p_range);
-void task_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil);
+
 void requests_gen();
-=======
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
 void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil);
 Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD = 0);
-void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
->>>>>>> modulate each sections.
+void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);W
 
 int main(int argc,char** argv)
 {
@@ -59,81 +55,7 @@ int main(int argc,char** argv)
 	results_2 = Scheduling_Test(lambdas[0], p_num[0], p_ranges[0], u_ranges[0], steps[0], exp_times, 1);
 	for(int i = 0; i < results_1.size(); i++)
 	{
-<<<<<<< HEAD
-		for(int j = 0; j < steps.size(); j++)
-		{
-			for(int k = 0; k < u_ranges.size(); k++)
-			{
-				for(int l = 0; l < processors.size(); l++)
-				{
-					for(int m = 0; m < p_ranges.size(); m++)
-					{
-						double_set r;
-						string file_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + ".csv";
-						ofstream output_file (file_name);
-						fraction_t u_ceil = u_ranges[k].min;
-						output_file<<"Lambda:"<<lambdas[i]<<" ";					
-						output_file<<" processor number:"<<processors[l]<<" ";
-						output_file<<" step:"<<steps[j]<<" ";
-						output_file<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] ";
-						output_file<<"period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"]\n";
-						output_file.flush();
-						do
-						{
-							int x = 0;
-							uint success = 0;
-							while(x++ < exp_t)
-							{
-								TaskSet taskset = TaskSet();
-								ProcessorSet processorset = ProcessorSet(processors[l]);
-								
-								task_gen(&taskset, lambdas[i], p_ranges[m], u_ceil.get_d());
-					
-								//if(is_schedulable(taskset, processorset,BCL_EDF))
-									//success++;
-								if(is_Partitioned_EDF_Schedulable(taskset, processorset))
-									success++;
-							}
-							fraction_t ratio(success, exp_t);
-							//cout<<"Lambda:"<<lambdas[i]<<" processor number:"<<processors[l]<<" step:"<<steps[j]<<" utilization range:["<<u_ranges[k].min<<","<<u_ranges[k].max<<"] period range:["<<p_ranges[m].min<<","<<p_ranges[m].max<<"] U:"<<u_ceil.get_d()<<" ratio:"<<ratio<<endl; 
-							
-							output_file<<"Utilization:"<<u_ceil.get_d()<<",";
-							output_file<<"Ratio:"<<ratio<<"\n";
-							output_file.flush();
-							r.push_back(ratio.get_d());
-
-						}while((u_ceil += steps[j]) < u_ranges[k].max);
-
-						output_file.close();
-						
-						mglGraph gr;
-						mglData y(r.size());
-						for(int i = 0; i < r.size(); i++)
-						{
-							y.a[i] = r[i];
-						}
-						
-						//gr.Rotate(50,60);
-						//gr.Light(false);
-						//gr.Surf(dat);
-						//gr.Cont(dat,"y");
-						gr.Title("Partitioned EDF");
-						gr.SetOrigin(0,0);
-						gr.SetRange('x', u_ranges[k].min, u_ranges[k].max);
-						gr.SetRange('y', 0, 1);
-						gr.Label('x',"x: TaskSet Utilization", 0);
-						gr.Label('y',"y: Ratio", 0);
-						gr.Plot(y,"b");
-						gr.Axis();
-						string png_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + ".png";
-						gr.WriteFrame(png_name.data());
-					}
-				}
-			}
-		}
-=======
 		output_file<<results_1[i].x<<","<<results_1[i].y<<","<<results_2[i].y<<"\n";
->>>>>>> modulate each sections.
 	}
 	output_file.flush();
 	output_file.close();
@@ -157,12 +79,8 @@ string output_filename(int lambda, double step, int p_num, Range u_range, Range 
 	return buf.str();
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-void task_gen(TaskSet *taskset, int lambda, range p_range, double u_ceil)
-=======
+
 void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil)
->>>>>>> modulate each sections.
 {
 	while(taskset->get_utilization_sum() < u_ceil)//generate tasks
 	{
@@ -186,14 +104,11 @@ void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil)
 	}
 }
 
-<<<<<<< HEAD
 void requests_gen()
 {
 
 }
-=======
-=======
->>>>>>> implement class Chart to draw line plot using mathGL.
+
 Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD)
 {
 	Result_Set results;
@@ -282,22 +197,3 @@ void Export_Chart(const char* path, const char* title, double min, double max, d
 }
 */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<<<<<<< HEAD
-
->>>>>>> modulate each sections.
-=======
->>>>>>> implement class Chart to draw line plot using mathGL.

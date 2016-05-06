@@ -5,14 +5,11 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-<<<<<<< HEAD
 #include "math-helper.h"
 #include "iteration-helper.h"
-
-=======
 #include "types.h"
 #include "random_gen.h"
->>>>>>> implement class Chart to draw line plot using mathGL.
+
 using namespace std;
 
 typedef vector<fraction_t> Ratio;
