@@ -73,55 +73,13 @@ int main(int argc,char** argv)
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range)
 {
 	stringstream buf;
-	buf<<"l:"<<lambda<<"-"<<"s:"<<step<<"-"<<"P:"<<p_num<<"-"<<"u:["<<u_range.min<<","<<u_range.max<<"]-"<<"p:["<<p_range.min<<","<<p_range.max<<"]-";
+	buf<<"l:"<<lambda<<"-"<<"s:"<<step<<"-"<<"P:"<<p_num<<"-"<<"u:["<<u_range.min<<","<<u_range.max<<"]-"<<"p:["<<p_range.min<<","<<p_range.max<<"]";
 	return buf.str();
 }
 
 void requests_gen()
 {
 
-}
-
-Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD)
-{
-	Result_Set results;
-	double utilization = u_range.min;
-	
-	do
-	{	
-		Result result;
-		result.x = utilization;
-		int success = 0;
-		for(int i = 0; i < exp_times; i++)
-		{
-			TaskSet taskset = TaskSet();
-			
-			ProcessorSet processorset = ProcessorSet(p_num);
-			
-			tast_gen(&taskset, lambda, p_range, utilization);
-
-			//if(is_schedulable(taskset, processorset,BCL_EDF))
-				//success++;
-			switch(TEST_METHOD)
-			{
-				case 0:
-					if(is_Partitioned_EDF_Schedulable(taskset, processorset))
-						success++;
-					break;
-				case 1:
-					if(is_schedulable(taskset, processorset, 1))
-						success++;
-					break;
-			}
-			
-		}
-
-		fraction_t ratio(success, exp_times);
-		result.y = ratio.get_d();
-		results.push_back(result);
-	}while((utilization += step) < u_range.max);
-	
-	return results;
 }
 
 Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD)
