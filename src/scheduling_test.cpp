@@ -8,9 +8,9 @@
 #include "partitioned_sched.h"
 #include "schedulability_test.h"
 #include "processors.h"
-#include "random_gen.h"
+//#include "random_gen.h"
+#include "mgl_chart.h"
 #include "xml.h"
-#include "mgl2/mgl.h"
 
 #define MAX_LEN 100
 
@@ -24,20 +24,12 @@ void Export_Chart(const char* path, const char* title, double min, double max, d
 
 int main(int argc,char** argv)
 {
-	/*
-	if(2 != argc)
-	{
-		cout<<"Usage: ./test [output file path]"<<endl;
-		return 0;
-	}
-	
-	string path = argv[1];
-	*/
 	Int_Set lambdas, p_num;
 	Double_Set steps;
 	Range_Set p_ranges, u_ranges;
 	int exp_times;
 	Result_Set results_1, results_2;
+	Chart chart;
 	config.LoadFile("config.xml");
 
 	exp_times = get_experiment_times();
@@ -67,7 +59,14 @@ int main(int argc,char** argv)
 	output_file.close();
 	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
 	const char *name[] = {"P-EDF","G-EDF"};
-	Export_Chart(png_name.data(), "P-EDF VS G-EDF", u_ranges[0].min, u_ranges[0].max, steps[0], name, 2, results_1, results_2);
+
+	chart.AddData(name[0], results_1);
+	chart.AddData(name[1], results_2);
+	chart.SetGraphSize(1280,800);
+	chart.SetGraphQual(3);
+	chart.ExportPNG(png_name.data(), "P-EDF VS G-EDF", u_ranges[0].min, u_ranges[0].max);
+	
+	//Export_Chart(png_name.data(), "P-EDF VS G-EDF", u_ranges[0].min, u_ranges[0].max, steps[0], name, 2, results_1, results_2);
 	return 0;
 }
 
@@ -76,29 +75,6 @@ string output_filename(int lambda, double step, int p_num, Range u_range, Range 
 	stringstream buf;
 	buf<<"l:"<<lambda<<"-"<<"s:"<<step<<"-"<<"P:"<<p_num<<"-"<<"u:["<<u_range.min<<","<<u_range.max<<"]-"<<"p:["<<p_range.min<<","<<p_range.max<<"]-";
 	return buf.str();
-}
-
-void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil)
-{
-	while(taskset->get_utilization_sum() < u_ceil)//generate tasks
-	{
-		int period = uniform_integral_gen(int(p_range.min),int(p_range.max));
-		fraction_t u = exponential_gen(lambda);
-		int wcet = int(period*u.get_d());
-		if(0 == wcet)
-			wcet++;
-		else if(wcet > period)
-			wcet = period;
-		fraction_t temp(wcet, period);
-		if(taskset->get_utilization_sum() + temp > u_ceil)
-		{
-			temp = u_ceil - taskset->get_utilization_sum();
-			wcet = floor(temp.get_d()*period);
-			taskset->add_task(wcet, period);
-			break;
-		}
-		taskset->add_task(wcet,period);	
-	}
 }
 
 Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD)
@@ -143,8 +119,8 @@ Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, 
 	return results;
 }
 
-
-void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...)//up to 5
+/*
+void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...)//up to 6
 {
 	va_list arg_ptr;
 	va_start (arg_ptr,n);
@@ -155,7 +131,7 @@ void Export_Chart(const char* path, const char* title, double min, double max, d
 		result_sets.push_back(temp);
 	}
 	va_end(arg_ptr);
-	const char *line_style[] = {"r*","bo","g+","cs","yd"};
+	const char *line_style[] = {"r*","bo","g+","cs","yd","m^"};
 	mglGraph gr;	
 	gr.SetSize(1280,800);
 	gr.SetQuality(3);
@@ -187,35 +163,7 @@ void Export_Chart(const char* path, const char* title, double min, double max, d
 	gr.Axis("xy");
 	gr.WritePNG(path);
 }
-
-
-
-
-
-/*
-mglGraph gr;
-mglData y(r.size());
-for(int i = 0; i < r.size(); i++)
-{
-	y.a[i] = r[i];
-}
-
-//gr.Rotate(50,60);
-//gr.Light(false);
-//gr.Surf(dat);
-//gr.Cont(dat,"y");
-gr.Title("Partitioned EDF");
-gr.SetOrigin(0,0);
-gr.SetRange('x', u_ranges[k].min, u_ranges[k].max);
-gr.SetRange('y', 0, 1);
-gr.Label('x',"x: TaskSet Utilization", 0);
-gr.Label('y',"y: Ratio", 0);
-gr.Plot(y,"b");
-gr.Axis();
-string png_name = "results/" + output_filename(lambdas[i], steps[j], processors[l], u_ranges[k], p_ranges[m]) + ".png";
-gr.WriteFrame(png_name.data());
 */
-
 
 
 

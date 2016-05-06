@@ -4,9 +4,9 @@ CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES) -std=c++11 -std=gnu++11 -fext-numeric-literals
-INCPATH       = -I. -I../include -I../include/SchedTest -I../include/QCustomPlot
+INCPATH       = -I. -I../include -I../include/SchedTest -I../include/QCustomPlot -I../include/mathGL
 LINK          = g++
-LFLAGS        = -m64 -Wl,-O1
+LFLAGS        = -Wl,-O1
 LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lgmp -lgmpxx -lmgl -lQt5PrintSupport -L/usr/lib/x86_64-linux-gnu -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
@@ -28,11 +28,9 @@ CHK_DIR_EXISTS= test -d
 MKDIR         = mkdir -p
 TARGET	      = test
 
-
-test:scheduling_test.o tasks.o processors.o tinyxml2.o
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o $(LFLAGS) $(LIBS)
-	mkdir results
-
+test:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o $(LFLAGS) $(LIBS)
+	
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
 
@@ -42,7 +40,14 @@ tasks.o:tasks.cpp
 processors.o:processors.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c processors.cpp $(LIBS)
 
+random_gen.o:random_gen.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c random_gen.cpp $(LIBS)
+
 tinyxml2.o:tinyxml2.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c tinyxml2.cpp $(LIBS)
 
-	
+mgl_chart.o:mathGL/mgl_chart.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c mathGL/mgl_chart.cpp $(LIBS)
+
+
+
