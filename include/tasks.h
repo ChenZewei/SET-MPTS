@@ -65,7 +65,7 @@ class Task
 		Ratio ratio;//for heterogeneous platform
 		Resource_Requests requests; 
 	public:
-		Task(uint id,
+		Task(	uint id,
 			ulong wcet, 
 			ulong period,
 			ulong deadline = 0,
