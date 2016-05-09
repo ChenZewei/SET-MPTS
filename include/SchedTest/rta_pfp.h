@@ -47,10 +47,10 @@ ulong rta_standard(const TaskSet tasks, uint t_id, uint ITER_BLOCKING)
 		
 		demand += interference;
 
-		if (response == demond)
+		if (response == demand)
 			return response + tasks[t_id].get_jitter();
 		else 
-			response = demond;
+			response = demand;
 	}
 	return test_end + 100;
 }
