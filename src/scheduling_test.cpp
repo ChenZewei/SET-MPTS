@@ -24,7 +24,7 @@ Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, 
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
-{
+{	
 	Int_Set lambdas, p_num;
 	Double_Set steps;
 	Range_Set p_ranges, u_ranges;
