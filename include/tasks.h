@@ -154,7 +154,7 @@ class TaskSet
 		{
 			tasks.clear();
 		}
-		void add_task(uint wcet, uint period, uint deadline = 0);
+		void add_task(long wcet, long period, long deadline = 0);
 
 		bool is_implicit_deadline()
 		{
@@ -183,15 +183,15 @@ class TaskSet
 		{
 			return tasks[index].get_density();
 		}
-		uint get_task_wcet(uint index)
+		ulong get_task_wcet(uint index)
 		{
 			return tasks[index].get_wcet();
 		}
-		uint get_task_deadline(uint index)
+		ulong get_task_deadline(uint index)
 		{
 			return tasks[index].get_deadline();
 		}
-		uint get_task_period(uint index)
+		ulong get_task_period(uint index)
 		{
 			return tasks[index].get_period();
 		}
@@ -205,9 +205,11 @@ class TaskSet
 		void get_density_sum(fraction_t &density_sum);
 		void get_density_max(fraction_t &density_max);
 
-		uint DBF(uint time);
+		ulong DBF(ulong time);
 };
 
 void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil);
+ulong gcd(ulong a, ulong b);
+ulong lcm(ulong a, ulong b);
 
 #endif

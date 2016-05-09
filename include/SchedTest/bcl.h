@@ -3,8 +3,42 @@
 
 #include <algorithm> // for min
 
-#include "../tasks.h"
-#include "../processors.h"
+#include "stdarg.h"
+#include "tasks.h"
+#include "processors.h"
+#include "schedulability_test.h"
+
+
+bool is_bcl_ftp_schedulable(TaskSet taskset, ProcessorSet processorset);
+bool is_bcl_edf_schedulable(TaskSet taskset, ProcessorSet processorset);
+
+class BCL_Test: public Schedulability_Test
+{
+	public:
+		BCL_Test(int n)
+		{
+			test = 2*n;
+		}
+		bool is_Schedulable(TaskSet taskset, ProcessorSet processorset, int METHOD)
+		{
+			/*
+			va_list arg_ptr; 
+			va_start (arg_ptr,n);
+			int algorithm = 0;
+			if(0 != n)
+				algorithm = va_arg(arg_ptr, int);
+			va_end(arg_ptr);
+			*/
+			switch(METHOD)
+			{
+				default:
+				case 0:
+					return is_bcl_ftp_schedulable(taskset, processorset);
+				case 1:
+					return is_bcl_edf_schedulable(taskset, processorset);
+			}
+		}
+};
 
 bool is_bcl_ftp_schedulable(TaskSet taskset, ProcessorSet processorset)
 {

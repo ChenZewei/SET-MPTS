@@ -22,9 +22,15 @@ fraction_t get_utilization_bound(TaskSet taskset)
 bool is_RM_schedulable(TaskSet taskset)//Uniprocessor
 {
 	fraction_t temp = 1, t_num = taskset.get_taskset_size(), bound;
+
+	if(0 == t_num)
+		return true;
 	temp /= t_num;
+
 	bound = t_num;
+
 	bound *= pow(2,temp.get_d())-1;
+
 	if(taskset.get_utilization_sum() <= bound)
 		return true;
 	else

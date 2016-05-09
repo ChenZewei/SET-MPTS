@@ -33,17 +33,18 @@ void Chart::SetGraphQual(int quality)
 void Chart::ExportPNG(const char* path, const char* title, double min, double max)
 {
 	const char *line_style[] = {"r*","bo","g+","cs","yd","m^"};	
-	graph.Title(title);
+	graph.Title(title,"",-2);	
 	graph.SetOrigin(0,0,0);
 	graph.SetRange('x', min, max);
-	//graph.SetTicks('x', 1, 4);
+	//graph.SetTicks('x', 9, 1);
 	graph.SetRange('y', 0, 1);	
-
+	
 	for(int i = 0; i < data_set.size(); i++)
 	{
 		graph.Plot(data_set[i].data,line_style[i]);
 		graph.AddLegend(data_set[i].name,line_style[i]);
 	}
+	
 	graph.Box();
 	graph.Label('x',"x: TaskSet Utilization", 0);
 	graph.Label('y',"y: Ratio", 0);

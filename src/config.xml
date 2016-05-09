@@ -22,8 +22,8 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>100</min>
-			<max>200</max>
+			<min>200000</min>
+			<max>1000000</max>
 		</data>
 	</period_range>
 </parameters>
