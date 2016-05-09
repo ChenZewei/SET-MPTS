@@ -55,7 +55,7 @@ class Task
 		ulong deadline;
 		ulong period;
 		uint priority;
-		uint partition;
+		uint partition;//0XFFFFFFFF
 		uint cluster;
 		CPU_Set affinity;
 		bool independent;
@@ -101,7 +101,7 @@ class Task
 		fraction_t get_utilization();
 		fraction_t get_density();
 		void get_utilization(fraction_t &utilization);
-		void get_density(fraction_t &density);	
+		void get_density(fraction_t &density);
 };
 
 typedef vector<uint> Jobs;//wcet

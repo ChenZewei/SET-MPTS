@@ -12,6 +12,7 @@
 //#include "random_gen.h"
 #include "mgl_chart.h"
 #include "xml.h"
+#include "resources.h"
 
 #define MAX_LEN 100
 
@@ -34,13 +35,30 @@ int main(int argc,char** argv)
 	config.LoadFile("config.xml");
 	
 
-
+	//scheduling parameter
 	exp_times = get_experiment_times();
 	get_lambda(&lambdas);
 	get_processor_num(&p_num);
 	get_period_range(&p_ranges);
 	get_utilization_range(&u_ranges);
 	get_step(&steps);
+
+
+	//resource parameter
+	ResourceSet resourceset = ResourceSet();
+	Int_Set resource_num, rrns;
+	Double_Set rrfs, tlfs;
+	Range_Set rrrs;
+	get_resource_num(&resource_num);
+	get_resource_request_frequency(&rrfs);
+	get_resource_request_num(&rrns);
+	get_resource_request_range(&rrrs);
+	get_total_len_factor(&tlfs);
+
+	resource_gen(&resourceset, resource_num[0]);
+
+
+	cout<<rrfs[0]<<":"<<rrns[0]<<":"<<rrrs[0].min<<":"<<rrrs[0].max<<":"<<tlfs[0]<<":"<<endl;
 
 	string file_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".csv";
 	ofstream output_file (file_name);

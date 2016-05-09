@@ -25,5 +25,23 @@
 			<min>200000</min>
 			<max>1000000</max>
 		</data>
-	</period_range>
+	</period_range>	
+	<resource_num>
+		<data>10</data>
+	</resource_num>
+	<rrf>//resource_request_frequency
+		<data>0.1</data>
+	</rrf>
+	<rrn>//resource_request_number
+		<data>5</data>
+	</rrn>
+	<rrr>//resource_request_range
+		<data>
+			<min>10</min>
+			<max>50</max>
+		</data>
+	</rrr>
+	<total_len_factor>
+		<data>0.6</data>
+	</total_len_factor>
 </parameters>

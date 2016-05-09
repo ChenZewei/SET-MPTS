@@ -107,25 +107,88 @@ void get_processor_num(Int_Set *i_set)
 	}
 }
 
-// To be implemented
+//resource
+
 void get_resource_num(Int_Set *i_set)
 {
-
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("resource_num");
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		content = subtitle->GetText();
+		i_set->push_back(atoi(content));
+		subtitle = subtitle->NextSiblingElement();
+	}
 }
 
-void get_fixed_critical_section_length_range(Range_Set *r_set)
-{
+//resource request
 
+void get_resource_request_frequency(Double_Set *d_set)
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("rrf");
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		content = subtitle->GetText();
+		floating_t temp(content);
+		d_set->push_back(temp.get_d());
+		subtitle = subtitle->NextSiblingElement();
+	}
 }
 
-void get_critical_section_length_range_by_ratio(Range_Set *r_set)
+void get_resource_request_num(Int_Set *i_set)
 {
-
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("rrn");
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		content = subtitle->GetText();
+		i_set->push_back(atoi(content));
+		subtitle = subtitle->NextSiblingElement();
+	}
 }
 
-void get_access_posibility(Double_Set *d_set)
+void get_resource_request_range(Range_Set *r_set)
 {
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("rrr");
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		Range temp;
+		XMLElement *SSubtitle = subtitle->FirstChildElement("min");
+		content = SSubtitle->GetText();
+		floating_t data(content);
+		temp.min = data.get_d();
+		SSubtitle = subtitle->FirstChildElement("max");
+		content = SSubtitle->GetText();
+		data = content;
+		temp.max = data.get_d();
+		r_set->push_back(temp);
+		subtitle = subtitle->NextSiblingElement();
+	}
+}
 
+void get_total_len_factor(Double_Set *d_set)
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("total_len_factor");
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		content = subtitle->GetText();
+		floating_t temp(content);
+		d_set->push_back(temp.get_d());
+		subtitle = subtitle->NextSiblingElement();
+	}
 }
 
 

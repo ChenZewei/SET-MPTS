@@ -28,8 +28,8 @@ CHK_DIR_EXISTS= test -d
 MKDIR         = mkdir -p
 TARGET	      = test
 
-test:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o $(LFLAGS) $(LIBS)
+test:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o $(LFLAGS) $(LIBS)
 	
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
@@ -42,6 +42,9 @@ processors.o:processors.cpp
 
 random_gen.o:random_gen.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c random_gen.cpp $(LIBS)
+
+resources.o:resources.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c resources.cpp $(LIBS)
 
 tinyxml2.o:tinyxml2.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c tinyxml2.cpp $(LIBS)

@@ -9,6 +9,9 @@
 #define uint unsigned int
 #define ulong unsigned long
 
+#define MAX_LONG 0xffffffffffffffff
+#define MAX_INT  0xffffffff
+
 using namespace std;
 
 typedef mpz_class int_t;		//multiple precision integer

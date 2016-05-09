@@ -1,5 +1,5 @@
-#ifndef PROCESSORS_H
-#define PROCESSORS_H
+#ifndef RESOURCES_H
+#define RESOURCES_H
 #include <vector>
 #include <list>
 #include "tasks.h"
@@ -18,6 +18,8 @@ class Resource
 		Request_Tasks tasks;
 
 	public:
+		//Resource(int id){resouce_id = id;}
+		Resource(uint id, uint locality = 0, bool global_resource = false, bool processor_local_resource = false);
 		uint get_resource_id() const { return resource_id; }
 		uint get_locality() const { return locality; }
 		bool is_global_resource() const { return global_resource; }
@@ -34,6 +36,11 @@ class ResourceSet
 	private:
 		Resources resources;
 	public:
-
+		ResourceSet();
+		void add_resource();
 };
+
+void resource_gen(ResourceSet *resourceset, int num);
+
+#endif
 
