@@ -38,6 +38,7 @@ class ResourceSet
 	public:
 		ResourceSet();
 		void add_resource();
+
 };
 
 void resource_gen(ResourceSet *resourceset, int num);
