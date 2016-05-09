@@ -34,6 +34,9 @@ class ResourceSet
 	private:
 		Resources resources;
 	public:
-
+		uint get_resoruceset_size()
+		{
+			return resources.size();
+		}
 };
 
