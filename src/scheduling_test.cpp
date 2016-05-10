@@ -12,7 +12,6 @@
 //#include "random_gen.h"
 #include "mgl_chart.h"
 #include "xml.h"
-#include "resources.h"
 
 #define MAX_LEN 100
 
@@ -21,7 +20,7 @@ using namespace std;
 
 void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
-Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD = 0);
+Result_Set Scheduling_Test(const ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD = 0);
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
@@ -34,7 +33,14 @@ int main(int argc,char** argv)
 	Chart chart;
 	config.LoadFile("config.xml");
 	
+	/*
+	probability(1.25);
 
+	for(int i = 0; i < 100; i++)
+	{
+		cout<<uniform_integral_gen(0,10)<<" ";
+	}
+	*/
 	//scheduling parameter
 	exp_times = get_experiment_times();
 	get_lambda(&lambdas);
@@ -43,22 +49,19 @@ int main(int argc,char** argv)
 	get_utilization_range(&u_ranges);
 	get_step(&steps);
 
-
+	
 	//resource parameter
 	ResourceSet resourceset = ResourceSet();
 	Int_Set resource_num, rrns;
-	Double_Set rrfs, tlfs;
+	Double_Set rrps, tlfs;
 	Range_Set rrrs;
 	get_resource_num(&resource_num);
-	get_resource_request_frequency(&rrfs);
+	get_resource_request_probability(&rrps);
 	get_resource_request_num(&rrns);
 	get_resource_request_range(&rrrs);
 	get_total_len_factor(&tlfs);
 
 	resource_gen(&resourceset, resource_num[0]);
-
-
-	cout<<rrfs[0]<<":"<<rrns[0]<<":"<<rrrs[0].min<<":"<<rrrs[0].max<<":"<<tlfs[0]<<":"<<endl;
 
 	string file_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".csv";
 	ofstream output_file (file_name);
@@ -70,8 +73,8 @@ int main(int argc,char** argv)
 	output_file<<"period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n";
 	output_file<<"Utilization,"<<"P_EDF_ratio,"<<"G_EDF_ratio\n";
 
-	results_1 = Scheduling_Test(lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
-	results_2 = Scheduling_Test(lambdas[0], 4, p_ranges[0], u_ranges[0], steps[0], exp_times, 1);	
+	results_1 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 0);
+	results_2 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 1);
 	//results_3 = Scheduling_Test(lambdas[0], 8, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
 	//results_4 = Scheduling_Test(lambdas[0], 16, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
 
@@ -110,7 +113,7 @@ void requests_gen()
 
 }
 
-Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, int TEST_METHOD)
+Result_Set Scheduling_Test(const ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD )
 {
 	Result_Set results;
 	double utilization = u_range.min;
@@ -127,8 +130,10 @@ Result_Set Scheduling_Test(int lambda, int p_num, Range p_range, Range u_range, 
 			TaskSet taskset = TaskSet();
 			
 			ProcessorSet processorset = ProcessorSet(p_num);
+			
+			tast_gen(&taskset, resourceset, lambda, p_range, utilization, probability, num_max, l_range, tlfs);
 
-			tast_gen(&taskset, lambda, p_range, utilization);
+			//tast_gen(&taskset, lambda, p_range, utilization);
 			//if(is_schedulable(taskset, processorset,BCL_EDF))
 				//success++;
 			switch(TEST_METHOD)

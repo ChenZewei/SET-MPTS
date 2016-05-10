@@ -125,11 +125,11 @@ void get_resource_num(Int_Set *i_set)
 
 //resource request
 
-void get_resource_request_frequency(Double_Set *d_set)
+void get_resource_request_probability(Double_Set *d_set)
 {
 	const char* content;
 	XMLElement *root = config.RootElement();
-	XMLElement *title = root->FirstChildElement("rrf");
+	XMLElement *title = root->FirstChildElement("rrp");
 	XMLElement *subtitle = title->FirstChildElement("data");
 	while(subtitle)
 	{

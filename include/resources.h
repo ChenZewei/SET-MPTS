@@ -2,7 +2,6 @@
 #define RESOURCES_H
 #include <vector>
 #include <list>
-#include "tasks.h"
 #include "types.h"
 
 using namespace std;
@@ -18,13 +17,12 @@ class Resource
 		Request_Tasks tasks;
 
 	public:
-		//Resource(int id){resouce_id = id;}
 		Resource(uint id, uint locality = 0, bool global_resource = false, bool processor_local_resource = false);
-		uint get_resource_id() const { return resource_id; }
-		uint get_locality() const { return locality; }
-		bool is_global_resource() const { return global_resource; }
-		bool is_processor_local_resource() const { return processor_local_resource; }
-		Request_Tasks get_tasks() const { return tasks; }
+		uint get_resource_id() const;
+		uint get_locality() const;
+		bool is_global_resource() const;
+		bool is_processor_local_resource() const;
+		Request_Tasks get_tasks() const;
 
 		void add_task(uint task_id);
 };
@@ -38,6 +36,7 @@ class ResourceSet
 	public:
 		ResourceSet();
 		void add_resource();
+		uint size() const;
 
 };
 

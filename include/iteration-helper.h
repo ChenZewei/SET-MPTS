@@ -2,7 +2,7 @@
 #define ITER_HELPER_H
 
 #define foreach(tasks, condition) 		\
-	for(int i; i < tasks.size(); i++)	\
+	for(uint i = 0; i < tasks.size(); i++)	\
 	{					\
 		if(condition)			\
 			return false;		\

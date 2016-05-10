@@ -29,9 +29,9 @@
 	<resource_num>
 		<data>10</data>
 	</resource_num>
-	<rrf>//resource_request_frequency
+	<rrp>//resource_request_probability
 		<data>0.1</data>
-	</rrf>
+	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>
 	</rrn>

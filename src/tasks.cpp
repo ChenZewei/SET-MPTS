@@ -1,5 +1,22 @@
-#include "../include/tasks.h"
-#include "math-helper.h"
+#include "tasks.h"
+
+////////////////////////////Request//////////////////////////////
+
+Request::Request(uint resource_id,
+	uint num_requests,
+	ulong max_length,
+	ulong total_length)
+{
+	this->resource_id = resource_id;
+	this->num_requests = num_requests;
+	this->max_length = max_length;
+	this->total_length = total_length;
+}
+
+uint Request::get_resource_id() const { return resource_id; }
+uint Request::get_num_requests() const { return num_requests; }
+ulong Request::get_max_length() const { return max_length; }
+ulong Request::get_total_length() const { return total_length; }
 
 ////////////////////////////Task//////////////////////////////
 
@@ -24,6 +41,52 @@ Task::Task(uint id,
 		density /= this->deadline;
 	else
 		density /= this->period;
+	partition = 0XFFFFFFFF;
+}
+
+Task::Task(	uint id,
+		const ResourceSet* resourceset,
+		double probability,
+		int num_max,
+		Range l_range,
+		double tlfs,
+		ulong wcet, 
+		ulong period,
+		ulong deadline,
+		uint priority)
+{
+	this->id = id;
+	this->wcet = wcet;
+	if(0 == deadline)
+		this->deadline = period;
+	else
+		this->deadline = deadline;
+	this->period = period;
+	this->priority = priority;
+	utilization = this->wcet;
+	utilization /= this->period;
+	density = this->wcet;
+	if (this->deadline <= this->period)
+		density /= this->deadline;
+	else
+		density /= this->period;
+	partition = 0XFFFFFFFF;
+	
+	Random_Gen r;
+	for(int i = 0; i < resourceset->size(); i++)
+	{
+		if(r.probability(probability))
+		{
+			uint num = r.uniform_integral_gen(1, num_max);
+			uint max_len = r.uniform_integral_gen(l_range.min, l_range.max);
+			add_request(i, num, max_len, tlfs*max_len);
+		}
+	}
+}
+
+void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len)
+{
+	requests.push_back(Request(res_id, num, max_len, total_len));
 }
 
 ulong Task::DBF(ulong time)
@@ -110,11 +173,36 @@ void TaskSet::add_task(long wcet, long period, long deadline)
 		density_max = density_new;
 }
 
+void TaskSet::add_task(const ResourceSet* resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline)
+{
+	fraction_t utilization_new = wcet, density_new = wcet;
+	utilization_new /= period;
+	if(0 == deadline)
+		density_new /= period;
+	else
+		density_new /= min(deadline, period);
+	tasks.push_back(Task(tasks.size(),
+			resourceset,
+			probability,
+			num_max,
+			l_range,
+			tlfs,
+			wcet, 
+			period,
+			deadline));
+	utilization_sum += utilization_new;
+	density_sum += density_new;
+	if(utilization_max < utilization_new)
+		utilization_max = utilization_new;
+	if(density_max < density_new)
+		density_max = density_new;
+}
+
 void TaskSet::get_utilization_sum(fraction_t &utilization_sum)
 {
 	fraction_t temp;
 	utilization_sum = 0;
-	for(int i; i < tasks.size(); i++)
+	for(int i = 0; i < tasks.size(); i++)
 	{
 		temp = tasks[i].get_wcet();
 		temp /= tasks[i].get_period();
@@ -132,7 +220,7 @@ void TaskSet::get_density_sum(fraction_t &density_sum)
 {
 	fraction_t temp;
 	density_sum = 0;
-	for(int i; i < tasks.size(); i++)
+	for(int i = 0; i < tasks.size(); i++)
 	{
 		temp = tasks[i].get_wcet();
 		temp /= std::min(tasks[i].get_deadline(),tasks[i].get_period());
@@ -149,12 +237,13 @@ void TaskSet::get_density_max(fraction_t &density_max)
 
 /////////////////////////////Others///////////////////////////////
 
-void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil)
+void tast_gen(TaskSet *taskset,const ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
 {
-	while(taskset->get_utilization_sum() < u_ceil)//generate tasks
+	Random_Gen r;
+	while(taskset->get_utilization_sum() < utilization)//generate tasks
 	{
-		long period = uniform_integral_gen(int(p_range.min),int(p_range.max));
-		fraction_t u = exponential_gen(lambda);
+		long period = r.uniform_integral_gen(int(p_range.min),int(p_range.max));
+		fraction_t u = r.exponential_gen(lambda);
 		
 		long wcet = period*u.get_d();
 		if(0 == wcet)
@@ -162,9 +251,9 @@ void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil)
 		else if(wcet > period)
 			wcet = period;
 		fraction_t temp(wcet, period);
-		if(taskset->get_utilization_sum() + temp > u_ceil)
+		if(taskset->get_utilization_sum() + temp > utilization)
 		{
-			temp = u_ceil - taskset->get_utilization_sum();			
+			temp = utilization - taskset->get_utilization_sum();			
 			wcet = period*temp.get_d();
 			taskset->add_task(wcet, period);
 			break;

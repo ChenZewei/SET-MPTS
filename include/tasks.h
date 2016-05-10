@@ -9,12 +9,12 @@
 #include "iteration-helper.h"
 #include "types.h"
 #include "random_gen.h"
+#include "resources.h"
 
 using namespace std;
 
 typedef vector<fraction_t> Ratio;
 
-class Task;
 
 class Request
 {
@@ -30,10 +30,10 @@ class Request
 			ulong max_length,
 			ulong total_length);
 
-		uint get_resource_id() const { return resource_id; }
-		uint get_num_requests() const { return num_requests; }
-		ulong get_max_length() const { return max_length; }
-		ulong get_total_length() const { return total_length; }
+		uint get_resource_id() const;
+		uint get_num_requests() const;
+		ulong get_max_length() const;
+		ulong get_total_length() const;
 };
 
 typedef vector<Request> Resource_Requests;
@@ -69,6 +69,17 @@ class Task
 			ulong period,
 			ulong deadline = 0,
 			uint priority = 0);
+
+		Task(	uint id,
+			const ResourceSet *resourceset,
+			double probability,
+			int num_max,
+			Range l_range,
+			double tlfs,
+			ulong wcet, 
+			ulong period,
+			ulong deadline = 0,
+			uint priority = 0);
 		
 		uint get_id() const { return id; }
 		ulong get_wcet() const	{ return wcet; }
@@ -90,10 +101,7 @@ class Task
 		bool is_independent() const { return independent; }
 		bool is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
 
-		void add_request(uint res_id, uint num, ulong max_len, ulong total_len)
-		{
-			requests.push_back(Request(res_id, num, max_len, total_len));
-		}	
+		void add_request(uint res_id, uint num, ulong max_len, ulong total_len);
 		
 		uint get_max_num_jobs(ulong interval); //max number of jobs in an arbitrary length of interval
 		ulong DBF(ulong interval);//Demand Bound Function
@@ -156,6 +164,8 @@ class TaskSet
 		}
 		void add_task(long wcet, long period, long deadline = 0);
 
+		void add_task(const ResourceSet *resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline = 0);
+
 		bool is_implicit_deadline()
 		{
 			foreach(tasks,tasks[i].get_deadline() != tasks[i].get_period());
@@ -208,7 +218,7 @@ class TaskSet
 		ulong DBF(ulong time);
 };
 
-void tast_gen(TaskSet *taskset, int lambda, Range p_range, double u_ceil);
+void tast_gen(TaskSet *taskset,const ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
 ulong gcd(ulong a, ulong b);
 ulong lcm(ulong a, ulong b);
 
