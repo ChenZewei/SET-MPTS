@@ -1,5 +1,5 @@
-#ifndef RTA_FP_UNIPROCESSOR_H
-#define RTA_FP_UNIPROCESSOR_H
+#ifndef RTA_PFP_H
+#define RTA_PFP_H
 
 #include <math.h>
 #include <math-helper.h>
