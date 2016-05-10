@@ -48,7 +48,27 @@ int main(int argc,char** argv)
 	get_period_range(&p_ranges);
 	get_utilization_range(&u_ranges);
 	get_step(&steps);
-
+	
+	//Random_Gen  r;
+	cout<<"r1:"<<endl;
+	for(int i = 0; i < 20; i++)
+	{
+		cout<<Random_Gen::uniform_integral_gen(1,10)<<" ";
+	}
+	cout<<endl;
+	cout<<"r1-2:"<<endl;
+	for(int i = 0; i < 20; i++)
+	{
+		cout<<Random_Gen::uniform_integral_gen(1,10)<<" ";
+	}
+	cout<<endl;
+	cout<<"r2:"<<endl;
+	for(int i = 0; i < 20; i++)
+	{
+		cout<<Random_Gen::uniform_integral_gen(1,10)<<" ";
+	}
+	cout<<endl;
+	
 	
 	//resource parameter
 	ResourceSet resourceset = ResourceSet();
@@ -62,6 +82,8 @@ int main(int argc,char** argv)
 	get_total_len_factor(&tlfs);
 
 	resource_gen(&resourceset, resource_num[0]);
+
+	//system("mkdir results");
 
 	string file_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".csv";
 	ofstream output_file (file_name);

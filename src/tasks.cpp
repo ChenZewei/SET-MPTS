@@ -72,13 +72,13 @@ Task::Task(	uint id,
 		density /= this->period;
 	partition = 0XFFFFFFFF;
 	
-	Random_Gen r;
+	//Random_Gen r;
 	for(int i = 0; i < resourceset->size(); i++)
 	{
-		if(r.probability(probability))
+		if(Random_Gen::probability(probability))
 		{
-			uint num = r.uniform_integral_gen(1, num_max);
-			uint max_len = r.uniform_integral_gen(l_range.min, l_range.max);
+			uint num = Random_Gen::uniform_integral_gen(1, num_max);
+			uint max_len = Random_Gen::uniform_integral_gen(l_range.min, l_range.max);
 			add_request(i, num, max_len, tlfs*max_len);
 		}
 	}
@@ -239,11 +239,11 @@ void TaskSet::get_density_max(fraction_t &density_max)
 
 void tast_gen(TaskSet *taskset,const ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
 {
-	Random_Gen r;
+	//Random_Gen r;
 	while(taskset->get_utilization_sum() < utilization)//generate tasks
 	{
-		long period = r.uniform_integral_gen(int(p_range.min),int(p_range.max));
-		fraction_t u = r.exponential_gen(lambda);
+		long period = Random_Gen::uniform_integral_gen(int(p_range.min),int(p_range.max));
+		fraction_t u = Random_Gen::exponential_gen(lambda);
 		
 		long wcet = period*u.get_d();
 		if(0 == wcet)
@@ -258,7 +258,8 @@ void tast_gen(TaskSet *taskset,const ResourceSet* resourceset, int lambda, Range
 			taskset->add_task(wcet, period);
 			break;
 		}
-		taskset->add_task(wcet,period);	
+		//taskset->add_task(wcet,period);	
+		taskset->add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
 	}
 }
 

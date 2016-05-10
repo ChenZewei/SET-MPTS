@@ -1,12 +1,8 @@
 #include "random_gen.h"
 #include <iostream>
 
-Random_Gen::Random_Gen()
-{
-	generator = default_random_engine(time(NULL));
-	uniform_int_distribution<int> distribution(0, 1);
-	distribution(generator);
-}
+
+default_random_engine Random_Gen::generator(time(NULL));
 
 double Random_Gen::exponential_gen(double lambda)
 {
