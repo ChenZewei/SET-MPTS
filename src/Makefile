@@ -7,24 +7,13 @@ CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES) -std=c++11 -std
 INCPATH       = -I. -I../include -I../include/SchedTest -I../include/QCustomPlot -I../include/mathGL
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lgmp -lgmpxx -lmgl -lQt5PrintSupport -L/usr/lib/x86_64-linux-gnu -lGL -lpthread 
-AR            = ar cqs
-RANLIB        = 
-TAR           = tar -cf
-COMPRESS      = gzip -9f
+LIBS          = -lgmp -lgmpxx -lmgl -lpthread 
 COPY          = cp -f
-SED           = sed
 COPY_FILE     = cp -f
 COPY_DIR      = cp -f -R
-STRIP         = strip
-INSTALL_FILE  = install -m 644 -p
-INSTALL_DIR   = $(COPY_DIR)
-INSTALL_PROGRAM = install -m 755 -p
 DEL_FILE      = rm -f
-SYMLINK       = ln -f -s
 DEL_DIR       = rmdir
 MOVE          = mv -f
-CHK_DIR_EXISTS= test -d
 MKDIR         = mkdir -p
 TARGET	      = test
 
