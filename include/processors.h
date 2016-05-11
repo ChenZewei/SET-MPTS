@@ -30,8 +30,7 @@ class Processor
 
 		void add_task(TaskSet taskset, uint id);
 		void remove_task(TaskSet taskset, uint id);
-		
-	
+		void clear();	
 };
 
 typedef vector<Processor> Processors;
