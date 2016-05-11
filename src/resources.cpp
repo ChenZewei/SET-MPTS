@@ -17,6 +17,11 @@ bool Resource::is_global_resource() const { return global_resource; }
 bool Resource::is_processor_local_resource() const { return processor_local_resource; }
 Request_Tasks Resource::get_tasks() const { return tasks; }
 
+void Resource::add_task(uint task_id)
+{
+	tasks.push_back(task_id);
+}
+
 /////////////////////////////ResourceSet///////////////////////////////
 
 ResourceSet::ResourceSet(){}
@@ -29,6 +34,11 @@ void ResourceSet::add_resource()
 uint ResourceSet::size() const
 {
 	return resources.size();
+}
+
+void ResourceSet::add_task(uint resource_id, uint task_id)
+{
+	resources[resource_id].add_task(task_id);
 }
 
 

@@ -45,7 +45,7 @@ Task::Task(uint id,
 }
 
 Task::Task(	uint id,
-		const ResourceSet* resourceset,
+		ResourceSet* resourceset,
 		double probability,
 		int num_max,
 		Range l_range,
@@ -80,6 +80,7 @@ Task::Task(	uint id,
 			uint num = Random_Gen::uniform_integral_gen(1, num_max);
 			uint max_len = Random_Gen::uniform_integral_gen(l_range.min, l_range.max);
 			add_request(i, num, max_len, tlfs*max_len);
+			resourceset->add_task(i, id);
 		}
 	}
 }
@@ -173,7 +174,7 @@ void TaskSet::add_task(long wcet, long period, long deadline)
 		density_max = density_new;
 }
 
-void TaskSet::add_task(const ResourceSet* resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline)
+void TaskSet::add_task(ResourceSet* resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline)
 {
 	fraction_t utilization_new = wcet, density_new = wcet;
 	utilization_new /= period;
@@ -237,7 +238,7 @@ void TaskSet::get_density_max(fraction_t &density_max)
 
 /////////////////////////////Others///////////////////////////////
 
-void tast_gen(TaskSet *taskset,const ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
+void tast_gen(TaskSet *taskset, ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
 {
 	//Random_Gen r;
 	while(taskset->get_utilization_sum() < utilization)//generate tasks
@@ -255,7 +256,8 @@ void tast_gen(TaskSet *taskset,const ResourceSet* resourceset, int lambda, Range
 		{
 			temp = utilization - taskset->get_utilization_sum();			
 			wcet = period*temp.get_d();
-			taskset->add_task(wcet, period);
+			//taskset->add_task(wcet, period);
+			taskset->add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
 			break;
 		}
 		//taskset->add_task(wcet,period);	

@@ -51,7 +51,7 @@ class Task
 		ulong local_blocking;
 		ulong total_blocking;
 		ulong jitter;
-		ulong response_time;
+		ulong response_time;//WCET
 		ulong deadline;
 		ulong period;
 		uint priority;
@@ -71,7 +71,7 @@ class Task
 			uint priority = 0);
 
 		Task(	uint id,
-			const ResourceSet *resourceset,
+			ResourceSet *resourceset,
 			double probability,
 			int num_max,
 			Range l_range,
@@ -164,7 +164,7 @@ class TaskSet
 		}
 		void add_task(long wcet, long period, long deadline = 0);
 
-		void add_task(const ResourceSet *resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline = 0);
+		void add_task(ResourceSet *resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline = 0);
 
 		bool is_implicit_deadline()
 		{
@@ -218,7 +218,7 @@ class TaskSet
 		ulong DBF(ulong time);
 };
 
-void tast_gen(TaskSet *taskset,const ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
+void tast_gen(TaskSet *taskset, ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
 ulong gcd(ulong a, ulong b);
 ulong lcm(ulong a, ulong b);
 
