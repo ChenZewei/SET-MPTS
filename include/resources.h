@@ -23,7 +23,7 @@ class Resource
 		bool is_global_resource() const;
 		bool is_processor_local_resource() const;
 		Request_Tasks get_tasks() const;
-
+		
 		void add_task(uint task_id);
 };
 
@@ -41,6 +41,7 @@ class ResourceSet
 		{
 			return resources.size();
 		}
+		void add_task(uint resource_id, uint task_id);
 };
 
 void resource_gen(ResourceSet *resourceset, int num);

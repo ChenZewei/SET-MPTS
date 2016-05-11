@@ -20,7 +20,7 @@ using namespace std;
 
 void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
-Result_Set Scheduling_Test(const ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD = 0);
+Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD = 0);
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
@@ -135,7 +135,7 @@ void requests_gen()
 
 }
 
-Result_Set Scheduling_Test(const ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD )
+Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD )
 {
 	Result_Set results;
 	double utilization = u_range.min;
