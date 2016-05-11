@@ -57,7 +57,7 @@ class Task
 		uint priority;
 		uint partition;//0XFFFFFFFF
 		uint cluster;
-		CPU_Set affinity;
+		CPU_Set* affinity;
 		bool independent;
 		fraction_t utilization;
 		fraction_t density;
@@ -83,25 +83,37 @@ class Task
 		
 		uint get_id() const { return id; }
 		ulong get_wcet() const	{ return wcet; }
-		ulong get_wcet_critical_sections() const { return wcet_critical_sections; }
-		ulong get_wcet_non_critical_sections() const {	return wcet_non_critical_sections; }
-		ulong get_spin() const	{ return spin; }
-		ulong get_local_blocking() const { return local_blocking; }
-		ulong get_total_blocking() const { return total_blocking; }
-		ulong get_self_suspension() const { return self_suspension; }
-		ulong get_jitter() const { return jitter; }
-		ulong get_response_time() const { return response_time; }
-		void set_response_time(ulong response) { response_time = response; }
 		ulong get_deadline() const { return deadline; }
 		ulong get_period() const { return period; }
+		const Resource_Requests& get_requests() const {	return requests; }
+		bool is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
+
+		ulong get_wcet_critical_sections() const { return wcet_critical_sections; }
+		void set_wcet_critical_sections(ulong csl) { wcet_critical_sections = csl; }
+		ulong get_wcet_non_critical_sections() const {	return wcet_non_critical_sections; }
+		void set_wcet_non_critical_sections(ulong ncsl) { wcet_non_critical_sections = ncsl; }
+		ulong get_spin() const	{ return spin; }
+		void set_spin(ulong spining) { spin = spining; }
+		ulong get_local_blocking() const { return local_blocking; }
+		void set_local_blocking(ulong lb) { local_blocking = lb; }
+		ulong get_total_blocking() const { return total_blocking; }
+		void set_total_blocking(ulong tb) { total_blocking = tb; }
+		ulong get_self_suspension() const { return self_suspension; }
+		void set_self_suspension(ulong ss) { self_suspension = ss; }
+		ulong get_jitter() const { return jitter; }
+		void set_jitter(ulong jit) { jitter = jit; }
+		ulong get_response_time() const { return response_time; }
+		void set_response_time(ulong response) { response_time = response; }
 		uint get_priority() const { return priority; }
+		void set_priority(uint prio) { priority = prio; }
 		uint get_partition() const { return partition; }
 		void set_partition(uint cpu) { partition = cpu; }
 		uint get_cluster() const { return cluster; }
-		const CPU_Set& get_affinity() const { return affinity; }
-		const Resource_Requests& get_requests() const {	return requests; }
+		void set_cluster(uint clu) { cluster = clu; }
+		CPU_Set* get_affinity() const { return affinity; }
+		void set_affinity(CPU_Set* affi) { affinity = affi; }
 		bool is_independent() const { return independent; }
-		bool is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
+		void set_dependent() { independent = false; }
 
 		void add_request(uint res_id, uint num, ulong max_len, ulong total_len);
 		
