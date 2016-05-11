@@ -91,10 +91,12 @@ class Task
 		ulong get_self_suspension() const { return self_suspension; }
 		ulong get_jitter() const { return jitter; }
 		ulong get_response_time() const { return response_time; }
+		void set_response_time(ulong response) { response_time = response; }
 		ulong get_deadline() const { return deadline; }
 		ulong get_period() const { return period; }
 		uint get_priority() const { return priority; }
 		uint get_partition() const { return partition; }
+		void set_partition(uint cpu) { partition = cpu; }
 		uint get_cluster() const { return cluster; }
 		const CPU_Set& get_affinity() const { return affinity; }
 		const Resource_Requests& get_requests() const {	return requests; }
@@ -166,6 +168,11 @@ class TaskSet
 
 		void add_task(ResourceSet *resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline = 0);
 
+		const Tasks& get_tasks() const
+		{
+			return tasks;
+		}
+
 		bool is_implicit_deadline()
 		{
 			foreach(tasks,tasks[i].get_deadline() != tasks[i].get_period());
@@ -180,7 +187,7 @@ class TaskSet
 		{
 			return !(is_implicit_deadline())&&!(is_constraint_deadline());
 		}
-		uint get_taskset_size()
+		const uint& get_taskset_size() const 
 		{
 			return tasks.size();
 		}
