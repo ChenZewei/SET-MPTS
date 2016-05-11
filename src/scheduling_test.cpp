@@ -169,7 +169,7 @@ Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Rang
 				case 1:
 					//if(is_EDF_schedulable(taskset))
 					//if(is_schedulable(taskset, processorset, 1))
-					if(b_test.is_Schedulable(taskset, processorset, TEST_METHOD))
+					if(b_test.is_Schedulable(taskset, processorset, 1))
 						success++;
 					break;
 			}
