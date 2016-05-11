@@ -37,7 +37,12 @@ class ResourceSet
 		ResourceSet();
 		void add_resource();
 		uint size() const;
-		uint get_resourceset_size()
+		const Resources& get_resources() const
+		{
+			return resources;
+		}
+
+		const uint& get_resourceset_size() const
 		{
 			return resources.size();
 		}
