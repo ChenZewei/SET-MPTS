@@ -15,11 +15,6 @@ fraction_t Processor::get_speedfactor()
 	return speedfactor;
 }
 
-fraction_t Processor::get_utilization()
-{
-	return utilization;
-}
-
 fraction_t Processor::get_density()
 {
 	return density;
@@ -40,7 +35,7 @@ void Processor::add_task(TaskSet taskset, uint t_id)
 void Processor::remove_task(TaskSet taskset, uint t_id)
 {
 	list<uint>::iterator it = queue.begin();
-	for(int i = 0; it != queue.end(); it++, i++)
+	for(uint i = 0; it != queue.end(); it++, i++)
 	{
 		if(t_id == *it)
 		{
@@ -56,11 +51,8 @@ void Processor::remove_task(TaskSet taskset, uint t_id)
 
 ProcessorSet::ProcessorSet(uint num)//for identical multiprocessor platform
 {
-	for(int i = 0; i < num; i++)
+	for(uint i = 0; i < num; i++)
 		processors.push_back(Processor());
 }
 
-uint ProcessorSet::get_processor_num()
-{
-	return processors.size();
-}
+

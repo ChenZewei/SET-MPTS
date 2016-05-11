@@ -70,7 +70,18 @@ Task::Task(	uint id,
 		density /= this->deadline;
 	else
 		density /= this->period;
-	partition = 0XFFFFFFFF;
+	partition = MAX_INT;
+	spin = 0;
+	self_suspension = 0;
+	local_blocking = 0;
+	total_blocking = 0;
+	jitter = 0;
+	response_time = 0;
+	cluster = MAX_INT;
+	independent = true;
+	wcet_non_critical_sections = this->wcet;
+	wcet_critical_sections = 0;
+
 	
 	//Random_Gen r;
 	for(int i = 0; i < resourceset->size(); i++)

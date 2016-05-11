@@ -141,6 +141,7 @@ Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Rang
 	Result_Set results;
 	double utilization = u_range.min;
 	BCL_Test b_test = BCL_Test(5);
+	ResourceSet res_set = *resourceset;
 	//Schedulability_Test *s_test = &b_test;
 
 	do
@@ -170,8 +171,7 @@ Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Rang
 				case 1:
 					//if(is_EDF_schedulable(taskset))
 					//if(is_schedulable(taskset, processorset, 1))
-
-					if(is_worst_fit_u_schedulable(taskset, processorset, resourceset, p_num, 0, 0))
+					if(is_worst_fit_u_schedulable(taskset, processorset, res_set, 0, 0))
 						success++;
 					break;
 			}

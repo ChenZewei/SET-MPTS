@@ -12,173 +12,186 @@
 
 using namespace std;
 
-ulong interf_standard(const TaskSet tasks, uint t_id, ulong interval)
+ulong interf_standard(const Task* task, ulong interval)
 {
-	return tasks[t_id].get_wcet() * int(ceiling((interval + tasks[t_id].get_jitter()) / tasks[t_id].get_period()));
+	return task->get_wcet() * ceiling((interval + task->get_jitter()), task->get_period());
 }
 
 // Audsly et al.'s standard RTA (1993)
-ulong rta_standard(const TaskSet tasks, uint t_id, uint ITER_BLOCKING)
+ulong rta_standard(const TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 {
-	ulong	test_end = tasks[t_id].get_deadline();
-	ulong	test_start = tasks[t_id].get_total_blocking() + tasks[t_id].get_wcet();
-	ulong	response = test_start;
-	while (respone <= test_end)
+	Task task = tasks.get_tasks()[t_id];
+	ulong test_end = task.get_deadline();
+	ulong test_start = task.get_total_blocking() + task.get_wcet();
+	ulong response = test_start;
+	ulong demand = 0;
+	while (response <= test_end)
 	{
 		switch (ITER_BLOCKING)
 		{
 			case 0:
-				ulong demand = test_start;
+				demand = test_start;
 				break;
 			case 1:
 				// add functions to bound "totoal blocking" here
 				// XXXXXXXX				
-				ulong demand = tasks[t_id].get_total_blocking() + tasks[t_id].get_wcet();
+				demand = task.get_total_blocking() + task.get_wcet();
 				break;
 		}
 
 		ulong interference = 0;
 		for (uint th = 0; th < t_id; th ++)
 		{
-			if (tasks[th].get_partition() == tasks[t_id].get_partition())
+			const Task& tsk = tasks.get_tasks()[th];
+			if (tsk.get_partition() == task.get_partition())
 			{
-				interference += interf_standard(tasks, th, response);
+				interference += interf_standard(&tsk, response);
 			}
 		}
 		
 		demand += interference;
 
 		if (response == demand)
-			return response + tasks[t_id].get_jitter();
+			return response + task.get_jitter();
 		else 
 			response = demand;
 	}
 	return test_end + 100;
 }
 
-ulong interf_with_spin(const TaskSet tasks, uint t_id, ulong interval)
+ulong interf_with_spin(const Task* task, ulong interval)
 {
-	return (tasks[t_id].get_wcet() + tasks[t_id].get_spin()) * int(ceiling((interval + tasks[t_id].get_jitter()) / tasks[t_id].get_period()));
+	return (task->get_wcet() + task->get_spin()) * ceiling((interval + task->get_jitter()), task->get_period());
 }
 
 // Awieder and Brandenburg's RTA with spin locks (2013)
-ulong rta_with_spin(const TaskSet tasks, uint t_id, uint ITER_BLOCKING)
+ulong rta_with_spin(const TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 {
-	ulong	test_end = tasks[t_id].get_deadline();
-	ulong	test_start = tasks[t_id].get_spin() + tasks[t_id].get_local_blocking() + tasks[t_id].get_wcet();
-	ulong	response = test_start;
-	while (respone <= test_end)
+	Task task = tasks.get_tasks()[t_id];
+	ulong test_end = task.get_deadline();
+	ulong test_start = task.get_spin() + task.get_local_blocking() + task.get_wcet();
+	ulong response = test_start;
+	ulong demand = 0;
+	while (response <= test_end)
 	{
 		switch (ITER_BLOCKING)
 		{
 			case 0:
-				ulong demand = test_start;
+				demand = test_start;
 				break;
 			case 1:
 				// add functions to bound "spin" and "local_blocking" here
 				// XXXXXXXX				
-				ulong demand = tasks[t_id].get_local_blocking() + tasks[t_id].get_spin() + tasks[t_id].get_wcet();
+				demand = task.get_local_blocking() + task.get_spin() + task.get_wcet();
 				break;
 		}
 
 		ulong interference = 0;
 		for (uint th = 0; th < t_id; th ++)
 		{
-			if (tasks[th].get_partition() == tasks[t_id].get_partition())
+			const Task& tsk = tasks.get_tasks()[th];
+			if (task.get_partition() == tsk.get_partition())
 			{
-				interference += interf_with_spin(tasks, th, response);
+				interference += interf_with_spin(&tsk, response);
 			}
 		}
 		
 		demand += interference;
 
 		if (response == demand)
-			return response + tasks[t_id].get_jitter();
+			return response + task.get_jitter();
 		else 
 			response = demand;
 	}
 	return test_end + 100;
 }
 
-ulong interf_with_suspension(const TaskSet tasks, uint t_id, ulong interval)
+ulong interf_with_suspension(const Task* task, ulong interval)
 {
-	return tasks[t_id].get_wcet() * int(ceiling((interval + tasks[t_id].get_response_time()) / tasks[t_id].get_period()));
+	return task->get_wcet() * ceiling((interval + task->get_response_time()), task->get_period());
 }
 
 // RTA with self-suspension (to appear in RTS journal)
-ulong rta_with_spin(const TaskSet tasks, uint t_id, uint ITER_BLOCKING)
+ulong rta_with_suspension(const TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 {
-	ulong	test_end = tasks[t_id].get_deadline();
-	ulong	test_start = tasks[t_id].get_total_blocking() + tasks[t_id].get_wcet();
-	ulong	response = test_start;
-	while (respone <= test_end)
+	Task task = tasks.get_tasks()[t_id];
+	ulong test_end = task.get_deadline();
+	ulong test_start = task.get_total_blocking() + task.get_wcet();
+	ulong response = test_start;
+	ulong demand = 0;
+	while (response <= test_end)
 	{
 		switch (ITER_BLOCKING)
 		{
 			case 0:
-				ulong demand = test_start;
+				demand = test_start;
 				break;
 			case 1:
 				// add functions to bound "spin" and "local_blocking" here
 				// XXXXXXXX				
-				ulong demand = tasks[t_id].get_total_blocking() + tasks[t_id].get_wcet();
+				demand = task.get_total_blocking() + task.get_wcet();
 				break;
 		}
 
 		ulong interference = 0;
 		for (uint th = 0; th < t_id; th ++)
 		{
-			if (tasks[th].get_partition() == tasks[t_id].get_partition())
+			const Task& tsk = tasks.get_tasks()[th];
+			if (task.get_partition() == tsk.get_partition())
 			{
-				interference += interf_with_suspension(tasks, th, response);
+				interference += interf_with_suspension(&tsk, response);
 			}
 		}
 		
 		demand += interference;
 
 		if (response == demand)
-			return response + tasks[t_id].get_jitter();
+			return response + task.get_jitter();
 		else 
 			response = demand;
 	}
 	return test_end + 100;
 }
 
-ulong interf_with_distributed_scheduling(const TaskSet tasks, uint t_id, ulong interval)
+ulong interf_with_distributed_scheduling(const Task* task, ulong interval)
 {
-	return tasks[t_id].get_wcet_non_critical_sections() * int(ceiling((interval + tasks[t_id].get_response_time()) / tasks[t_id].get_period()));
+	return task->get_wcet_non_critical_sections() * ceiling((interval + task->get_response_time()), task->get_period());
 }
 
-ulong rta_with_distributed_scheduling(const TaskSet tasks, const ResourceSet resources, uint t_id, uint ITER_BLOCKING)
+ulong rta_with_distributed_scheduling(const TaskSet& tasks, const ResourceSet& resources, uint t_id, uint ITER_BLOCKING)
 {
-	ulong	test_end = tasks[t_id].get_deadline();
-	ulong	test_start = tasks[t_id].get_total_blocking() + tasks[t_id].get_wcet();
-	ulong	response = test_start;
-	while (respone <= test_end)
+	Task task = tasks.get_tasks()[t_id];
+	ulong test_end = task.get_deadline();
+	ulong test_start = task.get_total_blocking() + task.get_wcet();
+	ulong response = test_start;
+	ulong demand = 0;
+	while (response <= test_end)
 	{
 		switch (ITER_BLOCKING)
 		{
 			case 0:
-				ulong demand = test_start;
+				demand = test_start;
 				break;
 			case 1:
 				// add functions to bound "spin" and "local_blocking" here
 				// XXXXXXXX				
-				ulong demand = tasks[t_id].get_total_blocking() + tasks[t_id].get_wcet();
+				demand = task.get_total_blocking() + task.get_wcet();
 				break;
 		}
 
 		ulong interference = 0;
 		for (uint th = 0; th < t_id; th ++)
 		{
-			if (tasks[th].get_partition() == tasks[t_id].get_partition())
+			const Task& tsk = tasks.get_tasks()[th];
+			if (task.get_partition() == tsk.get_partition())
 			{
-				interference += interf_with_distributed_scheduling(tasks, th, response);
+				interference += interf_with_distributed_scheduling(&tsk, response);
 			}
 		}
 		for (uint res = 0; res < resources.get_resourceset_size(); res ++)
 		{
-			if (resources[res].get_locality() == tasks[t_id].get_partition())
+			const Resource& resource = resources.get_resources()[res];
+			if (resource.get_locality() == task.get_partition())
 			{
 				// add functions to bound the interference from resource agents
 				// XXXXXXXX
@@ -188,15 +201,16 @@ ulong rta_with_distributed_scheduling(const TaskSet tasks, const ResourceSet res
 		demand += interference;
 
 		if (response == demand)
-			return response + tasks[t_id].get_jitter();
+			return response + task.get_jitter();
 		else 
 			response = demand;
 	}
 	return test_end + 100;
 }
 
-bool is_pfp_rta_schedulable(const TaskSet tasks, const ResourceSet resources, uint TEST_TYPE, uint ITER_BLOCKING)
+bool is_pfp_rta_schedulable(const TaskSet& tasks, const ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
 {
+	ulong response_bound;
 	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
 	{
 		switch (TEST_TYPE)
@@ -215,9 +229,10 @@ bool is_pfp_rta_schedulable(const TaskSet tasks, const ResourceSet resources, ui
 				break;
 
 		}
-
-		if (response_bound <= tasks[t_id].get_deadline())
-			tasks[t_id].response_time = response_bound;
+		
+		Task task = tasks.get_tasks()[t_id];
+		if (response_bound <= task.get_deadline())
+			task.set_response_time(response_bound);
 		else
 			return false;
 	}
