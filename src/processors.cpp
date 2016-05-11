@@ -7,6 +7,7 @@ Processor::Processor(fraction_t speedfactor)
 	speedfactor = speedfactor;
 	utilization = 0;
 	density = 0;
+	tryed_assign = false;
 }
 
 fraction_t Processor::get_speedfactor()
@@ -22,6 +23,11 @@ fraction_t Processor::get_utilization()
 fraction_t Processor::get_density()
 {
 	return density;
+}
+
+bool Processor::get_tryed_assign()
+{
+	return tryed_assign;
 }
 
 void Processor::add_task(TaskSet taskset, uint t_id)

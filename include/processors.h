@@ -17,11 +17,13 @@ class Processor
 		fraction_t speedfactor;
 		fraction_t utilization;
 		fraction_t density;
+		bool tryed_assign;
 	public:
 		Processor(fraction_t speedfactor = 1);
 		fraction_t get_speedfactor();
 		fraction_t get_utilization();
 		fraction_t get_density();
+		bool get_tryed_assign();
 
 		void add_task(TaskSet taskset, uint id);
 		void remove_task(TaskSet taskset, uint id);
