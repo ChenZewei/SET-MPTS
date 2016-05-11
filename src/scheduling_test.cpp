@@ -12,6 +12,7 @@
 //#include "random_gen.h"
 #include "mgl_chart.h"
 #include "xml.h"
+#include "pfp_algorithms.h"
 
 #define MAX_LEN 100
 
@@ -169,7 +170,7 @@ Result_Set Scheduling_Test(const ResourceSet* resourceset, int lambda, int p_num
 				case 1:
 					//if(is_EDF_schedulable(taskset))
 					//if(is_schedulable(taskset, processorset, 1))
-					if(b_test.is_Schedulable(taskset, processorset, TEST_METHOD))
+					if(is_worst_fit_u_schedulable(taskset, processorset, resourceset, p_num, 0, 0))
 						success++;
 					break;
 			}
