@@ -24,36 +24,26 @@ fraction_t Processor::get_density()
 	return density;
 }
 
-void Processor::update(TaskSet taskset)
-{	
-	utilization = 0;
-	list<uint>::iterator it = queue.begin();
-	density = 0;
-	for(; it != queue.end(); it++)
-	{
-		utilization += taskset.get_task_utilization(*it);
-		density += taskset.get_task_density(*it);
-	}
-}
-
-void Processor::add_task(TaskSet taskset, uint id)
+void Processor::add_task(TaskSet taskset, uint t_id)
 {
-	queue.push_back(id);
-	update(taskset);
+	queue.push_back(t_id);
+	utilization += taskset.get_task_utilization(t_id);
+	density += taskset.get_task_density(t_id);	
 }
 
-void Processor::remove_task(TaskSet taskset, uint id)
+void Processor::remove_task(TaskSet taskset, uint t_id)
 {
 	list<uint>::iterator it = queue.begin();
 	for(int i = 0; it != queue.end(); it++, i++)
 	{
-		if(id == *it)
+		if(t_id == *it)
 		{
 			queue.remove(i);
+			utilization -= taskset.get_task_utilization(t_id);
+			density -= taskset.get_task_density(t_id);
 			break;
 		}
 	}
-	update(taskset);
 }
 
 ///////////////////////////ProcessorSet/////////////////////////////

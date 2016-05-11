@@ -22,7 +22,6 @@ class Processor
 		fraction_t get_speedfactor();
 		fraction_t get_utilization();
 		fraction_t get_density();
-		void update(TaskSet taskset);
 
 		void add_task(TaskSet taskset, uint id);
 		void remove_task(TaskSet taskset, uint id);
