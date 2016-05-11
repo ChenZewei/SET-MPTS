@@ -21,7 +21,10 @@ class Processor
 	public:
 		Processor(fraction_t speedfactor = 1);
 		fraction_t get_speedfactor();
-		fraction_t get_utilization();
+		const fraction_t& get_utilization() const
+		{
+			return utilization;
+		}
 		fraction_t get_density();
 		bool get_tryed_assign();
 
@@ -39,6 +42,13 @@ class ProcessorSet
 		Processors processors;
 	public:
 		ProcessorSet(uint num);//for identical multiprocessor platform
-		uint get_processor_num();
+		const uint& get_processor_num() const 
+		{
+			return processors.size();
+		}
+		const Processors& get_processors() const 
+		{
+			return processors;
+		}
 };
 #endif
