@@ -120,8 +120,8 @@ class Task
 		uint get_max_num_jobs(ulong interval); //max number of jobs in an arbitrary length of interval
 		ulong DBF(ulong interval);//Demand Bound Function
 		void DBF();
-		fraction_t get_utilization();
-		fraction_t get_density();
+		fraction_t get_utilization() const;
+		fraction_t get_density() const;
 		void get_utilization(fraction_t &utilization);
 		void get_density(fraction_t &density);
 };
@@ -199,41 +199,42 @@ class TaskSet
 		{
 			return !(is_implicit_deadline())&&!(is_constraint_deadline());
 		}
-		const uint& get_taskset_size() const 
+		uint get_taskset_size() const 
 		{
 			return tasks.size();
 		}
 
-		fraction_t get_task_utilization(uint index)
+		fraction_t get_task_utilization(uint index) const
 		{
 			return tasks[index].get_utilization();
 		}
-		fraction_t get_task_density(uint index)
+		fraction_t get_task_density(uint index) const
 		{
 			return tasks[index].get_density();
 		}
-		ulong get_task_wcet(uint index)
+		ulong get_task_wcet(uint index) const
 		{
 			return tasks[index].get_wcet();
 		}
-		ulong get_task_deadline(uint index)
+		ulong get_task_deadline(uint index) const
 		{
 			return tasks[index].get_deadline();
 		}
-		ulong get_task_period(uint index)
+		ulong get_task_period(uint index) const
 		{
 			return tasks[index].get_period();
 		}
 		
-		fraction_t get_utilization_sum();
-		fraction_t get_utilization_max();
-		fraction_t get_density_sum();
-		fraction_t get_density_max();
-		void get_utilization_sum(fraction_t &utilization_sum);
-		void get_utilization_max(fraction_t &utilization_max);
-		void get_density_sum(fraction_t &density_sum);
-		void get_density_max(fraction_t &density_max);
+		fraction_t get_utilization_sum() const;
+		fraction_t get_utilization_max() const;
+		fraction_t get_density_sum() const;
+		fraction_t get_density_max() const;
+		void get_utilization_sum(fraction_t &utilization_sum) const;
+		void get_utilization_max(fraction_t &utilization_max) const;
+		void get_density_sum(fraction_t &density_sum) const;
+		void get_density_max(fraction_t &density_max) const;
 
+		void sort_by_priority();
 		ulong DBF(ulong time);
 };
 

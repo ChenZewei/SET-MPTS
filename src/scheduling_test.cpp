@@ -12,7 +12,7 @@
 //#include "random_gen.h"
 #include "mgl_chart.h"
 #include "xml.h"
-#include "pfp_algorithms.h"
+//#include "pfp_algorithms.h"
 
 #define MAX_LEN 100
 
@@ -48,29 +48,8 @@ int main(int argc,char** argv)
 	get_processor_num(&p_num);
 	get_period_range(&p_ranges);
 	get_utilization_range(&u_ranges);
-	get_step(&steps);
-	
-	//Random_Gen  r;
-	cout<<"r1:"<<endl;
-	for(int i = 0; i < 20; i++)
-	{
-		cout<<Random_Gen::uniform_integral_gen(1,10)<<" ";
-	}
-	cout<<endl;
-	cout<<"r1-2:"<<endl;
-	for(int i = 0; i < 20; i++)
-	{
-		cout<<Random_Gen::uniform_integral_gen(1,10)<<" ";
-	}
-	cout<<endl;
-	cout<<"r2:"<<endl;
-	for(int i = 0; i < 20; i++)
-	{
-		cout<<Random_Gen::uniform_integral_gen(1,10)<<" ";
-	}
-	cout<<endl;
-	
-	
+	get_step(&steps);	
+
 	//resource parameter
 	ResourceSet resourceset = ResourceSet();
 	Int_Set resource_num, rrns;
@@ -102,7 +81,6 @@ int main(int argc,char** argv)
 	//results_4 = Scheduling_Test(lambdas[0], 16, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
 
 
-
 	for(int i = 0; i < results_1.size(); i++)
 	{
 		output_file<<results_1[i].x<<","<<results_1[i].y<<","<<results_2[i].y<<"\n";
@@ -110,7 +88,7 @@ int main(int argc,char** argv)
 	output_file.flush();
 	output_file.close();
 	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
-	const char *name[] = {"P-EDF","G-EDF", "8 processors", "16 processors"};
+	const char *name[] = {"G-FTP","G-EDF", "8 processors", "16 processors"};
 
 	chart.AddData(name[0], results_1);
 	chart.AddData(name[1], results_2);
@@ -118,7 +96,7 @@ int main(int argc,char** argv)
 	//chart.AddData(name[3], results_4);
 	chart.SetGraphSize(1280,800);
 	chart.SetGraphQual(3);
-	chart.ExportPNG(png_name.data(), "P-EDF VS G-EDF based on BCL", u_ranges[0].min, u_ranges[0].max);
+	chart.ExportPNG(png_name.data(), "G-FTP VS G-EDF based on BCL", u_ranges[0].min, u_ranges[0].max);
 	
 	//Export_Chart(png_name.data(), "P-EDF VS G-EDF", u_ranges[0].min, u_ranges[0].max, steps[0], name, 2, results_1, results_2);
 	return 0;
@@ -163,15 +141,17 @@ Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Rang
 			switch(TEST_METHOD)
 			{
 				case 0:
-					if(is_Partitioned_EDF_Schedulable(taskset, processorset))
-					//if(b_test.is_Schedulable(taskset, processorset, TEST_METHOD))
+					//if(is_Partitioned_EDF_Schedulable(taskset, processorset))
+					if(b_test.is_Schedulable(taskset, processorset, TEST_METHOD))
 					//if(is_RM_schedulable(taskset))
 						success++;
 					break;
 				case 1:
+
 					//if(is_EDF_schedulable(taskset))
 					//if(is_schedulable(taskset, processorset, 1))
-					if(is_worst_fit_u_schedulable(taskset, processorset, res_set, 0, 0))
+					if(b_test.is_Schedulable(taskset, processorset, TEST_METHOD))
+					//if(is_worst_fit_u_schedulable(taskset, processorset, res_set, 0, 0))
 						success++;
 					break;
 			}

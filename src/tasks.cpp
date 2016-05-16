@@ -116,12 +116,12 @@ uint Task::get_max_num_jobs(ulong interval)
 	return num_jobs;
 }
 
-fraction_t Task::get_utilization()
+fraction_t Task::get_utilization() const
 {
 	return utilization;
 }
 
-fraction_t Task::get_density()
+fraction_t Task::get_density() const
 {
 	return density;
 }
@@ -148,22 +148,22 @@ TaskSet::TaskSet()
 	density_max = 0;
 }
 
-fraction_t TaskSet::get_utilization_sum()
+fraction_t TaskSet::get_utilization_sum() const
 {
 	return utilization_sum;
 }
 
-fraction_t TaskSet::get_utilization_max()
+fraction_t TaskSet::get_utilization_max() const
 {
 	return utilization_max;
 }
 
-fraction_t TaskSet::get_density_sum()
+fraction_t TaskSet::get_density_sum() const
 {
 	return density_sum;
 }
 
-fraction_t TaskSet::get_density_max()
+fraction_t TaskSet::get_density_max() const
 {
 	return density_max;
 }
@@ -210,7 +210,7 @@ void TaskSet::add_task(ResourceSet* resourceset, double probability, int num_max
 		density_max = density_new;
 }
 
-void TaskSet::get_utilization_sum(fraction_t &utilization_sum)
+void TaskSet::get_utilization_sum(fraction_t &utilization_sum) const
 {
 	fraction_t temp;
 	utilization_sum = 0;
@@ -221,14 +221,14 @@ void TaskSet::get_utilization_sum(fraction_t &utilization_sum)
 		utilization_sum += temp;
 	}
 }
-void TaskSet::get_utilization_max(fraction_t &utilization_max)
+void TaskSet::get_utilization_max(fraction_t &utilization_max) const
 {
 	utilization_max = tasks[0].get_utilization();
 	for(int i = 1; i < tasks.size(); i++)
 		if(tasks[i].get_utilization() > utilization_max)
 			utilization_max = tasks[i].get_utilization();
 }
-void TaskSet::get_density_sum(fraction_t &density_sum)
+void TaskSet::get_density_sum(fraction_t &density_sum) const
 {
 	fraction_t temp;
 	density_sum = 0;
@@ -239,12 +239,17 @@ void TaskSet::get_density_sum(fraction_t &density_sum)
 		density_sum += temp;
 	}
 }
-void TaskSet::get_density_max(fraction_t &density_max)
+void TaskSet::get_density_max(fraction_t &density_max) const
 {
 	density_max = tasks[0].get_density();
 	for(int i = 1; i < tasks.size(); i++)
 		if(tasks[i].get_density() > density_max)
 			density_max = tasks[i].get_density();
+}
+
+void TaskSet::sort_by_priority()
+{
+	
 }
 
 /////////////////////////////Others///////////////////////////////
