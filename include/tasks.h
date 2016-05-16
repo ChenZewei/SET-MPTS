@@ -10,6 +10,7 @@
 #include "types.h"
 #include "random_gen.h"
 #include "resources.h"
+#include "sort.h"
 
 using namespace std;
 
@@ -82,6 +83,7 @@ class Task
 			uint priority = 0);
 		
 		uint get_id() const { return id; }
+		void set_id(uint id) { this->id = id; };
 		ulong get_wcet() const	{ return wcet; }
 		ulong get_deadline() const { return deadline; }
 		ulong get_period() const { return period; }
@@ -234,12 +236,24 @@ class TaskSet
 		void get_density_sum(fraction_t &density_sum) const;
 		void get_density_max(fraction_t &density_max) const;
 
-		void sort_by_priority();
+		void sort_by_period();
 		ulong DBF(ulong time);
+
+		void display()
+		{
+			for(int i = 0; i < tasks.size(); i++)
+			{
+				cout<<"Task id:"<<tasks[i].get_id()<<" Task period:"<<tasks[i].get_period()<<endl;
+			}
+		}
+
+
+
 };
 
 void tast_gen(TaskSet *taskset, ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
 ulong gcd(ulong a, ulong b);
 ulong lcm(ulong a, ulong b);
+
 
 #endif

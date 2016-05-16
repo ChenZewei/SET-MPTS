@@ -247,10 +247,17 @@ void TaskSet::get_density_max(fraction_t &density_max) const
 			density_max = tasks[i].get_density();
 }
 
-void TaskSet::sort_by_priority()
+void TaskSet::sort_by_period()
 {
-	
+	sort(tasks.begin(), tasks.end(), period_increase);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_id(i);
 }
+
+
+
+
+
 
 /////////////////////////////Others///////////////////////////////
 
