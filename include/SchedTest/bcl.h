@@ -11,7 +11,7 @@
 
 bool is_bcl_ftp_schedulable(TaskSet taskset, ProcessorSet processorset);
 bool is_bcl_edf_schedulable(TaskSet taskset, ProcessorSet processorset);
-
+/*
 class BCL_Test: public Schedulability_Test
 {
 	public:
@@ -28,7 +28,7 @@ class BCL_Test: public Schedulability_Test
 			if(0 != n)
 				algorithm = va_arg(arg_ptr, int);
 			va_end(arg_ptr);
-			*/
+			
 			switch(METHOD)
 			{
 				default:
@@ -39,7 +39,7 @@ class BCL_Test: public Schedulability_Test
 			}
 		}
 };
-
+*/
 bool is_bcl_ftp_schedulable(TaskSet taskset, ProcessorSet processorset)
 {
 	int m = processorset.get_processor_num();

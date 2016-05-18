@@ -10,17 +10,22 @@ Processor::Processor(fraction_t speedfactor)
 	tryed_assign = false;
 }
 
-fraction_t Processor::get_speedfactor()
+fraction_t Processor::get_speedfactor() const
 {
 	return speedfactor;
 }
 
-fraction_t Processor::get_density()
+fraction_t Processor::get_utilization() const
+{
+	return utilization;
+}
+
+fraction_t Processor::get_density() const
 {
 	return density;
 }
 
-bool Processor::get_tryed_assign()
+bool Processor::get_tryed_assign() const
 {
 	return tryed_assign;
 }
@@ -60,4 +65,14 @@ ProcessorSet::ProcessorSet(uint num)//for identical multiprocessor platform
 {
 	for(uint i = 0; i < num; i++)
 		processors.push_back(Processor());
+}
+
+uint ProcessorSet::get_processor_num() const 
+{
+	return processors.size();
+}
+
+const Processors& ProcessorSet::get_processors() const 
+{
+	return processors;
 }

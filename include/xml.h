@@ -12,6 +12,42 @@ using namespace std;
 
 XMLDocument config;
 
+void get_method(Int_Set *i_set)
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("schedulability_test");
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		content = subtitle->GetText();
+		cout<<content<<endl;
+		int transform = 0;
+		if(content == "P-EDF")
+		{
+			cout<<"0"<<endl;
+			transform = 0;
+		}
+		else if(content == "BCL-FTP")
+		{
+			cout<<"1"<<endl;
+			transform = 1;
+		}
+		else if(content == "BCL-EDF")
+		{
+			cout<<"2"<<endl;
+			transform = 2;
+		}
+		else
+		{
+			cout<<"4"<<endl;
+			transform = 0;
+		}
+		i_set->push_back(transform);
+		subtitle = subtitle->NextSiblingElement();
+	}
+}
+
 uint get_experiment_times()
 {
 	const char* content;

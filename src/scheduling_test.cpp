@@ -4,12 +4,8 @@
 #include <sstream>
 #include <string>
 #include "tasks.h"
-#include "RMS.h"
-#include "bcl.h"
-#include "partitioned_sched.h"
 #include "schedulability_test.h"
 #include "processors.h"
-//#include "random_gen.h"
 #include "mgl_chart.h"
 #include "xml.h"
 //#include "pfp_algorithms.h"
@@ -21,16 +17,17 @@ using namespace std;
 
 void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
+string get_method_name(int method);
 Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD = 0);
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
 {	
-	Int_Set lambdas, p_num;
+	Int_Set lambdas, p_num, methods;
 	Double_Set steps;
 	Range_Set p_ranges, u_ranges;
 	uint exp_times;
-	Result_Set results_1, results_2, results_3, results_4;
+	Result_Set results, results_1, results_2, results_3, results_4;
 	Chart chart;
 	config.LoadFile("config.xml");
 	
@@ -46,6 +43,7 @@ int main(int argc,char** argv)
 	
 	
 	//scheduling parameter
+	get_method(&methods);
 	exp_times = get_experiment_times();
 	get_lambda(&lambdas);
 	get_processor_num(&p_num);
@@ -96,28 +94,37 @@ int main(int argc,char** argv)
 	output_file<<"period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n";
 	output_file<<"Utilization,"<<"P_EDF_ratio,"<<"G_EDF_ratio\n";
 
-	results_1 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 0);
-	results_2 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 1);
+	//results_1 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 1);
+	//results_2 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 2);
 	//results_3 = Scheduling_Test(lambdas[0], 8, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
 	//results_4 = Scheduling_Test(lambdas[0], 16, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
 
-
+/*
 	for(int i = 0; i < results_1.size(); i++)
 	{
 		output_file<<results_1[i].x<<","<<results_1[i].y<<","<<results_2[i].y<<"\n";
 	}
 	output_file.flush();
 	output_file.close();
+*/
+	
+	for(uint i = 0; i < methods.size(); i++)
+	{
+		cout<<"method:"<<methods[i]<<endl;
+		results = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods[i]);
+		chart.AddData(get_method_name(methods[i]).data(), results);
+		results.clear();
+	}
 	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
-	const char *name[] = {"G-FTP","G-EDF", "8 processors", "16 processors"};
+	//const char *name[] = {"G-FTP","G-EDF", "8 processors", "16 processors"};
 
-	chart.AddData(name[0], results_1);
-	chart.AddData(name[1], results_2);
+	//chart.AddData(name[0], results_1);
+	//chart.AddData(name[1], results_2);
 	//chart.AddData(name[2], results_3);
 	//chart.AddData(name[3], results_4);
 	chart.SetGraphSize(1280,800);
 	chart.SetGraphQual(3);
-	chart.ExportPNG(png_name.data(), "G-FTP VS G-EDF based on BCL", u_ranges[0].min, u_ranges[0].max);
+	chart.ExportPNG(png_name.data(), "", u_ranges[0].min, u_ranges[0].max);
 	
 	//Export_Chart(png_name.data(), "P-EDF VS G-EDF", u_ranges[0].min, u_ranges[0].max, steps[0], name, 2, results_1, results_2);
 	return 0;
@@ -130,18 +137,32 @@ string output_filename(int lambda, double step, int p_num, Range u_range, Range 
 	return buf.str();
 }
 
-void requests_gen()
+string get_method_name(int method)
 {
-
+	string name;
+	switch(method)
+	{
+		default:
+			name = "P-EDF";
+			break;
+		case 0:
+			name =  "P-EDF";
+			break;
+		case 1:
+			name =  "BCL-FTP";
+			break;
+		case 2:
+			name =  "BCL-EDF";
+			break;
+	}
+	return name;
 }
 
 Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD )
 {
 	Result_Set results;
 	double utilization = u_range.min;
-	BCL_Test b_test = BCL_Test(5);
 	ResourceSet res_set = *resourceset;
-	//Schedulability_Test *s_test = &b_test;
 
 	do
 	{	
@@ -156,27 +177,9 @@ Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Rang
 			
 			tast_gen(&taskset, resourceset, lambda, p_range, utilization, probability, num_max, l_range, tlfs);
 
-			//tast_gen(&taskset, lambda, p_range, utilization);
-			//if(is_schedulable(taskset, processorset,BCL_EDF))
-				//success++;
-			switch(TEST_METHOD)
-			{
-				case 0:
-					//if(is_Partitioned_EDF_Schedulable(taskset, processorset))
-					if(b_test.is_Schedulable(taskset, processorset, TEST_METHOD))
-					//if(is_RM_schedulable(taskset))
-						success++;
-					break;
-				case 1:
-
-					//if(is_EDF_schedulable(taskset))
-					//if(is_schedulable(taskset, processorset, 1))
-					if(b_test.is_Schedulable(taskset, processorset, TEST_METHOD))
-					//if(is_worst_fit_u_schedulable(taskset, processorset, res_set, 0, 0))
-						success++;
-					break;
-			}
-			
+			if(is_schedulable(taskset, processorset, TEST_METHOD))
+				success++;
+		
 		}
 
 		fraction_t ratio(success, exp_times);

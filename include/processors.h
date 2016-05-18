@@ -20,13 +20,10 @@ class Processor
 		bool tryed_assign;
 	public:
 		Processor(fraction_t speedfactor = 1);
-		fraction_t get_speedfactor();
-		fraction_t get_utilization() const
-		{
-			return utilization;
-		}
-		fraction_t get_density();
-		bool get_tryed_assign();
+		fraction_t get_speedfactor() const;
+		fraction_t get_utilization() const;
+		fraction_t get_density() const;
+		bool get_tryed_assign() const;
 
 		void add_task(TaskSet taskset, uint id);
 		void remove_task(TaskSet taskset, uint id);
@@ -41,13 +38,7 @@ class ProcessorSet
 		Processors processors;
 	public:
 		ProcessorSet(uint num);//for identical multiprocessor platform
-		uint get_processor_num() const 
-		{
-			return processors.size();
-		}
-		const Processors& get_processors() const 
-		{
-			return processors;
-		}
+		uint get_processor_num() const;
+		const Processors& get_processors() const;
 };
 #endif

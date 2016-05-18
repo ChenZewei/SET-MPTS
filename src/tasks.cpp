@@ -138,6 +138,41 @@ void Task::get_density(fraction_t &density)
 	density /= std::min(deadline,period);
 }
 
+uint Task::get_id() const { return id; }
+void Task::set_id(uint id) { this->id = id; };
+ulong Task::get_wcet() const	{ return wcet; }
+ulong Task::get_deadline() const { return deadline; }
+ulong Task::get_period() const { return period; }
+const Resource_Requests& Task::get_requests() const {	return requests; }
+bool Task::is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
+
+ulong Task::get_wcet_critical_sections() const { return wcet_critical_sections; }
+void Task::set_wcet_critical_sections(ulong csl) { wcet_critical_sections = csl; }
+ulong Task::get_wcet_non_critical_sections() const {	return wcet_non_critical_sections; }
+void Task::set_wcet_non_critical_sections(ulong ncsl) { wcet_non_critical_sections = ncsl; }
+ulong Task::get_spin() const	{ return spin; }
+void Task::set_spin(ulong spining) { spin = spining; }
+ulong Task::get_local_blocking() const { return local_blocking; }
+void Task::set_local_blocking(ulong lb) { local_blocking = lb; }
+ulong Task::get_total_blocking() const { return total_blocking; }
+void Task::set_total_blocking(ulong tb) { total_blocking = tb; }
+ulong Task::get_self_suspension() const { return self_suspension; }
+void Task::set_self_suspension(ulong ss) { self_suspension = ss; }
+ulong Task::get_jitter() const { return jitter; }
+void Task::set_jitter(ulong jit) { jitter = jit; }
+ulong Task::get_response_time() const { return response_time; }
+void Task::set_response_time(ulong response) { response_time = response; }
+uint Task::get_priority() const { return priority; }
+void Task::set_priority(uint prio) { priority = prio; }
+uint Task::get_partition() const { return partition; }
+void Task::set_partition(uint cpu) { partition = cpu; }
+uint Task::get_cluster() const { return cluster; }
+void Task::set_cluster(uint clu) { cluster = clu; }
+CPU_Set* Task::get_affinity() const { return affinity; }
+void Task::set_affinity(CPU_Set* affi) { affinity = affi; }
+bool Task::is_independent() const { return independent; }
+void Task::set_dependent() { independent = false; }
+
 /////////////////////////////TaskSet///////////////////////////////
 
 TaskSet::TaskSet()
@@ -146,6 +181,11 @@ TaskSet::TaskSet()
 	utilization_max = 0;
 	density_sum = 0;
 	density_max = 0;
+}
+
+TaskSet::~TaskSet()
+{
+	tasks.clear();
 }
 
 fraction_t TaskSet::get_utilization_sum() const
@@ -254,9 +294,58 @@ void TaskSet::sort_by_period()
 		tasks[i].set_id(i);
 }
 
+const Tasks& TaskSet::get_tasks() const
+{
+	return tasks;
+}
 
+bool TaskSet::is_implicit_deadline()
+{
+	foreach(tasks,tasks[i].get_deadline() != tasks[i].get_period());
+	return true;
+}
+bool TaskSet::is_constraint_deadline()
+{
+	foreach(tasks,tasks[i].get_deadline() > tasks[i].get_period());
+	return true;
+}
+bool TaskSet::is_arbitary_deadline()
+{
+	return !(is_implicit_deadline())&&!(is_constraint_deadline());
+}
+uint TaskSet::get_taskset_size() const 
+{
+	return tasks.size();
+}
 
+fraction_t TaskSet::get_task_utilization(uint index) const
+{
+	return tasks[index].get_utilization();
+}
+fraction_t TaskSet::get_task_density(uint index) const
+{
+	return tasks[index].get_density();
+}
+ulong TaskSet::get_task_wcet(uint index) const
+{
+	return tasks[index].get_wcet();
+}
+ulong TaskSet::get_task_deadline(uint index) const
+{
+	return tasks[index].get_deadline();
+}
+ulong TaskSet::get_task_period(uint index) const
+{
+	return tasks[index].get_period();
+}
 
+void TaskSet::display()
+{
+	for(int i = 0; i < tasks.size(); i++)
+	{
+		cout<<"Task id:"<<tasks[i].get_id()<<" Task period:"<<tasks[i].get_period()<<endl;
+	}
+}
 
 
 /////////////////////////////Others///////////////////////////////

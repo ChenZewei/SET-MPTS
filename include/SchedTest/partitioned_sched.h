@@ -1,3 +1,6 @@
+#ifndef PARTITIONED_SCHED_H
+#define PARTITIONED_SCHED_H
+
 #include <iostream>
 #include "../tasks.h"
 #include "../processors.h"
@@ -26,3 +29,5 @@ bool is_Partitioned_EDF_Schedulable(TaskSet taskset, ProcessorSet processorset)/
 	else
 		return false;
 }
+
+#endif

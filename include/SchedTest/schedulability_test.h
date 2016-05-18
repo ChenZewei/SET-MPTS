@@ -1,18 +1,24 @@
 #ifndef SCHEDULABILITY_TEST_H
 #define SCHEDULABILITY_TEST_H
+#include "RMS.h"
+#include "bcl.h"
+#include "partitioned_sched.h"
+#include "bin_packing.h"
+#include "types.h"
 
-#define BCL_FTP 0
-#define BCL_EDF 1
-/*
+
 bool is_schedulable(TaskSet taskset, ProcessorSet processorset, uint TEST_METHOD)
 {
 	bool schedulable;
 	switch(TEST_METHOD)
 	{
-		case 0:
+		case P_EDF:
+			schedulable = is_Partitioned_EDF_Schedulable(taskset, processorset);
+			break;		
+		case BCL_FTP:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);
 			break;
-		case 1:
+		case BCL_EDF:
 			schedulable = is_bcl_edf_schedulable(taskset, processorset);
 			break;
 		default:
@@ -21,7 +27,8 @@ bool is_schedulable(TaskSet taskset, ProcessorSet processorset, uint TEST_METHOD
 	}
 	return schedulable;
 }
-*/
+
+/*
 class Schedulability_Test
 {
 	public:
@@ -32,5 +39,5 @@ class Schedulability_Test
 		}
 		virtual bool is_Schedulable(TaskSet taskset, ProcessorSet processorset, int n, ...);
 };
-
+*/
 #endif

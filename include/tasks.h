@@ -82,40 +82,40 @@ class Task
 			ulong deadline = 0,
 			uint priority = 0);
 		
-		uint get_id() const { return id; }
-		void set_id(uint id) { this->id = id; };
-		ulong get_wcet() const	{ return wcet; }
-		ulong get_deadline() const { return deadline; }
-		ulong get_period() const { return period; }
-		const Resource_Requests& get_requests() const {	return requests; }
-		bool is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
+		uint get_id() const;
+		void set_id(uint id);
+		ulong get_wcet() const;
+		ulong get_deadline() const;
+		ulong get_period() const;
+		const Resource_Requests& get_requests() const;
+		bool is_feasible() const;
 
-		ulong get_wcet_critical_sections() const { return wcet_critical_sections; }
-		void set_wcet_critical_sections(ulong csl) { wcet_critical_sections = csl; }
-		ulong get_wcet_non_critical_sections() const {	return wcet_non_critical_sections; }
-		void set_wcet_non_critical_sections(ulong ncsl) { wcet_non_critical_sections = ncsl; }
-		ulong get_spin() const	{ return spin; }
-		void set_spin(ulong spining) { spin = spining; }
-		ulong get_local_blocking() const { return local_blocking; }
-		void set_local_blocking(ulong lb) { local_blocking = lb; }
-		ulong get_total_blocking() const { return total_blocking; }
-		void set_total_blocking(ulong tb) { total_blocking = tb; }
-		ulong get_self_suspension() const { return self_suspension; }
-		void set_self_suspension(ulong ss) { self_suspension = ss; }
-		ulong get_jitter() const { return jitter; }
-		void set_jitter(ulong jit) { jitter = jit; }
-		ulong get_response_time() const { return response_time; }
-		void set_response_time(ulong response) { response_time = response; }
-		uint get_priority() const { return priority; }
-		void set_priority(uint prio) { priority = prio; }
-		uint get_partition() const { return partition; }
-		void set_partition(uint cpu) { partition = cpu; }
-		uint get_cluster() const { return cluster; }
-		void set_cluster(uint clu) { cluster = clu; }
-		CPU_Set* get_affinity() const { return affinity; }
-		void set_affinity(CPU_Set* affi) { affinity = affi; }
-		bool is_independent() const { return independent; }
-		void set_dependent() { independent = false; }
+		ulong get_wcet_critical_sections() const;
+		void set_wcet_critical_sections(ulong csl);
+		ulong get_wcet_non_critical_sections() const;
+		void set_wcet_non_critical_sections(ulong ncsl);
+		ulong get_spin() const;
+		void set_spin(ulong spining);
+		ulong get_local_blocking() const;
+		void set_local_blocking(ulong lb);
+		ulong get_total_blocking() const;
+		void set_total_blocking(ulong tb);
+		ulong get_self_suspension() const;
+		void set_self_suspension(ulong ss);
+		ulong get_jitter() const;
+		void set_jitter(ulong jit);
+		ulong get_response_time() const;
+		void set_response_time(ulong response);
+		uint get_priority() const;
+		void set_priority(uint prio);
+		uint get_partition() const;
+		void set_partition(uint cpu);
+		uint get_cluster() const;
+		void set_cluster(uint clu);
+		CPU_Set* get_affinity() const;
+		void set_affinity(CPU_Set* affi);
+		bool is_independent() const;
+		void set_dependent();
 
 		void add_request(uint res_id, uint num, ulong max_len, ulong total_len);
 		
@@ -173,58 +173,23 @@ class TaskSet
 		fraction_t density_max;
 	public:
 		TaskSet();
-		~TaskSet()
-		{
-			tasks.clear();
-		}
-		void add_task(long wcet, long period, long deadline = 0);
+		~TaskSet();
 
+		void add_task(long wcet, long period, long deadline = 0);
 		void add_task(ResourceSet *resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline = 0);
 
-		const Tasks& get_tasks() const
-		{
-			return tasks;
-		}
+		const Tasks& get_tasks() const;
 
-		bool is_implicit_deadline()
-		{
-			foreach(tasks,tasks[i].get_deadline() != tasks[i].get_period());
-			return true;
-		}
-		bool is_constraint_deadline()
-		{
-			foreach(tasks,tasks[i].get_deadline() > tasks[i].get_period());
-			return true;
-		}
-		bool is_arbitary_deadline()
-		{
-			return !(is_implicit_deadline())&&!(is_constraint_deadline());
-		}
-		uint get_taskset_size() const 
-		{
-			return tasks.size();
-		}
+		bool is_implicit_deadline();
+		bool is_constraint_deadline();
+		bool is_arbitary_deadline();
+		uint get_taskset_size() const ;
 
-		fraction_t get_task_utilization(uint index) const
-		{
-			return tasks[index].get_utilization();
-		}
-		fraction_t get_task_density(uint index) const
-		{
-			return tasks[index].get_density();
-		}
-		ulong get_task_wcet(uint index) const
-		{
-			return tasks[index].get_wcet();
-		}
-		ulong get_task_deadline(uint index) const
-		{
-			return tasks[index].get_deadline();
-		}
-		ulong get_task_period(uint index) const
-		{
-			return tasks[index].get_period();
-		}
+		fraction_t get_task_utilization(uint index) const;
+		fraction_t get_task_density(uint index) const;
+		ulong get_task_wcet(uint index) const;
+		ulong get_task_deadline(uint index) const;
+		ulong get_task_period(uint index) const;
 		
 		fraction_t get_utilization_sum() const;
 		fraction_t get_utilization_max() const;
@@ -238,13 +203,7 @@ class TaskSet
 		void sort_by_period();
 		ulong DBF(ulong time);
 
-		void display()
-		{
-			for(int i = 0; i < tasks.size(); i++)
-			{
-				cout<<"Task id:"<<tasks[i].get_id()<<" Task period:"<<tasks[i].get_period()<<endl;
-			}
-		}
+		void display();
 
 
 
