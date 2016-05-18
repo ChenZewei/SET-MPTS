@@ -167,7 +167,6 @@ class TaskSet
 {
 	private:
 		Tasks tasks;
-		
 		fraction_t utilization_sum;
 		fraction_t utilization_max;
 		fraction_t density_sum;

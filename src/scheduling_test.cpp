@@ -42,6 +42,9 @@ int main(int argc,char** argv)
 		cout<<uniform_integral_gen(0,10)<<" ";
 	}
 	*/
+
+	
+	
 	//scheduling parameter
 	exp_times = get_experiment_times();
 	get_lambda(&lambdas);
@@ -62,6 +65,24 @@ int main(int argc,char** argv)
 	get_total_len_factor(&tlfs);
 
 	resource_gen(&resourceset, resource_num[0]);
+
+/*
+	TaskSet ts1;
+	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 2, 8);
+	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 1, 5);
+	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 1, 2);
+	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 1, 4);
+	ts1.display();
+	ts1.sort_by_period();
+	ts1.display();
+
+	const uint& ts1_size = ts1.get_taskset_size();
+	cout<<"f:"<<ts1.get_taskset_size()<<endl;
+	cout<<"v:"<<ts1_size<<endl;
+	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 1, 4);
+	cout<<"f:"<<ts1.get_taskset_size()<<endl;
+	cout<<"v:"<<ts1_size<<endl;
+*/
 
 	//system("mkdir results");
 
