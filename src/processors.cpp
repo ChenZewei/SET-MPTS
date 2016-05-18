@@ -47,6 +47,13 @@ void Processor::remove_task(TaskSet taskset, uint t_id)
 	}
 }
 
+void Processor::clear()
+{
+	queue.clear();
+	utilization = 0;
+	density = 0;
+	tryed_assign = false;
+}
 ///////////////////////////ProcessorSet/////////////////////////////
 
 ProcessorSet::ProcessorSet(uint num)//for identical multiprocessor platform
@@ -54,5 +61,3 @@ ProcessorSet::ProcessorSet(uint num)//for identical multiprocessor platform
 	for(uint i = 0; i < num; i++)
 		processors.push_back(Processor());
 }
-
-
