@@ -23,17 +23,17 @@ void get_method(Int_Set *i_set)
 		content = subtitle->GetText();
 		cout<<content<<endl;
 		int transform = 0;
-		if(content == "P-EDF")
+		if(0 == strcmp(content,"P-EDF"))
 		{
 			cout<<"0"<<endl;
 			transform = 0;
 		}
-		else if(content == "BCL-FTP")
+		else if(0 == strcmp(content,"BCL-FTP"))
 		{
 			cout<<"1"<<endl;
 			transform = 1;
 		}
-		else if(content == "BCL-EDF")
+		else if(0 == strcmp(content,"BCL-EDF"))
 		{
 			cout<<"2"<<endl;
 			transform = 2;

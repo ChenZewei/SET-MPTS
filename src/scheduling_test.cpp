@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <iomanip>
 #include "tasks.h"
 #include "schedulability_test.h"
 #include "processors.h"
@@ -17,7 +18,7 @@ using namespace std;
 
 void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
-string get_method_name(int method);
+const char* get_method_name(int method);
 Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD = 0);
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
@@ -30,7 +31,7 @@ int main(int argc,char** argv)
 	Result_Set results, results_1, results_2, results_3, results_4;
 	Chart chart;
 	config.LoadFile("config.xml");
-	
+	const char* temp_name[6];
 	/*
 	probability(1.25);
 
@@ -112,7 +113,9 @@ int main(int argc,char** argv)
 	{
 		cout<<"method:"<<methods[i]<<endl;
 		results = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods[i]);
-		chart.AddData(get_method_name(methods[i]).data(), results);
+		temp_name[i] = get_method_name(methods[i]);
+		cout<<temp_name[i]<<endl;
+		chart.AddData(temp_name[i], results);
 		results.clear();
 	}
 	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
@@ -133,13 +136,13 @@ int main(int argc,char** argv)
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range)
 {
 	stringstream buf;
-	buf<<"l:"<<lambda<<"-"<<"s:"<<step<<"-"<<"P:"<<p_num<<"-"<<"u:["<<u_range.min<<","<<u_range.max<<"]-"<<"p:["<<p_range.min<<","<<p_range.max<<"]";
+	buf<<"l:"<<lambda<<"-"<<"s:"<<step<<"-"<<"P:"<<p_num<<"-"<<fixed<<setprecision(0)<<"u:["<<u_range.min<<","<<u_range.max<<"]-"<<"p:["<<p_range.min<<","<<p_range.max<<"]";
 	return buf.str();
 }
 
-string get_method_name(int method)
+const char* get_method_name(int method)
 {
-	string name;
+	const char* name;
 	switch(method)
 	{
 		default:
