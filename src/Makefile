@@ -17,8 +17,8 @@ MOVE          = mv -f
 MKDIR         = mkdir -p
 TARGET	      = test
 
-test:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o sort.o
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o sort.o $(LFLAGS) $(LIBS)
+test:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o sort.o xml.o
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o sort.o xml.o $(LFLAGS) $(LIBS)
 	
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
@@ -43,6 +43,9 @@ mgl_chart.o:mathGL/mgl_chart.cpp
 
 sort.o:sort.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c sort.cpp $(LIBS)
+
+xml.o:xml.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c xml.cpp $(LIBS)
 
 clean:
 	rm -f *.o ${ALL}	

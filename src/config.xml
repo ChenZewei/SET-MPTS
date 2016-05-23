@@ -3,8 +3,9 @@
 	<schedulability_test>
 		<data>P-EDF</data>
 		<data>BCL-EDF</data>
+		<data>BCL-FTP</data>
 	</schedulability_test>
-	<experiment_times>100</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<lambda>
 		<data>10</data>
 	</lambda>

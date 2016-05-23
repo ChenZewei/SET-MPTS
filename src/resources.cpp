@@ -41,6 +41,15 @@ void ResourceSet::add_task(uint resource_id, uint task_id)
 	resources[resource_id].add_task(task_id);
 }
 
+const Resources& ResourceSet::get_resources() const
+{
+	return resources;
+}
+
+const uint& ResourceSet::get_resourceset_size() const
+{
+	return resources.size();
+}
 
 /////////////////////////////Others///////////////////////////////
 

@@ -37,15 +37,8 @@ class ResourceSet
 		ResourceSet();
 		void add_resource();
 		uint size() const;
-		const Resources& get_resources() const
-		{
-			return resources;
-		}
-
-		const uint& get_resourceset_size() const
-		{
-			return resources.size();
-		}
+		const Resources& get_resources() const;
+		const uint& get_resourceset_size() const;
 		void add_task(uint resource_id, uint task_id);
 };
 

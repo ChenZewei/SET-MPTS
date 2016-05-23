@@ -28,40 +28,32 @@ int main(int argc,char** argv)
 	Double_Set steps;
 	Range_Set p_ranges, u_ranges;
 	uint exp_times;
-	Result_Set results, results_1, results_2, results_3, results_4;
+	Result_Set results[6];
 	Chart chart;
-	config.LoadFile("config.xml");
-	const char* temp_name[6];
-	/*
-	probability(1.25);
 
-	for(int i = 0; i < 100; i++)
-	{
-		cout<<uniform_integral_gen(0,10)<<" ";
-	}
-	*/
+	//XML xml;	
 
-	
-	
+	XML::LoadFile("config.xml");
+
 	//scheduling parameter
-	get_method(&methods);
-	exp_times = get_experiment_times();
-	get_lambda(&lambdas);
-	get_processor_num(&p_num);
-	get_period_range(&p_ranges);
-	get_utilization_range(&u_ranges);
-	get_step(&steps);	
+	XML::get_method(&methods);
+	exp_times = XML::get_experiment_times();
+	XML::get_lambda(&lambdas);
+	XML::get_processor_num(&p_num);
+	XML::get_period_range(&p_ranges);
+	XML::get_utilization_range(&u_ranges);
+	XML::get_step(&steps);	
 
 	//resource parameter
 	ResourceSet resourceset = ResourceSet();
 	Int_Set resource_num, rrns;
 	Double_Set rrps, tlfs;
 	Range_Set rrrs;
-	get_resource_num(&resource_num);
-	get_resource_request_probability(&rrps);
-	get_resource_request_num(&rrns);
-	get_resource_request_range(&rrrs);
-	get_total_len_factor(&tlfs);
+	XML::get_resource_num(&resource_num);
+	XML::get_resource_request_probability(&rrps);
+	XML::get_resource_request_num(&rrns);
+	XML::get_resource_request_range(&rrrs);
+	XML::get_total_len_factor(&tlfs);
 
 	resource_gen(&resourceset, resource_num[0]);
 
@@ -93,43 +85,50 @@ int main(int argc,char** argv)
 	output_file<<" step:"<<steps[0]<<",";
 	output_file<<" utilization range:["<<u_ranges[0].min<<"-"<<u_ranges[0].max<<"] ";
 	output_file<<"period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n";
-	output_file<<"Utilization,"<<"P_EDF_ratio,"<<"G_EDF_ratio\n";
+	output_file<<"Utilization,";
+	for(uint i = 0; i < methods.size(); i++)
+	{
+		output_file<<get_method_name(methods[i])<<" ratio,";
+	}
+	output_file<<"\n";
 
 	//results_1 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 1);
 	//results_2 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 2);
 	//results_3 = Scheduling_Test(lambdas[0], 8, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
 	//results_4 = Scheduling_Test(lambdas[0], 16, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
 
-/*
-	for(int i = 0; i < results_1.size(); i++)
-	{
-		output_file<<results_1[i].x<<","<<results_1[i].y<<","<<results_2[i].y<<"\n";
-	}
-	output_file.flush();
-	output_file.close();
-*/
+
+	
+
 	
 	for(uint i = 0; i < methods.size(); i++)
 	{
-		cout<<"method:"<<methods[i]<<endl;
-		results = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods[i]);
-		temp_name[i] = get_method_name(methods[i]);
-		cout<<temp_name[i]<<endl;
-		chart.AddData(temp_name[i], results);
-		results.clear();
+		results[i] = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods[i]);
+		chart.AddData(get_method_name(methods[i]), results[i]);
+		//results.clear();
 	}
-	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
-	//const char *name[] = {"G-FTP","G-EDF", "8 processors", "16 processors"};
 
-	//chart.AddData(name[0], results_1);
-	//chart.AddData(name[1], results_2);
-	//chart.AddData(name[2], results_3);
-	//chart.AddData(name[3], results_4);
+	if(0 != methods.size())
+	{
+		for(uint i = 0; i < results[0].size(); i++)
+		{	
+			output_file<<results[0][i].x<<",";
+			for( uint j = 0; j < methods.size(); j++)
+			{
+				output_file<<results[j][i].y<<",";
+			}
+			output_file<<"\n";
+		}
+	}	
+	output_file.flush();
+	output_file.close();
+	
+	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
+
 	chart.SetGraphSize(1280,800);
 	chart.SetGraphQual(3);
 	chart.ExportPNG(png_name.data(), "", u_ranges[0].min, u_ranges[0].max);
-	
-	//Export_Chart(png_name.data(), "P-EDF VS G-EDF", u_ranges[0].min, u_ranges[0].max, steps[0], name, 2, results_1, results_2);
+
 	return 0;
 }
 
