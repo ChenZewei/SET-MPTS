@@ -287,13 +287,6 @@ void TaskSet::get_density_max(fraction_t &density_max) const
 			density_max = tasks[i].get_density();
 }
 
-void TaskSet::sort_by_period()
-{
-	sort(tasks.begin(), tasks.end(), period_increase);
-	for(int i = 0; i < tasks.size(); i++)
-		tasks[i].set_id(i);
-}
-
 const Tasks& TaskSet::get_tasks() const
 {
 	return tasks;
@@ -339,6 +332,13 @@ ulong TaskSet::get_task_period(uint index) const
 	return tasks[index].get_period();
 }
 
+void TaskSet::sort_by_period()
+{
+	sort(tasks.begin(), tasks.end(), period_increase);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_id(i);
+}
+
 void TaskSet::display()
 {
 	for(int i = 0; i < tasks.size(); i++)
@@ -375,6 +375,7 @@ void tast_gen(TaskSet *taskset, ResourceSet* resourceset, int lambda, Range p_ra
 		//taskset->add_task(wcet,period);	
 		taskset->add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
 	}
+	taskset->sort_by_period();
 }
 
 ulong gcd(ulong a, ulong b)

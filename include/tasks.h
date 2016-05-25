@@ -16,7 +16,6 @@ using namespace std;
 
 typedef vector<fraction_t> Ratio;
 
-
 class Request
 {
 	private:
@@ -128,7 +127,18 @@ class Task
 		void get_density(fraction_t &density);
 };
 
-typedef vector<uint> Jobs;//wcet
+class Job
+{
+	private:
+		uint id;
+		ulong cost;
+	public:
+		Job(uint id, ulong cost);
+		uint get_id() const;
+		ulong get_cost() const;
+}
+
+typedef vector<Job> Jobs;
 
 struct Edge//job m can be excuted only if job v is completed
 {

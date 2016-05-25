@@ -13,7 +13,6 @@ class Processor
 {
 	private:
 		TaskQueue queue;
-
 		fraction_t speedfactor;
 		fraction_t utilization;
 		fraction_t density;
@@ -25,8 +24,8 @@ class Processor
 		fraction_t get_density() const;
 		bool get_tryed_assign() const;
 
-		void add_task(TaskSet taskset, uint id);
-		void remove_task(TaskSet taskset, uint id);
+		bool add_task(TaskSet taskset, uint id);
+		bool remove_task(TaskSet taskset, uint id);
 		void clear();	
 };
 
