@@ -161,18 +161,19 @@ simtime_t GlobalScheduling::get_current_time() const
 {
 	return current_time;
 }
+
 void GlobalScheduling::abort() const
 {
 	abort = true;
 }
+
 void GlobalScheduling::simulate_until(simtime_t end_of_simulation)
 {
 	while (current_time <= end_of_simulation &&//进行到最近一个事件发生的时刻
                !aborted &&
                !events.empty()) 
 	{
-            simtime_t next = events.top().time();
-            advance_time(next);
+            advance_time(events.top().time());
         }
 }
 
