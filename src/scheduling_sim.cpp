@@ -101,6 +101,16 @@ uint SimProcessorSet::get_processor_num() const
 	return simprocessors.size();
 }
 
+SimProcessor* SimProcessorSet::get_processor(uint index)
+{
+	return &simprocessors[index];
+}
+
+bool SimProcessorSet::is_job_finished(uint index, simtime_t untill)
+{
+	return simprocessors[index].advance_time(untill);
+}
+
 //////////////////////////////////Event////////////////////////////////////
 
 Object* Event::object() const
@@ -177,4 +187,26 @@ void GlobalScheduling::simulate_until(simtime_t end_of_simulation)
         }
 }
 
-void GlobalScheduling::advance_time(simtime_t time);
+void GlobalScheduling::advance_time(simtime_t untill)
+{
+	simtime_t last = current_time;
+	current_time = untill;
+	//check if current job is finished or not
+	for(uint i = 0; i < processorset.get_processor_num(); i++)
+	{
+		if(processorset.is_job_finished(i, untill))
+		{
+			SimJob* complete_job processorset.get_processor(i)->get_current_job();
+			processorset.get_processor(i)->idle();
+		}
+	}
+	
+	//check
+	while(!events.empty())
+	{
+		
+	}
+
+	//preemption
+	
+}

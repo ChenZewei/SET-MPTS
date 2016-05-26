@@ -58,6 +58,8 @@ class SimProcessorSet
 		SimProcessors simprocessors;
 	public:
 		uint get_processor_num() const;
+		SimProcessor* get_processor(uint index);
+		bool is_job_finished(uint index, simtime_t untill);
 };
 
 template<typename Object,typename Time>
@@ -107,7 +109,7 @@ class GlobalScheduling
 		bool aborted;
 
 	private:
-		void advance_time(simtime_t time);
+		void advance_time(simtime_t untill);
 	public:
 		GlobalScheduling(SimProcessorSet &processorset);
 		~GlobalScheduling();
