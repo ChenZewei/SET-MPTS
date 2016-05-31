@@ -16,6 +16,10 @@
 			<min>0</min>
 			<max>4</max>
 		</data>
+		<data>
+			<min>0</min>
+			<max>8</max>
+		</data>
 	</init_utilization_range>
 	<processor_num>
 		<data>4</data>	
@@ -24,6 +28,10 @@
 		<data>
 			<min>200000</min>
 			<max>1000000</max>
+		</data>
+		<data>
+			<min>400000</min>
+			<max>2000000</max>
 		</data>
 	</period_range>	
 	<resource_num>

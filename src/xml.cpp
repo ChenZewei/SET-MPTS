@@ -2,7 +2,7 @@
 
 XML::XML()
 {
-	
+	output = new XMLDocument();
 }
 
 XMLDocument XML::config;
@@ -228,4 +228,65 @@ void XML::get_total_len_factor(Double_Set *d_set)
 		d_set->push_back(temp.get_d());
 		subtitle = subtitle->NextSiblingElement();
 	}
+}
+
+//xml construction
+void XML::initialization()
+{
+	XMLDeclaration *declaration = output->NewDeclaration();
+	output->InsertFirstChild(declaration);
+}
+
+void XML::add_element(const char* name)
+{
+	XMLElement *root = output->NewElement(name);
+	root->SetName(name);
+	output->InsertEndChild(root);
+}
+
+void XML::add_element(const char* parent, const char* name, const char* text)
+{
+	XMLElement *root = output->RootElement();
+	XMLElement *title = output->FirstChildElement(parent);
+	XMLElement *element = output->NewElement(name);
+	element->SetText(text);
+	title->InsertEndChild(element);
+}
+
+void XML::add_range(const char* parent, Range range)
+{
+	XMLElement *root = output->RootElement();
+	XMLElement *title = root->FirstChildElement(parent);
+	XMLElement *data = output->NewElement("data");
+	XMLElement *min = output->NewElement("min");
+	XMLElement *max = output->NewElement("max");
+	fraction_t transform = range.min;
+	min->SetText(transform.get_str().data());
+	data->InsertEndChild(min);
+	transform = range.max;
+	max->SetText(transform.get_str().data());
+	data->InsertEndChild(max);
+	title->InsertFirstChild(data);
+}
+
+void XML::set_text(const char* parent, int index1, const char* element, int index2,const char* text)
+{
+	XMLElement *root = output->RootElement();
+	XMLElement *title = output->FirstChildElement(parent);
+	for(int i = 0; i < index1; i++)
+		title = title->NextSiblingElement();
+	XMLElement *subtitle = title->FirstChildElement(element);
+	for(int i = 0; i < index2; i++)
+		subtitle = subtitle->NextSiblingElement();
+	subtitle->SetText(text);
+}
+
+void XML::save_file(const char* path)
+{
+	output->SaveFile(path);
+}
+
+void XML::clear()
+{
+	output->Clear();
 }
