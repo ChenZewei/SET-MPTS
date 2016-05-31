@@ -7,7 +7,7 @@
 #include "types.h"
 
 
-bool is_schedulable(TaskSet taskset, ProcessorSet processorset, uint TEST_METHOD)
+bool is_schedulable(TaskSet taskset, ProcessorSet processorset, ResourceSet resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
 {
 	bool schedulable;
 	switch(TEST_METHOD)
@@ -21,6 +21,8 @@ bool is_schedulable(TaskSet taskset, ProcessorSet processorset, uint TEST_METHOD
 		case BCL_EDF:
 			schedulable = is_bcl_edf_schedulable(taskset, processorset);
 			break;
+		case WF_DM:
+			schedulable = is_worst_fit_u_schedulable(taskset, processorset,	resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
 		default:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);
 			break;

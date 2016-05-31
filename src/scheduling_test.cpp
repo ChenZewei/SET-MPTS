@@ -9,7 +9,7 @@
 #include "processors.h"
 #include "mgl_chart.h"
 #include "xml.h"
-//#include "pfp_algorithms.h"
+#include "pfp_algorithms.h"
 
 #define MAX_LEN 100
 
@@ -156,6 +156,9 @@ const char* get_method_name(int method)
 		case 2:
 			name =  "BCL-EDF";
 			break;
+		case 3:
+			name = "WF-DM";
+			break;
 	}
 	return name;
 }
@@ -179,7 +182,7 @@ Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Rang
 			
 			tast_gen(&taskset, resourceset, lambda, p_range, utilization, probability, num_max, l_range, tlfs);
 
-			if(is_schedulable(taskset, processorset, TEST_METHOD))
+			if(is_schedulable(taskset, processorset, resourceset, TEST_METHOD, 1, 1))
 				success++;
 		
 		}

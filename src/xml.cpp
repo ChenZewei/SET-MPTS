@@ -33,6 +33,9 @@ void XML::get_method(Int_Set *i_set)
 		else if(0 == strcmp(content,"BCL-EDF"))
 		{
 			transform = 2;
+		}else if(0 == strcmp(content,"WF-DM"))
+		{
+			transform = 3;
 		}
 		else
 		{
