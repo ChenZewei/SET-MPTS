@@ -11,6 +11,7 @@
 #include "xml.h"
 
 #define MAX_LEN 100
+#define MAX_METHOD 6
 
 
 using namespace std;
@@ -18,7 +19,7 @@ using namespace std;
 void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
 const char* get_method_name(int method);
-Result_Set Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD = 0);
+void	 Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, Int_Set methods, Result_Set *results);
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
@@ -27,7 +28,7 @@ int main(int argc,char** argv)
 	Double_Set steps;
 	Range_Set p_ranges, u_ranges;
 	uint exp_times;
-	Result_Set results[6];
+	Result_Set results[MAX_METHOD];
 	Chart chart;
 
 	//XML xml;	
@@ -56,24 +57,6 @@ int main(int argc,char** argv)
 
 	resource_gen(&resourceset, resource_num[0]);
 
-/*
-	TaskSet ts1;
-	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 2, 8);
-	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 1, 5);
-	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 1, 2);
-	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 1, 4);
-	ts1.display();
-	ts1.sort_by_period();
-	ts1.display();
-
-	const uint& ts1_size = ts1.get_taskset_size();
-	cout<<"f:"<<ts1.get_taskset_size()<<endl;
-	cout<<"v:"<<ts1_size<<endl;
-	ts1.add_task(&resourceset, 0.2, 5, rrrs[0], tlfs[0], 1, 4);
-	cout<<"f:"<<ts1.get_taskset_size()<<endl;
-	cout<<"v:"<<ts1_size<<endl;
-*/
-
 	//system("mkdir results");
 
 	string file_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".csv";
@@ -91,21 +74,41 @@ int main(int argc,char** argv)
 	}
 	output_file<<"\n";
 
-	//results_1 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 1);
-	//results_2 = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], 2);
-	//results_3 = Scheduling_Test(lambdas[0], 8, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
-	//results_4 = Scheduling_Test(lambdas[0], 16, p_ranges[0], u_ranges[0], steps[0], exp_times, 0);
+	double utilization = u_ranges[0].min;
+	do
+	{	
+		Result result;
+		result.x = utilization;
+		int success[MAX_METHOD] = {0, 0, 0, 0, 0, 0};
+		for(int i = 0; i < exp_times; i++)
+		{
+			TaskSet taskset = TaskSet();
+			
+			ProcessorSet processorset = ProcessorSet(p_num[0]);
+			
+			tast_gen(taskset, resourceset, lambdas[0], p_ranges[0], utilization, rrps[0], rrns[0], rrrs[0], tlfs[0]);
+			for(uint i = 0; i < methods.size(); i++)
+			{
+				if(is_schedulable(taskset, processorset, resourceset, methods[i], 0, 0))
+				{	
+					success[i]++;
+				}
+			}
+		
+		}
+		for(uint i = 0; i < methods.size(); i++)
+		{
+			fraction_t ratio(success[i], exp_times);
+			result.y = ratio.get_d();
+			results[i].push_back(result);
+		}
+		
+	}while((utilization += steps[0]) < u_ranges[0].max);
 
-
-	
-
-	
+	//Scheduling_Test(resourceset, lambdas[0], p_num[0], p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods, results);
 	for(uint i = 0; i < methods.size(); i++)
-	{
-		results[i] = Scheduling_Test(resourceset, lambdas[0], p_num[0], p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods[i]);
 		chart.AddData(get_method_name(methods[i]), results[i]);
 		//results.clear();
-	}
 
 	if(0 != methods.size())
 	{
@@ -165,15 +168,14 @@ const char* get_method_name(int method)
 	return name;
 }
 
-Result_Set Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD )
+void Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, Int_Set methods, Result_Set *results )
 {
-	Result_Set results;
 	double utilization = u_range.min;
 	do
 	{	
 		Result result;
 		result.x = utilization;
-		int success = 0;
+		int success[MAX_METHOD] = {0, 0, 0, 0, 0, 0};
 		for(int i = 0; i < exp_times; i++)
 		{
 			TaskSet taskset = TaskSet();
@@ -181,19 +183,24 @@ Result_Set Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Rang
 			ProcessorSet processorset = ProcessorSet(p_num);
 			
 			tast_gen(taskset, resourceset, lambda, p_range, utilization, probability, num_max, l_range, tlfs);
-			if(is_schedulable(taskset, processorset, resourceset, TEST_METHOD, 0, 0))
-			{	
-				success++;
+			for(uint i = 0; i < methods.size(); i++)
+			{
+				if(is_schedulable(taskset, processorset, resourceset, methods[i], 0, 0))
+				{	
+					success[i]++;
+				}
 			}
 		
 		}
-
-		fraction_t ratio(success, exp_times);
-		result.y = ratio.get_d();
-		results.push_back(result);
+		for(uint i = 0; i < methods.size(); i++)
+		{
+			fraction_t ratio(success[i], exp_times);
+			result.y = ratio.get_d();
+			results[i].push_back(result);
+		}
+		
 	}while((utilization += step) < u_range.max);
 	
-	return results;
 }
 
 
