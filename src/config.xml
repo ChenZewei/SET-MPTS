@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <parameters>
 	<schedulability_test>
-		<data>P-EDF</data>
 		<data>WF-DM</data>
+		<data>WF-EDF</data>
 	</schedulability_test>
 	<experiment_times>20</experiment_times>
 	<lambda>

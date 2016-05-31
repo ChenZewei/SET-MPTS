@@ -45,7 +45,7 @@ Task::Task(uint id,
 }
 
 Task::Task(	uint id,
-		ResourceSet* resourceset,
+		ResourceSet& resourceset,
 		double probability,
 		int num_max,
 		Range l_range,
@@ -84,14 +84,14 @@ Task::Task(	uint id,
 
 	
 	//Random_Gen r;
-	for(int i = 0; i < resourceset->size(); i++)
+	for(int i = 0; i < resourceset.size(); i++)
 	{
 		if(Random_Gen::probability(probability))
 		{
 			uint num = Random_Gen::uniform_integral_gen(1, num_max);
 			uint max_len = Random_Gen::uniform_integral_gen(l_range.min, l_range.max);
 			add_request(i, num, max_len, tlfs*max_len);
-			resourceset->add_task(i, id);
+			resourceset.add_task(i, id);
 		}
 	}
 }
@@ -225,7 +225,7 @@ void TaskSet::add_task(long wcet, long period, long deadline)
 		density_max = density_new;
 }
 
-void TaskSet::add_task(ResourceSet* resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline)
+void TaskSet::add_task(ResourceSet& resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline)
 {
 	fraction_t utilization_new = wcet, density_new = wcet;
 	utilization_new /= period;
@@ -287,7 +287,7 @@ void TaskSet::get_density_max(fraction_t &density_max) const
 			density_max = tasks[i].get_density();
 }
 
-const Tasks& TaskSet::get_tasks() const
+Tasks& TaskSet::get_tasks()
 {
 	return tasks;
 }
@@ -339,6 +339,13 @@ void TaskSet::sort_by_period()
 		tasks[i].set_id(i);
 }
 
+void TaskSet::sort_by_utilization()
+{
+	sort(tasks.begin(), tasks.end(), utilization_decrease);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_id(i);
+}
+
 void TaskSet::display()
 {
 	for(int i = 0; i < tasks.size(); i++)
@@ -350,10 +357,10 @@ void TaskSet::display()
 
 /////////////////////////////Others///////////////////////////////
 
-void tast_gen(TaskSet *taskset, ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
+void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
 {
 	//Random_Gen r;
-	while(taskset->get_utilization_sum() < utilization)//generate tasks
+	while(taskset.get_utilization_sum() < utilization)//generate tasks
 	{
 		long period = Random_Gen::uniform_integral_gen(int(p_range.min),int(p_range.max));
 		fraction_t u = Random_Gen::exponential_gen(lambda);
@@ -364,18 +371,18 @@ void tast_gen(TaskSet *taskset, ResourceSet* resourceset, int lambda, Range p_ra
 		else if(wcet > period)
 			wcet = period;
 		fraction_t temp(wcet, period);
-		if(taskset->get_utilization_sum() + temp > utilization)
+		if(taskset.get_utilization_sum() + temp > utilization)
 		{
-			temp = utilization - taskset->get_utilization_sum();			
+			temp = utilization - taskset.get_utilization_sum();			
 			wcet = period*temp.get_d();
 			//taskset->add_task(wcet, period);
-			taskset->add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
+			taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
 			break;
 		}
 		//taskset->add_task(wcet,period);	
-		taskset->add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
+		taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
 	}
-	taskset->sort_by_period();
+	taskset.sort_by_period();
 }
 
 ulong gcd(ulong a, ulong b)

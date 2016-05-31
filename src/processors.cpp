@@ -76,7 +76,7 @@ uint ProcessorSet::get_processor_num() const
 	return processors.size();
 }
 
-const Processors& ProcessorSet::get_processors() const 
+Processors& ProcessorSet::get_processors()
 {
 	return processors;
 }

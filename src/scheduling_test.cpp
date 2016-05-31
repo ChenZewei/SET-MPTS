@@ -9,7 +9,6 @@
 #include "processors.h"
 #include "mgl_chart.h"
 #include "xml.h"
-#include "pfp_algorithms.h"
 
 #define MAX_LEN 100
 
@@ -19,7 +18,7 @@ using namespace std;
 void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
 const char* get_method_name(int method);
-Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD = 0);
+Result_Set Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD = 0);
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
@@ -103,7 +102,7 @@ int main(int argc,char** argv)
 	
 	for(uint i = 0; i < methods.size(); i++)
 	{
-		results[i] = Scheduling_Test(&resourceset, lambdas[0], 2, p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods[i]);
+		results[i] = Scheduling_Test(resourceset, lambdas[0], p_num[0], p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods[i]);
 		chart.AddData(get_method_name(methods[i]), results[i]);
 		//results.clear();
 	}
@@ -159,16 +158,17 @@ const char* get_method_name(int method)
 		case 3:
 			name = "WF-DM";
 			break;
+		case 4:
+			name = "WF-EDF";
+			break;
 	}
 	return name;
 }
 
-Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD )
+Result_Set Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, int TEST_METHOD )
 {
 	Result_Set results;
 	double utilization = u_range.min;
-	ResourceSet res_set = *resourceset;
-
 	do
 	{	
 		Result result;
@@ -180,10 +180,11 @@ Result_Set Scheduling_Test(ResourceSet* resourceset, int lambda, int p_num, Rang
 			
 			ProcessorSet processorset = ProcessorSet(p_num);
 			
-			tast_gen(&taskset, resourceset, lambda, p_range, utilization, probability, num_max, l_range, tlfs);
-
-			if(is_schedulable(taskset, processorset, resourceset, TEST_METHOD, 1, 1))
+			tast_gen(taskset, resourceset, lambda, p_range, utilization, probability, num_max, l_range, tlfs);
+			if(is_schedulable(taskset, processorset, resourceset, TEST_METHOD, 0, 0))
+			{	
 				success++;
+			}
 		
 		}
 

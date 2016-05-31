@@ -71,7 +71,7 @@ class Task
 			uint priority = 0);
 
 		Task(	uint id,
-			ResourceSet *resourceset,
+			ResourceSet& resourceset,
 			double probability,
 			int num_max,
 			Range l_range,
@@ -136,7 +136,7 @@ class Job
 		Job(uint id, ulong cost);
 		uint get_id() const;
 		ulong get_cost() const;
-}
+};
 
 typedef vector<Job> Jobs;
 
@@ -186,9 +186,9 @@ class TaskSet
 		~TaskSet();
 
 		void add_task(long wcet, long period, long deadline = 0);
-		void add_task(ResourceSet *resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline = 0);
+		void add_task(ResourceSet& resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline = 0);
 
-		const Tasks& get_tasks() const;
+		Tasks& get_tasks();
 
 		bool is_implicit_deadline();
 		bool is_constraint_deadline();
@@ -210,7 +210,8 @@ class TaskSet
 		void get_density_sum(fraction_t &density_sum) const;
 		void get_density_max(fraction_t &density_max) const;
 
-		void sort_by_period();
+		void sort_by_period();//increase
+		void sort_by_utilization();//decrease
 		ulong DBF(ulong time);
 
 		void display();
@@ -219,7 +220,7 @@ class TaskSet
 
 };
 
-void tast_gen(TaskSet *taskset, ResourceSet* resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
+void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
 ulong gcd(ulong a, ulong b);
 ulong lcm(ulong a, ulong b);
 

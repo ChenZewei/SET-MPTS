@@ -11,5 +11,6 @@
 class Task;
 
 int period_increase(Task t1, Task t2);
+int utilization_decrease(Task t1, Task t2);
 
 #endif

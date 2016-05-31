@@ -16,6 +16,7 @@
 #define BCL_FTP 1
 #define BCL_EDF 2
 #define WF_DM 3
+#define WF_EDF 4
 using namespace std;
 
 typedef mpz_class int_t;		//multiple precision integer

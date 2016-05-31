@@ -38,6 +38,7 @@ class ProcessorSet
 	public:
 		ProcessorSet(uint num);//for identical multiprocessor platform
 		uint get_processor_num() const;
-		const Processors& get_processors() const;
+		Processors& get_processors();
+		
 };
 #endif
