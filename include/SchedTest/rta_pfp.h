@@ -213,6 +213,10 @@ bool is_pfp_rta_schedulable( TaskSet& tasks, const ResourceSet& resources, uint 
 	ulong response_bound;
 	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
 	{
+		Task& task = tasks.get_tasks()[t_id];
+		if (task.get_partition() == 0XFFFFFFFF)
+			continue;
+
 		switch (TEST_TYPE)
 		{
 			case 0:
@@ -230,7 +234,6 @@ bool is_pfp_rta_schedulable( TaskSet& tasks, const ResourceSet& resources, uint 
 
 		}
 		
-		Task& task = tasks.get_tasks()[t_id];
 		if (response_bound <= task.get_deadline())
 			task.set_response_time(response_bound);
 		else
