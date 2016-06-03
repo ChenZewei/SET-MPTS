@@ -75,10 +75,12 @@ int main(int argc,char** argv)
 	output_file<<"\n";
 
 	double utilization = u_ranges[0].min;
-	do
+
+	//while(utilization <= u_ranges[0].max)
+	for(;utilization <= u_ranges[0].max ; utilization += steps[0])
 	{	
 		Result result;
-		result.x = utilization;
+		
 		int success[MAX_METHOD] = {0, 0, 0, 0, 0, 0};
 		for(int i = 0; i < exp_times; i++)
 		{
@@ -94,6 +96,7 @@ int main(int argc,char** argv)
 					success[i]++;
 				}
 			}
+			result.x = taskset.get_utilization_sum().get_d();
 		
 		}
 		for(uint i = 0; i < methods.size(); i++)
@@ -102,8 +105,13 @@ int main(int argc,char** argv)
 			result.y = ratio.get_d();
 			results[i].push_back(result);
 		}
-		
-	}while((utilization += steps[0]) < u_ranges[0].max);
+		cout<<"U-MAX:"<<u_ranges[0].max<<endl;
+		cout<<"utilization:"<<utilization<<endl;
+		cout<<u_ranges[0].max-utilization<<endl;
+		cout<<steps[0]<<endl;
+		if(utilization+steps[0] == u_ranges[0].max)
+			cout<<"11111111111111111111"<<endl;
+	}
 
 	//Scheduling_Test(resourceset, lambdas[0], p_num[0], p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods, results);
 	for(uint i = 0; i < methods.size(); i++)
@@ -129,7 +137,7 @@ int main(int argc,char** argv)
 
 	chart.SetGraphSize(1280,800);
 	chart.SetGraphQual(3);
-	chart.ExportPNG(png_name.data(), "", u_ranges[0].min, u_ranges[0].max);
+	chart.ExportPNG(png_name.data(), "", u_ranges[0].min, results[0][results[0].size()-1].x);
 
 	return 0;
 }
@@ -198,7 +206,7 @@ void Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_ra
 			result.y = ratio.get_d();
 			results[i].push_back(result);
 		}
-		
+		cout<<"utilization:"<<utilization<<endl;
 	}while((utilization += step) < u_range.max);
 	
 }

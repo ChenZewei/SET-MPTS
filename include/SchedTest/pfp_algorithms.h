@@ -37,7 +37,7 @@ bool is_worst_fit_edf_schedulable(TaskSet& tasks,
 	{
 		processors.get_processors()[i].clear();
 	}
-	//tasks.sort_by_utilization();
+	tasks.sort_by_utilization();
 	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
 	{
 		if (!worst_fit_edf(tasks, processors, resources, t_id, TEST_TYPE, ITER_BLOCKING))

@@ -374,7 +374,7 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_ra
 		if(taskset.get_utilization_sum() + temp > utilization)
 		{
 			temp = utilization - taskset.get_utilization_sum();			
-			wcet = period*temp.get_d();
+			wcet = period*temp.get_d() + 1;
 			//taskset->add_task(wcet, period);
 			taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
 			break;
@@ -383,6 +383,7 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_ra
 		taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
 	}
 	taskset.sort_by_period();
+	cout<<utilization<<":"<<taskset.get_utilization_sum().get_d()<<endl;
 }
 
 ulong gcd(ulong a, ulong b)
