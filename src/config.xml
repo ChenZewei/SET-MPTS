@@ -2,6 +2,7 @@
 <parameters>
 	<schedulability_test>
 		<data>WF-DM</data>
+		<data>WF-DM</data>
 		<data>WF-EDF</data>
 	</schedulability_test>
 	<experiment_times>1</experiment_times>

@@ -10,5 +10,10 @@ static inline ulong ceiling(ulong numer, ulong denom)
 	else
 		return (numer / denom) + 1;
 }
-
+/*
+bool double_equal(double a, double b)
+{
+	return fabs(a - b) < EPS;
+}
+*/
 #endif

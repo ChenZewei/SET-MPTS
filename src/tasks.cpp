@@ -91,9 +91,24 @@ Task::Task(	uint id,
 			uint num = Random_Gen::uniform_integral_gen(1, num_max);
 			uint max_len = Random_Gen::uniform_integral_gen(l_range.min, l_range.max);
 			add_request(i, num, max_len, tlfs*max_len);
-			resourceset.add_task(i, id);
+			resourceset.add_task(i, this);
 		}
 	}
+}
+
+void Task::init()
+{
+	partition = MAX_INT;
+	spin = 0;
+	self_suspension = 0;
+	local_blocking = 0;
+	total_blocking = 0;
+	jitter = 0;
+	response_time = 0;
+	cluster = MAX_INT;
+	independent = true;
+	wcet_non_critical_sections = this->wcet;
+	wcet_critical_sections = 0;
 }
 
 void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len)
@@ -143,9 +158,19 @@ void Task::set_id(uint id) { this->id = id; };
 ulong Task::get_wcet() const	{ return wcet; }
 ulong Task::get_deadline() const { return deadline; }
 ulong Task::get_period() const { return period; }
-const Resource_Requests& Task::get_requests() const {	return requests; }
 bool Task::is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
 
+Resource_Requests& Task::get_requests() {	return requests; }
+Request& Task::get_request_by_id(uint id)
+{
+	Request *result = NULL;
+	for(uint i = 0; i < requests.size(); i++)
+	{
+		if(id == requests[i].get_resource_id())
+			return requests[i];
+	}
+	return *result;
+}
 ulong Task::get_wcet_critical_sections() const { return wcet_critical_sections; }
 void Task::set_wcet_critical_sections(ulong csl) { wcet_critical_sections = csl; }
 ulong Task::get_wcet_non_critical_sections() const {	return wcet_non_critical_sections; }
@@ -186,6 +211,12 @@ TaskSet::TaskSet()
 TaskSet::~TaskSet()
 {
 	tasks.clear();
+}
+
+void TaskSet::init()
+{
+	for(uint i = 0; i < tasks.size(); i++)
+		tasks[i].init();
 }
 
 fraction_t TaskSet::get_utilization_sum() const
@@ -250,6 +281,76 @@ void TaskSet::add_task(ResourceSet& resourceset, double probability, int num_max
 		density_max = density_new;
 }
 
+void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorset)
+{
+	ulong spinning = 0;
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		Task &task_i = tasks[i];
+		for(uint j = 0; j < task_i.get_requests().size(); j++)
+		{
+			Request &request = task_i.get_requests()[j];
+			uint id = request.get_resource_id();
+			uint num = request.get_num_requests();
+			ulong Sum = 0;
+			for(uint processor_id = 0; processor_id < processorset.get_processor_num(); processor_id++)
+			{
+				if(processor_id != task_i.get_partition())
+				{
+					Processor &processor = processorset.get_processors()[processor_id];
+					TaskQueue &queue = processor.get_taskqueue();
+					list<Task*>::iterator it = queue.begin();
+					ulong max_length = 0;
+					for(uint k = 0; it != queue.end(); it++, k++)
+					{
+						Task* task_k = *it;
+						Request &request_k = task_k->get_request_by_id(id);
+						if(&request_k)
+						{
+							if(max_length < request_k.get_max_length())
+								max_length = request_k.get_max_length();
+						}
+					}
+					Sum += max_length;
+				}
+			}
+			spinning += num*Sum;
+		}
+		task_i.set_spin(spinning);
+	}
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		cout<<"Spin:"<<tasks[i].get_spin()<<endl;
+	}
+}
+
+void TaskSet::calculate_local_blocking(ResourceSet& resourceset)
+{
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		Task &task_i = tasks[i];
+		ulong lb = 0;
+		for(uint j = 0; j < task_i.get_requests().size(); j++)
+		{
+			Request &request_i = task_i.get_requests()[j];
+			uint id = request_i.get_resource_id();
+			if(resourceset.get_resources()[id].get_ceiling() <= i)
+			{
+				for(uint k = task_i.get_id() + 1; k < tasks.size(); k++)
+				{
+					Task &task_k = tasks[k];
+					Request &request_k = task_k.get_request_by_id(id);
+					if(&request_k)
+					{
+						lb = max(lb, request_k.get_max_length());
+					}
+				}
+			}
+		}
+		task_i.set_local_blocking(lb);
+	}
+}
+
 void TaskSet::get_utilization_sum(fraction_t &utilization_sum) const
 {
 	fraction_t temp;
@@ -290,6 +391,11 @@ void TaskSet::get_density_max(fraction_t &density_max) const
 Tasks& TaskSet::get_tasks()
 {
 	return tasks;
+}
+
+Task& TaskSet::get_task_by_id(uint id)
+{
+	return tasks[id];
 }
 
 bool TaskSet::is_implicit_deadline()
@@ -383,7 +489,7 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_ra
 		taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
 	}
 	taskset.sort_by_period();
-	cout<<utilization<<":"<<taskset.get_utilization_sum().get_d()<<endl;
+	//cout<<utilization<<":"<<taskset.get_utilization_sum().get_d()<<endl;
 }
 
 ulong gcd(ulong a, ulong b)

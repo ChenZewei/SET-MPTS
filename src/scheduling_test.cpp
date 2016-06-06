@@ -45,7 +45,6 @@ int main(int argc,char** argv)
 	XML::get_step(&steps);	
 
 	//resource parameter
-	ResourceSet resourceset = ResourceSet();
 	Int_Set resource_num, rrns;
 	Double_Set rrps, tlfs;
 	Range_Set rrrs;
@@ -55,7 +54,7 @@ int main(int argc,char** argv)
 	XML::get_resource_request_range(&rrrs);
 	XML::get_total_len_factor(&tlfs);
 
-	resource_gen(&resourceset, resource_num[0]);
+	
 
 	//system("mkdir results");
 
@@ -76,8 +75,7 @@ int main(int argc,char** argv)
 
 	double utilization = u_ranges[0].min;
 
-	//while(utilization <= u_ranges[0].max)
-	for(;utilization <= u_ranges[0].max ; utilization += steps[0])
+	do
 	{	
 		Result result;
 		
@@ -85,19 +83,24 @@ int main(int argc,char** argv)
 		for(int i = 0; i < exp_times; i++)
 		{
 			TaskSet taskset = TaskSet();
-			
+			ResourceSet resourceset = ResourceSet();
 			ProcessorSet processorset = ProcessorSet(p_num[0]);
-			
+
+			resource_gen(&resourceset, resource_num[0]);
 			tast_gen(taskset, resourceset, lambdas[0], p_ranges[0], utilization, rrps[0], rrns[0], rrrs[0], tlfs[0]);
+			
 			for(uint i = 0; i < methods.size(); i++)
 			{
-				if(is_schedulable(taskset, processorset, resourceset, methods[i], 0, 0))
+				taskset.init();
+				processorset.init();
+				taskset.calculate_spin(resourceset, processorset);
+				taskset.calculate_local_blocking(resourceset);
+				if(is_schedulable(taskset, processorset, resourceset, methods[i], i, 0))
 				{	
 					success[i]++;
 				}
 			}
 			result.x = taskset.get_utilization_sum().get_d();
-		
 		}
 		for(uint i = 0; i < methods.size(); i++)
 		{
@@ -105,13 +108,10 @@ int main(int argc,char** argv)
 			result.y = ratio.get_d();
 			results[i].push_back(result);
 		}
-		cout<<"U-MAX:"<<u_ranges[0].max<<endl;
-		cout<<"utilization:"<<utilization<<endl;
-		cout<<u_ranges[0].max-utilization<<endl;
-		cout<<steps[0]<<endl;
-		if(utilization+steps[0] == u_ranges[0].max)
-			cout<<"11111111111111111111"<<endl;
+		
+		utilization += steps[0];
 	}
+	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
 
 	//Scheduling_Test(resourceset, lambdas[0], p_num[0], p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods, results);
 	for(uint i = 0; i < methods.size(); i++)

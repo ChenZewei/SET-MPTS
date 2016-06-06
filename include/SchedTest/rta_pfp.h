@@ -61,6 +61,7 @@ ulong rta_standard(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 
 ulong interf_with_spin(Task& task, ulong interval)
 {
+	//cout<<"Brem:"<<task.get_spin()<<endl;
 	return (task.get_wcet() + task.get_spin()) * ceiling((interval + task.get_jitter()), task.get_period());
 }
 
@@ -158,7 +159,7 @@ ulong interf_with_distributed_scheduling(Task& task, ulong interval)
 	return task.get_wcet_non_critical_sections() * ceiling((interval + task.get_response_time()), task.get_period());
 }
 
-ulong rta_with_distributed_scheduling(TaskSet& tasks, const ResourceSet& resources, uint t_id, uint ITER_BLOCKING)
+ulong rta_with_distributed_scheduling(TaskSet& tasks, ResourceSet& resources, uint t_id, uint ITER_BLOCKING)
 {
 	Task& task = tasks.get_tasks()[t_id];
 	ulong test_end = task.get_deadline();
@@ -208,7 +209,7 @@ ulong rta_with_distributed_scheduling(TaskSet& tasks, const ResourceSet& resourc
 	return test_end + 100;
 }
 
-bool is_pfp_rta_schedulable( TaskSet& tasks, const ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
+bool is_pfp_rta_schedulable( TaskSet& tasks, ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
 {
 	ulong response_bound;
 	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
@@ -221,9 +222,11 @@ bool is_pfp_rta_schedulable( TaskSet& tasks, const ResourceSet& resources, uint 
 		{
 			case 0:
 				response_bound = rta_standard(tasks, t_id, ITER_BLOCKING);
+				//cout<<"standard"<<endl;
 				break;
 			case 1:
 				response_bound = rta_with_spin(tasks, t_id, ITER_BLOCKING);
+				//cout<<"spin"<<endl;
 				break;
 			case 2:
 				response_bound = rta_with_suspension(tasks, t_id, ITER_BLOCKING);

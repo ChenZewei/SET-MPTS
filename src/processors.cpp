@@ -2,12 +2,18 @@
 
 ///////////////////////////Processor/////////////////////////////
 
-Processor::Processor(fraction_t speedfactor)
+Processor::Processor(uint id, fraction_t speedfactor)
 {
+	processor_id = id;
 	speedfactor = speedfactor;
 	utilization = 0;
 	density = 0;
 	tryed_assign = false;
+}
+
+uint Processor::get_processor_id() const
+{
+	return processor_id;
 }
 
 fraction_t Processor::get_speedfactor() const
@@ -30,33 +36,38 @@ bool Processor::get_tryed_assign() const
 	return tryed_assign;
 }
 
-bool Processor::add_task(TaskSet taskset, uint t_id)
+TaskQueue& Processor::get_taskqueue()
 {
-	if(1 < utilization + taskset.get_task_utilization(t_id))
+	return queue;
+}
+
+bool Processor::add_task(Task* task)
+{
+	if(1 < utilization + task->get_utilization())
 		return false;
-	queue.push_back(t_id);
-	utilization += taskset.get_task_utilization(t_id);
-	density += taskset.get_task_density(t_id);
+	queue.push_back(task);
+	utilization += task->get_utilization();
+	density += task->get_density();
 	return true;	
 }
 
-bool Processor::remove_task(TaskSet taskset, uint t_id)
+bool Processor::remove_task(Task* task)
 {
-	list<uint>::iterator it = queue.begin();
+	list<Task*>::iterator it = queue.begin();
 	for(uint i = 0; it != queue.end(); it++, i++)
 	{
-		if(t_id == *it)
+		if(task == *it)
 		{
-			queue.remove(i);
-			utilization -= taskset.get_task_utilization(t_id);
-			density -= taskset.get_task_density(t_id);
+			queue.remove(*it);
+			utilization -= task->get_utilization();
+			density -= task->get_density();
 			return true;
 		}
 	}
 	return false;
 }
 
-void Processor::clear()
+void Processor::init()
 {
 	queue.clear();
 	utilization = 0;
@@ -68,7 +79,7 @@ void Processor::clear()
 ProcessorSet::ProcessorSet(uint num)//for identical multiprocessor platform
 {
 	for(uint i = 0; i < num; i++)
-		processors.push_back(Processor());
+		processors.push_back(Processor(i));
 }
 
 uint ProcessorSet::get_processor_num() const 
@@ -79,4 +90,10 @@ uint ProcessorSet::get_processor_num() const
 Processors& ProcessorSet::get_processors()
 {
 	return processors;
+}
+
+void ProcessorSet::init()
+{
+	for(uint i = 0; i < processors.size(); i++)
+		processors[i].init();
 }

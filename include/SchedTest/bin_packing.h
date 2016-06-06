@@ -1,20 +1,19 @@
 #ifndef BIN_PACKING_H
 #define BIN_PACKING_H
 
-#include <math.h>
 #include <math-helper.h>
 #include <algorithm>
 #include <iostream>
 #include "rta_pfp.h"
-#include "../tasks.h"
-#include "../processors.h"
-#include "../resources.h"
+#include "tasks.h"
+#include "processors.h"
+#include "resources.h"
 
 using namespace std;
 
 bool worst_fit_dm(	TaskSet& tasks, 
 				ProcessorSet& processors, 
-				const ResourceSet& resources, 
+				ResourceSet& resources, 
 				uint t_id, 
 				uint TEST_TYPE, 
 				uint ITER_BLOCKING)
@@ -37,7 +36,7 @@ bool worst_fit_dm(	TaskSet& tasks,
 	if (is_pfp_rta_schedulable(tasks, resources, TEST_TYPE, ITER_BLOCKING))
 	//if(processor.get_utilization() + task.get_utilization() <= 1)
 	{
-		processor.add_task(tasks, t_id);
+		processor.add_task(&task);
 		return true;
 	}
 	return false;
@@ -45,7 +44,7 @@ bool worst_fit_dm(	TaskSet& tasks,
 
 bool worst_fit_edf(	TaskSet& tasks, 
 				ProcessorSet& processors, 
-				const ResourceSet& resources, 
+				ResourceSet& resources, 
 				uint t_id, 
 				uint TEST_TYPE, 
 				uint ITER_BLOCKING)
@@ -68,7 +67,7 @@ bool worst_fit_edf(	TaskSet& tasks,
 	//if (is_pfp_rta_schedulable(tasks, resources, TEST_TYPE, ITER_BLOCKING))
 	if(processor.get_utilization() + task.get_utilization() <= 1)
 	{
-		processor.add_task(tasks, t_id);
+		processor.add_task(&task);
 		return true;
 	}
 	return false;

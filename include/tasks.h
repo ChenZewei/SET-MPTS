@@ -1,7 +1,6 @@
 #ifndef TASKS_H
 #define TASKS_H
 
-#include <math.h>
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -11,6 +10,7 @@
 #include "random_gen.h"
 #include "resources.h"
 #include "sort.h"
+#include "processors.h"
 
 using namespace std;
 
@@ -81,13 +81,17 @@ class Task
 			ulong deadline = 0,
 			uint priority = 0);
 		
+		void init();
+
 		uint get_id() const;
 		void set_id(uint id);
 		ulong get_wcet() const;
 		ulong get_deadline() const;
 		ulong get_period() const;
-		const Resource_Requests& get_requests() const;
 		bool is_feasible() const;
+
+		Resource_Requests& get_requests();
+		Request& get_request_by_id(uint id);
 
 		ulong get_wcet_critical_sections() const;
 		void set_wcet_critical_sections(ulong csl);
@@ -184,11 +188,17 @@ class TaskSet
 	public:
 		TaskSet();
 		~TaskSet();
+		
+		void init();
 
+		void calculate_spin(ResourceSet& resourceset, ProcessorSet& processorset);
+		void calculate_local_blocking(ResourceSet& resourceset);
+		
 		void add_task(long wcet, long period, long deadline = 0);
 		void add_task(ResourceSet& resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline = 0);
 
 		Tasks& get_tasks();
+		Task& get_task_by_id(uint id);
 
 		bool is_implicit_deadline();
 		bool is_constraint_deadline();

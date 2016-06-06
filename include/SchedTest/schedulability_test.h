@@ -7,7 +7,7 @@
 #include "pfp_algorithms.h"
 
 
-bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, const ResourceSet& resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
+bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
 {
 	bool schedulable;
 	switch(TEST_METHOD)
