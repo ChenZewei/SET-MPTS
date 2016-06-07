@@ -18,12 +18,15 @@ int Random_Gen::uniform_integral_gen(int min, int max)
 
 bool Random_Gen::probability(double prob)
 {
-	int i = 1;
-	while(prob != floor(prob))
+	int i = 1, j = 0;
+	if(1 < prob)
+		prob = 1;
+	while(prob != floor(prob) && j++ < 3)
 	{
 		prob *= 10;
 		i *= 10;
 	}
+	prob = floor(prob);
 	if(uniform_integral_gen(1, i) <= prob)
 		return true;
 	else 

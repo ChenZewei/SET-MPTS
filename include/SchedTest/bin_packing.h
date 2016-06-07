@@ -33,6 +33,17 @@ bool worst_fit_dm(	TaskSet& tasks,
 	
 	task.set_partition(assign);
 	Processor& processor = processors.get_processors()[assign];
+	switch(TEST_TYPE)
+	{
+		case 0:
+				break;
+		case 1:
+				tasks.calculate_spin(resources, processors);
+				tasks.calculate_local_blocking(resources);
+				break;
+		default:
+				break;
+	}
 	if (is_pfp_rta_schedulable(tasks, resources, TEST_TYPE, ITER_BLOCKING))
 	//if(processor.get_utilization() + task.get_utilization() <= 1)
 	{

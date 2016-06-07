@@ -306,7 +306,7 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 						Task* task_k = *it;
 						Request &request_k = task_k->get_request_by_id(id);
 						if(&request_k)
-						{
+						{	
 							if(max_length < request_k.get_max_length())
 								max_length = request_k.get_max_length();
 						}
@@ -318,10 +318,11 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 		}
 		task_i.set_spin(spinning);
 	}
-	for(uint i = 0; i < tasks.size(); i++)
-	{
-		cout<<"Spin:"<<tasks[i].get_spin()<<endl;
-	}
+
+//	for(uint i = 0; i < tasks.size(); i++)
+//	{
+//		cout<<"Spin:"<<tasks[i].get_spin()<<endl;
+//	}
 }
 
 void TaskSet::calculate_local_blocking(ResourceSet& resourceset)

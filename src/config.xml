@@ -5,7 +5,7 @@
 		<data>WF-DM</data>
 		<data>WF-EDF</data>
 	</schedulability_test>
-	<experiment_times>1</experiment_times>
+	<experiment_times>10</experiment_times>
 	<lambda>
 		<data>10</data>
 	</lambda>
@@ -39,7 +39,7 @@
 		<data>10</data>
 	</resource_num>
 	<rrp>//resource_request_probability
-		<data>0.1</data>
+		<data>1</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>

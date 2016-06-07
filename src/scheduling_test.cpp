@@ -93,8 +93,6 @@ int main(int argc,char** argv)
 			{
 				taskset.init();
 				processorset.init();
-				taskset.calculate_spin(resourceset, processorset);
-				taskset.calculate_local_blocking(resourceset);
 				if(is_schedulable(taskset, processorset, resourceset, methods[i], i, 0))
 				{	
 					success[i]++;
