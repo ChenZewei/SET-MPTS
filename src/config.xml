@@ -5,7 +5,7 @@
 		<data>WF-DM</data>
 		<data>WF-EDF</data>
 	</schedulability_test>
-	<experiment_times>10</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<lambda>
 		<data>10</data>
 	</lambda>

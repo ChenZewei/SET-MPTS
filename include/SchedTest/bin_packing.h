@@ -30,9 +30,9 @@ bool worst_fit_dm(	TaskSet& tasks,
 			assign = cpu_id;
 		}
 	}
-	
-	task.set_partition(assign);
 	Processor& processor = processors.get_processors()[assign];
+	task.set_partition(assign);
+	processor.add_task(&task);
 	switch(TEST_TYPE)
 	{
 		case 0:
@@ -47,7 +47,6 @@ bool worst_fit_dm(	TaskSet& tasks,
 	if (is_pfp_rta_schedulable(tasks, resources, TEST_TYPE, ITER_BLOCKING))
 	//if(processor.get_utilization() + task.get_utilization() <= 1)
 	{
-		processor.add_task(&task);
 		return true;
 	}
 	return false;
