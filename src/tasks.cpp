@@ -76,11 +76,12 @@ Task::Task(	uint id,
 	local_blocking = 0;
 	total_blocking = 0;
 	jitter = 0;
-	response_time = 0;
+	response_time = wcet;
 	cluster = MAX_INT;
 	independent = true;
 	wcet_non_critical_sections = this->wcet;
 	wcet_critical_sections = 0;
+	carry_in = false;
 
 	
 	//Random_Gen r;
@@ -104,11 +105,12 @@ void Task::init()
 	local_blocking = 0;
 	total_blocking = 0;
 	jitter = 0;
-	response_time = 0;
+	response_time = wcet;
 	cluster = MAX_INT;
 	independent = true;
 	wcet_non_critical_sections = this->wcet;
 	wcet_critical_sections = 0;
+	carry_in = false;
 }
 
 void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len)
@@ -197,6 +199,9 @@ CPU_Set* Task::get_affinity() const { return affinity; }
 void Task::set_affinity(CPU_Set* affi) { affinity = affi; }
 bool Task::is_independent() const { return independent; }
 void Task::set_dependent() { independent = false; }
+bool Task::is_carry_in() const { return carry_in; }
+void Task::set_carry_in() { carry_in = true; }
+void Task::clear_carry_in() { carry_in = false; }
 
 /////////////////////////////TaskSet///////////////////////////////
 

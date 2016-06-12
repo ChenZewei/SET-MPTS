@@ -59,6 +59,7 @@ class Task
 		uint cluster;
 		CPU_Set* affinity;
 		bool independent;
+		bool carry_in;
 		fraction_t utilization;
 		fraction_t density;
 		Ratio ratio;//for heterogeneous platform
@@ -119,6 +120,9 @@ class Task
 		void set_affinity(CPU_Set* affi);
 		bool is_independent() const;
 		void set_dependent();
+		bool is_carry_in() const;
+		void set_carry_in();
+		void clear_carry_in();
 
 		void add_request(uint res_id, uint num, ulong max_len, ulong total_len);
 		

@@ -74,7 +74,7 @@ int main(int argc,char** argv)
 	output_file<<"\n";
 
 	double utilization = u_ranges[0].min;
-
+//cout<<""<<endl;
 	do
 	{	
 		Result result;
@@ -93,7 +93,7 @@ int main(int argc,char** argv)
 			{
 				taskset.init();
 				processorset.init();
-				if(is_schedulable(taskset, processorset, resourceset, methods[i], i, 0))
+				if(is_schedulable(taskset, processorset, resourceset, methods[i], 2, 0))
 				{	
 					success[i]++;
 				}
@@ -106,7 +106,7 @@ int main(int argc,char** argv)
 			result.y = ratio.get_d();
 			results[i].push_back(result);
 		}
-		
+		cout<<"Utilization:"<<utilization<<endl;
 		utilization += steps[0];
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
@@ -169,6 +169,9 @@ const char* get_method_name(int method)
 			break;
 		case 4:
 			name = "WF-EDF";
+			break;
+		case 5:
+			name = "RTA-GPF";
 			break;
 	}
 	return name;

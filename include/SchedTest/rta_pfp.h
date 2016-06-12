@@ -20,7 +20,7 @@ ulong interf_standard(Task& task, ulong interval)
 // Audsly et al.'s standard RTA (1993)
 ulong rta_standard(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 {
-	Task& task = tasks.get_tasks()[t_id];
+	Task& task = tasks.get_task_by_id(t_id);
 	ulong test_end = task.get_deadline();
 	ulong test_start = task.get_total_blocking() + task.get_wcet();
 	ulong response = test_start;
@@ -42,7 +42,7 @@ ulong rta_standard(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 		ulong interference = 0;
 		for (uint th = 0; th < t_id; th ++)
 		{
-			Task& tsk = tasks.get_tasks()[th];
+			Task& tsk = tasks.get_task_by_id(th);
 			if (tsk.get_partition() == task.get_partition())
 			{
 				interference += interf_standard(tsk, response);
@@ -68,7 +68,7 @@ ulong interf_with_spin(Task& task, ulong interval)
 // Awieder and Brandenburg's RTA with spin locks (2013)
 ulong rta_with_spin(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 {
-	Task& task = tasks.get_tasks()[t_id];
+	Task& task = tasks.get_task_by_id(t_id);
 	ulong test_end = task.get_deadline();
 	ulong test_start = task.get_spin() + task.get_local_blocking() + task.get_wcet();
 	ulong response = test_start;
@@ -90,7 +90,7 @@ ulong rta_with_spin(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 		ulong interference = 0;
 		for (uint th = 0; th < t_id; th ++)
 		{
-			Task& tsk = tasks.get_tasks()[th];
+			Task& tsk = tasks.get_task_by_id(th);
 			if (task.get_partition() == tsk.get_partition())
 			{
 				interference += interf_with_spin(tsk, response);
@@ -115,7 +115,7 @@ ulong interf_with_suspension(Task& task, ulong interval)
 // RTA with self-suspension (to appear in RTS journal)
 ulong rta_with_suspension(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 {
-	Task& task = tasks.get_tasks()[t_id];
+	Task& task = tasks.get_task_by_id(t_id);
 	ulong test_end = task.get_deadline();
 	ulong test_start = task.get_total_blocking() + task.get_wcet();
 	ulong response = test_start;
@@ -137,7 +137,7 @@ ulong rta_with_suspension(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 		ulong interference = 0;
 		for (uint th = 0; th < t_id; th ++)
 		{
-			Task& tsk = tasks.get_tasks()[th];
+			Task& tsk = tasks.get_task_by_id(th);
 			if (task.get_partition() == tsk.get_partition())
 			{
 				interference += interf_with_suspension(tsk, response);
@@ -161,7 +161,7 @@ ulong interf_with_distributed_scheduling(Task& task, ulong interval)
 
 ulong rta_with_distributed_scheduling(TaskSet& tasks, ResourceSet& resources, uint t_id, uint ITER_BLOCKING)
 {
-	Task& task = tasks.get_tasks()[t_id];
+	Task& task = tasks.get_task_by_id(t_id);
 	ulong test_end = task.get_deadline();
 	ulong test_start = task.get_total_blocking() + task.get_wcet();
 	ulong response = test_start;
@@ -183,7 +183,7 @@ ulong rta_with_distributed_scheduling(TaskSet& tasks, ResourceSet& resources, ui
 		ulong interference = 0;
 		for (uint th = 0; th < t_id; th ++)
 		{
-			Task& tsk = tasks.get_tasks()[th];
+			Task& tsk = tasks.get_task_by_id(th);
 			if (task.get_partition() == tsk.get_partition())
 			{
 				interference += interf_with_distributed_scheduling(tsk, response);
@@ -209,12 +209,12 @@ ulong rta_with_distributed_scheduling(TaskSet& tasks, ResourceSet& resources, ui
 	return test_end + 100;
 }
 
-bool is_pfp_rta_schedulable( TaskSet& tasks, ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
+bool is_pfp_rta_schedulable(TaskSet& tasks, ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
 {
 	ulong response_bound;
 	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
 	{
-		Task& task = tasks.get_tasks()[t_id];
+		Task& task = tasks.get_task_by_id(t_id);
 		if (task.get_partition() == 0XFFFFFFFF)
 			continue;
 

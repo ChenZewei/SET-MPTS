@@ -42,6 +42,10 @@ void XML::get_method(Int_Set *i_set)
 		{
 			transform = 4;
 		}
+		else if(0 == strcmp(content,"RTA_GPF"))
+		{
+			transform = 5;
+		}
 		else
 		{
 			transform = 0;

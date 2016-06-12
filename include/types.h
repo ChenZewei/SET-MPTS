@@ -20,6 +20,8 @@
 #define BCL_EDF 2
 #define WF_DM 3
 #define WF_EDF 4
+#define RTA_GPF 5
+
 using namespace std;
 
 typedef mpz_class int_t;		//multiple precision integer

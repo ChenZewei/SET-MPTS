@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <parameters>
 	<schedulability_test>
-		<data>WF-DM</data>
-		<data>WF-DM</data>
+		<data>RTA_GPF</data>
 		<data>WF-EDF</data>
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
@@ -39,7 +38,7 @@
 		<data>10</data>
 	</resource_num>
 	<rrp>//resource_request_probability
-		<data>1</data>
+		<data>0.1</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>
