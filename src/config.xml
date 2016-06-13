@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <parameters>
 	<schedulability_test>
-		<data>RTA_GPF</data>
+		<data TEST_TYPE="0">RTA_GPF</data>
+		<data TEST_TYPE="1">RTA_GPF</data>
+		<data TEST_TYPE="2">RTA_GPF</data>
 		<data>WF-EDF</data>
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
 	<lambda>
-		<data>10</data>
+		<data>15</data>
 	</lambda>
 	<step>
 		<data>0.1</data>
@@ -14,7 +16,7 @@
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>4</max>
+			<max>6</max>
 		</data>
 		<data>
 			<min>0</min>
@@ -22,11 +24,11 @@
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>4</data>	
+		<data>6</data>	
 	</processor_num>
 	<period_range>
 		<data>
-			<min>200000</min>
+			<min>100000</min>
 			<max>1000000</max>
 		</data>
 		<data>
@@ -34,6 +36,12 @@
 			<max>2000000</max>
 		</data>
 	</period_range>	
+	<deadline_propotion>
+		<data>
+			<min>0.8</min>
+			<max>1</max>
+		</data>
+	</deadline_propotion>
 	<resource_num>
 		<data>10</data>
 	</resource_num>

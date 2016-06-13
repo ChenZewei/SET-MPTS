@@ -20,13 +20,15 @@ class XML
 		
 		static void LoadFile(const char* path);		
 		
-		static void get_method(Int_Set *i_set);
+		static void get_method(Test_Attribute_Set *t_set);
 
 		static uint get_experiment_times();
 
 		static void get_lambda(Int_Set *i_set);
 
 		static void get_period_range(Range_Set *r_set);
+
+		static void get_deadline_propotion(Range_Set *r_set);
 
 		static void get_utilization_range(Range_Set *r_set);
 

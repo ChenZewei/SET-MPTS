@@ -13,6 +13,7 @@ class Random_Gen
 		//Random_Gen();
 		static double exponential_gen(double lambda);
 		static int uniform_integral_gen(int min, int max);
+		static double uniform_real_gen(double min, double max);
 		static bool probability(double prob);
 };
 

@@ -205,7 +205,7 @@ class TaskSet
 		Task& get_task_by_id(uint id);
 
 		bool is_implicit_deadline();
-		bool is_constraint_deadline();
+		bool is_constrained_deadline();
 		bool is_arbitary_deadline();
 		uint get_taskset_size() const ;
 
@@ -234,7 +234,7 @@ class TaskSet
 
 };
 
-void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
+void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, Range d_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
 ulong gcd(ulong a, ulong b);
 ulong lcm(ulong a, ulong b);
 

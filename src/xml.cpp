@@ -12,7 +12,7 @@ void XML::LoadFile(const char* path)
 	config.LoadFile(path);
 }
 
-void XML::get_method(Int_Set *i_set)
+void XML::get_method(Test_Attribute_Set *t_set)
 {
 	const char* content;
 	XMLElement *root = config.RootElement();
@@ -21,6 +21,8 @@ void XML::get_method(Int_Set *i_set)
 	while(subtitle)
 	{
 		content = subtitle->GetText();
+		Test_Attribute ta;
+		int test_type = subtitle->IntAttribute("TEST_TYPE");
 		int transform = 0;
 		if(0 == strcmp(content,"P-EDF"))
 		{
@@ -50,7 +52,10 @@ void XML::get_method(Int_Set *i_set)
 		{
 			transform = 0;
 		}
-		i_set->push_back(transform);
+		ta.test_method = transform;
+		ta.test_type = test_type;
+		t_set->push_back(ta);
+//		i_set->push_back(transform);
 		subtitle = subtitle->NextSiblingElement();
 	}
 }
@@ -89,6 +94,28 @@ void XML::get_period_range(Range_Set *r_set)
 		XMLElement *SSubtitle = subtitle->FirstChildElement("min");
 		content = SSubtitle->GetText();
 		fraction_t data(content);
+		temp.min = data.get_d();
+		SSubtitle = subtitle->FirstChildElement("max");
+		content = SSubtitle->GetText();
+		data = content;
+		temp.max = data.get_d();
+		r_set->push_back(temp);
+		subtitle = subtitle->NextSiblingElement();
+	}
+}
+
+void XML::get_deadline_propotion(Range_Set *r_set)
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("deadline_propotion");
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		Range temp;
+		XMLElement *SSubtitle = subtitle->FirstChildElement("min");
+		content = SSubtitle->GetText();
+		floating_t data(content);
 		temp.min = data.get_d();
 		SSubtitle = subtitle->FirstChildElement("max");
 		content = SSubtitle->GetText();

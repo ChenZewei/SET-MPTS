@@ -409,14 +409,14 @@ bool TaskSet::is_implicit_deadline()
 	foreach(tasks,tasks[i].get_deadline() != tasks[i].get_period());
 	return true;
 }
-bool TaskSet::is_constraint_deadline()
+bool TaskSet::is_constrained_deadline()
 {
 	foreach(tasks,tasks[i].get_deadline() > tasks[i].get_period());
 	return true;
 }
 bool TaskSet::is_arbitary_deadline()
 {
-	return !(is_implicit_deadline())&&!(is_constraint_deadline());
+	return !(is_implicit_deadline())&&!(is_constrained_deadline());
 }
 uint TaskSet::get_taskset_size() const 
 {
@@ -469,15 +469,24 @@ void TaskSet::display()
 
 /////////////////////////////Others///////////////////////////////
 
-void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
+void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, Range d_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
 {
 	//Random_Gen r;
 	while(taskset.get_utilization_sum() < utilization)//generate tasks
 	{
-		long period = Random_Gen::uniform_integral_gen(int(p_range.min),int(p_range.max));
+		ulong period = Random_Gen::uniform_integral_gen(int(p_range.min),int(p_range.max));
 		fraction_t u = Random_Gen::exponential_gen(lambda);
-		
-		long wcet = period*u.get_d();
+		ulong wcet = period*u.get_d();
+		ulong deadline = 0;
+		if(d_range.max != 0)
+		{
+			deadline = ceil(period*Random_Gen::uniform_real_gen(d_range.min, d_range.max));
+			if(deadline > period)
+				deadline = period;
+			if(deadline < wcet)
+				deadline = wcet;
+		}
+//		cout<<"wcet:"<<wcet<<" deadling:"<<deadline<<" period:"<<period<<endl;
 		if(0 == wcet)
 			wcet++;
 		else if(wcet > period)
@@ -487,12 +496,14 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_ra
 		{
 			temp = utilization - taskset.get_utilization_sum();			
 			wcet = period*temp.get_d() + 1;
+			if(deadline != 0 && deadline < wcet)
+				deadline = wcet;
 			//taskset->add_task(wcet, period);
-			taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
+			taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period, deadline);
 			break;
 		}
 		//taskset->add_task(wcet,period);	
-		taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
+		taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period, deadline);
 	}
 	taskset.sort_by_period();
 	//cout<<utilization<<":"<<taskset.get_utilization_sum().get_d()<<endl;

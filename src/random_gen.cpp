@@ -16,6 +16,12 @@ int Random_Gen::uniform_integral_gen(int min, int max)
 	return distribution(generator);
 }
 
+double Random_Gen::uniform_real_gen(double min, double max)
+{
+	uniform_real_distribution<double> distribution(min, max);
+	return distribution(generator);
+}
+
 bool Random_Gen::probability(double prob)
 {
 	int i = 1, j = 0;

@@ -55,7 +55,7 @@ bool is_RM_schedulable(TaskSet taskset, ProcessorSet processorset)//for identica
 			else
 				return false;
 		}
-		else if(taskset.is_constraint_deadline())
+		else if(taskset.is_constrained_deadline())
 		{
 			
 		}
