@@ -84,15 +84,18 @@ Task::Task(	uint id,
 
 	
 	//Random_Gen r;
+	//cout<<"resourceset size:"<<resourceset.size()<<endl;
 	for(int i = 0; i < resourceset.size(); i++)
 	{
 		if(Random_Gen::probability(probability))
 		{
+			//cout<<"1";
 			uint num = Random_Gen::uniform_integral_gen(1, num_max);
 			uint max_len = Random_Gen::uniform_integral_gen(l_range.min, l_range.max);
 			add_request(i, num, max_len, tlfs*max_len);
 			resourceset.add_task(i, this);
 		}
+		cout<<endl;
 	}
 }
 
@@ -287,6 +290,7 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		Task &task_i = tasks[i];
+		cout<<"request num:"<<task_i.get_requests().size()<<endl;
 		for(uint j = 0; j < task_i.get_requests().size(); j++)
 		{
 			Request &request = task_i.get_requests()[j];
@@ -320,7 +324,7 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 	}
 	for(uint i = 0; i < tasks.size(); i++)
 	{
-		cout<<"Spin:"<<tasks[i].get_spin()<<endl;
+		//cout<<"Spin:"<<tasks[i].get_spin()<<endl;
 	}
 }
 
