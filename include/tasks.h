@@ -59,6 +59,7 @@ class Task
 		uint cluster;
 		CPU_Set* affinity;
 		bool independent;
+		bool carry_in;
 		fraction_t utilization;
 		fraction_t density;
 		Ratio ratio;//for heterogeneous platform
@@ -119,6 +120,9 @@ class Task
 		void set_affinity(CPU_Set* affi);
 		bool is_independent() const;
 		void set_dependent();
+		bool is_carry_in() const;
+		void set_carry_in();
+		void clear_carry_in();
 
 		void add_request(uint res_id, uint num, ulong max_len, ulong total_len);
 		
@@ -201,7 +205,7 @@ class TaskSet
 		Task& get_task_by_id(uint id);
 
 		bool is_implicit_deadline();
-		bool is_constraint_deadline();
+		bool is_constrained_deadline();
 		bool is_arbitary_deadline();
 		uint get_taskset_size() const ;
 
@@ -230,7 +234,7 @@ class TaskSet
 
 };
 
-void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
+void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, Range d_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
 ulong gcd(ulong a, ulong b);
 ulong lcm(ulong a, ulong b);
 

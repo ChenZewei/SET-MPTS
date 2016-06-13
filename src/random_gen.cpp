@@ -16,23 +16,24 @@ int Random_Gen::uniform_integral_gen(int min, int max)
 	return distribution(generator);
 }
 
+double Random_Gen::uniform_real_gen(double min, double max)
+{
+	uniform_real_distribution<double> distribution(min, max);
+	return distribution(generator);
+}
+
 bool Random_Gen::probability(double prob)
 {
-	int i = 1;
-	cout<<fixed;
-	cout<<"original prob:"<<prob<<endl;
-	fraction_t p(0.1);
-	cout<<p.get_num()<<endl;
-	cout<<p.get_den()<<endl;
-	while(prob != floor(prob))
+
+	int i = 1, j = 0;
+	if(1 < prob)
+		prob = 1;
+	while(prob != floor(prob) && j++ < 3)
 	{
 		prob *= 10;
 		i *= 10;
 	}
-	cout<<"current prob:"<<prob<<endl;
-	cout<<i<<endl;
-	for(uint i = 0; i < 20; i++)
-		cout<<uniform_integral_gen(1, i)<<endl;
+	prob = floor(prob);
 	if(uniform_integral_gen(1, i) <= prob)
 		return true;
 	else 

@@ -19,28 +19,31 @@ using namespace std;
 void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
 const char* get_method_name(int method);
-void	 Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, Int_Set methods, Result_Set *results);
+void	 Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range d_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, Test_Attribute_Set test_attributes, Result_Set *results);
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
 {	
 	Int_Set lambdas, p_num, methods;
 	Double_Set steps;
-	Range_Set p_ranges, u_ranges;
+	Range_Set p_ranges, u_ranges, d_ranges;
+	Test_Attribute_Set test_attributes;
 	uint exp_times;
 	Result_Set results[MAX_METHOD];
 	Chart chart;
+	
 
 	//XML xml;	
 
 	XML::LoadFile("config.xml");
 
 	//scheduling parameter
-	XML::get_method(&methods);
+	XML::get_method(&test_attributes);
 	exp_times = XML::get_experiment_times();
 	XML::get_lambda(&lambdas);
 	XML::get_processor_num(&p_num);
 	XML::get_period_range(&p_ranges);
+	XML::get_deadline_propotion(&d_ranges);
 	XML::get_utilization_range(&u_ranges);
 	XML::get_step(&steps);	
 
@@ -67,18 +70,18 @@ int main(int argc,char** argv)
 	output_file<<" utilization range:["<<u_ranges[0].min<<"-"<<u_ranges[0].max<<"] ";
 	output_file<<"period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n";
 	output_file<<"Utilization,";
-	for(uint i = 0; i < methods.size(); i++)
+	for(uint i = 0; i < test_attributes.size(); i++)
 	{
-		output_file<<get_method_name(methods[i])<<" ratio,";
+		output_file<<get_method_name(test_attributes[i].test_method)<<" ratio,";
 	}
 	output_file<<"\n";
 
 	double utilization = u_ranges[0].min;
-
+//cout<<""<<endl;
 	do
 	{	
 		Result result;
-		
+		cout<<"Utilization:"<<utilization<<endl;
 		int success[MAX_METHOD] = {0, 0, 0, 0, 0, 0};
 		for(int i = 0; i < exp_times; i++)
 		{
@@ -87,43 +90,41 @@ int main(int argc,char** argv)
 			ProcessorSet processorset = ProcessorSet(p_num[0]);
 
 			resource_gen(&resourceset, resource_num[0]);
-			tast_gen(taskset, resourceset, lambdas[0], p_ranges[0], utilization, rrps[0], rrns[0], rrrs[0], tlfs[0]);
+			tast_gen(taskset, resourceset, lambdas[0], p_ranges[0], d_ranges[0], utilization, rrps[0], rrns[0], rrrs[0], tlfs[0]);
 			
-			for(uint i = 0; i < methods.size(); i++)
+			for(uint i = 0; i < test_attributes.size(); i++)
 			{
 				taskset.init();
 				processorset.init();
-				taskset.calculate_spin(resourceset, processorset);
-				taskset.calculate_local_blocking(resourceset);
-				if(is_schedulable(taskset, processorset, resourceset, methods[i], i, 0))
+//				cout<<"Test method:"<<get_method_name(test_attributes[i].test_method)<<" Test_type:"<<test_attributes[i].test_type<<endl;
+				if(is_schedulable(taskset, processorset, resourceset, test_attributes[i].test_method, test_attributes[i].test_type, 0))
 				{	
 					success[i]++;
 				}
 			}
 			result.x = taskset.get_utilization_sum().get_d();
 		}
-		for(uint i = 0; i < methods.size(); i++)
+		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp_times);
 			result.y = ratio.get_d();
 			results[i].push_back(result);
 		}
-		
 		utilization += steps[0];
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
 
-	//Scheduling_Test(resourceset, lambdas[0], p_num[0], p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], methods, results);
-	for(uint i = 0; i < methods.size(); i++)
-		chart.AddData(get_method_name(methods[i]), results[i]);
+	//Scheduling_Test(resourceset, lambdas[0], p_num[0], p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], test_attributes, results);
+	for(uint i = 0; i < test_attributes.size(); i++)
+		chart.AddData(get_method_name(test_attributes[i].test_method), results[i]);
 		//results.clear();
 
-	if(0 != methods.size())
+	if(0 != test_attributes.size())
 	{
 		for(uint i = 0; i < results[0].size(); i++)
 		{	
 			output_file<<results[0][i].x<<",";
-			for( uint j = 0; j < methods.size(); j++)
+			for( uint j = 0; j < test_attributes.size(); j++)
 			{
 				output_file<<results[j][i].y<<",";
 			}
@@ -172,11 +173,14 @@ const char* get_method_name(int method)
 		case 4:
 			name = "WF-EDF";
 			break;
+		case 5:
+			name = "RTA-GPF";
+			break;
 	}
 	return name;
 }
 
-void Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, Int_Set methods, Result_Set *results )
+void Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range d_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, Test_Attribute_Set test_attributes, Result_Set *results )
 {
 	double utilization = u_range.min;
 	do
@@ -190,17 +194,19 @@ void Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_ra
 			
 			ProcessorSet processorset = ProcessorSet(p_num);
 			
-			tast_gen(taskset, resourceset, lambda, p_range, utilization, probability, num_max, l_range, tlfs);
-			for(uint i = 0; i < methods.size(); i++)
+			tast_gen(taskset, resourceset, lambda, p_range, d_range, utilization, probability, num_max, l_range, tlfs);
+			if(!taskset.is_constrained_deadline())
+				cout<<"nnnnn"<<endl;
+			for(uint i = 0; i < test_attributes.size(); i++)
 			{
-				if(is_schedulable(taskset, processorset, resourceset, methods[i], 0, 0))
+				if(is_schedulable(taskset, processorset, resourceset, test_attributes[i].test_method, 0, 0))
 				{	
 					success[i]++;
 				}
 			}
 		
 		}
-		for(uint i = 0; i < methods.size(); i++)
+		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp_times);
 			result.y = ratio.get_d();

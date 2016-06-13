@@ -76,11 +76,12 @@ Task::Task(	uint id,
 	local_blocking = 0;
 	total_blocking = 0;
 	jitter = 0;
-	response_time = 0;
+	response_time = wcet;
 	cluster = MAX_INT;
 	independent = true;
 	wcet_non_critical_sections = this->wcet;
 	wcet_critical_sections = 0;
+	carry_in = false;
 
 	
 	//Random_Gen r;
@@ -107,11 +108,12 @@ void Task::init()
 	local_blocking = 0;
 	total_blocking = 0;
 	jitter = 0;
-	response_time = 0;
+	response_time = wcet;
 	cluster = MAX_INT;
 	independent = true;
 	wcet_non_critical_sections = this->wcet;
 	wcet_critical_sections = 0;
+	carry_in = false;
 }
 
 void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len)
@@ -200,6 +202,9 @@ CPU_Set* Task::get_affinity() const { return affinity; }
 void Task::set_affinity(CPU_Set* affi) { affinity = affi; }
 bool Task::is_independent() const { return independent; }
 void Task::set_dependent() { independent = false; }
+bool Task::is_carry_in() const { return carry_in; }
+void Task::set_carry_in() { carry_in = true; }
+void Task::clear_carry_in() { carry_in = false; }
 
 /////////////////////////////TaskSet///////////////////////////////
 
@@ -310,7 +315,7 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 						Task* task_k = *it;
 						Request &request_k = task_k->get_request_by_id(id);
 						if(&request_k)
-						{
+						{	
 							if(max_length < request_k.get_max_length())
 								max_length = request_k.get_max_length();
 						}
@@ -322,11 +327,6 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 		}
 		task_i.set_spin(spinning);
 	}
-	for(uint i = 0; i < tasks.size(); i++)
-	{
-		//cout<<"Spin:"<<tasks[i].get_spin()<<endl;
-	}
-}
 
 void TaskSet::calculate_local_blocking(ResourceSet& resourceset)
 {
@@ -407,14 +407,14 @@ bool TaskSet::is_implicit_deadline()
 	foreach(tasks,tasks[i].get_deadline() != tasks[i].get_period());
 	return true;
 }
-bool TaskSet::is_constraint_deadline()
+bool TaskSet::is_constrained_deadline()
 {
 	foreach(tasks,tasks[i].get_deadline() > tasks[i].get_period());
 	return true;
 }
 bool TaskSet::is_arbitary_deadline()
 {
-	return !(is_implicit_deadline())&&!(is_constraint_deadline());
+	return !(is_implicit_deadline())&&!(is_constrained_deadline());
 }
 uint TaskSet::get_taskset_size() const 
 {
@@ -467,15 +467,24 @@ void TaskSet::display()
 
 /////////////////////////////Others///////////////////////////////
 
-void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
+void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, Range d_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
 {
 	//Random_Gen r;
 	while(taskset.get_utilization_sum() < utilization)//generate tasks
 	{
-		long period = Random_Gen::uniform_integral_gen(int(p_range.min),int(p_range.max));
+		ulong period = Random_Gen::uniform_integral_gen(int(p_range.min),int(p_range.max));
 		fraction_t u = Random_Gen::exponential_gen(lambda);
-		
-		long wcet = period*u.get_d();
+		ulong wcet = period*u.get_d();
+		ulong deadline = 0;
+		if(d_range.max != 0)
+		{
+			deadline = ceil(period*Random_Gen::uniform_real_gen(d_range.min, d_range.max));
+			if(deadline > period)
+				deadline = period;
+			if(deadline < wcet)
+				deadline = wcet;
+		}
+//		cout<<"wcet:"<<wcet<<" deadling:"<<deadline<<" period:"<<period<<endl;
 		if(0 == wcet)
 			wcet++;
 		else if(wcet > period)
@@ -485,12 +494,14 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_ra
 		{
 			temp = utilization - taskset.get_utilization_sum();			
 			wcet = period*temp.get_d() + 1;
+			if(deadline != 0 && deadline < wcet)
+				deadline = wcet;
 			//taskset->add_task(wcet, period);
-			taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
+			taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period, deadline);
 			break;
 		}
 		//taskset->add_task(wcet,period);	
-		taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period);
+		taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period, deadline);
 	}
 	taskset.sort_by_period();
 	//cout<<utilization<<":"<<taskset.get_utilization_sum().get_d()<<endl;

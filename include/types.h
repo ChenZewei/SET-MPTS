@@ -20,6 +20,8 @@
 #define BCL_EDF 2
 #define WF_DM 3
 #define WF_EDF 4
+#define RTA_GPF 5
+
 using namespace std;
 
 typedef mpz_class int_t;		//multiple precision integer
@@ -45,10 +47,17 @@ typedef struct
 	double y;
 }Result;
 
+typedef struct
+{
+	int test_method;
+	int test_type;
+}Test_Attribute;
+
 typedef vector<int> Int_Set;
 typedef vector<double> Double_Set;
 typedef vector<Range> Range_Set;
 typedef vector<Result> Result_Set;
+typedef vector<Test_Attribute> Test_Attribute_Set;
 typedef list<Task*> TaskQueue;//之所以用list是因为list是双向链表，适合增删比较频繁的情况
 
 
