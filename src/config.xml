@@ -8,7 +8,7 @@
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
 	<lambda>
-		<data>15</data>
+		<data>20</data>
 	</lambda>
 	<step>
 		<data>0.1</data>

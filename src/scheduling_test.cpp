@@ -31,7 +31,7 @@ int main(int argc,char** argv)
 	uint exp_times;
 	Result_Set results[MAX_METHOD];
 	Chart chart;
-	
+//	cout<<""<<endl;	
 
 	//XML xml;	
 
@@ -88,10 +88,8 @@ int main(int argc,char** argv)
 			TaskSet taskset = TaskSet();
 			ResourceSet resourceset = ResourceSet();
 			ProcessorSet processorset = ProcessorSet(p_num[0]);
-
 			resource_gen(&resourceset, resource_num[0]);
-			tast_gen(taskset, resourceset, lambdas[0], p_ranges[0], d_ranges[0], utilization, rrps[0], rrns[0], rrrs[0], tlfs[0]);
-			
+			tast_gen(taskset, resourceset, lambdas[0], p_ranges[0], d_ranges[0], utilization, rrps[0], rrns[0], rrrs[0], tlfs[0]);	
 			for(uint i = 0; i < test_attributes.size(); i++)
 			{
 				taskset.init();

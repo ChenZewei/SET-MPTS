@@ -90,13 +90,11 @@ Task::Task(	uint id,
 	{
 		if(Random_Gen::probability(probability))
 		{
-			//cout<<"1";
 			uint num = Random_Gen::uniform_integral_gen(1, num_max);
 			uint max_len = Random_Gen::uniform_integral_gen(l_range.min, l_range.max);
 			add_request(i, num, max_len, tlfs*max_len);
 			resourceset.add_task(i, this);
 		}
-		cout<<endl;
 	}
 }
 
@@ -327,6 +325,7 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 		}
 		task_i.set_spin(spinning);
 	}
+}
 
 void TaskSet::calculate_local_blocking(ResourceSet& resourceset)
 {
