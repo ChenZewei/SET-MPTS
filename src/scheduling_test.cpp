@@ -108,6 +108,14 @@ int main(int argc,char** argv)
 			result.y = ratio.get_d();
 			results[i].push_back(result);
 		}
+//output to csv file		
+		output_file<<utilization<<",";
+		for(uint i = 0; i < test_attributes.size(); i++)
+		{
+			output_file<<results[i][results[i].size()-1].y<<",";
+		}
+		output_file<<"\n";
+		output_file.flush();
 		utilization += steps[0];
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
@@ -116,7 +124,7 @@ int main(int argc,char** argv)
 	for(uint i = 0; i < test_attributes.size(); i++)
 		chart.AddData(get_method_name(test_attributes[i].test_method), results[i]);
 		//results.clear();
-
+/*
 	if(0 != test_attributes.size())
 	{
 		for(uint i = 0; i < results[0].size(); i++)
@@ -129,7 +137,8 @@ int main(int argc,char** argv)
 			output_file<<"\n";
 		}
 	}	
-	output_file.flush();
+*/
+	
 	output_file.close();
 	
 	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
