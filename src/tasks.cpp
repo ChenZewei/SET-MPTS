@@ -293,7 +293,7 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		Task &task_i = tasks[i];
-		cout<<"request num:"<<task_i.get_requests().size()<<endl;
+//		cout<<"request num:"<<task_i.get_requests().size()<<endl;
 		for(uint j = 0; j < task_i.get_requests().size(); j++)
 		{
 			Request &request = task_i.get_requests()[j];

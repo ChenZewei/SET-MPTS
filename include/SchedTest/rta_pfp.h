@@ -82,7 +82,7 @@ ulong rta_with_spin(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 				break;
 			case 1:
 				// add functions to bound "spin" and "local_blocking" here
-				// XXXXXXXX				
+				// XXXXXXXX			
 				demand = task.get_local_blocking() + task.get_spin() + task.get_wcet();
 				break;
 		}

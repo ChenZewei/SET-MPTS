@@ -51,7 +51,7 @@ class Task
 		ulong local_blocking;
 		ulong total_blocking;
 		ulong jitter;
-		ulong response_time;//WCET
+		ulong response_time;//initialization as WCET
 		ulong deadline;
 		ulong period;
 		uint priority;
