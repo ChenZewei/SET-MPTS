@@ -107,6 +107,124 @@ ulong rta_with_spin(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 	return test_end + 100;
 }
 
+ulong transitive_preemption(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint t_id, uint r_id)
+{
+	Task& task_i = taskset.get_task_by_id(t_id);
+	uint cpu = task_i.get_partition();
+	Processor& processor = processorset.get_processors()[cpu];
+	TaskQueue& tq = processor.get_taskqueue();
+	Recource& resource = resourceset.get_resources()[r_id];
+	uint ceiling_k = resource.get_ceiling();
+	
+	ulong sum = 0;
+	for(uint j = 0; j < tq.size(); j++)
+	{
+		Task* task_j = tq[j];
+		if(t_id == task_j->get_id())
+			continue;
+		
+		Resource_Requests& rr =  task_j->get_requests();
+		for(uint x = 0; x < rr.size(); x++)
+		{
+			Request& request_x = rr[x];
+			Recource& resource_x = resourceset.get_resources()[request_x.get_resource_id()];
+			if(ceiling_k < resource_x.get_ceiling())
+				sum += request_x.get_max_length();
+		}
+	}
+	return sum;
+}
+
+ulong DLB(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint t_id)
+{
+	Task& task_i = taskset.get_task_by_id(t_id);
+	uint cpu = task_i.get_partition();
+	Processor& processor = processorset.get_processors()[cpu];
+	TaskQueue& tq = processor.get_taskqueue();
+	Resource_Requests& rr_i =  task_i.get_requests();
+	uint num = 1;
+
+	for(uint i = 0; i < rr_i.size(); i++)
+	{
+		if(resourceset.get_resources()[rr_i[i].get_resource_id()].is_global_resource())
+			num++;
+	}
+
+
+	ulong max_length = 0;
+
+	for(uint j = 0; j < tq.size(); j++)
+	{
+		Task* task_j = tq[j];
+		if(t_id >= task_j->get_id())
+			continue;
+		
+		Resource_Requests& rr_j =  task_j->get_requests();
+		for(uint l = 0; l < rr_j.size(); l++)
+		{
+			Request& request_l = rr_j[l];
+			Recource& resource_l = resourceset.get_resources()[request_l.get_resource_id()];
+			if(resource_l.is_global_resource())
+				continue;
+			if(t_id < resource_l.get_ceiling() && max_length < request_l.get_max_length())
+			{
+				max_length = request_l.get_max_length();
+			}
+		}
+	}
+	
+	return num*max_length;
+}
+
+ulong DGB_l(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint t_id)
+{
+	Task& task_i = taskset.get_task_by_id(t_id);
+	Resource_Requests& rr_i =  task_i.get_requests();
+	uint cpu = task_i.get_partition();
+
+	ulong sum = 0;
+
+	for(uint k = 0; k < rr_i.size(); k++)
+	{
+		uint k_id = rr_i[k].get_resource_id();
+		Recource& resource_k = resourceset.get_resources()[k_id];
+		uint N_i_k = resource_k.get_num_requests();
+		if(!resource_k.is_global_resource())
+			continue;
+		for(uint j = t_id + 1; j < taskset.get_taskset_size(); j++)
+		{
+			ulong max_element = 0;
+			Task& task_j = taskset.get_task_by_id(j);
+			if(cpu == task_j.get_partition())
+				continue;
+			Resource_Requests& rr_j =  task_j.get_requests();
+			for(uint l = 0; l < rr_j.size(); l++)
+			{
+				Request& request_l = rr_j[l];
+				uint l_id = request_l.get_resource_id();
+				if(l_id == k_id)
+				{
+					ulong temp = request_l.get_max_length() + transitive_preemption(taskset, processorset, resourceset, j, l_id);
+					if(temp > max_element)
+						max_element = temp;
+				}
+			}
+			sum += N_i_k*max_element;
+		}
+	}
+	return sum;
+}
+
+ulong DGB_h(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint t_id)
+{
+	
+}
+
+ulong MLI(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint t_id)
+{
+
+}
+
 ulong interf_with_suspension(Task& task, ulong interval)
 {
 	return task.get_wcet() * ceiling((interval + task.get_response_time()), task.get_period());

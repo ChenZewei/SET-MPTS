@@ -49,6 +49,7 @@ class Task
 		ulong spin;
 		ulong self_suspension;
 		ulong local_blocking;
+		ulong remote_blocking;
 		ulong total_blocking;
 		ulong jitter;
 		ulong response_time;//initialization as WCET
@@ -102,6 +103,8 @@ class Task
 		void set_spin(ulong spining);
 		ulong get_local_blocking() const;
 		void set_local_blocking(ulong lb);
+		ulong get_remote_blocking() const;
+		void set_remote_blocking(ulong rb);
 		ulong get_total_blocking() const;
 		void set_total_blocking(ulong tb);
 		ulong get_self_suspension() const;
@@ -119,7 +122,7 @@ class Task
 		CPU_Set* get_affinity() const;
 		void set_affinity(CPU_Set* affi);
 		bool is_independent() const;
-		void set_dependent();
+		void set_dependent();e
 		bool is_carry_in() const;
 		void set_carry_in();
 		void clear_carry_in();

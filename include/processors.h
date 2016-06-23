@@ -7,8 +7,6 @@
 using namespace std;
 
 
-//typedef vector<Task&> TaskQueue;
-
 class Processor
 {
 	private:
