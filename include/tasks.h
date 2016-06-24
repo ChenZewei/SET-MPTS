@@ -122,7 +122,7 @@ class Task
 		CPU_Set* get_affinity() const;
 		void set_affinity(CPU_Set* affi);
 		bool is_independent() const;
-		void set_dependent();e
+		void set_dependent();
 		bool is_carry_in() const;
 		void set_carry_in();
 		void clear_carry_in();
