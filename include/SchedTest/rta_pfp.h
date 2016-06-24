@@ -356,7 +356,70 @@ ulong rta_with_suspension(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
 				interference += interf_with_suspension(tsk, response);
 			}
 		}
-		
+//cout<<"interference1:"<<interference<<endl;
+		demand += interference;
+
+		if (response == demand)
+			return response + task.get_jitter();
+		else 
+			response = demand;
+	}
+	return test_end + 100;
+}
+
+ulong interf_with_suspension2(Task& task, ulong interval)
+{
+	ulong wcet_h = task.get_wcet();
+	ulong period_h = task.get_period();
+	ulong r_h = task.get_response_time();
+	ulong body = 0;
+	ulong carry_in = 0;
+	ulong carry_out = 0;
+	if(interval > r_h)
+	{
+		body = ((interval - r_h)/period_h)*wcet_h;
+//cout<<"body:"<<body<<endl;
+	carry_in = min((interval - r_h)%period_h, wcet_h);
+//cout<<"carry_in:"<<carry_in<<endl;
+	}
+	carry_out = wcet_h;
+//cout<<"carry_out:"<<carry_out<<endl;
+	
+	return carry_in + body + carry_out;
+}
+
+// test
+ulong rta_with_suspension2(TaskSet& tasks, uint t_id, uint ITER_BLOCKING)
+{
+	Task& task = tasks.get_task_by_id(t_id);
+	ulong test_end = task.get_deadline();
+	ulong test_start = task.get_total_blocking() + task.get_wcet();
+	ulong response = test_start;
+	ulong demand = 0;
+	while (response <= test_end)
+	{
+		switch (ITER_BLOCKING)
+		{
+			case 0:
+				demand = test_start;
+				break;
+			case 1:
+				// add functions to bound "spin" and "local_blocking" here
+				// XXXXXXXX			
+				demand = task.get_total_blocking() + task.get_wcet();
+				break;
+		}
+
+		ulong interference = 0;
+		for (uint th = 0; th < t_id; th ++)
+		{
+			Task& tsk = tasks.get_task_by_id(th);
+			if (task.get_partition() == tsk.get_partition())
+			{
+				interference += interf_with_suspension2(tsk, response);
+			}
+		}
+//cout<<"interference2:"<<interference<<endl;
 		demand += interference;
 
 		if (response == demand)
@@ -443,14 +506,15 @@ bool is_pfp_rta_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSe
 				response_bound = rta_with_spin(tasks, t_id, ITER_BLOCKING);
 				break;
 			case 2:
-//cout<<"1"<<endl;
 				calculate_total_blocking(tasks, processors, resources, t_id);
-//cout<<"2"<<endl;
 				response_bound = rta_with_suspension(tasks, t_id, ITER_BLOCKING);
-//cout<<"3"<<endl;
 				break;
 			case 3:
 				response_bound = rta_with_distributed_scheduling(tasks, resources, t_id, ITER_BLOCKING);
+				break;
+			case 8:
+				calculate_total_blocking(tasks, processors, resources, t_id);
+				response_bound = rta_with_suspension2(tasks, t_id, ITER_BLOCKING);
 				break;
 
 		}

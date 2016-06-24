@@ -9,6 +9,7 @@
 		<data TEST_TYPE="0">WF-DM</data>
 		<data TEST_TYPE="1">WF-DM</data>
 		<data TEST_TYPE="2">WF-DM</data>
+		<data TEST_TYPE="8">WF-DM</data>
 <!-->
 		<data>WF-EDF</data>
 <!-->
@@ -49,7 +50,7 @@
 		<data>10</data>
 	</resource_num>
 	<rrp>//resource_request_probability
-		<data>0.5</data>
+		<data>0.2</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>
