@@ -82,9 +82,7 @@ Task::Task(	uint id,
 	wcet_non_critical_sections = this->wcet;
 	wcet_critical_sections = 0;
 	carry_in = false;
-	
-	//Random_Gen r;
-	//cout<<"resourceset size:"<<resourceset.size()<<endl;
+
 	for(int i = 0; i < resourceset.size(); i++)
 	{
 		if(Random_Gen::probability(probability))

@@ -44,7 +44,7 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		{
 			transform = 4;
 		}
-		else if(0 == strcmp(content,"RTA_GPF"))
+		else if(0 == strcmp(content,"RTA_GFP"))
 		{
 			transform = 5;
 		}

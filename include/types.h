@@ -20,7 +20,7 @@
 #define BCL_EDF 2
 #define WF_DM 3
 #define WF_EDF 4
-#define RTA_GPF 5
+#define RTA_GFP 5
 
 using namespace std;
 
