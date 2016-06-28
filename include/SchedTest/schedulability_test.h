@@ -27,7 +27,7 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 		case WF_EDF:
 			schedulable = is_worst_fit_edf_schedulable(taskset, processorset, resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
 			break;
-		case RTA_GPF:
+		case RTA_GFP:
 			schedulable = is_gfp_rta_schedulable(taskset, processorset, TEST_TYPE);
 			break;
 		default:

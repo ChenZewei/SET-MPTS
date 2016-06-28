@@ -14,7 +14,7 @@
 		<data>WF-EDF</data>
 <!-->
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>100</experiment_times>
 	<lambda>
 		<data>10</data>
 	</lambda>
@@ -32,7 +32,7 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>100000</min>
+			<min>500000</min>
 			<max>1000000</max>
 		</data>
 		<data>
