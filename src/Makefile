@@ -15,9 +15,9 @@ DEL_FILE      = rm -f
 DEL_DIR       = rmdir
 MOVE          = mv -f
 MKDIR         = mkdir -p
-TARGET	      = test
+TARGET	      = SchedulingAnalysis
 
-test:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o sort.o xml.o
+SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o sort.o xml.o
 	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o sort.o xml.o $(LFLAGS) $(LIBS)
 	
 scheduling_test.o:scheduling_test.cpp
