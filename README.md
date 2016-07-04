@@ -27,31 +27,33 @@ enter src and make.(C++ 11 is needed)<br/>
 
 ## Configure
 We use XML file to save the configurations.<br/>
-1. Using <parameter_name> to bound parameters;<br/>
-2. Using <data> to group the data for a test;<br/>
+1. Using "parameter_name" to bound parameters;<br/>
+2. Using "data" to group the data for a test;<br/>
 3. The parameter content could be strings, int, double.<br/>
 example:<br/>
-<parameters>
-	<schedulability_test>
-		<data TEST_TYPE="0">WF-DM</data>
-		<data TEST_TYPE="1">WF-DM</data>
-		<data TEST_TYPE="2">WF-DM</data>
-		<data TEST_TYPE="8">WF-DM</data>
-	</schedulability_test>
-	<experiment_times>100</experiment_times>
-	<lambda>
-		<data>10</data>
-	</lambda>
-	<step>
-		<data>0.1</data>
-	</step>
-	<init_utilization_range>
-		<data>
-			<min>0</min>
-			<max>4</max>
-		</data>
-	</init_utilization_range>
-	......
-</parameters>
+
+	<parameters>
+		<schedulability_test>
+			<data TEST_TYPE="0">WF-DM</data>
+			<data TEST_TYPE="1">WF-DM</data>
+			<data TEST_TYPE="2">WF-DM</data>
+			<data TEST_TYPE="8">WF-DM</data>
+		</schedulability_test>
+		<experiment_times>100</experiment_times>
+		<lambda>
+			<data>10</data>
+		</lambda>
+		<step>
+			<data>0.1</data>
+		</step>
+		<init_utilization_range>
+			<data>
+				<min>0</min>
+				<max>4</max>
+			</data>
+		</init_utilization_range>
+		......
+	</parameters>
+
 
 
