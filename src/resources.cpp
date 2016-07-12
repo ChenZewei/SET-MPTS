@@ -31,7 +31,6 @@ uint Resource::get_ceiling()
 {
 	uint ceiling = 0xffffffff;	
 	list<Task*>::iterator it = queue.begin();
-	
 	for(uint i = 0; it != queue.end(); it++, i++)
 	{
 		if(ceiling >= (*it)->get_id())
@@ -46,7 +45,10 @@ ResourceSet::ResourceSet(){}
 
 void ResourceSet::add_resource()
 {
-	resources.push_back(Resource(resources.size()));
+	bool global = false;
+	if(Random_Gen::probability(0.4))
+		global = true;
+	resources.push_back(Resource(resources.size(), 0, global));
 }
 
 uint ResourceSet::size() const

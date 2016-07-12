@@ -44,7 +44,7 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		{
 			transform = 4;
 		}
-		else if(0 == strcmp(content,"RTA_GPF"))
+		else if(0 == strcmp(content,"RTA_GFP"))
 		{
 			transform = 5;
 		}
@@ -173,6 +173,59 @@ void XML::get_processor_num(Int_Set *i_set)
 	{
 		content = subtitle->GetText();
 		i_set->push_back(atoi(content));
+		subtitle = subtitle->NextSiblingElement();
+	}
+}
+
+//defalut
+
+void XML::get_integers(Int_Set *i_set, const char* element_name)
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement(element_name);
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		content = subtitle->GetText();
+		i_set->push_back(atoi(content));
+		subtitle = subtitle->NextSiblingElement();
+	}
+}
+
+void XML::get_doubles(Double_Set *d_set, const char* element_name)
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement(element_name);
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		content = subtitle->GetText();
+		floating_t temp(content);
+		d_set->push_back(temp.get_d());
+		subtitle = subtitle->NextSiblingElement();
+	}
+}
+
+void XML::get_ranges(Range_Set *r_set, const char* element_name)
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement(element_name);
+	XMLElement *subtitle = title->FirstChildElement("data");
+	while(subtitle)
+	{
+		Range temp;
+		XMLElement *SSubtitle = subtitle->FirstChildElement("min");
+		content = SSubtitle->GetText();
+		floating_t data(content);
+		temp.min = data.get_d();
+		SSubtitle = subtitle->FirstChildElement("max");
+		content = SSubtitle->GetText();
+		data = content;
+		temp.max = data.get_d();
+		r_set->push_back(temp);
 		subtitle = subtitle->NextSiblingElement();
 	}
 }

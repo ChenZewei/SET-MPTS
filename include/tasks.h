@@ -49,9 +49,10 @@ class Task
 		ulong spin;
 		ulong self_suspension;
 		ulong local_blocking;
+		ulong remote_blocking;
 		ulong total_blocking;
 		ulong jitter;
-		ulong response_time;//WCET
+		ulong response_time;//initialization as WCET
 		ulong deadline;
 		ulong period;
 		uint priority;
@@ -102,6 +103,8 @@ class Task
 		void set_spin(ulong spining);
 		ulong get_local_blocking() const;
 		void set_local_blocking(ulong lb);
+		ulong get_remote_blocking() const;
+		void set_remote_blocking(ulong rb);
 		ulong get_total_blocking() const;
 		void set_total_blocking(ulong tb);
 		ulong get_self_suspension() const;

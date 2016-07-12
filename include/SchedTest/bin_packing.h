@@ -33,19 +33,8 @@ bool worst_fit_dm(	TaskSet& tasks,
 	Processor& processor = processors.get_processors()[assign];
 	task.set_partition(assign);
 	processor.add_task(&task);
-	switch(TEST_TYPE)
-	{
-		case 0:
-				break;
-		case 1:
-				tasks.calculate_spin(resources, processors);
-				tasks.calculate_local_blocking(resources);
-				break;
-		default:
-				break;
-	}
-	if (is_pfp_rta_schedulable(tasks, resources, TEST_TYPE, ITER_BLOCKING))
-	//if(processor.get_utilization() + task.get_utilization() <= 1)
+
+	if (is_pfp_rta_schedulable(tasks, processors, resources, TEST_TYPE, ITER_BLOCKING))
 	{
 		return true;
 	}
@@ -74,7 +63,6 @@ bool worst_fit_edf(	TaskSet& tasks,
 	
 	task.set_partition(assign);
 	Processor& processor = processors.get_processors()[assign];
-	//if (is_pfp_rta_schedulable(tasks, resources, TEST_TYPE, ITER_BLOCKING))
 	if(processor.get_utilization() + task.get_utilization() <= 1)
 	{
 		processor.add_task(&task);

@@ -31,9 +31,6 @@ int main(int argc,char** argv)
 	uint exp_times;
 	Result_Set results[MAX_METHOD];
 	Chart chart;
-//	cout<<""<<endl;	
-
-	//XML xml;	
 
 	XML::LoadFile("config.xml");
 
@@ -57,10 +54,6 @@ int main(int argc,char** argv)
 	XML::get_resource_request_range(&rrrs);
 	XML::get_total_len_factor(&tlfs);
 
-	
-
-	//system("mkdir results");
-
 	string file_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".csv";
 	ofstream output_file (file_name);
 	fraction_t u_ceil = u_ranges[0].min;
@@ -77,7 +70,7 @@ int main(int argc,char** argv)
 	output_file<<"\n";
 
 	double utilization = u_ranges[0].min;
-//cout<<""<<endl;
+
 	do
 	{	
 		Result result;
@@ -94,7 +87,6 @@ int main(int argc,char** argv)
 			{
 				taskset.init();
 				processorset.init();
-//				cout<<"Test method:"<<get_method_name(test_attributes[i].test_method)<<" Test_type:"<<test_attributes[i].test_type<<endl;
 				if(is_schedulable(taskset, processorset, resourceset, test_attributes[i].test_method, test_attributes[i].test_type, 0))
 				{	
 					success[i]++;
@@ -120,25 +112,9 @@ int main(int argc,char** argv)
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
 
-	//Scheduling_Test(resourceset, lambdas[0], p_num[0], p_ranges[0], u_ranges[0], steps[0], exp_times, rrps[0], rrns[0], rrrs[0], tlfs[0], test_attributes, results);
 	for(uint i = 0; i < test_attributes.size(); i++)
 		chart.AddData(get_method_name(test_attributes[i].test_method), results[i]);
-		//results.clear();
-/*
-	if(0 != test_attributes.size())
-	{
-		for(uint i = 0; i < results[0].size(); i++)
-		{	
-			output_file<<results[0][i].x<<",";
-			for( uint j = 0; j < test_attributes.size(); j++)
-			{
-				output_file<<results[j][i].y<<",";
-			}
-			output_file<<"\n";
-		}
-	}	
-*/
-	
+
 	output_file.close();
 	
 	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
@@ -181,7 +157,7 @@ const char* get_method_name(int method)
 			name = "WF-EDF";
 			break;
 		case 5:
-			name = "RTA-GPF";
+			name = "RTA-GFP";
 			break;
 	}
 	return name;

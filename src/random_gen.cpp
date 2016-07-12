@@ -1,7 +1,6 @@
 #include "random_gen.h"
 #include <iostream>
 
-
 default_random_engine Random_Gen::generator(time(NULL));
 
 double Random_Gen::exponential_gen(double lambda)

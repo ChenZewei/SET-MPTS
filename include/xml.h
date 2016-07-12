@@ -50,6 +50,14 @@ class XML
 
 		static void get_total_len_factor(Double_Set *d_set);
 
+		//defalut
+
+		static void get_integers(Int_Set *i_set, const char* element_name);
+
+		static void get_doubles(Double_Set *d_set, const char* element_name);
+
+		static void get_ranges(Range_Set *r_set, const char* element_name);
+
 		//xml construction
 		void initialization();
 		void add_element(const char* name);

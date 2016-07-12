@@ -83,9 +83,6 @@ Task::Task(	uint id,
 	wcet_critical_sections = 0;
 	carry_in = false;
 
-	
-	//Random_Gen r;
-	//cout<<"resourceset size:"<<resourceset.size()<<endl;
 	for(int i = 0; i < resourceset.size(); i++)
 	{
 		if(Random_Gen::probability(probability))
@@ -178,10 +175,12 @@ ulong Task::get_wcet_critical_sections() const { return wcet_critical_sections; 
 void Task::set_wcet_critical_sections(ulong csl) { wcet_critical_sections = csl; }
 ulong Task::get_wcet_non_critical_sections() const {	return wcet_non_critical_sections; }
 void Task::set_wcet_non_critical_sections(ulong ncsl) { wcet_non_critical_sections = ncsl; }
-ulong Task::get_spin() const	{ return spin; }
+ulong Task::get_spin() const { return spin; }
 void Task::set_spin(ulong spining) { spin = spining; }
 ulong Task::get_local_blocking() const { return local_blocking; }
 void Task::set_local_blocking(ulong lb) { local_blocking = lb; }
+ulong Task::get_remote_blocking() const { return remote_blocking; }
+void Task::set_remote_blocking(ulong rb) { remote_blocking = rb; }
 ulong Task::get_total_blocking() const { return total_blocking; }
 void Task::set_total_blocking(ulong tb) { total_blocking = tb; }
 ulong Task::get_self_suspension() const { return self_suspension; }
@@ -293,7 +292,7 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		Task &task_i = tasks[i];
-		cout<<"request num:"<<task_i.get_requests().size()<<endl;
+//		cout<<"request num:"<<task_i.get_requests().size()<<endl;
 		for(uint j = 0; j < task_i.get_requests().size(); j++)
 		{
 			Request &request = task_i.get_requests()[j];
