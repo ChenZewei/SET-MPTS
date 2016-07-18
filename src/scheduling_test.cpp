@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include <unistd.h>
 #include "tasks.h"
 #include "schedulability_test.h"
 #include "processors.h"
@@ -33,6 +34,17 @@ int main(int argc,char** argv)
 	Chart chart;
 
 	XML::LoadFile("config.xml");
+
+	if(0 == access("results", 0))
+		printf("results folder exsists.\n");
+	else
+	{
+		printf("results folder does not exsist.\n");
+		if(0 == mkdir("results", S_IRUSR|S_IWUSR))
+			printf("results folder has been created.\n");
+		else
+			return 0;
+	}
 
 	//scheduling parameter
 	XML::get_method(&test_attributes);
