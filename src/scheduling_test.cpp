@@ -40,7 +40,7 @@ int main(int argc,char** argv)
 	else
 	{
 		printf("results folder does not exsist.\n");
-		if(0 == mkdir("results", S_IRUSR|S_IWUSR))
+		if(0 == mkdir("results", S_IRWXU))
 			printf("results folder has been created.\n");
 		else
 			return 0;
@@ -67,13 +67,13 @@ int main(int argc,char** argv)
 	XML::get_total_len_factor(&tlfs);
 
 	string file_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".csv";
-	ofstream output_file (file_name);
+	ofstream output_file(file_name);
 	fraction_t u_ceil = u_ranges[0].min;
 	output_file<<"Lambda:"<<lambdas[0]<<",";					
 	output_file<<" processor number:"<<p_num[0]<<",";
 	output_file<<" step:"<<steps[0]<<",";
-	output_file<<" utilization range:["<<u_ranges[0].min<<"-"<<u_ranges[0].max<<"] ";
-	output_file<<"period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n";
+	output_file<<" utilization range:["<<u_ranges[0].min<<"-"<<u_ranges[0].max<<"],";
+	output_file<<fixed<<setprecision(0)<<" period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n";
 	output_file<<"Utilization,";
 	for(uint i = 0; i < test_attributes.size(); i++)
 	{

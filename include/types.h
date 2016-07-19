@@ -51,6 +51,7 @@ typedef struct
 {
 	int test_method;
 	int test_type;
+	char* remark;
 }Test_Attribute;
 
 typedef vector<int> Int_Set;

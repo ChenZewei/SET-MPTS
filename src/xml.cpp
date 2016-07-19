@@ -23,6 +23,7 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		content = subtitle->GetText();
 		Test_Attribute ta;
 		int test_type = subtitle->IntAttribute("TEST_TYPE");
+		
 		int transform = 0;
 		if(0 == strcmp(content,"P-EDF"))
 		{

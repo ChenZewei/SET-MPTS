@@ -32,7 +32,7 @@ void Chart::SetGraphQual(int quality)
 
 void Chart::ExportPNG(const char* path, const char* title, double min, double max)
 {
-	const char *line_style[] = {"r*","bo","g+","cs","yd","m^"};	
+	const char *line_style[] = {"k*","ko","k+","ks","kd","k^","kv","k<","k>","kx"};	
 	graph.Title(title,"",-2);	
 	graph.SetOrigin(0,0,0);
 	graph.SetRange('x', min, max);
