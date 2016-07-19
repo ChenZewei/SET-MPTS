@@ -23,7 +23,11 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		content = subtitle->GetText();
 		Test_Attribute ta;
 		int test_type = subtitle->IntAttribute("TEST_TYPE");
-		
+		string remark;
+		if(NULL == subtitle->Attribute("REMARK"))
+			remark = "";
+		else
+			remark = subtitle->Attribute("REMARK");
 		int transform = 0;
 		if(0 == strcmp(content,"P-EDF"))
 		{
@@ -55,6 +59,7 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		}
 		ta.test_method = transform;
 		ta.test_type = test_type;
+		ta.remark = remark;
 		t_set->push_back(ta);
 //		i_set->push_back(transform);
 		subtitle = subtitle->NextSiblingElement();

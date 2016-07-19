@@ -7,6 +7,7 @@
 #include <vector>
 #include <list>
 #include <math.h>
+#include <time.h>
 
 #define uint unsigned int
 #define ulong unsigned long
@@ -51,7 +52,7 @@ typedef struct
 {
 	int test_method;
 	int test_type;
-	char* remark;
+	string remark;
 }Test_Attribute;
 
 typedef vector<int> Int_Set;
