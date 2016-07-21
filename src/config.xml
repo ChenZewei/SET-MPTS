@@ -3,8 +3,8 @@
 	<schedulability_test>
 		<data TEST_TYPE="0" REMARK="">WF-DM</data>
 		<data TEST_TYPE="0" REMARK="normal">RTA_GFP</data>
-		<data TEST_TYPE="1" REMARK="spin">RTA_GFP</data>
-		<data TEST_TYPE="2" REMARK="semaphore">RTA_GFP</data>
+		<data TEST_TYPE="1" REMARK="spinlock">RTA_GFP</data>
+		<data TEST_TYPE="2" REMARK="semephore">RTA_GFP</data>
 <!-->
 		<data TEST_TYPE="0">WF-DM</data>
 		<data TEST_TYPE="1">WF-DM</data>

@@ -54,7 +54,7 @@ int main(int argc,char** argv)
 	XML::get_deadline_propotion(&d_ranges);
 	XML::get_utilization_range(&u_ranges);
 	XML::get_step(&steps);	
-cout<<"1"<<endl;
+
 	//resource parameter
 	Int_Set resource_num, rrns;
 	Double_Set rrps, tlfs;
@@ -64,7 +64,7 @@ cout<<"1"<<endl;
 	XML::get_resource_request_num(&rrns);
 	XML::get_resource_request_range(&rrrs);
 	XML::get_total_len_factor(&tlfs);
-cout<<"2"<<endl;
+
 	string file_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".csv";
 	ofstream output_file(file_name);
 
@@ -79,7 +79,7 @@ cout<<"2"<<endl;
 		output_file<<get_method_name(test_attributes[i])<<" ratio,";
 	}
 	output_file<<"\n";
-cout<<"3"<<endl;
+
 	double utilization = u_ranges[0].min;
 
 	do
@@ -124,7 +124,10 @@ cout<<"3"<<endl;
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
 
 	for(uint i = 0; i < test_attributes.size(); i++)
-		chart.AddData(get_method_name(test_attributes[i]).data(), results[i]);
+	{
+		string test_name = get_method_name(test_attributes[i]);
+		chart.AddData(test_name, results[i]);
+	}
 
 	output_file.close();
 	
@@ -171,7 +174,7 @@ string get_method_name(Test_Attribute ta)
 			name = "RTA-GFP";
 			break;
 	}
-	return name;
+	return name + "-" + ta.remark;
 }
 
 

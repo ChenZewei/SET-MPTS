@@ -8,7 +8,7 @@
 
 typedef struct
 {
-	const char* name;
+	string name;
 	mglData data;
 }Chart_Data;
 
@@ -30,8 +30,8 @@ class Chart
 		~Chart(){}
 
 		void AddColor(string color);
-		void AddData(const char* name, double* d, int size);
-		void AddData(const char* name, Result_Set r_set);
+		void AddData(string name, double* d, int size);
+		void AddData(string name, Result_Set r_set);
 		void SetGraphSize(int width, int height);
 		void SetGraphQual(int quality);
 		void ExportPNG(const char* path, const char* title, double min, double max);

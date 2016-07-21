@@ -46,7 +46,7 @@ void Chart::AddColor(string newColor)
 	color.push_back(newColor);
 }
 
-void Chart::AddData(const char* name, double* d, int size)
+void Chart::AddData(string name, double* d, int size)
 {
 	Chart_Data temp;
 	temp.name = name;
@@ -54,8 +54,9 @@ void Chart::AddData(const char* name, double* d, int size)
 	data_set.push_back(temp);
 }
 
-void Chart::AddData(const char* name, Result_Set r_set)
+void Chart::AddData(string name, Result_Set r_set)
 {
+
 	Chart_Data temp;
 	temp.name = name;
 	temp.data = mglData(r_set.size());
@@ -86,7 +87,7 @@ void Chart::ExportPNG(const char* path, const char* title, double min, double ma
 	for(int i = 0; i < data_set.size(); i++)
 	{
 		graph.Plot(data_set[i].data, get_line_style(i).c_str());
-		graph.AddLegend(data_set[i].name, get_line_style(i).c_str());
+		graph.AddLegend(data_set[i].name.c_str(), get_line_style(i).c_str());
 	}
 	
 	graph.Box();
