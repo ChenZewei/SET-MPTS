@@ -7,6 +7,7 @@
 #include <vector>
 #include <list>
 #include <math.h>
+#include <time.h>
 
 #define uint unsigned int
 #define ulong unsigned long
@@ -51,12 +52,14 @@ typedef struct
 {
 	int test_method;
 	int test_type;
+	string remark;
 }Test_Attribute;
 
 typedef vector<int> Int_Set;
 typedef vector<double> Double_Set;
 typedef vector<Range> Range_Set;
 typedef vector<Result> Result_Set;
+typedef vector<Result_Set> Result_Sets;
 typedef vector<Test_Attribute> Test_Attribute_Set;
 typedef list<Task*> TaskQueue;//之所以用list是因为list是双向链表，适合增删比较频繁的情况
 

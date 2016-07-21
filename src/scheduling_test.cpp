@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include <unistd.h>
 #include "tasks.h"
 #include "schedulability_test.h"
 #include "processors.h"
@@ -18,8 +19,7 @@ using namespace std;
 
 void requests_gen();
 string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
-const char* get_method_name(int method);
-void	 Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range d_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, Test_Attribute_Set test_attributes, Result_Set *results);
+string get_method_name(Test_Attribute ta);
 void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
@@ -33,6 +33,17 @@ int main(int argc,char** argv)
 	Chart chart;
 
 	XML::LoadFile("config.xml");
+
+	if(0 == access(string("results").data(), 0))
+		printf("results folder exsists.\n");
+	else
+	{
+		printf("results folder does not exsist.\n");
+		if(0 == mkdir(string("results").data(), S_IRWXU))
+			printf("results folder has been created.\n");
+		else
+			return 0;
+	}
 
 	//scheduling parameter
 	XML::get_method(&test_attributes);
@@ -55,17 +66,17 @@ int main(int argc,char** argv)
 	XML::get_total_len_factor(&tlfs);
 
 	string file_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".csv";
-	ofstream output_file (file_name);
-	fraction_t u_ceil = u_ranges[0].min;
+	ofstream output_file(file_name);
+
 	output_file<<"Lambda:"<<lambdas[0]<<",";					
 	output_file<<" processor number:"<<p_num[0]<<",";
 	output_file<<" step:"<<steps[0]<<",";
-	output_file<<" utilization range:["<<u_ranges[0].min<<"-"<<u_ranges[0].max<<"] ";
-	output_file<<"period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n";
+	output_file<<" utilization range:["<<u_ranges[0].min<<"-"<<u_ranges[0].max<<"],";
+	output_file<<setprecision(0)<<" period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n"<<setprecision(3);
 	output_file<<"Utilization,";
 	for(uint i = 0; i < test_attributes.size(); i++)
 	{
-		output_file<<get_method_name(test_attributes[i].test_method)<<" ratio,";
+		output_file<<get_method_name(test_attributes[i])<<" ratio,";
 	}
 	output_file<<"\n";
 
@@ -113,7 +124,10 @@ int main(int argc,char** argv)
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
 
 	for(uint i = 0; i < test_attributes.size(); i++)
-		chart.AddData(get_method_name(test_attributes[i].test_method), results[i]);
+	{
+		string test_name = get_method_name(test_attributes[i]);
+		chart.AddData(test_name, results[i]);
+	}
 
 	output_file.close();
 	
@@ -133,10 +147,10 @@ string output_filename(int lambda, double step, int p_num, Range u_range, Range 
 	return buf.str();
 }
 
-const char* get_method_name(int method)
+string get_method_name(Test_Attribute ta)
 {
-	const char* name;
-	switch(method)
+	string name;
+	switch(ta.test_method)
 	{
 		default:
 			name = "P-EDF";
@@ -160,45 +174,9 @@ const char* get_method_name(int method)
 			name = "RTA-GFP";
 			break;
 	}
-	return name;
+	return name + "-" + ta.remark;
 }
 
-void Scheduling_Test(ResourceSet& resourceset, int lambda, int p_num, Range p_range, Range d_range, Range u_range, double step, int exp_times, double probability, int num_max, Range l_range, double tlfs, Test_Attribute_Set test_attributes, Result_Set *results )
-{
-	double utilization = u_range.min;
-	do
-	{	
-		Result result;
-		result.x = utilization;
-		int success[MAX_METHOD] = {0, 0, 0, 0, 0, 0};
-		for(int i = 0; i < exp_times; i++)
-		{
-			TaskSet taskset = TaskSet();
-			
-			ProcessorSet processorset = ProcessorSet(p_num);
-			
-			tast_gen(taskset, resourceset, lambda, p_range, d_range, utilization, probability, num_max, l_range, tlfs);
-			if(!taskset.is_constrained_deadline())
-				cout<<"nnnnn"<<endl;
-			for(uint i = 0; i < test_attributes.size(); i++)
-			{
-				if(is_schedulable(taskset, processorset, resourceset, test_attributes[i].test_method, 0, 0))
-				{	
-					success[i]++;
-				}
-			}
-		
-		}
-		for(uint i = 0; i < test_attributes.size(); i++)
-		{
-			fraction_t ratio(success[i], exp_times);
-			result.y = ratio.get_d();
-			results[i].push_back(result);
-		}
-		cout<<"utilization:"<<utilization<<endl;
-	}while((utilization += step) < u_range.max);
-	
-}
 
 
 

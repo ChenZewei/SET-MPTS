@@ -20,11 +20,6 @@
 ## Compile
 enter src and make.(C++ 11 is needed)<br/>
 
-## Run
-1. Adjust the parameters in the config.xml in src;
-2. Execute the program;
-3. Check the numeric results and graph in results folder.
-
 ## Configure
 We use XML file to save the configurations.<br/>
 1. Using "parameter_name" to bound parameters;<br/>
@@ -54,6 +49,13 @@ example:<br/>
 		</init_utilization_range>
 		......
 	</parameters>
+
+## Run
+1. Adjust the parameters in the config.xml in src;
+2. Execute the program;
+3. Check the numeric results and graph in results folder.
+
+## Results
 
 
 
