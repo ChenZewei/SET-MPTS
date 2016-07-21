@@ -174,7 +174,10 @@ string get_method_name(Test_Attribute ta)
 			name = "RTA-GFP";
 			break;
 	}
-	return name + "-" + ta.remark;
+	if("" != ta.remark)
+		return name + "-" + ta.remark;
+	else
+		return name;
 }
 
 
