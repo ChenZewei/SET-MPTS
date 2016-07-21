@@ -12,7 +12,7 @@
 #include "xml.h"
 
 #define MAX_LEN 100
-#define MAX_METHOD 6
+#define MAX_METHOD 8
 
 
 using namespace std;
