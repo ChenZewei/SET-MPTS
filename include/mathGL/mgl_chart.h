@@ -35,6 +35,7 @@ class Chart
 		void SetGraphSize(int width, int height);
 		void SetGraphQual(int quality);
 		void ExportPNG(const char* path, const char* title, double min, double max);
+		void ExportJSON(const char* path);
 };
 
 

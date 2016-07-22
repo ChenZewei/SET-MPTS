@@ -79,7 +79,8 @@ void Chart::SetGraphQual(int quality)
 
 void Chart::ExportPNG(const char* path, const char* title, double min, double max)
 {
-	graph.Title(title,"",-2);	
+	if("" != title)
+		graph.Title(title,"",-2);	
 	graph.SetOrigin(0,0,0);
 	graph.SetRange('x', min, max);
 	graph.SetRange('y', 0, 1);	
@@ -96,4 +97,9 @@ void Chart::ExportPNG(const char* path, const char* title, double min, double ma
 	graph.Legend(0);
 	graph.Axis("xy");
 	graph.WritePNG(path);
+}
+
+void Chart::ExportJSON(const char* path)
+{
+	graph.WriteJSON(path);
 }

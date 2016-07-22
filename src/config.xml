@@ -5,8 +5,6 @@
 		<data TEST_TYPE="1" REMARK="bc">RTA-GFP</data>
 		<data TEST_TYPE="2" REMARK="gn">RTA-GFP</data>
 		<data TEST_TYPE="0" REMARK="normal">WF-DM</data>
-		<data TEST_TYPE="1" REMARK="spinlock">WF-DM</data>
-		<data TEST_TYPE="2" REMARK="semephore">WF-DM</data>
 		<data TEST_TYPE="0" REMARK="normal">WF-EDF</data>
 <!-->
 		<data TEST_TYPE="0" REMARK="normal">RTA-GFP</data>

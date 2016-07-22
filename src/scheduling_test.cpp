@@ -133,7 +133,7 @@ int main(int argc,char** argv)
 	
 	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
 
-	chart.SetGraphSize(1280,800);
+	chart.SetGraphSize(1280,640);
 	chart.SetGraphQual(3);
 	chart.ExportPNG(png_name.data(), "", u_ranges[0].min, results[0][results[0].size()-1].x);
 
