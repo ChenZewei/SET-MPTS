@@ -1,9 +1,10 @@
 #ifndef PARAM_H
 #define PARAM_H
 
+#include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
-#include <string>
 #include "types.h"
 
 
@@ -58,6 +59,6 @@ class Param
 		string output_filename();
 		string get_method_name(Test_Attribute ta);
 
-}
+};
 
 #endif

@@ -21,10 +21,10 @@ ulong Request::get_total_length() const { return total_length; }
 ////////////////////////////Task//////////////////////////////
 
 Task::Task(uint id,
-	ulong wcet, 
-   	ulong period,
-   	ulong deadline,
-    	uint priority)
+		ulong wcet, 
+	   	ulong period,
+	   	ulong deadline,
+		uint priority)
 {
 	this->id = id;
 	this->wcet = wcet;
@@ -46,10 +46,7 @@ Task::Task(uint id,
 
 Task::Task(	uint id,
 		ResourceSet& resourceset,
-		double probability,
-		int num_max,
-		Range l_range,
-		double tlfs,
+		Param param,
 		ulong wcet, 
 		ulong period,
 		ulong deadline,
@@ -85,11 +82,11 @@ Task::Task(	uint id,
 
 	for(int i = 0; i < resourceset.size(); i++)
 	{
-		if(Random_Gen::probability(probability))
+		if(Random_Gen::probability(param.rrp))
 		{
-			uint num = Random_Gen::uniform_integral_gen(1, num_max);
-			uint max_len = Random_Gen::uniform_integral_gen(l_range.min, l_range.max);
-			add_request(i, num, max_len, tlfs*max_len);
+			uint num = Random_Gen::uniform_integral_gen(1, param.rrn);
+			uint max_len = Random_Gen::uniform_integral_gen(param.rrr.min, param.rrr.max);
+			add_request(i, num, max_len, param.tlf*max_len);
 			resourceset.add_task(i, this);
 		}
 	}
@@ -261,7 +258,7 @@ void TaskSet::add_task(long wcet, long period, long deadline)
 		density_max = density_new;
 }
 
-void TaskSet::add_task(ResourceSet& resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline)
+void TaskSet::add_task(ResourceSet& resourceset, Param param, long wcet, long period, long deadline)
 {
 	fraction_t utilization_new = wcet, density_new = wcet;
 	utilization_new /= period;
@@ -271,10 +268,7 @@ void TaskSet::add_task(ResourceSet& resourceset, double probability, int num_max
 		density_new /= min(deadline, period);
 	tasks.push_back(Task(tasks.size(),
 			resourceset,
-			probability,
-			num_max,
-			l_range,
-			tlfs,
+			param,
 			wcet, 
 			period,
 			deadline));
@@ -465,18 +459,18 @@ void TaskSet::display()
 
 /////////////////////////////Others///////////////////////////////
 
-void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, Range d_range, double utilization,double probability, int num_max, Range l_range, double tlfs)
+void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double utilization)
 {
 	//Random_Gen r;
 	while(taskset.get_utilization_sum() < utilization)//generate tasks
 	{
-		ulong period = Random_Gen::uniform_integral_gen(int(p_range.min),int(p_range.max));
-		fraction_t u = Random_Gen::exponential_gen(lambda);
+		ulong period = Random_Gen::uniform_integral_gen(int(param.p_range.min),int(param.p_range.max));
+		fraction_t u = Random_Gen::exponential_gen(param.lambda);
 		ulong wcet = period*u.get_d();
 		ulong deadline = 0;
-		if(d_range.max != 0)
+		if(param.d_range.max != 0)
 		{
-			deadline = ceil(period*Random_Gen::uniform_real_gen(d_range.min, d_range.max));
+			deadline = ceil(period*Random_Gen::uniform_real_gen(param.d_range.min, param.d_range.max));
 			if(deadline > period)
 				deadline = period;
 			if(deadline < wcet)
@@ -495,11 +489,11 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_ra
 			if(deadline != 0 && deadline < wcet)
 				deadline = wcet;
 			//taskset->add_task(wcet, period);
-			taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period, deadline);
+			taskset.add_task(resourceset, param, wcet, period, deadline);
 			break;
 		}
 		//taskset->add_task(wcet,period);	
-		taskset.add_task(resourceset, probability, num_max, l_range, tlfs, wcet, period, deadline);
+		taskset.add_task(resourceset, param, wcet, period, deadline);
 	}
 	taskset.sort_by_period();
 	//cout<<utilization<<":"<<taskset.get_utilization_sum().get_d()<<endl;

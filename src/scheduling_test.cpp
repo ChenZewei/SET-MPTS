@@ -10,6 +10,7 @@
 #include "processors.h"
 #include "mgl_chart.h"
 #include "xml.h"
+#include "param.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
@@ -31,6 +32,7 @@ int main(int argc,char** argv)
 	uint exp_times;
 	Result_Set results[MAX_METHOD];
 	Chart chart;
+	Param parameters;
 
 	XML::LoadFile("config.xml");
 
@@ -65,7 +67,22 @@ int main(int argc,char** argv)
 	XML::get_resource_request_range(&rrrs);
 	XML::get_total_len_factor(&tlfs);
 
-	string file_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".csv";
+	//set parameters
+	parameters.lambda = lambdas[0];
+	parameters.p_num = p_num[0];
+	parameters.step = steps[0];
+	parameters.p_range = p_ranges[0];
+	parameters.u_range = u_ranges[0];
+	parameters.d_range =  d_ranges[0];
+	parameters.test_attributes = test_attributes;
+	parameters.exp_times = exp_times;
+	parameters.resource_num = resource_num[0];
+	parameters.rrn = rrns[0];
+	parameters.rrp = rrps[0];
+	parameters.tlf = tlfs[0];
+	parameters.rrr = rrrs[0];
+
+	string file_name = "results/" + parameters.output_filename() + ".csv";
 	ofstream output_file(file_name);
 
 	output_file<<"Lambda:"<<lambdas[0]<<",";					
@@ -93,7 +110,7 @@ int main(int argc,char** argv)
 			ResourceSet resourceset = ResourceSet();
 			ProcessorSet processorset = ProcessorSet(p_num[0]);
 			resource_gen(&resourceset, resource_num[0]);
-			tast_gen(taskset, resourceset, lambdas[0], p_ranges[0], d_ranges[0], utilization, rrps[0], rrns[0], rrrs[0], tlfs[0]);	
+			tast_gen(taskset, resourceset, parameters, utilization);	
 			for(uint i = 0; i < test_attributes.size(); i++)
 			{
 				taskset.init();

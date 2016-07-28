@@ -31,6 +31,6 @@ class Output
 		void SetGraphSize(int width, int height);
 		void SetGraphQual(int quality);
 		void export_line_chart(int format);
-}
+};
 
 #endif
