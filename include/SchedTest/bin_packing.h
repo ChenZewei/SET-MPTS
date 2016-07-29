@@ -41,6 +41,34 @@ bool worst_fit_dm(	TaskSet& tasks,
 	return false;
 }
 
+bool first_fit_dm(	TaskSet& tasks, 
+				ProcessorSet& processors, 
+				ResourceSet& resources, 
+				uint t_id, 
+				uint TEST_TYPE, 
+				uint ITER_BLOCKING)
+{
+	uint assign;
+	Task& task = tasks.get_tasks()[t_id];
+	for (uint cpu_id = 0; cpu_id < processors.get_processor_num(); cpu_id ++)
+	{	
+		assign = cpu_id;
+		Processor& processor = processors.get_processors()[assign];
+		processor.add_task(&task);
+		task.set_partition(assign);
+		if (is_pfp_rta_schedulable(tasks, processors, resources, TEST_TYPE, ITER_BLOCKING))
+		{
+			return true;
+		}
+		else
+		{
+			processor.remove_task(&task);
+		}
+	}
+
+	return false;
+}
+
 bool worst_fit_edf(	TaskSet& tasks, 
 				ProcessorSet& processors, 
 				ResourceSet& resources, 

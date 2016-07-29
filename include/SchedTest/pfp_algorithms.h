@@ -23,6 +23,23 @@ bool is_worst_fit_dm_schedulable(TaskSet& tasks,
 	return true;
 }
 
+bool is_first_fit_dm_schedulable(TaskSet& tasks, 
+				ProcessorSet& processors,
+				ResourceSet& resources,
+				uint cpu_num,
+				uint TEST_TYPE,
+				uint ITER_BLOCKING)
+{
+	processors.init();
+	//tasks.sort_by_utilization();
+	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
+	{
+		if (!first_fit_dm(tasks, processors, resources, t_id, TEST_TYPE, ITER_BLOCKING))
+			return false;
+	}
+	return true;
+}
+
 bool is_worst_fit_edf_schedulable(TaskSet& tasks, 
 				ProcessorSet& processors,
 				ResourceSet& resources,
