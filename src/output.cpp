@@ -3,6 +3,8 @@
 Output::Output(const char* path)
 {
 	this->path = path;
+	chart.SetGraphSize(1280,640);
+	chart.SetGraphQual(3);
 }
 
 Output::Output(Param param)
@@ -18,6 +20,11 @@ Output::Output(Param param)
 			return 0;
 	}
 	this->path = "results/" + param.output_filename()) + "/";
+	chart.SetGraphSize(1280,640);
+	chart.SetGraphQual(3);
+
+	for(uint i = 0; i < param.get_method_num(); i++)
+		add_set();
 }
 
 void Output::add_set()
@@ -44,6 +51,43 @@ uint Output::get_results_num(uint index) const
 	return result_sets[index].size();
 }
 
+string Output::output_filename()
+{
+	stringstream buf;
+	buf<<"l:"<<param.lambda<<"-"<<"s:"<<param.step<<"-"<<"P:"<<param.p_num<<"-"<<fixed<<setprecision(0)<<"u:["<<param.u_range.min<<","<<param.u_range.max<<"]-"<<"p:["<<param.p_range.min<<","<<param.p_range.max<<"]";
+	return buf.str();
+}
+
+string Output::get_method_name(Test_Attribute ta)
+{
+	string name;
+	switch(ta.test_method)
+	{
+		default:
+			name = "P-EDF";
+			break;
+		case 0:
+			name =  "P-EDF";
+			break;
+		case 1:
+			name =  "BCL-FTP";
+			break;
+		case 2:
+			name =  "BCL-EDF";
+			break;
+		case 3:
+			name = "WF-DM";
+			break;
+		case 4:
+			name = "WF-EDF";
+			break;
+		case 5:
+			name = "RTA-GFP";
+			break;
+	}
+	return name + "-" + ta.remark;
+}
+
 //export to csv
 void Output::export_csv()
 {
@@ -56,9 +100,9 @@ void Output::export_csv()
 	output_file<<" utilization range:["<<param.u_range.min<<"-"<<param.u_range.max<<"],";
 	output_file<<setprecision(0)<<" period range:["<<param.p_range.min<<"-"<<param.p_range.max<<"]\n"<<setprecision(3);
 	output_file<<"Utilization,";
-	for(uint i = 0; i < test_attributes.size(); i++)
+	for(uint i = 0; i < param.test_attributes.size(); i++)
 	{
-		output_file<<get_method_name(test_attributes[i])<<" ratio,";
+		output_file<<get_method_name(param.test_attributes[i])<<" ratio,";
 	}
 	output_file<<"\n";
 
@@ -100,6 +144,7 @@ void Output::export_line_chart(int format)
 {
 	for(uint i = 0; i < get_sets_num(); i++)
 	{
-		
+		chart.AddData(get_method_name(param.test_attributes[i]), result_sets[i]);
 	}
+	chart.ExportPNG(png_name.data(), "", param.u_range.min, param.u_range.max);
 }

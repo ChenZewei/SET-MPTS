@@ -43,7 +43,7 @@
 		<data>10</data>
 	</resource_num>
 	<rrp>//resource_request_probability
-		<data>0.8</data>
+		<data>0.1</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>

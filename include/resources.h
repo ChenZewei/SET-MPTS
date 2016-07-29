@@ -44,7 +44,7 @@ class ResourceSet
 		void add_task(uint resource_id, Task* task);
 };
 
-void resource_gen(ResourceSet *resourceset, int num);
+void resource_gen(ResourceSet *resourceset, Param param);
 
 #endif
 

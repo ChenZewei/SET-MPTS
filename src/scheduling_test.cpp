@@ -11,17 +11,13 @@
 #include "mgl_chart.h"
 #include "xml.h"
 #include "param.h"
+#include "output.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
 
 
 using namespace std;
-
-void requests_gen();
-string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range);
-string get_method_name(Test_Attribute ta);
-void Export_Chart(const char* path, const char* title, double min, double max, double step, const char** names, int n, ...);
 
 int main(int argc,char** argv)
 {	
@@ -82,6 +78,9 @@ int main(int argc,char** argv)
 	parameters.tlf = tlfs[0];
 	parameters.rrr = rrrs[0];
 
+	Output output(param);
+
+/*
 	string file_name = "results/" + parameters.output_filename() + ".csv";
 	ofstream output_file(file_name);
 
@@ -96,26 +95,32 @@ int main(int argc,char** argv)
 		output_file<<get_method_name(test_attributes[i])<<" ratio,";
 	}
 	output_file<<"\n";
-
+*/
+	
+	ProcessorSet processorset = ProcessorSet(param);
+	ResourceSet resourceset = ResourceSet();
+	resource_gen(&resourceset, param);
+	
 	double utilization = u_ranges[0].min;
-
+	
 	do
 	{	
 		Result result;
 		cout<<"Utilization:"<<utilization<<endl;
-		int success[MAX_METHOD] = {0, 0, 0, 0, 0, 0};
+		vector<int> success;
+		for(uint i = 0; i < test_attributes.size(); i++)
+		{
+			success.push_back(0);
+		}
 		for(int i = 0; i < exp_times; i++)
 		{
 			TaskSet taskset = TaskSet();
-			ResourceSet resourceset = ResourceSet();
-			ProcessorSet processorset = ProcessorSet(p_num[0]);
-			resource_gen(&resourceset, resource_num[0]);
 			tast_gen(taskset, resourceset, parameters, utilization);	
-			for(uint i = 0; i < test_attributes.size(); i++)
+			for(uint i = 0; i < param.get_method_num(); i++)
 			{
 				taskset.init();
 				processorset.init();
-				if(is_schedulable(taskset, processorset, resourceset, test_attributes[i].test_method, test_attributes[i].test_type, 0))
+				if(is_schedulable(taskset, processorset, resourceset, param.get_test_method(i), param.get_test_type(i), 0))
 				{	
 					success[i]++;
 				}
@@ -126,9 +131,11 @@ int main(int argc,char** argv)
 		{
 			fraction_t ratio(success[i], exp_times);
 			result.y = ratio.get_d();
-			results[i].push_back(result);
+			output.add_resutl(i, result.x, result.y);
 		}
+
 //output to csv file		
+/*
 		output_file<<utilization<<",";
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
@@ -136,10 +143,13 @@ int main(int argc,char** argv)
 		}
 		output_file<<"\n";
 		output_file.flush();
+*/
 		utilization += steps[0];
+
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
 
+/*
 	for(uint i = 0; i < test_attributes.size(); i++)
 	{
 		string test_name = get_method_name(test_attributes[i]);
@@ -153,48 +163,8 @@ int main(int argc,char** argv)
 	chart.SetGraphSize(1280,640);
 	chart.SetGraphQual(3);
 	chart.ExportPNG(png_name.data(), "", u_ranges[0].min, results[0][results[0].size()-1].x);
-
+*/
 	return 0;
-}
-
-string output_filename(int lambda, double step, int p_num, Range u_range, Range p_range)
-{
-	stringstream buf;
-	buf<<"l:"<<lambda<<"-"<<"s:"<<step<<"-"<<"P:"<<p_num<<"-"<<fixed<<setprecision(0)<<"u:["<<u_range.min<<","<<u_range.max<<"]-"<<"p:["<<p_range.min<<","<<p_range.max<<"]";
-	return buf.str();
-}
-
-string get_method_name(Test_Attribute ta)
-{
-	string name;
-	switch(ta.test_method)
-	{
-		default:
-			name = "P-EDF";
-			break;
-		case 0:
-			name =  "P-EDF";
-			break;
-		case 1:
-			name =  "BCL-FTP";
-			break;
-		case 2:
-			name =  "BCL-EDF";
-			break;
-		case 3:
-			name = "WF-DM";
-			break;
-		case 4:
-			name = "WF-EDF";
-			break;
-		case 5:
-			name = "RTA-GFP";
-			break;
-	}
-	if("" != ta.remark)
-		return name + "-" + ta.remark;
-	else
-		return name;
 }
 
 

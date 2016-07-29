@@ -23,6 +23,8 @@ class Output
 		uint get_sets_num() const;
 		void add_result(uint index, double x, double y);
 		uint get_results_num(uint index) const;
+		string output_filename();
+		string get_method_name(Test_Attribute ta);
 
 		//export to csv
 		void export_csv();

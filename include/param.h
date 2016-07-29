@@ -56,8 +56,7 @@ class Param
 		void set_request_range(Range rrr);
 		Range get_request_range() const;
 		
-		string output_filename();
-		string get_method_name(Test_Attribute ta);
+		uint get_method_num();
 
 };
 
