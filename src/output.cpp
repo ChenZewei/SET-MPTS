@@ -9,22 +9,23 @@ Output::Output(const char* path)
 
 Output::Output(Param param)
 {
-	if(0 == access(string("results/" + param.output_filename()), 0))
-		printf("results folder exsists.\n");
+	this->param = param;
+	if(0 == access(string("results/" + output_filename()).data(), 0))
+		printf("result folder exsists.\n");
 	else
 	{
-		printf("results folder does not exsist.\n");
-		if(0 == mkdir(string("results/" + param.output_filename(), S_IRWXU))
-			printf("results folder has been created.\n");
-		else
-			return 0;
+		printf("result folder does not exsist.\n");
+		if(0 == mkdir(string("results/" + output_filename()).data(), S_IRWXU))
+			printf("result folder has been created.\n");
 	}
-	this->path = "results/" + param.output_filename()) + "/";
+	this->path = "results/" + output_filename() + "/";
 	chart.SetGraphSize(1280,640);
 	chart.SetGraphQual(3);
-
+	
+	
 	for(uint i = 0; i < param.get_method_num(); i++)
 		add_set();
+	
 }
 
 void Output::add_set()
@@ -107,7 +108,18 @@ void Output::export_csv()
 	output_file<<"\n";
 
 	double utilization = param.u_range.min;
-	
+
+	for(uint i = 0; i < result_sets[0].size(); i++)
+	{
+		output_file<<result_sets[0][i].x<<",";
+		for(uint j = 0; j < result_sets.size(); j++)
+		{
+			output_file<<result_sets[j][i].y<<",";
+		}
+		output_file<<"\n";
+	}
+
+/*
 	output_file<<utilization<<",";
 	do
 	{
@@ -116,15 +128,7 @@ void Output::export_csv()
 	}
 	while(utilization < param.u_range.max || fabs(param.u_range.max - utilization) < EPS);
 	output_file<<utilization<<"\n";
-	
-	for(uint i = 0; i < result_sets.size(); i++)
-	{
-		for(uint j = 0; j < result_sets[i].size(); j++)
-		{
-			output_file<<result_sets[i][j].y<<",";
-		}
-	}
-	output_file<<"\n";
+*/
 	output_file.flush();
 	utilization += param.step;
 }
@@ -142,6 +146,7 @@ void Output::SetGraphQual(int quality)
 
 void Output::export_line_chart(int format)
 {
+	string png_name = path + "result.png";
 	for(uint i = 0; i < get_sets_num(); i++)
 	{
 		chart.AddData(get_method_name(param.test_attributes[i]), result_sets[i]);

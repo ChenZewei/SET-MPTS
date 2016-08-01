@@ -4,8 +4,10 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unistd.h>
 #include "types.h"
 #include "mgl_chart.h"
+#include "param.h"
 
 class Output
 {
@@ -32,7 +34,7 @@ class Output
 		//export to graph
 		void SetGraphSize(int width, int height);
 		void SetGraphQual(int quality);
-		void export_line_chart(int format);
+		void export_line_chart(int format = 0);
 };
 
 #endif

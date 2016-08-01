@@ -63,6 +63,14 @@ int main(int argc,char** argv)
 	XML::get_resource_request_range(&rrrs);
 	XML::get_total_len_factor(&tlfs);
 
+cout<<lambdas[0]<<endl;
+cout<<p_num[0]<<endl;
+cout<<steps[0]<<endl;
+cout<<p_ranges[0].min<<" "<<p_ranges[0].max<<endl;
+cout<<u_ranges[0].min<<" "<<u_ranges[0].max<<endl;
+cout<<d_ranges[0].min<<" "<<d_ranges[0].max<<endl;
+cout<<exp_times<<endl;
+
 	//set parameters
 	parameters.lambda = lambdas[0];
 	parameters.p_num = p_num[0];
@@ -77,8 +85,20 @@ int main(int argc,char** argv)
 	parameters.rrp = rrps[0];
 	parameters.tlf = tlfs[0];
 	parameters.rrr = rrrs[0];
+cout<<"////////////////////"<<endl;
+cout<<parameters.lambda<<endl;
+cout<<parameters.p_num<<endl;
+cout<<parameters.step<<endl;
+cout<<parameters.p_range.min<<" "<<parameters.p_range.max<<endl;
+cout<<parameters.u_range.min<<" "<<parameters.u_range.max<<endl;
+cout<<parameters.d_range.min<<" "<<parameters.d_range.max<<endl;
+cout<<parameters.exp_times<<endl;
+cout<<"////////////////////"<<endl;
 
-	Output output(param);
+
+	Output output(parameters);
+
+cout<<output.output_filename()<<endl;
 
 /*
 	string file_name = "results/" + parameters.output_filename() + ".csv";
@@ -97,9 +117,9 @@ int main(int argc,char** argv)
 	output_file<<"\n";
 */
 	
-	ProcessorSet processorset = ProcessorSet(param);
+	ProcessorSet processorset = ProcessorSet(parameters);
 	ResourceSet resourceset = ResourceSet();
-	resource_gen(&resourceset, param);
+	resource_gen(&resourceset, parameters);
 	
 	double utilization = u_ranges[0].min;
 	
@@ -116,11 +136,11 @@ int main(int argc,char** argv)
 		{
 			TaskSet taskset = TaskSet();
 			tast_gen(taskset, resourceset, parameters, utilization);	
-			for(uint i = 0; i < param.get_method_num(); i++)
+			for(uint i = 0; i < parameters.get_method_num(); i++)
 			{
 				taskset.init();
 				processorset.init();
-				if(is_schedulable(taskset, processorset, resourceset, param.get_test_method(i), param.get_test_type(i), 0))
+				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(i), parameters.get_test_type(i), 0))
 				{	
 					success[i]++;
 				}
@@ -131,7 +151,7 @@ int main(int argc,char** argv)
 		{
 			fraction_t ratio(success[i], exp_times);
 			result.y = ratio.get_d();
-			output.add_resutl(i, result.x, result.y);
+			output.add_result(i, result.x, result.y);
 		}
 
 //output to csv file		
@@ -148,6 +168,10 @@ int main(int argc,char** argv)
 
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
+
+	output.export_csv();
+
+	output.export_line_chart();
 
 /*
 	for(uint i = 0; i < test_attributes.size(); i++)

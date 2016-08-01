@@ -57,6 +57,8 @@ class Param
 		Range get_request_range() const;
 		
 		uint get_method_num();
+		int get_test_method(uint index);
+		int get_test_type(uint index);
 
 };
 

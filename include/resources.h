@@ -4,6 +4,7 @@
 #include <list>
 #include "types.h"
 #include "processors.h"
+#include "param.h"
 
 using namespace std;
 
