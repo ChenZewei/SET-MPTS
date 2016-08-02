@@ -117,9 +117,7 @@ cout<<output.output_filename()<<endl;
 	output_file<<"\n";
 */
 	
-	ProcessorSet processorset = ProcessorSet(parameters);
-	ResourceSet resourceset = ResourceSet();
-	resource_gen(&resourceset, parameters);
+	
 	
 	double utilization = u_ranges[0].min;
 	
@@ -135,11 +133,17 @@ cout<<output.output_filename()<<endl;
 		for(int i = 0; i < exp_times; i++)
 		{
 			TaskSet taskset = TaskSet();
-			tast_gen(taskset, resourceset, parameters, utilization);	
+				
+			ProcessorSet processorset = ProcessorSet(parameters);
+			ResourceSet resourceset = ResourceSet();
+			resource_gen(&resourceset, parameters);
+			tast_gen(taskset, resourceset, parameters, utilization);
+
 			for(uint i = 0; i < parameters.get_method_num(); i++)
 			{
 				taskset.init();
 				processorset.init();
+				
 				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(i), parameters.get_test_type(i), 0))
 				{	
 					success[i]++;
