@@ -22,6 +22,7 @@
 #define WF_DM 3
 #define WF_EDF 4
 #define RTA_GFP 5
+#define FF_DM 6
 
 using namespace std;
 

@@ -53,6 +53,10 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		{
 			transform = 5;
 		}
+		else if(0 == strcmp(content,"FF-DM"))
+		{
+			transform = 6;
+		}
 		else
 		{
 			transform = 0;

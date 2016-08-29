@@ -30,6 +30,9 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 		case RTA_GFP:
 			schedulable = is_gfp_rta_schedulable(taskset, processorset, TEST_TYPE);
 			break;
+		case FF_DM:
+			schedulable = is_first_fit_dm_schedulable(taskset, processorset, resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
+			break;
 		default:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);
 			break;
