@@ -2,9 +2,14 @@
 <parameters>
 	<schedulability_test>
 <!-->
-		<data TEST_TYPE="0" REMARK="normal">WF-DM</data>
-		<data TEST_TYPE="1" REMARK="spinlock">WF-DM</data>
-		<data TEST_TYPE="2" REMARK="semephore">WF-DM</data>
+		<data TEST_TYPE="0">WF-DM</data>
+		<data TEST_TYPE="1">WF-DM</data>
+		<data TEST_TYPE="2">WF-DM</data>
+		<data TEST_TYPE="0">FF-DM</data>
+		<data TEST_TYPE="1">FF-DM</data>
+		<data TEST_TYPE="2">FF-DM</data>
+<!-->
+		<data>WF-EDF</data>
 <!-->
 		<data TEST_TYPE="0">RTA-GFP</data>
 		<data TEST_TYPE="1">RTA-GFP</data>
@@ -15,7 +20,7 @@
 		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.1</data>
+		<data>0.2</data>
 	</step>
 	<init_utilization_range>
 		<data>
