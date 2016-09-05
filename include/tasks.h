@@ -140,11 +140,14 @@ class Job
 {
 	private:
 		uint id;
-		ulong cost;
+		ulong wcet;
+		uint level;
+		vector<uint> precedence;
+		vector<uint> follow_up;
 	public:
 		Job(uint id, ulong cost);
 		uint get_id() const;
-		ulong get_cost() const;
+		ulong get_wcet() const;
 };
 
 typedef vector<Job> Jobs;
@@ -170,6 +173,7 @@ class DAG_Task:public Task
 		Graph graph;
 		uint vol;//total wcet of the jobs in graph
 	public:
+		void add_job(uint wcet);
 		void update_vol();
 		bool is_acyclic();
 		uint DBF(uint time);//Demand Bound Function
