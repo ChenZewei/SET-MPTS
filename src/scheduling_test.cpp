@@ -124,7 +124,7 @@ cout<<"////////////////DAG//////////////////"<<endl;
 	dag_task.add_job(1);
 	dag_task.add_job(2);
 	dag_task.add_job(1);
-	dag_task.add_job(1);
+	dag_task.add_job(2);
 	
 	dag_task.add_arc(0,2);
 	dag_task.add_arc(1,2);
@@ -148,9 +148,9 @@ cout<<"////////////////DAG//////////////////"<<endl;
 	dag_task.display_follow_ups(4);
 
 	dag_task.update_vol();
-	//dag_task.update_len();
+	dag_task.update_len();
 
-	//cout<<"vol:"<<dag_task.get_vol()<<" "<<"len:"<<dag_task.get_len()<<endl;
+	cout<<"vol:"<<dag_task.get_vol()<<" "<<"len:"<<dag_task.get_len()<<endl;
 	
 	
 	double utilization = u_ranges[0].min;
