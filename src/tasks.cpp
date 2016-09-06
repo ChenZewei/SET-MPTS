@@ -477,7 +477,7 @@ ulong DAG_Task::get_period() const {return period;}
 void DAG_Task::add_job(uint wcet, ulong deadline)
 {
 	VNode vnode;
-	vnode.id = vnodes.size();
+	vnode.job_id = vnodes.size();
 	vnode.wcet = wcet;
 	if(0 == deadline)
 		vnode.deadline = this->deadline;
@@ -493,9 +493,21 @@ void DAG_Task::add_arc(uint tail, uint head)
 	arcnode.tail = tail;
 	arcnode.head = head;
 	arcnodes.push_back(arcnode);
-	vnodes[tail].follow_ups.push_back(&arcnodes.back());
-	vnodes[head].precedences.push_back(&arcnodes.back());
-	
+	uint arc_num = arcnodes.size();
+}
+
+void DAG_Task::refresh_relationship()
+{
+	for(uint i = 0; i < vnodes.size(); i++)
+	{
+		vnodes[i].precedences.clear();
+		vnodes[i].follow_ups.clear();
+	}
+	for(uint i = 0; i < arcnodes.size(); i++)
+	{
+		vnodes[arcnodes[i].tail].follow_ups.push_back(&arcnodes[i]);
+		vnodes[arcnodes[i].head].precedences.push_back(&arcnodes[i]);
+	}
 }
 
 void DAG_Task::update_vol()
@@ -531,7 +543,7 @@ bool DAG_Task::is_acyclic()
 
 ulong DAG_Task::DFS(VNode vnode)
 {
-cout<<"node id:"<<vnode.id<<endl;
+cout<<"node id:"<<vnode.job_id<<endl;
 	ulong result = 0;
 	if(0 == vnode.follow_ups.size())
 		result = vnode.wcet;
@@ -554,16 +566,20 @@ ulong DAG_Task::BFS(VNode vnode)
 
 void DAG_Task::display_arcs()
 {
-	for(uint i; i < arcnodes.size(); i++)
+	for(uint i = 0; i < arcnodes.size(); i++)
 	{
 		cout<<arcnodes[i].tail<<"--->"<<arcnodes[i].head<<endl;
+		cout<<&arcnodes[i]<<endl;
 	}
 }
 
 void DAG_Task::display_follow_ups(uint job_id)
 {
 	for(uint i = 0; i < vnodes[job_id].follow_ups.size(); i++)
+	{
 		cout<<"follow up of node "<<job_id<<":"<<vnodes[job_id].follow_ups[i]->head<<endl;
+		cout<<vnodes[job_id].follow_ups[i]<<endl;
+	}
 }
 
 void DAG_Task::display_precedences(uint job_id)

@@ -144,7 +144,7 @@ typedef struct ArcNode
 
 typedef struct VNode
 {
-	uint id;
+	uint job_id;
 	ulong wcet;
 	ulong deadline;
 	uint level;
@@ -172,6 +172,7 @@ class DAG_Task:public Task
 		ulong get_period() const;
 		void add_job(uint wcet, ulong deadline = 0);
 		void add_arc(uint tail, uint head);
+		void refresh_relationship();
 		void update_vol();
 		void update_len();
 		bool is_acyclic();

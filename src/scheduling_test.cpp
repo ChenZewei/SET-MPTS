@@ -131,6 +131,8 @@ cout<<"////////////////DAG//////////////////"<<endl;
 	dag_task.add_arc(2,3);
 	dag_task.add_arc(2,4);
 
+	dag_task.refresh_relationship();
+
 	dag_task.display_arcs();
 
 	dag_task.display_precedences(0);
