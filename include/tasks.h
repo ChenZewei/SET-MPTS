@@ -136,45 +136,42 @@ class Task
 		void get_density(fraction_t &density);
 };
 
-class Job
+typedef struct ArcNode
 {
-	private:
-		uint id;
-		ulong wcet;
-		uint level;
-		vector<uint> precedence;
-		vector<uint> follow_up;
-	public:
-		Job(uint id, ulong cost);
-		uint get_id() const;
-		ulong get_wcet() const;
-};
+	uint tail;//i
+	uint head;//j
+}ArcNode,*ArcPtr;
 
-typedef vector<Job> Jobs;
-
-struct Edge//job m can be excuted only if job v is completed
+typedef struct VNode
 {
-	uint v;
-	uint m;
-};
-
-typedef vector<struct Edge> Edges;
-
-typedef struct
-{
-	Jobs jobs;
-	Edges edges;
-}Graph;
-
+	uint id;
+	ulong wcet;
+	ulong deadline;
+	uint level;
+	vector<ArcPtr> precedences;
+	vector<ArcPtr> follow_ups;
+}VNode;
 
 class DAG_Task:public Task
 {
 	private:
-		Graph graph;
-		uint vol;//total wcet of the jobs in graph
+		vector<VNode> vnodes;
+		vector<ArcPtr> arcnodes;
+		ulong vol;//total wcet of the jobs in graph
+		ulong len;
+		ulong deadline;
+		ulong period;
+		uint vexnum;
+		uint arcnum;
 	public:
-		void add_job(uint wcet);
+		DAG_Task(ulong period, ulong deadline = 0);
+		ulong get_vol() const;
+		ulong get_len() const;
+		ulong get_deadline() const;
+		ulong get_period() const;
+		void add_job(uint wcet, ulong deadline = 0);
 		void update_vol();
+		void update_len();
 		bool is_acyclic();
 		uint DBF(uint time);//Demand Bound Function
 		void DBF();

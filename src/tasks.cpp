@@ -456,6 +456,53 @@ void TaskSet::display()
 	}
 }
 
+////////////////////////////DAG Tasks//////////////////////////////
+
+DAG_Task::DAG_Task(ulong period, ulong deadline)
+{
+	len = 0;
+	vol = 0;
+	if(0 == deadline)
+		this->deadline = period;
+	this->period = period;
+	vexnum = 0;
+	arcnum = 0;
+}
+
+ulong DAG_Task::get_vol() const {return vol;}
+ulong DAG_Task::get_len() const {return len;}
+ulong DAG_Task::get_deadline() const {return deadline;}
+ulong DAG_Task::get_period() const {return period;}
+
+void DAG_Task::add_job(uint wcet, ulong deadline)
+{
+	VNode vnode;
+	vnode.id = vnodes.size();
+	vnode.wcet = wcet;
+	if(0 == deadline)
+		vnode.deadline = this->deadline;
+	vnode.level = 0;
+	vnodes.push_back(vnode);
+	update_vol();
+	update_len();
+}
+
+void DAG_Task::update_vol()
+{
+	vol = 0;
+	for(int i = 0; i < vnodes.size(); i++)
+		vol += vnodes[i].wcet;
+}
+
+void DAG_Task::update_len()
+{
+
+}
+
+bool DAG_Task::is_acyclic()
+{
+
+}
 
 /////////////////////////////Others///////////////////////////////
 
