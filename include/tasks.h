@@ -150,7 +150,7 @@ typedef struct VNode
 	uint level;
 	vector<ArcPtr> precedences;
 	vector<ArcPtr> follow_ups;
-}VNode;
+}VNode,*VNodePtr;
 
 class DAG_Task:public Task
 {
@@ -178,7 +178,10 @@ class DAG_Task:public Task
 		fraction_t get_utilization();
 		fraction_t get_density();
 		void get_utilization(fraction_t &utilization);
-		void get_density(fraction_t &density);	
+		void get_density(fraction_t &density);
+		
+		ulong DFS(VNode vnode);
+		ulong BFS(VNode vnode);
 };
 
 typedef vector<Task> Tasks;

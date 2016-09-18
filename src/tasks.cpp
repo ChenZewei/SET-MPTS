@@ -496,10 +496,43 @@ void DAG_Task::update_vol()
 
 void DAG_Task::update_len()
 {
-
+	len = 0;
+	for(uint i = 0; i < vnodes.size(); i++)
+	{
+		if(0 == vnodes[i].precedences.size())//finding the head
+		{
+			ulong temp = vnodes[i].wcet;
+			for(uint j = 0; j < vnodes[i].follow_ups.size(); j++)
+			{
+				temp +=  DFS(vnodes[i].follwo_ups[j]);
+			}
+			if(len < temp)
+				len = temp;
+		}
+	}
 }
 
 bool DAG_Task::is_acyclic()
+{
+
+}
+
+ulong DAG_Task::DFS(VNode vnode)
+{
+	ulong result = 0;
+	if(0 == vnode.follow_ups.size())
+		result = vnode.wcet;
+	else
+		for(uint i = 0; i < vnode.follow_ups.size(); i++)
+		{	
+			ulong temp = DFS(vnode.follow_ups[i]);
+			if(result < temp)
+				result = temp;
+		}
+	return result;
+}
+
+ulong DAG_Task::BFS(VNode vnode)
 {
 
 }
