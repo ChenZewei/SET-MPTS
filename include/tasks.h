@@ -155,8 +155,9 @@ typedef struct VNode
 class DAG_Task:public Task
 {
 	private:
+		uint task_id;
 		vector<VNode> vnodes;
-		vector<ArcPtr> arcnodes;
+		vector<ArcNode> arcnodes;
 		ulong vol;//total wcet of the jobs in graph
 		ulong len;
 		ulong deadline;
@@ -164,12 +165,13 @@ class DAG_Task:public Task
 		uint vexnum;
 		uint arcnum;
 	public:
-		DAG_Task(ulong period, ulong deadline = 0);
+		DAG_Task(uint task_id, ulong period, ulong deadline = 0);
 		ulong get_vol() const;
 		ulong get_len() const;
 		ulong get_deadline() const;
 		ulong get_period() const;
 		void add_job(uint wcet, ulong deadline = 0);
+		void add_arc(uint tail, uint head);
 		void update_vol();
 		void update_len();
 		bool is_acyclic();
@@ -179,9 +181,15 @@ class DAG_Task:public Task
 		fraction_t get_density();
 		void get_utilization(fraction_t &utilization);
 		void get_density(fraction_t &density);
+				
 		
+
 		ulong DFS(VNode vnode);
 		ulong BFS(VNode vnode);
+
+		void display_arcs();
+		void display_follow_ups(uint job_id);
+		void display_precedences(uint job_id);
 };
 
 typedef vector<Task> Tasks;

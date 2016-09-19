@@ -458,7 +458,7 @@ void TaskSet::display()
 
 ////////////////////////////DAG Tasks//////////////////////////////
 
-DAG_Task::DAG_Task(ulong period, ulong deadline)
+DAG_Task::DAG_Task(uint task_id, ulong period, ulong deadline):Task(task_id, 0, period, deadline)
 {
 	len = 0;
 	vol = 0;
@@ -483,8 +483,19 @@ void DAG_Task::add_job(uint wcet, ulong deadline)
 		vnode.deadline = this->deadline;
 	vnode.level = 0;
 	vnodes.push_back(vnode);
-	update_vol();
-	update_len();
+	//update_vol();
+	//update_len();
+}
+
+void DAG_Task::add_arc(uint tail, uint head)
+{
+	ArcNode arcnode;
+	arcnode.tail = tail;
+	arcnode.head = head;
+	arcnodes.push_back(arcnode);
+	vnodes[tail].follow_ups.push_back(&arcnodes.back());
+	vnodes[head].precedences.push_back(&arcnodes.back());
+	
 }
 
 void DAG_Task::update_vol()
@@ -504,12 +515,13 @@ void DAG_Task::update_len()
 			ulong temp = vnodes[i].wcet;
 			for(uint j = 0; j < vnodes[i].follow_ups.size(); j++)
 			{
-				temp +=  DFS(vnodes[i].follwo_ups[j]);
+				temp += DFS(vnodes[vnodes[i].follow_ups[j]->head]);
 			}
 			if(len < temp)
 				len = temp;
 		}
 	}
+	//cout<<"len:"<<len<<endl;
 }
 
 bool DAG_Task::is_acyclic()
@@ -519,22 +531,45 @@ bool DAG_Task::is_acyclic()
 
 ulong DAG_Task::DFS(VNode vnode)
 {
+cout<<"node id:"<<vnode.id<<endl;
 	ulong result = 0;
 	if(0 == vnode.follow_ups.size())
 		result = vnode.wcet;
 	else
 		for(uint i = 0; i < vnode.follow_ups.size(); i++)
 		{	
-			ulong temp = DFS(vnode.follow_ups[i]);
+cout<<"head"<<vnode.follow_ups[i]->head<<endl;
+			ulong temp = vnode.wcet + DFS(vnodes[vnode.follow_ups[i]->head]);
 			if(result < temp)
 				result = temp;
 		}
+cout<<"max len from this node:"<<result<<endl;
 	return result;
 }
 
 ulong DAG_Task::BFS(VNode vnode)
 {
 
+}
+
+void DAG_Task::display_arcs()
+{
+	for(uint i; i < arcnodes.size(); i++)
+	{
+		cout<<arcnodes[i].tail<<"--->"<<arcnodes[i].head<<endl;
+	}
+}
+
+void DAG_Task::display_follow_ups(uint job_id)
+{
+	for(uint i = 0; i < vnodes[job_id].follow_ups.size(); i++)
+		cout<<"follow up of node "<<job_id<<":"<<vnodes[job_id].follow_ups[i]->head<<endl;
+}
+
+void DAG_Task::display_precedences(uint job_id)
+{
+	for(uint i = 0; i < vnodes[job_id].precedences.size(); i++)
+		cout<<"precedences of node "<<job_id<<":"<<vnodes[job_id].precedences[i]->tail<<endl;
 }
 
 /////////////////////////////Others///////////////////////////////

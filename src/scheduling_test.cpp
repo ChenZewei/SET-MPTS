@@ -42,7 +42,7 @@ int main(int argc,char** argv)
 		else
 			return 0;
 	}
-
+cout<<"111111111111"<<endl;
 	//scheduling parameter
 	XML::get_method(&test_attributes);
 	exp_times = XML::get_experiment_times();
@@ -52,7 +52,7 @@ int main(int argc,char** argv)
 	XML::get_deadline_propotion(&d_ranges);
 	XML::get_utilization_range(&u_ranges);
 	XML::get_step(&steps);	
-
+cout<<"222222222222"<<endl;
 	//resource parameter
 	Int_Set resource_num, rrns;
 	Double_Set rrps, tlfs;
@@ -117,6 +117,38 @@ cout<<output.output_filename()<<endl;
 	output_file<<"\n";
 */
 	
+cout<<"////////////////DAG//////////////////"<<endl;
+	DAG_Task dag_task(1, 4);
+
+	dag_task.add_job(1);
+	dag_task.add_job(1);
+	dag_task.add_job(2);
+	dag_task.add_job(1);
+	dag_task.add_job(1);
+	
+	dag_task.add_arc(0,2);
+	dag_task.add_arc(1,2);
+	dag_task.add_arc(2,3);
+	dag_task.add_arc(2,4);
+
+	dag_task.display_arcs();
+
+	dag_task.display_precedences(0);
+	dag_task.display_precedences(1);
+	dag_task.display_precedences(2);
+	dag_task.display_precedences(3);
+	dag_task.display_precedences(4);
+
+	dag_task.display_follow_ups(0);
+	dag_task.display_follow_ups(1);
+	dag_task.display_follow_ups(2);
+	dag_task.display_follow_ups(3);
+	dag_task.display_follow_ups(4);
+
+	dag_task.update_vol();
+	//dag_task.update_len();
+
+	//cout<<"vol:"<<dag_task.get_vol()<<" "<<"len:"<<dag_task.get_len()<<endl;
 	
 	
 	double utilization = u_ranges[0].min;
