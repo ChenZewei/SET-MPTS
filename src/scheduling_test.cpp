@@ -121,31 +121,31 @@ cout<<"////////////////DAG//////////////////"<<endl;
 	DAG_Task dag_task(1, 4);
 
 	dag_task.add_job(1);
+	dag_task.add_job(2);
+	dag_task.add_job(1);
+	dag_task.add_job(1);
+	dag_task.add_job(3);
 	dag_task.add_job(1);
 	dag_task.add_job(2);
 	dag_task.add_job(1);
-	dag_task.add_job(2);
 	
-	dag_task.add_arc(0,2);
-	dag_task.add_arc(1,2);
-	dag_task.add_arc(2,3);
+	dag_task.add_arc(0,3);
+	dag_task.add_arc(1,3);
 	dag_task.add_arc(2,4);
+	dag_task.add_arc(3,5);
+	dag_task.add_arc(3,6);
+	dag_task.add_arc(4,6);
+	dag_task.add_arc(6,7);
 
 	dag_task.refresh_relationship();
 
 	dag_task.display_arcs();
 
-	dag_task.display_precedences(0);
-	dag_task.display_precedences(1);
-	dag_task.display_precedences(2);
-	dag_task.display_precedences(3);
-	dag_task.display_precedences(4);
-
-	dag_task.display_follow_ups(0);
-	dag_task.display_follow_ups(1);
-	dag_task.display_follow_ups(2);
-	dag_task.display_follow_ups(3);
-	dag_task.display_follow_ups(4);
+	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
+		dag_task.display_precedences(i);
+	
+	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
+		dag_task.display_follow_ups(i);
 
 	dag_task.update_vol();
 	dag_task.update_len();

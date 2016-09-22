@@ -469,6 +469,8 @@ DAG_Task::DAG_Task(uint task_id, ulong period, ulong deadline):Task(task_id, 0, 
 	arcnum = 0;
 }
 
+uint DAG_Task::get_vnode_num() const {return vnodes.size();}
+uint DAG_Task::get_arcnode_num() const {return arcnodes.size();}
 ulong DAG_Task::get_vol() const {return vol;}
 ulong DAG_Task::get_len() const {return len;}
 ulong DAG_Task::get_deadline() const {return deadline;}

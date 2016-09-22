@@ -166,6 +166,8 @@ class DAG_Task:public Task
 		uint arcnum;
 	public:
 		DAG_Task(uint task_id, ulong period, ulong deadline = 0);
+		uint get_vnode_num() const;
+		uint get_arcnode_num() const;
 		ulong get_vol() const;
 		ulong get_len() const;
 		ulong get_deadline() const;
