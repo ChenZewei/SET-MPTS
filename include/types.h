@@ -24,6 +24,9 @@
 #define RTA_GFP 5
 #define FF_DM 6
 
+#define TPS_TASK_MODEL 0 //Three Parameters Sporadic Task Model
+#define DAG_TASK_MODEL 1
+
 using namespace std;
 
 typedef mpz_class int_t;		//multiple precision integer
@@ -62,7 +65,8 @@ typedef vector<Range> Range_Set;
 typedef vector<Result> Result_Set;
 typedef vector<Result_Set> Result_Sets;
 typedef vector<Test_Attribute> Test_Attribute_Set;
-typedef list<Task*> TaskQueue;//之所以用list是因为list是双向链表，适合增删比较频繁的情况
+typedef template <typename TaskModlePtr>
+list<TaskModlePtr> TaskQueue;//之所以用list是因为list是双向链表，适合增删比较频繁的情况
 
 
 #endif

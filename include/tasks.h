@@ -65,7 +65,7 @@ class Task
 		fraction_t utilization;
 		fraction_t density;
 		Ratio ratio;//for heterogeneous platform
-		Resource_Requests requests; 
+		Resource_Requests requests;
 	public:
 		Task(	uint id,
 			ulong wcet, 
@@ -136,65 +136,6 @@ class Task
 		void get_density(fraction_t &density);
 };
 
-typedef struct ArcNode
-{
-	uint tail;//i
-	uint head;//j
-}ArcNode,*ArcPtr;
-
-typedef struct VNode
-{
-	uint job_id;
-	ulong wcet;
-	ulong deadline;
-	uint level;
-	vector<ArcPtr> precedences;
-	vector<ArcPtr> follow_ups;
-}VNode,*VNodePtr;
-
-class DAG_Task:public Task
-{
-	private:
-		uint task_id;
-		vector<VNode> vnodes;
-		vector<ArcNode> arcnodes;
-		ulong vol;//total wcet of the jobs in graph
-		ulong len;
-		ulong deadline;
-		ulong period;
-		uint vexnum;
-		uint arcnum;
-	public:
-		DAG_Task(uint task_id, ulong period, ulong deadline = 0);
-		uint get_vnode_num() const;
-		uint get_arcnode_num() const;
-		ulong get_vol() const;
-		ulong get_len() const;
-		ulong get_deadline() const;
-		ulong get_period() const;
-		void add_job(uint wcet, ulong deadline = 0);
-		void add_arc(uint tail, uint head);
-		void refresh_relationship();
-		void update_vol();
-		void update_len();
-		bool is_acyclic();
-		uint DBF(uint time);//Demand Bound Function
-		void DBF();
-		fraction_t get_utilization();
-		fraction_t get_density();
-		void get_utilization(fraction_t &utilization);
-		void get_density(fraction_t &density);
-				
-		
-
-		ulong DFS(VNode vnode);
-		ulong BFS(VNode vnode);
-
-		void display_arcs();
-		void display_follow_ups(uint job_id);
-		void display_precedences(uint job_id);
-};
-
 typedef vector<Task> Tasks;
 
 class TaskSet
@@ -246,8 +187,97 @@ class TaskSet
 
 		void display();
 
+};
 
+typedef struct ArcNode
+{
+	uint tail;//i
+	uint head;//j
+}ArcNode,*ArcPtr;
 
+typedef struct VNode
+{
+	uint job_id;
+	ulong wcet;
+	ulong deadline;
+	uint level;
+	vector<ArcPtr> precedences;
+	vector<ArcPtr> follow_ups;
+}VNode,*VNodePtr;
+
+class DAG_Task:public Task
+{
+	private:
+		uint task_id;
+		vector<VNode> vnodes;
+		vector<ArcNode> arcnodes;
+		ulong vol;//total wcet of the jobs in graph
+		ulong len;
+		ulong deadline;
+		ulong period;
+		uint vexnum;
+		uint arcnum;
+		ulong spin;
+		ulong self_suspension;
+		ulong local_blocking;
+		ulong remote_blocking;
+		ulong total_blocking;
+		ulong jitter;
+		ulong response_time;//initialization as WCET
+		uint priority;
+		uint partition;//0XFFFFFFFF
+		Ratio ratio;//for heterogeneous platform
+		Resource_Requests requests;
+	public:
+		DAG_Task(uint task_id, ulong period, ulong deadline = 0, uint priority = 0);
+		DAG_Task(	uint task_id,
+					ResourceSet& resourceset,
+					Param param,
+					ulong wcet, 
+					ulong period,
+					ulong deadline = 0,
+					uint priority = 0);
+		uint get_vnode_num() const;
+		uint get_arcnode_num() const;
+		ulong get_vol() const;
+		ulong get_len() const;
+		ulong get_deadline() const;
+		ulong get_period() const;
+		void add_job(uint wcet, ulong deadline = 0);
+		void add_arc(uint tail, uint head);
+		void refresh_relationship();
+		void update_vol();
+		void update_len();
+		bool is_acyclic();
+		uint DBF(uint time);//Demand Bound Function
+		void DBF();
+		fraction_t get_utilization();
+		fraction_t get_density();
+		void get_utilization(fraction_t &utilization);
+		void get_density(fraction_t &density);
+				
+		
+
+		ulong DFS(VNode vnode);
+		ulong BFS(VNode vnode);
+
+		void display_arcs();
+		void display_follow_ups(uint job_id);
+		void display_precedences(uint job_id);
+};
+
+typedef vector<DAG_Task> DAG_Tasks;
+
+class DAG_TaskSet
+{
+	private:
+		DAG_Tasks dag_tasks;
+		fraction_t utilization_sum;
+		fraction_t utilization_max;
+		fraction_t density_sum;
+		fraction_t density_max;
+	public:
+		
 };
 
 void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double utilization);

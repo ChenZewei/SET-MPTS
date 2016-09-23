@@ -22,9 +22,9 @@ TaskQueue& Resource::get_taskqueue()
 	return queue;
 }
 
-void Resource::add_task(Task* task)
+void Resource::add_task(TaskModlePtr)
 {
-	queue.push_back(task);
+	queue.push_back(TaskModlePtr);
 }
 
 uint Resource::get_ceiling()

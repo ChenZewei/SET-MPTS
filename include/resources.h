@@ -9,6 +9,7 @@
 using namespace std;
 
 //typedef vector<uint> Request_Tasks;
+template <typename TaskModlePtr>
 class Resource
 {
 	private:
@@ -26,7 +27,7 @@ class Resource
 		bool is_processor_local_resource() const;
 		//Request_Tasks get_tasks() const;
 		TaskQueue& get_taskqueue();
-		void add_task(Task* task);
+		void add_task(TaskModlePtr);
 		uint get_ceiling();
 };
 

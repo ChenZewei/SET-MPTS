@@ -458,7 +458,7 @@ void TaskSet::display()
 
 ////////////////////////////DAG Tasks//////////////////////////////
 
-DAG_Task::DAG_Task(uint task_id, ulong period, ulong deadline):Task(task_id, 0, period, deadline)
+DAG_Task::DAG_Task(uint task_id, ulong period, ulong deadline, uint priority):Task(task_id, 0, period, deadline, priority)
 {
 	len = 0;
 	vol = 0;
@@ -467,6 +467,47 @@ DAG_Task::DAG_Task(uint task_id, ulong period, ulong deadline):Task(task_id, 0, 
 	this->period = period;
 	vexnum = 0;
 	arcnum = 0;
+	spin = 0;
+	self_suspension = 0;
+	local_blocking = 0;
+	remote_blocking = 0;
+	total_blocking = 0;
+	jitter = 0;
+	response_time = 0;
+	priority = priority;
+	partition = 0XFFFFFFFF;
+}
+
+DAG_Task::DAG_Task(	uint task_id,
+					ResourceSet& resourceset,
+					Param param,
+					ulong wcet, 
+					ulong period,
+					ulong deadline,
+					uint priority):Task(	task_id,
+											resourceset,
+											param,
+											wcet, 
+											period,
+											deadline,
+											priority)
+{
+	len = 0;
+	vol = 0;
+	if(0 == deadline)
+		this->deadline = period;
+	this->period = period;
+	vexnum = 0;
+	arcnum = 0;
+	spin = 0;
+	self_suspension = 0;
+	local_blocking = 0;
+	remote_blocking = 0;
+	total_blocking = 0;
+	jitter = 0;
+	response_time = 0;
+	priority = 0;
+	partition = 0XFFFFFFFF;
 }
 
 uint DAG_Task::get_vnode_num() const {return vnodes.size();}
