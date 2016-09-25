@@ -84,43 +84,6 @@ const uint& ResourceSet::get_resourceset_size() const
 	return resources.size();
 }
 
-/////////////////////////////ResourceSet2///////////////////////////////
-
-template <typename TaskModlePtr>
-ResourceSet2<TaskModlePtr>::ResourceSet2(){}
-
-template <typename TaskModlePtr>
-void ResourceSet2<TaskModlePtr>::add_resource()
-{
-	bool global = false;
-	if(Random_Gen::probability(0.4))
-		global = true;
-	resources.push_back(Resource(resources.size(), 0, global));
-}
-
-template <typename TaskModlePtr>
-uint ResourceSet2<TaskModlePtr>::size() const
-{
-	return resources.size();
-}
-
-template <typename TaskModlePtr>
-void ResourceSet2<TaskModlePtr>::add_task(uint resource_id, TaskModlePtr taskptr)
-{
-	resources[resource_id].add_task(taskptr);
-}
-
-template <typename TaskModlePtr>
-Resources& ResourceSet2<TaskModlePtr>::get_resources()
-{
-	return resources;
-}
-
-template <typename TaskModlePtr>
-const uint& ResourceSet2<TaskModlePtr>::get_resourceset_size() const
-{
-	return resources.size();
-}
 
 /////////////////////////////Others///////////////////////////////
 
@@ -129,3 +92,5 @@ void resource_gen(ResourceSet *resourceset, Param param)
 	for(int i = 0; i < param.resource_num; i++)
 		resourceset->add_resource();
 }
+
+
