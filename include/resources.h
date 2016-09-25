@@ -9,7 +9,7 @@
 using namespace std;
 
 //typedef vector<uint> Request_Tasks;
-template <typename TaskModlePtr>
+//template<class TaskModlePtr>
 class Resource
 {
 	private:
@@ -27,24 +27,40 @@ class Resource
 		bool is_processor_local_resource() const;
 		//Request_Tasks get_tasks() const;
 		TaskQueue& get_taskqueue();
-		void add_task(TaskModlePtr);
+		void add_task(Task* taskptr);
 		uint get_ceiling();
 };
 
 typedef vector<Resource> Resources;
 
+//template <typename TaskModlePtr>
 class ResourceSet
 {
 	private:
-		Resources resources;
+		vector<Resource> resources;
 	public:
 		ResourceSet();
 		void add_resource();
 		uint size() const;
 		Resources& get_resources();
 		const uint& get_resourceset_size() const;
-		void add_task(uint resource_id, Task* task);
+		void add_task(uint resource_id, Task* taskptr);
 };
+
+template <typename TaskModlePtr>
+class ResourceSet2
+{
+	private:
+		vector<Resource> resources;
+	public:
+		ResourceSet2();
+		void add_resource();
+		uint size() const;
+		Resources& get_resources();
+		const uint& get_resourceset_size() const;
+		void add_task(uint resource_id, TaskModlePtr taskptr);
+};
+
 
 void resource_gen(ResourceSet *resourceset, Param param);
 
