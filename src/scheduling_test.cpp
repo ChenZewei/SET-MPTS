@@ -170,9 +170,9 @@ cout<<"////////////////DAG//////////////////"<<endl;
 				
 			ProcessorSet processorset = ProcessorSet(parameters);
 			ResourceSet resourceset = ResourceSet();
-			ResourceSet2<Task> resourceset2 = ResourceSet2<Task>();
+			//ResourceSet2<Task> resourceset2 = ResourceSet2<Task>();
 			resource_gen(&resourceset, parameters);
-			resource_gen2<Task>(&resourceset2, parameters);
+			//resource_gen2<Task>(&resourceset2, parameters);
 
 			tast_gen(taskset, resourceset, parameters, utilization);
 

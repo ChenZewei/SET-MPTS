@@ -28,11 +28,10 @@ TaskQueue& Resource::get_taskqueue()
 }
 
 
-void Resource::add_task(Task* taskptr)
+void Resource::add_task(void* taskptr)
 {
 	queue.push_back(taskptr);
 }
-
 
 uint Resource::get_ceiling()
 {
@@ -67,7 +66,7 @@ uint ResourceSet::size() const
 }
 
 
-void ResourceSet::add_task(uint resource_id, Task* taskptr)
+void ResourceSet::add_task(uint resource_id, void* taskptr)
 {
 	resources[resource_id].add_task(taskptr);
 }

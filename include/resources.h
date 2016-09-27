@@ -18,7 +18,7 @@ class Resource
 		bool global_resource;
 		bool processor_local_resource;
 		//Request_Tasks tasks;
-		TaskQueue queue;
+		list<void*> queue;
 	public:
 		Resource(uint id, uint locality = 0, bool global_resource = false, bool processor_local_resource = false);
 		uint get_resource_id() const;
@@ -27,7 +27,7 @@ class Resource
 		bool is_processor_local_resource() const;
 		//Request_Tasks get_tasks() const;
 		TaskQueue& get_taskqueue();
-		void add_task(Task* taskptr);
+		void add_task(void* taskptr);
 		uint get_ceiling();
 };
 
@@ -44,7 +44,7 @@ class ResourceSet
 		uint size() const;
 		Resources& get_resources();
 		const uint& get_resourceset_size() const;
-		void add_task(uint resource_id, Task* taskptr);
+		void add_task(uint resource_id, void* taskptr);
 };
 
 //////////////////////////for multiple task models//////////////////////////////
