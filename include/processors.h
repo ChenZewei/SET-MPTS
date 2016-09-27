@@ -3,6 +3,7 @@
 #include <vector>
 #include "tasks.h"
 #include "types.h"
+#include "param.h"
 
 using namespace std;
 
@@ -36,7 +37,7 @@ class ProcessorSet
 	private:
 		Processors processors;
 	public:
-		ProcessorSet(uint num);//for identical multiprocessor platform
+		ProcessorSet(Param param);//for identical multiprocessor platform
 		uint get_processor_num() const;
 		Processors& get_processors();
 		void init();

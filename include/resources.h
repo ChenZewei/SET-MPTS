@@ -4,6 +4,7 @@
 #include <list>
 #include "types.h"
 #include "processors.h"
+#include "param.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ class ResourceSet
 		void add_task(uint resource_id, Task* task);
 };
 
-void resource_gen(ResourceSet *resourceset, int num);
+void resource_gen(ResourceSet *resourceset, Param param);
 
 #endif
 

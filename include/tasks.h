@@ -11,6 +11,7 @@
 #include "resources.h"
 #include "sort.h"
 #include "processors.h"
+#include "param.h"
 
 using namespace std;
 
@@ -74,10 +75,7 @@ class Task
 
 		Task(	uint id,
 			ResourceSet& resourceset,
-			double probability,
-			int num_max,
-			Range l_range,
-			double tlfs,
+			Param param,
 			ulong wcet, 
 			ulong period,
 			ulong deadline = 0,
@@ -202,7 +200,7 @@ class TaskSet
 		void calculate_local_blocking(ResourceSet& resourceset);
 		
 		void add_task(long wcet, long period, long deadline = 0);
-		void add_task(ResourceSet& resourceset, double probability, int num_max, Range l_range, double tlfs, long wcet, long period, long deadline = 0);
+		void add_task(ResourceSet& resourceset, Param param, long wcet, long period, long deadline = 0);
 
 		Tasks& get_tasks();
 		Task& get_task_by_id(uint id);
@@ -237,7 +235,7 @@ class TaskSet
 
 };
 
-void tast_gen(TaskSet& taskset, ResourceSet& resourceset, int lambda, Range p_range, Range d_range, double utilization,double probability, int num_max, Range l_range, double tlfs);
+void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double utilization);
 ulong gcd(ulong a, ulong b);
 ulong lcm(ulong a, ulong b);
 

@@ -73,8 +73,8 @@ const uint& ResourceSet::get_resourceset_size() const
 
 /////////////////////////////Others///////////////////////////////
 
-void resource_gen(ResourceSet *resourceset, int num)
+void resource_gen(ResourceSet *resourceset, Param param)
 {
-	for(int i = 0; i < num; i++)
+	for(int i = 0; i < param.resource_num; i++)
 		resourceset->add_resource();
 }

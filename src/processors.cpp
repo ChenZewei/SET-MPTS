@@ -76,9 +76,9 @@ void Processor::init()
 }
 ///////////////////////////ProcessorSet/////////////////////////////
 
-ProcessorSet::ProcessorSet(uint num)//for identical multiprocessor platform
+ProcessorSet::ProcessorSet(Param param)//for identical multiprocessor platform
 {
-	for(uint i = 0; i < num; i++)
+	for(uint i = 0; i < param.p_num; i++)
 		processors.push_back(Processor(i));
 }
 
