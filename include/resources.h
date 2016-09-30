@@ -18,7 +18,7 @@ class Resource
 		bool global_resource;
 		bool processor_local_resource;
 		//Request_Tasks tasks;
-		list<void*> queue;
+		TaskQueue queue;
 	public:
 		Resource(uint id, uint locality = 0, bool global_resource = false, bool processor_local_resource = false);
 		uint get_resource_id() const;

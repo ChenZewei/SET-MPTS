@@ -65,7 +65,7 @@ typedef vector<Range> Range_Set;
 typedef vector<Result> Result_Set;
 typedef vector<Result_Set> Result_Sets;
 typedef vector<Test_Attribute> Test_Attribute_Set;
-typedef list<Task*> TaskQueue;//之所以用list是因为list是双向链表，适合增删比较频繁的情况
+typedef list<void*> TaskQueue;//之所以用list是因为list是双向链表，适合增删比较频繁的情况
 
 
 

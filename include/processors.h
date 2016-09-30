@@ -25,8 +25,8 @@ class Processor
 		fraction_t get_density() const;
 		bool get_tryed_assign() const;
 		TaskQueue& get_taskqueue();
-		bool add_task(Task* task);
-		bool remove_task(Task* task);
+		bool add_task(void* taskptr);
+		bool remove_task(void* taskptr);
 		void init();	
 };
 

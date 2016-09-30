@@ -299,11 +299,11 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 				{
 					Processor &processor = processorset.get_processors()[processor_id];
 					TaskQueue &queue = processor.get_taskqueue();
-					list<Task*>::iterator it = queue.begin();
+					list<void*>::iterator it = queue.begin();
 					ulong max_length = 0;
 					for(uint k = 0; it != queue.end(); it++, k++)
 					{
-						Task* task_k = *it;
+						Task* task_k = (Task*)*it;
 						Request &request_k = task_k->get_request_by_id(id);
 						if(&request_k)
 						{	

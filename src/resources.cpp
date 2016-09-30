@@ -36,11 +36,11 @@ void Resource::add_task(void* taskptr)
 uint Resource::get_ceiling()
 {
 	uint ceiling = 0xffffffff;	
-	list<Task*>::iterator it = queue.begin();
+	list<void*>::iterator it = queue.begin();
 	for(uint i = 0; it != queue.end(); it++, i++)
 	{
-		if(ceiling >= (*it)->get_id())
-			ceiling = (*it)->get_id();
+		if(ceiling >= ((Task*)(*it))->get_id())
+			ceiling = ((Task*)(*it))->get_id();
 	}
 	return ceiling;
 }

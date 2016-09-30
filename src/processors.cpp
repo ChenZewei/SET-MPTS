@@ -41,26 +41,26 @@ TaskQueue& Processor::get_taskqueue()
 	return queue;
 }
 
-bool Processor::add_task(Task* task)
+bool Processor::add_task(void* taskptr)
 {
-	if(1 < utilization + task->get_utilization())
+	if(1 < utilization + ((Task*)taskptr)->get_utilization())
 		return false;
-	queue.push_back(task);
-	utilization += task->get_utilization();
-	density += task->get_density();
+	queue.push_back(taskptr);
+	utilization += ((Task*)taskptr)->get_utilization();
+	density += ((Task*)taskptr)->get_density();
 	return true;	
 }
 
-bool Processor::remove_task(Task* task)
+bool Processor::remove_task(void* taskptr)
 {
-	list<Task*>::iterator it = queue.begin();
+	TaskQueue::iterator it = queue.begin();
 	for(uint i = 0; it != queue.end(); it++, i++)
 	{
-		if(task == *it)
+		if(taskptr == *it)
 		{
 			queue.remove(*it);
-			utilization -= task->get_utilization();
-			density -= task->get_density();
+			utilization -= ((Task*)taskptr)->get_utilization();
+			density -= ((Task*)taskptr)->get_density();
 			return true;
 		}
 	}
