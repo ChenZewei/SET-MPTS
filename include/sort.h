@@ -9,8 +9,18 @@
 #define DECREASE 1
 
 class Task;
+class DAG_Task;
 
-int period_increase(Task t1, Task t2);
-int utilization_decrease(Task t1, Task t2);
+template <typename TaskModel>
+int period_increase(TaskModel t1, TaskModel t2)
+{
+	return t1.get_period() < t2.get_period();
+}
+
+template <typename TaskModel>
+int utilization_decrease(TaskModel t1, TaskModel t2)
+{
+	return t1.get_utilization() > t2.get_utilization();
+}
 
 #endif

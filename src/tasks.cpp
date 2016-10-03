@@ -436,14 +436,14 @@ ulong TaskSet::get_task_period(uint index) const
 
 void TaskSet::sort_by_period()
 {
-	sort(tasks.begin(), tasks.end(), period_increase);
+	sort(tasks.begin(), tasks.end(), period_increase<Task>);
 	for(int i = 0; i < tasks.size(); i++)
 		tasks[i].set_id(i);
 }
 
 void TaskSet::sort_by_utilization()
 {
-	sort(tasks.begin(), tasks.end(), utilization_decrease);
+	sort(tasks.begin(), tasks.end(), utilization_decrease<Task>);
 	for(int i = 0; i < tasks.size(); i++)
 		tasks[i].set_id(i);
 }
@@ -476,24 +476,28 @@ DAG_Task::DAG_Task(uint task_id, ulong period, ulong deadline, uint priority):Ta
 	response_time = 0;
 	priority = priority;
 	partition = 0XFFFFFFFF;
+	utilization = 0;
+	density = 0;
+	
+
 }
 
 DAG_Task::DAG_Task(	uint task_id,
 					ResourceSet& resourceset,
 					Param param,
-					ulong wcet, 
+					ulong vol, 
 					ulong period,
 					ulong deadline,
 					uint priority):Task(	task_id,
 											resourceset,
 											param,
-											wcet, 
+											vol, 
 											period,
 											deadline,
 											priority)
 {
-	len = 0;
-	vol = 0;
+	this->len = 0;
+	this->vol = vol;
 	if(0 == deadline)
 		this->deadline = period;
 	this->period = period;
@@ -508,14 +512,23 @@ DAG_Task::DAG_Task(	uint task_id,
 	response_time = 0;
 	priority = 0;
 	partition = 0XFFFFFFFF;
+	utilization = vol;
+	utilization /= period;
+	density = 0;
+
 }
 
+
+uint DAG_Task::get_id() const {return task_id;}
+void DAG_Task::set_id(uint id) { task_id = id;}
 uint DAG_Task::get_vnode_num() const {return vnodes.size();}
 uint DAG_Task::get_arcnode_num() const {return arcnodes.size();}
 ulong DAG_Task::get_vol() const {return vol;}
 ulong DAG_Task::get_len() const {return len;}
 ulong DAG_Task::get_deadline() const {return deadline;}
 ulong DAG_Task::get_period() const {return period;}
+fraction_t DAG_Task::get_utilization() const {return utilization;}
+fraction_t DAG_Task::get_density() const {return density;}
 
 void DAG_Task::add_job(uint wcet, ulong deadline)
 {
@@ -631,7 +644,62 @@ void DAG_Task::display_precedences(uint job_id)
 		cout<<"precedences of node "<<job_id<<":"<<vnodes[job_id].precedences[i]->tail<<endl;
 }
 
-/////////////////////////////Others///////////////////////////////
+////////////////////////////DAG TaskSet////////////////////////////
+
+DAG_TaskSet::DAG_TaskSet()
+{
+	utilization_sum = 0;
+	utilization_max = 0;
+	density_sum = 0;
+	density_max = 0;
+}
+
+void DAG_TaskSet::add_task(ResourceSet& resourceset, Param param, long wcet, long period, long deadline)
+{
+	uint task_id = dag_tasks.size();
+	dag_tasks.push_back(DAG_Task(	task_id,
+									resourceset,
+									param,
+									wcet, 
+									period,
+									deadline));
+	utilization_sum += get_task_by_id(task_id).get_utilization();
+}
+
+
+DAG_TaskSet::~DAG_TaskSet()
+{
+	dag_tasks.clear();
+}
+
+DAG_Tasks& DAG_TaskSet::get_tasks()
+{
+	return dag_tasks;
+}
+
+DAG_Task& DAG_TaskSet::get_task_by_id(uint id)
+{
+	return dag_tasks[id];
+}
+
+uint DAG_TaskSet::get_taskset_size() const
+{
+	return dag_tasks.size();
+}
+
+fraction_t DAG_TaskSet::get_utilization_sum() const {return utilization_sum;}
+fraction_t DAG_TaskSet::get_utilization_max() const {return utilization_max;}
+fraction_t DAG_TaskSet::get_density_sum() const {return density_sum;}
+fraction_t DAG_TaskSet::get_density_max() const {return density_max;}
+
+void DAG_TaskSet::sort_by_period()
+{
+	sort(dag_tasks.begin(), dag_tasks.end(), period_increase<DAG_Task>);
+	for(int i = 0; i < dag_tasks.size(); i++)
+		dag_tasks[i].set_id(i);
+}
+
+//////////////////////////////Others//////////////////////////////
 
 void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double utilization)
 {
@@ -671,6 +739,54 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double ut
 	}
 	taskset.sort_by_period();
 	//cout<<utilization<<":"<<taskset.get_utilization_sum().get_d()<<endl;
+}
+
+void dag_task_gen(DAG_TaskSet& dag_taskset, ResourceSet& resourceset, Param param, double utilization)
+{
+//cout<<"DAG_Task generation, utilization:"<<utilization<<endl;
+	while(dag_taskset.get_utilization_sum() < utilization)//generate tasks
+	{
+		ulong period = Random_Gen::uniform_integral_gen(int(param.p_range.min),int(param.p_range.max));
+		fraction_t u = Random_Gen::exponential_gen(param.lambda);
+		ulong wcet = period*u.get_d();
+		ulong deadline = 0;
+		if(fabs(param.d_range.max) < EPS)
+		{
+			deadline = ceil(period*Random_Gen::uniform_real_gen(param.d_range.min, param.d_range.max));
+			if(deadline > period)
+				deadline = period;
+			if(deadline < wcet)
+				deadline = wcet;
+		}
+//		cout<<"wcet:"<<wcet<<" deadling:"<<deadline<<" period:"<<period<<endl;
+		if(0 == wcet)
+			wcet++;
+		else if(wcet > period)
+			wcet = period;
+		fraction_t temp(wcet, period);
+		if(dag_taskset.get_utilization_sum() + temp > utilization)
+		{
+			temp = utilization - dag_taskset.get_utilization_sum();			
+			wcet = period*temp.get_d() + 1;
+			if(deadline != 0 && deadline < wcet)
+				deadline = wcet;
+			dag_taskset.add_task(resourceset, param, wcet, period, deadline);
+			break;
+		}
+		dag_taskset.add_task(resourceset, param, wcet, period, deadline);
+	}
+	dag_taskset.sort_by_period();
+/*
+	double sum = 0;
+	for(uint i = 0; i < dag_taskset.get_taskset_size(); i++)
+	{
+		DAG_Task temp = dag_taskset.get_task_by_id(i);
+		double t = temp.get_utilization().get_d();
+		sum += t;
+		cout<<"Task"<<i<<":"<<t<<endl;
+		cout<<"Sum:"<<sum<<endl;
+	}
+*/
 }
 
 ulong gcd(ulong a, ulong b)

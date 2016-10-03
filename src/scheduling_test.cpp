@@ -71,6 +71,20 @@ cout<<u_ranges[0].min<<" "<<u_ranges[0].max<<endl;
 cout<<d_ranges[0].min<<" "<<d_ranges[0].max<<endl;
 cout<<exp_times<<endl;
 
+	//graph parameters
+	Range_Set job_num_ranges;
+	Range_Set arc_num_ranges;
+	Int_Set is_cyclics;
+	Int_Set max_indegrees;
+	Int_Set max_outdegrees;
+	
+	get_ranges(job_num_ranges, "dag_job_num_range");
+	get_ranges(arc_num_ranges, "dag_arc_num_range");
+	get_integers(is_cyclics, "is_cyclic");
+	get_integers(max_indegrees, "max_indegree");
+	get_integers(max_outdegrees, "max_outdegree");
+	
+
 	//set parameters
 	parameters.lambda = lambdas[0];
 	parameters.p_num = p_num[0];
@@ -85,6 +99,17 @@ cout<<exp_times<<endl;
 	parameters.rrp = rrps[0];
 	parameters.tlf = tlfs[0];
 	parameters.rrr = rrrs[0];
+	
+	parameters.job_num_range = job_num_ranges[0];	
+	parameters.arc_num_range = arc_num_ranges[0];	
+	if(0 == is_cyclics[0])
+		parameters.cyclic = false;
+	else
+		parameters.cyclic = true;	
+	parameters.max_indegree = max_indegrees[0];	
+	parameters.max_outdegree = max_outdegrees[0];
+
+
 cout<<"////////////////////"<<endl;
 cout<<parameters.lambda<<endl;
 cout<<parameters.p_num<<endl;
@@ -119,7 +144,7 @@ cout<<output.output_filename()<<endl;
 	
 cout<<"////////////////DAG//////////////////"<<endl;
 	DAG_Task dag_task(1, 4);
-
+cout<<"1"<<endl;
 	dag_task.add_job(1);
 	dag_task.add_job(2);
 	dag_task.add_job(1);
@@ -128,7 +153,7 @@ cout<<"////////////////DAG//////////////////"<<endl;
 	dag_task.add_job(1);
 	dag_task.add_job(2);
 	dag_task.add_job(1);
-	
+cout<<"2"<<endl;	
 	dag_task.add_arc(0,3);
 	dag_task.add_arc(1,3);
 	dag_task.add_arc(2,4);
@@ -136,11 +161,11 @@ cout<<"////////////////DAG//////////////////"<<endl;
 	dag_task.add_arc(3,6);
 	dag_task.add_arc(4,6);
 	dag_task.add_arc(6,7);
-
+cout<<"3"<<endl;
 	dag_task.refresh_relationship();
-
+cout<<"4"<<endl;
 	dag_task.display_arcs();
-
+cout<<"5"<<endl;
 	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
 		dag_task.display_precedences(i);
 	
@@ -167,7 +192,7 @@ cout<<"////////////////DAG//////////////////"<<endl;
 		for(int i = 0; i < exp_times; i++)
 		{
 			TaskSet taskset = TaskSet();
-				
+			DAG_TaskSet dag_taskset = DAG_TaskSet();
 			ProcessorSet processorset = ProcessorSet(parameters);
 			ResourceSet resourceset = ResourceSet();
 			//ResourceSet2<Task> resourceset2 = ResourceSet2<Task>();
@@ -175,7 +200,7 @@ cout<<"////////////////DAG//////////////////"<<endl;
 			//resource_gen2<Task>(&resourceset2, parameters);
 
 			tast_gen(taskset, resourceset, parameters, utilization);
-
+			dag_task_gen(dag_taskset, resourceset, parameters, utilization);
 			for(uint i = 0; i < parameters.get_method_num(); i++)
 			{
 				taskset.init();

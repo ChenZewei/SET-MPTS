@@ -215,6 +215,8 @@ class DAG_Task:public Task
 		ulong len;
 		ulong deadline;
 		ulong period;
+		fraction_t utilization;
+		fraction_t density;
 		uint vexnum;
 		uint arcnum;
 		ulong spin;
@@ -237,12 +239,16 @@ class DAG_Task:public Task
 					ulong period,
 					ulong deadline = 0,
 					uint priority = 0);
+		uint get_id() const;
+		void set_id(uint id);
 		uint get_vnode_num() const;
 		uint get_arcnode_num() const;
 		ulong get_vol() const;
 		ulong get_len() const;
 		ulong get_deadline() const;
 		ulong get_period() const;
+		fraction_t get_utilization() const;
+		fraction_t get_density() const;
 		void add_job(uint wcet, ulong deadline = 0);
 		void add_arc(uint tail, uint head);
 		void refresh_relationship();
@@ -251,8 +257,6 @@ class DAG_Task:public Task
 		bool is_acyclic();
 		uint DBF(uint time);//Demand Bound Function
 		void DBF();
-		fraction_t get_utilization();
-		fraction_t get_density();
 		void get_utilization(fraction_t &utilization);
 		void get_density(fraction_t &density);
 				
@@ -277,10 +281,27 @@ class DAG_TaskSet
 		fraction_t density_sum;
 		fraction_t density_max;
 	public:
+		DAG_TaskSet();
+		~DAG_TaskSet();
+
+		void add_task(ResourceSet& resourceset, Param param, long wcet, long period, long deadline = 0);
+
+		DAG_Tasks& get_tasks();
+		DAG_Task& get_task_by_id(uint id);
+		uint get_taskset_size() const ;
 		
+		fraction_t get_utilization_sum() const;
+		fraction_t get_utilization_max() const;
+		fraction_t get_density_sum() const;
+		fraction_t get_density_max() const;
+
+	
+		void sort_by_period();		
 };
 
 void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double utilization);
+
+void dag_task_gen(DAG_TaskSet& dag_taskset, ResourceSet& resourceset, Param param, double utilization);
 ulong gcd(ulong a, ulong b);
 ulong lcm(ulong a, ulong b);
 

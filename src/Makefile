@@ -17,8 +17,8 @@ MOVE          = mv -f
 MKDIR         = mkdir -p
 TARGET	      = SchedulingAnalysis
 
-SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o sort.o xml.o param.o output.o
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o sort.o xml.o param.o output.o $(LFLAGS) $(LIBS)
+SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o $(LFLAGS) $(LIBS)
 	
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
@@ -40,9 +40,6 @@ tinyxml2.o:tinyxml2.cpp
 
 mgl_chart.o:mathGL/mgl_chart.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c mathGL/mgl_chart.cpp $(LIBS)
-
-sort.o:sort.cpp
-	$(CXX) $(CXXFLAGS) $(INCPATH) -c sort.cpp $(LIBS)
 
 xml.o:xml.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c xml.cpp $(LIBS)

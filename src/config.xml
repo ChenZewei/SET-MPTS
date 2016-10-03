@@ -61,4 +61,25 @@
 	<total_len_factor>
 		<data>0.6</data>
 	</total_len_factor>
+	<dag_job_num_range>
+		<data>
+			<min>0</min>
+			<max>10</max>
+		</data>
+	</dag_job_num_range>
+	<dag_arc_num_range>
+		<data>
+			<min>0</min>
+			<max>10</max>
+		</data>
+	</dag_arc_num_range>
+	<is_cyclic>
+		<data>0</data>
+	</is_cyclic>
+	<max_indegree>
+		<data>2</data>
+	</max_indegree>
+	<max_outdegree>
+		<data>2</data>
+	</max_outdegree>
 </parameters>
