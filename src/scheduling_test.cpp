@@ -184,7 +184,12 @@ cout<<"5"<<endl;
 	dag_task.update_len();
 
 	cout<<"vol:"<<dag_task.get_vol()<<" "<<"len:"<<dag_task.get_len()<<endl;
-	
+cout<<"////////////////DAG TaskSet//////////////////"<<endl;
+	DAG_TaskSet dag_taskset = DAG_TaskSet();
+	ResourceSet testresource = ResourceSet();
+	dag_task_gen(dag_taskset, testresource, parameters, 0.6);
+
+cout<<"utilization:"<<dag_taskset.get_utilization_sum()<<endl;
 	
 	double utilization = u_ranges[0].min;
 	
@@ -200,7 +205,7 @@ cout<<"5"<<endl;
 		for(int i = 0; i < exp_times; i++)
 		{
 			TaskSet taskset = TaskSet();
-			DAG_TaskSet dag_taskset = DAG_TaskSet();
+			
 			ProcessorSet processorset = ProcessorSet(parameters);
 			ResourceSet resourceset = ResourceSet();
 			//ResourceSet2<Task> resourceset2 = ResourceSet2<Task>();
@@ -208,7 +213,7 @@ cout<<"5"<<endl;
 			//resource_gen2<Task>(&resourceset2, parameters);
 
 			tast_gen(taskset, resourceset, parameters, utilization);
-			dag_task_gen(dag_taskset, resourceset, parameters, utilization);
+			//dag_task_gen(dag_taskset, resourceset, parameters, utilization);
 			for(uint i = 0; i < parameters.get_method_num(); i++)
 			{
 				taskset.init();

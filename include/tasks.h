@@ -265,6 +265,8 @@ class DAG_Task:public Task
 		ulong DFS(VNode vnode);
 		ulong BFS(VNode vnode);
 
+		bool is_arc_exist(uint tail, uint head);
+
 		void display_arcs();
 		void display_follow_ups(uint job_id);
 		void display_precedences(uint job_id);
