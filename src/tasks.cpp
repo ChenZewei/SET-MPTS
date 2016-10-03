@@ -478,7 +478,6 @@ DAG_Task::DAG_Task(uint task_id, ulong period, ulong deadline, uint priority):Ta
 	partition = 0XFFFFFFFF;
 	utilization = 0;
 	density = 0;
-	
 
 }
 
@@ -516,6 +515,61 @@ DAG_Task::DAG_Task(	uint task_id,
 	utilization /= period;
 	density = 0;
 
+//creating jobs
+	uint JobNode_num = Random_Gen::uniform_integral_gen(int(max(1, int(param.job_num_range.min))),int(param.job_num_range.max));
+	vector<ulong> sep_points;
+	sep_points.push_back(0);
+	for(uint i = 1; i < JobNode_num ; i++)
+	{
+		ulong temp = Random_Gen::uniform_ulong_gen(param.job_num_range.min,param.job_num_range.max);
+		if(0 == temp)
+			temp++;
+		else if(vol == temp)
+			temp--;
+		sep_points.push_back(temp);
+	}
+	sep_points.push_back(vol);
+	sort(sep_points.begin(), sep_points.end());
+	for(uint i = 0; i < JobNode_num; i++)
+		add_job(sep_points[i + 1] - sep_points[i], deadline);
+
+//creating arcs
+	uint ArcNode_num = Random_Gen::uniform_integral_gen(int(param.arc_num_range.min),int(param.arc_num_range.max));
+	uint min_degree = min(param.max_indegree, param.max_indegree);
+	if(param.is_cyclic)
+		ArcNode_num = min(JobNode_num * min_degree, JobNode_num * (JobNode_num - 1));
+	else
+		ArcNode_num = min(1 + (JobNode_num - 2) * min_degree, (JobNode_num * (JobNode_num - 1)) / 2);
+	for(uint i = 0; i < ArcNode_num; i++)
+	{
+		uint tail, head;
+		do
+		{
+			if(param.is_cyclic)//cyclic graph
+				tail = Random_Gen::uniform_integral_gen(0, JobNode_num - 1);
+			else//acyclic graph
+				tail = Random_Gen::uniform_integral_gen(0, JobNode_num - 2);
+		}
+		while(param.max_outdegree <= get_outdegrees(tail));
+
+		do
+		{
+			if(param.is_cyclic)//cyclic graph
+			{
+				head = Random_Gen::uniform_integral_gen(0, JobNode_num - 1);
+				if(tail == head)
+					continue;
+			}
+			else//acyclic graph
+				head = Random_Gen::uniform_integral_gen(tail, JobNode_num - 1);
+		}
+		while(param.max_indegree <= get_indegrees(head));
+		add_arc(tail, head);
+	}
+
+	refresh_relationship();
+	update_vol();
+	update_len();
 }
 
 
@@ -530,7 +584,7 @@ ulong DAG_Task::get_period() const {return period;}
 fraction_t DAG_Task::get_utilization() const {return utilization;}
 fraction_t DAG_Task::get_density() const {return density;}
 
-void DAG_Task::add_job(uint wcet, ulong deadline)
+void DAG_Task::add_job(ulong wcet, ulong deadline)
 {
 	VNode vnode;
 	vnode.job_id = vnodes.size();
@@ -643,6 +697,9 @@ void DAG_Task::display_precedences(uint job_id)
 	for(uint i = 0; i < vnodes[job_id].precedences.size(); i++)
 		cout<<"precedences of node "<<job_id<<":"<<vnodes[job_id].precedences[i]->tail<<endl;
 }
+
+uint DAG_Task::get_indegrees(uint job_id) const {return vnodes[job_id].precedences.size();}
+uint DAG_Task::get_outdegrees(uint job_id) const {return vnodes[job_id].follow_ups.size();}
 
 ////////////////////////////DAG TaskSet////////////////////////////
 

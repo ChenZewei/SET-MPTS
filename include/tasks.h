@@ -249,7 +249,7 @@ class DAG_Task:public Task
 		ulong get_period() const;
 		fraction_t get_utilization() const;
 		fraction_t get_density() const;
-		void add_job(uint wcet, ulong deadline = 0);
+		void add_job(ulong wcet, ulong deadline = 0);
 		void add_arc(uint tail, uint head);
 		void refresh_relationship();
 		void update_vol();
@@ -268,6 +268,8 @@ class DAG_Task:public Task
 		void display_arcs();
 		void display_follow_ups(uint job_id);
 		void display_precedences(uint job_id);
+		uint get_indegrees(uint job_id) const;
+		uint get_outdegrees(uint job_id) const;
 };
 
 typedef vector<DAG_Task> DAG_Tasks;

@@ -29,7 +29,7 @@ class Param
 		//graph task model parameters
 		Range job_num_range;
 		Range arc_num_range;
-		bool cyclic;
+		bool is_cyclic;
 		int max_indegree;
 		int max_outdegree;
 	
@@ -66,8 +66,8 @@ class Param
 		Range get_job_num_range() const;
 		void set_arc_num_range(Range arc_num_range);
 		Range get_arc_num_range() const;
-		void set_cyclic(bool is_cyclic);
-		bool get_cyclic() const;
+		void set_is_cyclic(bool is_cyclic);
+		bool get_is_cyclic() const;
 		void set_max_indegree(int max_indegree);
 		int get_max_indegree() const;
 		void set_max_outdegree(int max_outdegree);

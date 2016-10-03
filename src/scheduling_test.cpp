@@ -78,11 +78,11 @@ cout<<exp_times<<endl;
 	Int_Set max_indegrees;
 	Int_Set max_outdegrees;
 	
-	get_ranges(job_num_ranges, "dag_job_num_range");
-	get_ranges(arc_num_ranges, "dag_arc_num_range");
-	get_integers(is_cyclics, "is_cyclic");
-	get_integers(max_indegrees, "max_indegree");
-	get_integers(max_outdegrees, "max_outdegree");
+	XML::get_ranges(&job_num_ranges, "dag_job_num_range");
+	XML::get_ranges(&arc_num_ranges, "dag_arc_num_range");
+	XML::get_integers(&is_cyclics, "is_cyclic");
+	XML::get_integers(&max_indegrees, "max_indegree");
+	XML::get_integers(&max_outdegrees, "max_outdegree");
 	
 
 	//set parameters
@@ -103,9 +103,9 @@ cout<<exp_times<<endl;
 	parameters.job_num_range = job_num_ranges[0];	
 	parameters.arc_num_range = arc_num_ranges[0];	
 	if(0 == is_cyclics[0])
-		parameters.cyclic = false;
+		parameters.is_cyclic = false;
 	else
-		parameters.cyclic = true;	
+		parameters.is_cyclic = true;	
 	parameters.max_indegree = max_indegrees[0];	
 	parameters.max_outdegree = max_outdegrees[0];
 
@@ -118,6 +118,14 @@ cout<<parameters.p_range.min<<" "<<parameters.p_range.max<<endl;
 cout<<parameters.u_range.min<<" "<<parameters.u_range.max<<endl;
 cout<<parameters.d_range.min<<" "<<parameters.d_range.max<<endl;
 cout<<parameters.exp_times<<endl;
+cout<<parameters.job_num_range.min<<" "<<parameters.job_num_range.max<<endl;
+cout<<parameters.arc_num_range.min<<" "<<parameters.arc_num_range.max<<endl;
+if(parameters.is_cyclic)
+	cout<<"true."<<endl;
+else
+	cout<<"false."<<endl;
+cout<<parameters.max_indegree<<endl;
+cout<<parameters.max_indegree<<endl;
 cout<<"////////////////////"<<endl;
 
 
