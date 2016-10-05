@@ -251,6 +251,7 @@ class DAG_Task:public Task
 		fraction_t get_density() const;
 		void add_job(ulong wcet, ulong deadline = 0);
 		void add_arc(uint tail, uint head);
+		void delete_arc(uint tail, uint head);
 		void refresh_relationship();
 		void update_vol();
 		void update_len();
@@ -262,8 +263,8 @@ class DAG_Task:public Task
 				
 		
 
-		ulong DFS(VNode vnode);
-		ulong BFS(VNode vnode);
+		ulong DFS(VNode vnode);//Depth First Search
+		ulong BFS(VNode vnode);//Breath First Search
 
 		bool is_arc_exist(uint tail, uint head);
 

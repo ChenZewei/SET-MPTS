@@ -546,6 +546,8 @@ cout<<"1"<<endl;
 
 //creating arcs
 cout<<"2"<<endl;
+	
+			
 	uint ArcNode_num = Random_Gen::uniform_integral_gen(int(param.arc_num_range.min),int(param.arc_num_range.max));
 	uint min_degree = min(param.max_indegree, param.max_indegree);
 	if(param.is_cyclic)//cyclic graph
@@ -572,7 +574,7 @@ cout<<"JobNode_num:"<<JobNode_num<<" ArcNode_num:"<<ArcNode_num<<endl;
 				tail = Random_Gen::uniform_integral_gen(0, JobNode_num - 2);
 				if(param.max_outdegree <= get_outdegrees(tail))
 					continue;
-				head = Random_Gen::uniform_integral_gen(tail + 1, min(tail + min_degree, JobNode_num - 1));
+				head = Random_Gen::uniform_integral_gen(tail + 1, JobNode_num - 1);
 				if(param.max_indegree <= get_indegrees(head))
 					continue;
 			}
@@ -635,6 +637,12 @@ void DAG_Task::add_arc(uint tail, uint head)
 	uint arc_num = arcnodes.size();
 }
 
+
+void DAG_Task::delete_arc(uint tail, uint head)
+{
+	
+}
+
 void DAG_Task::refresh_relationship()
 {
 	for(uint i = 0; i < vnodes.size(); i++)
@@ -663,10 +671,12 @@ void DAG_Task::update_len()
 	{
 		if(0 == vnodes[i].precedences.size())//finding the head
 		{
-			ulong temp = vnodes[i].wcet;
+			ulong temp = 0;
 			for(uint j = 0; j < vnodes[i].follow_ups.size(); j++)
 			{
-				temp += DFS(vnodes[vnodes[i].follow_ups[j]->head]);
+				ulong temp2 = vnodes[i].wcet + DFS(vnodes[vnodes[i].follow_ups[j]->head]);
+				if(temp < temp2)
+					temp = temp2;
 			}
 			if(len < temp)
 				len = temp;
@@ -677,6 +687,7 @@ void DAG_Task::update_len()
 
 bool DAG_Task::is_acyclic()
 {
+	VNodePtr job = &vnodes[0];
 	
 }
 
@@ -700,7 +711,7 @@ ulong DAG_Task::DFS(VNode vnode)
 
 ulong DAG_Task::BFS(VNode vnode)
 {
-
+	
 }
 
 bool DAG_Task::is_arc_exist(uint tail, uint head)
