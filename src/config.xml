@@ -17,7 +17,7 @@
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
 	<lambda>
-		<data>15</data>
+		<data>10</data>
 	</lambda>
 	<step>
 		<data>0.1</data>
@@ -36,7 +36,7 @@
 			<min>100000</min>
 			<max>1000000</max>
 		</data>
-	</period_range>	
+	</period_range>
 	<deadline_propotion>
 		<data>
 			<min>0.8</min>
