@@ -3,7 +3,7 @@
 Output::Output(const char* path)
 {
 	this->path = path;
-	chart.SetGraphSize(1280,640);
+	chart.SetGraphSize(800,600);
 	chart.SetGraphQual(3);
 }
 
@@ -26,6 +26,11 @@ Output::Output(Param param)
 	for(uint i = 0; i < param.get_method_num(); i++)
 		add_set();
 	
+}
+
+string Output::get_path()
+{
+	return path;
 }
 
 void Output::add_set()
@@ -126,7 +131,7 @@ void Output::export_csv()
 		output_file<<","<<utilization;
 		
 	}
-	while(utilization < param.u_range.max || fabs(param.u_range.max - utilization) < EPS);
+	while(utilization < param.u_range.max || fabs(param.u_range.max - utilization) < _EPS);
 	output_file<<utilization<<"\n";
 */
 	output_file.flush();
@@ -144,24 +149,21 @@ void Output::SetGraphQual(int quality)
 	chart.SetGraphQual(quality);
 }
 
-void Output::export_line_chart(int format)
+void Output::Export(int format)
 {
-	string file_name = path + "result";
-	switch(format)
-	{
-		case 0:
-			file_name += ".png";
-			break;
-		case 1:
-			file_name += ".svg";
-			break;
-		default:
-			file_name += ".png";
-			break;
-	}
+	string temp, file_name = path + "result";
 	for(uint i = 0; i < get_sets_num(); i++)
 	{
 		chart.AddData(get_method_name(param.test_attributes[i]), result_sets[i]);
 	}
-	chart.ExportLineChart(file_name.data(), "", param.u_range.min, param.u_range.max);
+
+	if(0x0f & format)
+	{
+		chart.ExportLineChart(file_name, "", param.u_range.min, param.u_range.max, format);
+	}
+	if(0x10 & format)
+	{
+		temp = file_name + ".json";
+		chart.ExportJSON(temp);
+	}
 }

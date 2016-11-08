@@ -12,6 +12,11 @@ void XML::LoadFile(const char* path)
 	config.LoadFile(path);
 }
 
+void XML::SaveConfig(const char* path)
+{
+	config.SaveFile(path);
+}
+
 void XML::get_method(Test_Attribute_Set *t_set)
 {
 	const char* content;

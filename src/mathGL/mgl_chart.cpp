@@ -35,7 +35,7 @@ Chart::Chart()
 string Chart::get_line_style(int index)
 {
 	string style = "";
-	style += color[index];
+	style += color[0];
 	style += width[2];
 	style += dot[index];
 	return style;
@@ -77,8 +77,9 @@ void Chart::SetGraphQual(int quality)
 	graph.SetQuality(quality);
 }
 
-void Chart::ExportLineChart(const char* path, const char* title, double min, double max, int format)
+void Chart::ExportLineChart(string path, const char* title, double min, double max, int format)
 {
+	graph.Clf('w');
 	if("" != title)
 		graph.Title(title,"",-2);	
 	graph.SetOrigin(0,0,0);
@@ -96,21 +97,33 @@ void Chart::ExportLineChart(const char* path, const char* title, double min, dou
 	graph.Label('y',"y: Ratio", 0);
 	graph.Legend(0);
 	graph.Axis("xy");
-	switch(format)
+
+	string temp;
+
+	if(0x01 & format)
 	{
-		case 0:
-			graph.WritePNG(path);
-			break;
-		case 1:
-			graph.WriteSVG(path);
-			break;
-		default:
-			graph.WritePNG(path);
-			break;
+		temp = path + ".png";
+		graph.WritePNG(temp.data());
 	}
+	if(0x02 & format)
+	{
+		temp = path + ".eps";
+		graph.WriteEPS(temp.data());
+	}
+	if(0x04 & format)
+	{
+		temp = path + ".svg";
+		graph.WriteSVG(temp.data());
+	}
+	if(0x08 & format)
+	{
+		temp = path + ".tga";
+		graph.WriteTGA(temp.data());
+	}
+
 }
 
-void Chart::ExportJSON(const char* path)
+void Chart::ExportJSON(string path)
 {
-	graph.WriteJSON(path);
+	graph.WriteJSON(path.data());
 }

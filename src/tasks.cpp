@@ -810,7 +810,7 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double ut
 		//fraction_t u = Random_Gen::uniform_real_gen(0.05, 0.1);
 		ulong wcet = period*u.get_d();
 		ulong deadline = 0;
-		if(fabs(param.d_range.max) < EPS)
+		if(fabs(param.d_range.max) < _EPS)
 		{
 			deadline = ceil(period*Random_Gen::uniform_real_gen(param.d_range.min, param.d_range.max));
 			if(deadline > period)
@@ -850,7 +850,7 @@ void dag_task_gen(DAG_TaskSet& dag_taskset, ResourceSet& resourceset, Param para
 		fraction_t u = Random_Gen::exponential_gen(param.lambda);
 		ulong wcet = period*u.get_d();
 		ulong deadline = 0;
-		if(fabs(param.d_range.max) < EPS)
+		if(fabs(param.d_range.max) < _EPS)
 		{
 			deadline = ceil(period*Random_Gen::uniform_real_gen(param.d_range.min, param.d_range.max));
 			if(deadline > period)

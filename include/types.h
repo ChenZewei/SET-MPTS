@@ -14,10 +14,13 @@
 
 #define MAX_LONG 0xffffffffffffffff
 #define MAX_INT  0xffffffff
-#define EPS 0.000001
+#define _EPS 0.000001
 
-#define PNG 0
-#define SVG 1
+#define PNG 	0x01
+#define EPS 	0x02
+#define SVG 	0x04
+#define TGA 	0x08
+#define JSON 	0x10
 
 #define P_EDF 0
 #define BCL_FTP 1

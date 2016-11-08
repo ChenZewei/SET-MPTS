@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <parameters>
 	<schedulability_test>
+<!-->
 		<data TEST_TYPE="0" REMARK="native">RTA-GFP</data>
 		<data TEST_TYPE="1" REMARK="bc">RTA-GFP</data>
 		<data TEST_TYPE="2" REMARK="gn">RTA-GFP</data>
-		<data REMARK="normal">WF-DM</data>
 		<data REMARK="normal">WF-EDF</data>
+		<data TEST_TYPE="0" REMARK="normal">WF-DM</data>
+		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
+		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
+<!-->
+		<data TEST_TYPE="0" REMARK="normal">WF-DM</data>
+		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
+		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
 	</schedulability_test>
-	<experiment_times>10</experiment_times>
+	<experiment_times>1000</experiment_times>
+	<output>
+		<data FORMAT="0" >LineChart</data>
+		<data>JSON</data>
+	</output>
 	<lambda>
 		<data>10</data>
 	</lambda>
@@ -39,7 +50,7 @@
 		<data>10</data>
 	</resource_num>
 	<rrp>//resource_request_probability
-		<data>0.1</data>
+		<data>0.8</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>

@@ -147,11 +147,13 @@ int main(int argc,char** argv)
 		utilization += steps[0];
 
 	}
-	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < EPS);
+	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < _EPS);
+
+	XML::SaveConfig((output.get_path() + "config.xml").data());
 
 	output.export_csv();
 
-	output.export_line_chart(1);
+	output.Export(PNG|EPS|SVG|TGA|JSON);
 
 	return 0;
 }

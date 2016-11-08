@@ -20,7 +20,7 @@ class Output
 		Output(const char* path);
 		Output(Param param);
 		
-		
+		string get_path();
 		void add_set();
 		uint get_sets_num() const;
 		void add_result(uint index, double x, double y);
@@ -34,7 +34,7 @@ class Output
 		//export to graph
 		void SetGraphSize(int width, int height);
 		void SetGraphQual(int quality);
-		void export_line_chart(int format = 0);
+		void Export(int format = 0);
 };
 
 #endif
