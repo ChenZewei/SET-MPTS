@@ -16,6 +16,9 @@
 #define MAX_INT  0xffffffff
 #define EPS 0.000001
 
+#define PNG 0
+#define SVG 1
+
 #define P_EDF 0
 #define BCL_FTP 1
 #define BCL_EDF 2

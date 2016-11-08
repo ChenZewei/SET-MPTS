@@ -15,7 +15,7 @@
 		<data REMARK="normal">WF-DM</data>
 		<data REMARK="normal">WF-EDF</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>10</experiment_times>
 	<lambda>
 		<data>10</data>
 	</lambda>
@@ -25,11 +25,11 @@
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>6</max>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>6</data>	
+		<data>4</data>	
 	</processor_num>
 	<period_range>
 		<data>
@@ -39,7 +39,7 @@
 	</period_range>
 	<deadline_propotion>
 		<data>
-			<min>0.8</min>
+			<min>0.6</min>
 			<max>1</max>
 		</data>
 	</deadline_propotion>

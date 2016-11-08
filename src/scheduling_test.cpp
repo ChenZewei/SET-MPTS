@@ -175,7 +175,7 @@ cout<<output.output_filename()<<endl;
 
 	output.export_csv();
 
-	output.export_line_chart();
+	output.export_line_chart(1);
 
 /*
 	for(uint i = 0; i < test_attributes.size(); i++)

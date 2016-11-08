@@ -77,7 +77,7 @@ void Chart::SetGraphQual(int quality)
 	graph.SetQuality(quality);
 }
 
-void Chart::ExportPNG(const char* path, const char* title, double min, double max)
+void Chart::ExportLineChart(const char* path, const char* title, double min, double max, int format)
 {
 	if("" != title)
 		graph.Title(title,"",-2);	
@@ -96,7 +96,18 @@ void Chart::ExportPNG(const char* path, const char* title, double min, double ma
 	graph.Label('y',"y: Ratio", 0);
 	graph.Legend(0);
 	graph.Axis("xy");
-	graph.WritePNG(path);
+	switch(format)
+	{
+		case 0:
+			graph.WritePNG(path);
+			break;
+		case 1:
+			graph.WriteSVG(path);
+			break;
+		default:
+			graph.WritePNG(path);
+			break;
+	}
 }
 
 void Chart::ExportJSON(const char* path)

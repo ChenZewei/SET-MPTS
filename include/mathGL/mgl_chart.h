@@ -34,7 +34,7 @@ class Chart
 		void AddData(string name, Result_Set r_set);
 		void SetGraphSize(int width, int height);
 		void SetGraphQual(int quality);
-		void ExportPNG(const char* path, const char* title, double min, double max);
+		void ExportLineChart(const char* path, const char* title, double min, double max, int format = 0);
 		void ExportJSON(const char* path);
 };
 
