@@ -63,14 +63,6 @@ int main(int argc,char** argv)
 	XML::get_resource_request_range(&rrrs);
 	XML::get_total_len_factor(&tlfs);
 
-cout<<lambdas[0]<<endl;
-cout<<p_num[0]<<endl;
-cout<<steps[0]<<endl;
-cout<<p_ranges[0].min<<" "<<p_ranges[0].max<<endl;
-cout<<u_ranges[0].min<<" "<<u_ranges[0].max<<endl;
-cout<<d_ranges[0].min<<" "<<d_ranges[0].max<<endl;
-cout<<exp_times<<endl;
-
 	//set parameters
 	parameters.lambda = lambdas[0];
 	parameters.p_num = p_num[0];
@@ -85,40 +77,9 @@ cout<<exp_times<<endl;
 	parameters.rrp = rrps[0];
 	parameters.tlf = tlfs[0];
 	parameters.rrr = rrrs[0];
-cout<<"////////////////////"<<endl;
-cout<<parameters.lambda<<endl;
-cout<<parameters.p_num<<endl;
-cout<<parameters.step<<endl;
-cout<<parameters.p_range.min<<" "<<parameters.p_range.max<<endl;
-cout<<parameters.u_range.min<<" "<<parameters.u_range.max<<endl;
-cout<<parameters.d_range.min<<" "<<parameters.d_range.max<<endl;
-cout<<parameters.exp_times<<endl;
-cout<<"////////////////////"<<endl;
-
 
 	Output output(parameters);
 
-cout<<output.output_filename()<<endl;
-
-/*
-	string file_name = "results/" + parameters.output_filename() + ".csv";
-	ofstream output_file(file_name);
-
-	output_file<<"Lambda:"<<lambdas[0]<<",";					
-	output_file<<" processor number:"<<p_num[0]<<",";
-	output_file<<" step:"<<steps[0]<<",";
-	output_file<<" utilization range:["<<u_ranges[0].min<<"-"<<u_ranges[0].max<<"],";
-	output_file<<setprecision(0)<<" period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n"<<setprecision(3);
-	output_file<<"Utilization,";
-	for(uint i = 0; i < test_attributes.size(); i++)
-	{
-		output_file<<get_method_name(test_attributes[i])<<" ratio,";
-	}
-	output_file<<"\n";
-*/
-	
-	
-	
 	double utilization = u_ranges[0].min;
 	
 	do
@@ -158,16 +119,6 @@ cout<<output.output_filename()<<endl;
 			output.add_result(i, result.x, result.y);
 		}
 
-//output to csv file		
-/*
-		output_file<<utilization<<",";
-		for(uint i = 0; i < test_attributes.size(); i++)
-		{
-			output_file<<results[i][results[i].size()-1].y<<",";
-		}
-		output_file<<"\n";
-		output_file.flush();
-*/
 		utilization += steps[0];
 
 	}
@@ -177,21 +128,6 @@ cout<<output.output_filename()<<endl;
 
 	output.export_line_chart(1);
 
-/*
-	for(uint i = 0; i < test_attributes.size(); i++)
-	{
-		string test_name = get_method_name(test_attributes[i]);
-		chart.AddData(test_name, results[i]);
-	}
-
-	output_file.close();
-	
-	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
-
-	chart.SetGraphSize(1280,640);
-	chart.SetGraphQual(3);
-	chart.ExportPNG(png_name.data(), "", u_ranges[0].min, results[0][results[0].size()-1].x);
-*/
 	return 0;
 }
 
