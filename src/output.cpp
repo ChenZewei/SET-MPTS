@@ -146,10 +146,22 @@ void Output::SetGraphQual(int quality)
 
 void Output::export_line_chart(int format)
 {
-	string png_name = path + "result.png";
+	string file_name = path + "result";
+	switch(format)
+	{
+		case 0:
+			file_name += ".png";
+			break;
+		case 1:
+			file_name += ".svg";
+			break;
+		default:
+			file_name += ".png";
+			break;
+	}
 	for(uint i = 0; i < get_sets_num(); i++)
 	{
 		chart.AddData(get_method_name(param.test_attributes[i]), result_sets[i]);
 	}
-	chart.ExportPNG(png_name.data(), "", param.u_range.min, param.u_range.max);
+	chart.ExportLineChart(file_name.data(), "", param.u_range.min, param.u_range.max);
 }

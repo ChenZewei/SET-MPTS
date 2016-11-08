@@ -807,6 +807,7 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double ut
 	{
 		ulong period = Random_Gen::uniform_integral_gen(int(param.p_range.min),int(param.p_range.max));
 		fraction_t u = Random_Gen::exponential_gen(param.lambda);
+		//fraction_t u = Random_Gen::uniform_real_gen(0.05, 0.1);
 		ulong wcet = period*u.get_d();
 		ulong deadline = 0;
 		if(fabs(param.d_range.max) < EPS)

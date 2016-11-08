@@ -42,7 +42,7 @@ int main(int argc,char** argv)
 		else
 			return 0;
 	}
-cout<<"111111111111"<<endl;
+
 	//scheduling parameter
 	XML::get_method(&test_attributes);
 	exp_times = XML::get_experiment_times();
@@ -52,7 +52,7 @@ cout<<"111111111111"<<endl;
 	XML::get_deadline_propotion(&d_ranges);
 	XML::get_utilization_range(&u_ranges);
 	XML::get_step(&steps);	
-cout<<"222222222222"<<endl;
+
 	//resource parameter
 	Int_Set resource_num, rrns;
 	Double_Set rrps, tlfs;
@@ -62,14 +62,6 @@ cout<<"222222222222"<<endl;
 	XML::get_resource_request_num(&rrns);
 	XML::get_resource_request_range(&rrrs);
 	XML::get_total_len_factor(&tlfs);
-
-cout<<lambdas[0]<<endl;
-cout<<p_num[0]<<endl;
-cout<<steps[0]<<endl;
-cout<<p_ranges[0].min<<" "<<p_ranges[0].max<<endl;
-cout<<u_ranges[0].min<<" "<<u_ranges[0].max<<endl;
-cout<<d_ranges[0].min<<" "<<d_ranges[0].max<<endl;
-cout<<exp_times<<endl;
 
 	//graph parameters
 	Range_Set job_num_ranges;
@@ -84,7 +76,6 @@ cout<<exp_times<<endl;
 	XML::get_integers(&max_indegrees, "max_indegree");
 	XML::get_integers(&max_outdegrees, "max_outdegree");
 	
-
 	//set parameters
 	parameters.lambda = lambdas[0];
 	parameters.p_num = p_num[0];
@@ -99,7 +90,7 @@ cout<<exp_times<<endl;
 	parameters.rrp = rrps[0];
 	parameters.tlf = tlfs[0];
 	parameters.rrr = rrrs[0];
-	
+
 	parameters.job_num_range = job_num_ranges[0];	
 	parameters.arc_num_range = arc_num_ranges[0];	
 	if(0 == is_cyclics[0])
@@ -109,86 +100,8 @@ cout<<exp_times<<endl;
 	parameters.max_indegree = max_indegrees[0];	
 	parameters.max_outdegree = max_outdegrees[0];
 
-
-cout<<"////////////////////"<<endl;
-cout<<parameters.lambda<<endl;
-cout<<parameters.p_num<<endl;
-cout<<parameters.step<<endl;
-cout<<parameters.p_range.min<<" "<<parameters.p_range.max<<endl;
-cout<<parameters.u_range.min<<" "<<parameters.u_range.max<<endl;
-cout<<parameters.d_range.min<<" "<<parameters.d_range.max<<endl;
-cout<<parameters.exp_times<<endl;
-cout<<parameters.job_num_range.min<<" "<<parameters.job_num_range.max<<endl;
-cout<<parameters.arc_num_range.min<<" "<<parameters.arc_num_range.max<<endl;
-if(parameters.is_cyclic)
-	cout<<"true."<<endl;
-else
-	cout<<"false."<<endl;
-cout<<parameters.max_indegree<<endl;
-cout<<parameters.max_indegree<<endl;
-cout<<"////////////////////"<<endl;
-
-
 	Output output(parameters);
 
-cout<<output.output_filename()<<endl;
-
-/*
-	string file_name = "results/" + parameters.output_filename() + ".csv";
-	ofstream output_file(file_name);
-
-	output_file<<"Lambda:"<<lambdas[0]<<",";					
-	output_file<<" processor number:"<<p_num[0]<<",";
-	output_file<<" step:"<<steps[0]<<",";
-	output_file<<" utilization range:["<<u_ranges[0].min<<"-"<<u_ranges[0].max<<"],";
-	output_file<<setprecision(0)<<" period range:["<<p_ranges[0].min<<"-"<<p_ranges[0].max<<"]\n"<<setprecision(3);
-	output_file<<"Utilization,";
-	for(uint i = 0; i < test_attributes.size(); i++)
-	{
-		output_file<<get_method_name(test_attributes[i])<<" ratio,";
-	}
-	output_file<<"\n";
-*/
-	
-cout<<"////////////////DAG//////////////////"<<endl;
-	DAG_Task dag_task(1, 4);
-cout<<"1"<<endl;
-	dag_task.add_job(3);
-	dag_task.add_job(1);
-	dag_task.add_job(2);
-	dag_task.add_job(2);
-	dag_task.add_job(3);
-
-cout<<"2"<<endl;	
-	dag_task.add_arc(2,0);
-	dag_task.add_arc(2,3);
-	dag_task.add_arc(4,0);
-	dag_task.add_arc(4,3);
-	dag_task.add_arc(0,1);
-	dag_task.add_arc(3,1);
-
-cout<<"3"<<endl;
-	dag_task.refresh_relationship();
-cout<<"4"<<endl;
-	dag_task.display_arcs();
-cout<<"5"<<endl;
-	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
-		dag_task.display_precedences(i);
-	
-	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
-		dag_task.display_follow_ups(i);
-
-	dag_task.update_vol();
-	dag_task.update_len();
-
-	cout<<"vol:"<<dag_task.get_vol()<<" "<<"len:"<<dag_task.get_len()<<endl;
-cout<<"////////////////DAG TaskSet//////////////////"<<endl;
-	DAG_TaskSet dag_taskset = DAG_TaskSet();
-	ResourceSet testresource = ResourceSet();
-	dag_task_gen(dag_taskset, testresource, parameters, 0.6);
-
-cout<<"utilization:"<<dag_taskset.get_utilization_sum()<<endl;
-	
 	double utilization = u_ranges[0].min;
 	
 	do
@@ -231,16 +144,6 @@ cout<<"utilization:"<<dag_taskset.get_utilization_sum()<<endl;
 			output.add_result(i, result.x, result.y);
 		}
 
-//output to csv file		
-/*
-		output_file<<utilization<<",";
-		for(uint i = 0; i < test_attributes.size(); i++)
-		{
-			output_file<<results[i][results[i].size()-1].y<<",";
-		}
-		output_file<<"\n";
-		output_file.flush();
-*/
 		utilization += steps[0];
 
 	}
@@ -248,23 +151,8 @@ cout<<"utilization:"<<dag_taskset.get_utilization_sum()<<endl;
 
 	output.export_csv();
 
-	output.export_line_chart();
+	output.export_line_chart(1);
 
-/*
-	for(uint i = 0; i < test_attributes.size(); i++)
-	{
-		string test_name = get_method_name(test_attributes[i]);
-		chart.AddData(test_name, results[i]);
-	}
-
-	output_file.close();
-	
-	string png_name = "results/" + output_filename(lambdas[0], steps[0], p_num[0], u_ranges[0], p_ranges[0]) + ".png";
-
-	chart.SetGraphSize(1280,640);
-	chart.SetGraphQual(3);
-	chart.ExportPNG(png_name.data(), "", u_ranges[0].min, results[0][results[0].size()-1].x);
-*/
 	return 0;
 }
 
