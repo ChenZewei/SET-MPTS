@@ -198,6 +198,8 @@ typedef struct ArcNode
 typedef struct VNode
 {
 	uint job_id;
+	uint type;
+	uint pair;
 	ulong wcet;
 	ulong deadline;
 	uint level;
@@ -239,6 +241,7 @@ class DAG_Task:public Task
 					ulong period,
 					ulong deadline = 0,
 					uint priority = 0);
+		void graph_gen(vector<VNode> &vnodes, vector<ArcNode> &arcnodes, uint n_num, double arc_density);
 		uint get_id() const;
 		void set_id(uint id);
 		uint get_vnode_num() const;
@@ -251,8 +254,10 @@ class DAG_Task:public Task
 		fraction_t get_density() const;
 		void add_job(ulong wcet, ulong deadline = 0);
 		void add_arc(uint tail, uint head);
+		void add_arc(vector<ArcNode> &a, uint tail, uint head);
 		void delete_arc(uint tail, uint head);
 		void refresh_relationship();
+		void refresh_relationship(vector<VNode> &v, vector<ArcNode> &a);
 		void update_vol();
 		void update_len();
 		bool is_acyclic();
@@ -267,6 +272,7 @@ class DAG_Task:public Task
 		ulong BFS(VNode vnode);//Breath First Search
 
 		bool is_arc_exist(uint tail, uint head);
+		bool is_arc_exist(const vector<ArcNode> &a, uint tail, uint head);
 
 		void display_arcs();
 		void display_follow_ups(uint job_id);

@@ -16,7 +16,10 @@
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
 	<output>
-		<data FORMAT="0" >LineChart</data>
+		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
+		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
+		<data FORMAT="SVG" BLACK_ONLY="true" >LineChart</data>
+		<data FORMAT="TGA" BLACK_ONLY="true" >LineChart</data>
 		<data>JSON</data>
 	</output>
 	<lambda>

@@ -35,7 +35,7 @@ Chart::Chart()
 string Chart::get_line_style(int index)
 {
 	string style = "";
-	style += color[0];
+	style += color[index];
 	style += width[2];
 	style += dot[index];
 	return style;

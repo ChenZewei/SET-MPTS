@@ -515,9 +515,9 @@ DAG_Task::DAG_Task(	uint task_id,
 	utilization /= period;
 	density = 0;
 
-//creating jobs
+//creating vnodes
 cout<<"1"<<endl;
-	uint JobNode_num = Random_Gen::uniform_integral_gen(int(max(1, int(param.job_num_range.min))),int(param.job_num_range.max));
+	uint JobNode_num = Random_Gen::uniform_integral_gen(int(max(1, int(param.job_num_range.min))),int(param.job_num_range.max)) + 2;
 	vector<ulong> sep_points;
 	sep_points.push_back(0);
 	for(uint i = 1; i < JobNode_num ; i++)
@@ -535,7 +535,7 @@ cout<<"1"<<endl;
 		while(true);
 		sep_points.push_back(temp);
 	}
-	sep_points.push_back(vol);
+	sep_points.push_back(vol);	q
 	sort(sep_points.begin(), sep_points.end());
 
 	for(uint i = 0; i < sep_points.size(); i++)
@@ -557,21 +557,29 @@ cout<<"2"<<endl;
 cout<<"JobNode_num:"<<JobNode_num<<" ArcNode_num:"<<ArcNode_num<<endl;
 	for(uint i = 0; i < ArcNode_num; i++)
 	{
-		uint tail, head;
+		uint tail, head, temppppp;
 		
 		do
 		{
 			if(param.is_cyclic)//cyclic graph
 			{
-				tail = Random_Gen::uniform_integral_gen(0, JobNode_num - 1);
-				head = Random_Gen::uniform_integral_gen(0, JobNode_num - 1);
+				tail = Random_Gen::uniform_integral_gen(1, JobNode_num - 2);
+				head = Random_Gen::uniform_integral_gen(1, JobNode_num - 2);
 				if(tail == head)
 					continue;
 			}
 			else//acyclic graph
 			{
-				tail = Random_Gen::uniform_integral_gen(0, JobNode_num - 2);
-				head = Random_Gen::uniform_integral_gen(tail + 1, JobNode_num - 1);
+				tail = Random_Gen::uniform_integral_gen(1, JobNode_num - 2);
+				head = Random_Gen::uniform_integral_gen(2, JobNode_num - 2);
+				if(tail == head)
+					continue;
+				else if(tail > head)
+				{
+					temp = tail;
+					tail = head;
+					head = temp;
+				}
 			}
 
 			if(is_arc_exist(tail, head))
@@ -596,6 +604,85 @@ cout<<"5"<<endl;
 	update_len();
 cout<<"6"<<endl;
 }
+
+void DAG_Task::void graph_gen(vector<VNode> &v, vector<ArcNode> &ae, uint n_num, double arc_density)
+{
+	v.clear();
+	a.clear();
+
+//creating vnodes
+	VNode polar_start, polar_end;
+	polar_start.job_id = 0;
+	polar_end.job_id = u_num + 1;
+	polar_start.type = P_POINT|S_POINT;
+	polar_end.type = P_POINT|E_POINT;
+	polar_start.pair = polar_end.job_id;
+	polar_end.pair = polar_start.job_id;
+
+	v.push_back(polar_start);
+
+	for(uint i = 0; i < n_num; i++)
+	{
+		VNode temp_node;
+		temp_node.job_id = v.size();
+		temp_node.type = J_POINT;
+		temp_node.pair = MAX_INT;
+		v.push_back(temp_node);
+	}
+
+	v.push_back(polar_end);
+
+//creating arcs
+	uint ArcNode_num;	
+
+	if(param.is_cyclic)//cyclic graph
+		ArcNode_num = Random_Gen::uniform_integral_gen(0, n_num * (n_num - 1));
+	else//acyclic graph
+		ArcNode_num = Random_Gen::uniform_integral_gen(0, (n_num * (n_num - 1)) / 2);
+
+	for(uint i = 0; i < ArcNode_num; i++)
+	{
+		uint tail, head, temp;
+		
+		do
+		{
+			if(param.is_cyclic)//cyclic graph
+			{
+				tail = Random_Gen::uniform_integral_gen(1, n_num);
+				head = Random_Gen::uniform_integral_gen(1, n_num);
+				if(tail == head)
+					continue;
+			}
+			else//acyclic graph
+			{
+				tail = Random_Gen::uniform_integral_gen(1, n_num);
+				head = Random_Gen::uniform_integral_gen(1, n_num);
+				if(tail == head)
+					continue;
+				else if(tail > head)
+				{
+					temp = tail;
+					tail = head;
+					head = temp;
+				}
+			}
+
+			if(is_arc_exist(a, tail, head))
+			{
+				continue;
+			}
+			break;
+		}
+		while(true);
+
+		add_arc(a, tail, head);
+		
+	}
+	refresh_relationship(v, a);
+
+}
+
+
 
 
 uint DAG_Task::get_id() const {return task_id;}
@@ -628,7 +715,14 @@ void DAG_Task::add_arc(uint tail, uint head)
 	arcnode.tail = tail;
 	arcnode.head = head;
 	arcnodes.push_back(arcnode);
-	uint arc_num = arcnodes.size();
+}
+
+void DAG_Task::add_arc(vector<ArcNode> &a, uint tail, uint head)
+{
+	ArcNode arcnode;
+	arcnode.tail = tail;
+	arcnode.head = head;
+	a.push_back(arcnode);
 }
 
 
@@ -648,6 +742,20 @@ void DAG_Task::refresh_relationship()
 	{
 		vnodes[arcnodes[i].tail].follow_ups.push_back(&arcnodes[i]);
 		vnodes[arcnodes[i].head].precedences.push_back(&arcnodes[i]);
+	}
+}
+
+void DAG_Task::refresh_relationship(vector<VNode> &v, vector<ArcNode> &a)
+{
+	for(uint i = 0; i < v.size(); i++)
+	{
+		v[i].precedences.clear();
+		v[i].follow_ups.clear();
+	}
+	for(uint i = 0; i < a.size(); i++)
+	{
+		v[a[i].tail].follow_ups.push_back(&a[i]);
+		v[a[i].head].precedences.push_back(&a[i]);
 	}
 }
 
@@ -713,6 +821,17 @@ bool DAG_Task::is_arc_exist(uint tail, uint head)
 	for(uint i = 0; i < vnodes[tail].follow_ups.size(); i++)
 		if(head == vnodes[tail].follow_ups[i]->head)
 			return true;
+	return false;
+}
+
+bool DAG_Task::is_arc_exist(const vector<ArcNode> &a, uint tail, uint head)
+{
+	for(uint i = 0; i < a.size(); i++)
+	{
+		if(tail == a[i].tail)
+			if(head == a[i].head)
+				return true;
+	}
 	return false;
 }
 

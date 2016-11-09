@@ -16,11 +16,21 @@
 #define MAX_INT  0xffffffff
 #define _EPS 0.000001
 
+//output file format
 #define PNG 	0x01
 #define EPS 	0x02
 #define SVG 	0x04
 #define TGA 	0x08
 #define JSON 	0x10
+
+//VNode type
+#define P_POINT 0x02
+#define C_POINT 0x04
+#define J_POINT 0x08
+
+#define S_POINT 0x00
+#define E_POINT 0x01
+
 
 #define P_EDF 0
 #define BCL_FTP 1
