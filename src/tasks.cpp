@@ -716,8 +716,34 @@ cout<<"JobNode_num:"<<n_num<<" ArcNode_num:"<<ArcNode_num<<endl;
 	update_len();
 }
 
+void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_node)
+{
+	uint v_num = v.size();
+	uint a_num = a.size();
+	for(uint i = 0; i < v_num; i++)
+	{
+		v[i].job_id += replace_node;
+	}
+	vector<VNode>::iterator it = vnodes.begin();
+	vnodes.insert(it + replace_node, v.begin(), v.end());
+	for(it = v.begin() + replace_node + v_num; i < v_num; i++)
+	{
+		it->job_id += v_num;
+	}
+	vnodes.erase(vnodes.begin() + replace_node);
+	
+	vector<ArcNode>::iterator it2 = arcnodes.begin();
+	for(uint i = 0; i < a_num; i++)
+	{
+		a[i].tail += replace_node;
+		a[i].head += replace_node;
+	}
 
-
+	arcnodes.push_back(a.begin(), a.end());
+	
+	refresh_relationship();
+}
+	
 
 uint DAG_Task::get_id() const {return task_id;}
 void DAG_Task::set_id(uint id) { task_id = id;}

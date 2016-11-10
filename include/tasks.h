@@ -242,6 +242,7 @@ class DAG_Task:public Task
 					ulong deadline = 0,
 					uint priority = 0);
 		void graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, double arc_density);
+		void graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_node);
 		uint get_id() const;
 		void set_id(uint id);
 		uint get_vnode_num() const;
