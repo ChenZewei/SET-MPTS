@@ -31,6 +31,9 @@
 #define S_POINT 0x00
 #define E_POINT 0x01
 
+//Graph type
+#define G_TYPE_P 0 //Paralleled
+#define G_TYPE_C 1 //Conditional
 
 #define P_EDF 0
 #define BCL_FTP 1
@@ -42,6 +45,11 @@
 
 #define TPS_TASK_MODEL 0 //Three Parameters Sporadic Task Model
 #define DAG_TASK_MODEL 1
+
+#define PRIORITY 0
+
+#define INCREASE 0
+#define DECREASE 1
 
 using namespace std;
 

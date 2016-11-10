@@ -69,8 +69,8 @@
 	</total_len_factor>
 	<dag_job_num_range>
 		<data>
-			<min>2</min>
-			<max>5</max>
+			<min>4</min>
+			<max>4</max>
 		</data>
 	</dag_job_num_range>
 	<dag_arc_num_range>

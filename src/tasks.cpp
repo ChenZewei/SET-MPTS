@@ -622,7 +622,7 @@ cout<<"6"<<endl;
 */
 }
 
-void DAG_Task::graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, double arc_density)
+void DAG_Task::graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, int G_TYPE, double arc_density)
 {
 	v.clear();
 	a.clear();
@@ -631,10 +631,20 @@ void DAG_Task::graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint
 	VNode polar_start, polar_end;
 	polar_start.job_id = 0;
 	polar_end.job_id = n_num + 1;
-	polar_start.type = P_POINT|S_POINT;
-	polar_end.type = P_POINT|E_POINT;
+	if(G_TYPE == G_TYPE_P)
+	{
+		polar_start.type = P_POINT|S_POINT;
+		polar_end.type = P_POINT|E_POINT;
+	}
+	else
+	{
+		polar_start.type = C_POINT|S_POINT;
+		polar_end.type = C_POINT|E_POINT;
+	}
 	polar_start.pair = polar_end.job_id;
 	polar_end.pair = polar_start.job_id;
+	polar_start.wcet = 0;
+	polar_end.wcet = 0;
 
 	v.push_back(polar_start);
 
@@ -644,6 +654,7 @@ void DAG_Task::graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint
 		temp_node.job_id = v.size();
 		temp_node.type = J_POINT;
 		temp_node.pair = MAX_INT;
+		temp_node.wcet = 0;
 		v.push_back(temp_node);
 	}
 
@@ -712,26 +723,56 @@ cout<<"JobNode_num:"<<n_num<<" ArcNode_num:"<<ArcNode_num<<endl;
 
 	display_arcs(a);
 	//display_arcs();
-	update_vol();
-	update_len();
+//cout<<"dump!!!"<<endl;
+	//update_vol();
+//cout<<"dump!!!"<<endl;
+	//update_len();
 }
 
 void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_node)
 {
 	uint v_num = v.size();
 	uint a_num = a.size();
+	cout<<"reset id:"<<endl;
 	for(uint i = 0; i < v_num; i++)
 	{
 		v[i].job_id += replace_node;
+		cout<<v[i].job_id<<endl;
 	}
-	vector<VNode>::iterator it = vnodes.begin();
-	vnodes.insert(it + replace_node, v.begin(), v.end());
-	for(it = v.begin() + replace_node + v_num; it < v.end(); it++)
-	{
-		it->job_id += v_num;
-	}
-	vnodes.erase(vnodes.begin() + replace_node);
+	cout<<" before insert:"<<endl;
+	display_vertices();
+
+	display_arcs();
+
+	int gap = v_num - 1;
 	
+	for(uint i = replace_node + 1; i < vnodes.size(); i++)
+	{
+		vnodes[i].job_id += gap;
+	}
+
+	for(uint i = 0; i < arcnodes.size(); i++)
+	{
+		if(arcnodes[i].tail >= replace_node)
+			arcnodes[i].tail += gap;
+		if(arcnodes[i].head > replace_node)
+			arcnodes[i].head += gap;
+	}
+
+	cout<<" before insert2:"<<endl;
+	display_vertices();
+
+	display_arcs();
+
+	vnodes.insert(vnodes.begin() + replace_node + 1, v.begin(), v.end());
+
+	cout<<"after insert:"<<endl;
+	display_vertices();
+	
+	vnodes.erase(vnodes.begin() + replace_node);
+	cout<<"after erase:"<<endl;
+	display_vertices();
+
 	vector<ArcNode>::iterator it2 = arcnodes.begin();
 	for(uint i = 0; i < a_num; i++)
 	{
@@ -743,6 +784,13 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 		arcnodes.push_back(*it);
 	
 	refresh_relationship();
+
+	display_arcs();
+
+//cout<<"dump!!!"<<endl;
+	update_vol();
+//cout<<"dump!!!"<<endl;
+	update_len();
 }
 	
 
@@ -805,6 +853,7 @@ void DAG_Task::delete_arc(uint tail, uint head)
 
 void DAG_Task::refresh_relationship()
 {
+	sort(arcnodes.begin(), arcnodes.end(), arcs_increase<ArcNode>);
 	for(uint i = 0; i < vnodes.size(); i++)
 	{
 		vnodes[i].precedences.clear();
@@ -819,6 +868,7 @@ void DAG_Task::refresh_relationship()
 
 void DAG_Task::refresh_relationship(vector<VNode> &v, vector<ArcNode> &a)
 {
+	sort(a.begin(), a.end(), arcs_increase<ArcNode>);
 	for(uint i = 0; i < v.size(); i++)
 	{
 		v[i].precedences.clear();
@@ -903,24 +953,43 @@ bool DAG_Task::is_arc_exist(const vector<ArcNode> &a, uint tail, uint head)
 {
 	for(uint i = 0; i < a.size(); i++)
 	{
-		if(tail == arcnodes[i].tail)
+		if(tail == a[i].tail)
 			if(head == a[i].head)
 				return true;
 	}
 	return false;
 }
 
+void DAG_Task::display_vertices()
+{
+	cout<<"display main vertices:"<<endl;
+	for(uint i = 0; i < vnodes.size(); i++)
+	{
+		cout<<vnodes[i].job_id<<":"<<vnodes[i].type<<endl;
+	}
+}
+
+void DAG_Task::display_vertices(vector<VNode> v)
+{
+	cout<<"display vertices:"<<endl;
+	for(uint i = 0; i < v.size(); i++)
+	{
+		cout<<v[i].job_id<<":"<<v[i].type<<endl;
+	}
+}
+
 void DAG_Task::display_arcs()
 {
+	cout<<"display main arcs:"<<endl;
 	for(uint i = 0; i < arcnodes.size(); i++)
 	{
 		cout<<arcnodes[i].tail<<"--->"<<arcnodes[i].head<<endl;
-		cout<<&arcnodes[i]<<endl;
 	}
 }
 
 void DAG_Task::display_arcs(vector<ArcNode> a)
 {
+	cout<<"display arcs:"<<endl;
 	for(uint i = 0; i < a.size(); i++)
 	{
 		cout<<a[i].tail<<"--->"<<a[i].head<<endl;
@@ -933,7 +1002,6 @@ void DAG_Task::display_follow_ups(uint job_id)
 	for(uint i = 0; i < vnodes[job_id].follow_ups.size(); i++)
 	{
 		cout<<"follow up of node "<<job_id<<":"<<vnodes[job_id].follow_ups[i]->head<<endl;
-		cout<<vnodes[job_id].follow_ups[i]<<endl;
 	}
 }
 

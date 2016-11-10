@@ -110,14 +110,31 @@ int main(int argc,char** argv)
 
 	DAG_Task dag(0, test_r, parameters, 100, 500);
 
-	vector<VNode> vtest;
-	vector<ArcNode> atest;
-	
-	dag.graph_gen(vtest, atest, parameters, 3);
+	vector<VNode> vtest1, vtest2;
+	vector<ArcNode> atest1, atest2;
 
-	dag.graph_insert(vtest, atest, 1);
+//Paralleled
+cout<<"Insert paralleled graph."<<endl;
+	dag.graph_gen(vtest1, atest1, parameters, 2);
 
-	dag.display_arcs();
+	dag.graph_insert(vtest1, atest1, 1);
+
+//Conditional
+cout<<"Insert conditional graph."<<endl;
+	dag.graph_gen(vtest2, atest2, parameters, 2, G_TYPE_C);
+
+	dag.graph_insert(vtest2, atest2, 2);
+
+
+	for(uint i = 0; i < dag.get_vnode_num(); i++)
+	{
+		dag.display_follow_ups(i);
+	}
+
+	for(uint i = 0; i < dag.get_vnode_num(); i++)
+	{
+		dag.display_precedences(i);
+	}
 
 
 ///DAG test
