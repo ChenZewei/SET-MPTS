@@ -241,7 +241,7 @@ class DAG_Task:public Task
 					ulong period,
 					ulong deadline = 0,
 					uint priority = 0);
-		void graph_gen(vector<VNode> &vnodes, vector<ArcNode> &arcnodes, uint n_num, double arc_density);
+		void graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, double arc_density);
 		uint get_id() const;
 		void set_id(uint id);
 		uint get_vnode_num() const;
@@ -253,6 +253,7 @@ class DAG_Task:public Task
 		fraction_t get_utilization() const;
 		fraction_t get_density() const;
 		void add_job(ulong wcet, ulong deadline = 0);
+		void add_job(vector<VNode> &v, ulong wcet, ulong deadline = 0);
 		void add_arc(uint tail, uint head);
 		void add_arc(vector<ArcNode> &a, uint tail, uint head);
 		void delete_arc(uint tail, uint head);

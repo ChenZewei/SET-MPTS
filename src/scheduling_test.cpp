@@ -102,6 +102,18 @@ int main(int argc,char** argv)
 
 	Output output(parameters);
 
+	Random_Gen::uniform_integral_gen(0,10);
+
+///DAG test
+
+	ResourceSet test_r = ResourceSet();
+
+	DAG_Task dag(0, test_r, parameters, 100, 500);
+
+
+///DAG test
+
+
 	double utilization = u_ranges[0].min;
 	
 	do
