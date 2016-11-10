@@ -110,6 +110,15 @@ int main(int argc,char** argv)
 
 	DAG_Task dag(0, test_r, parameters, 100, 500);
 
+	vector<VNode> vtest;
+	vector<ArcNode> atest;
+	
+	dag.graph_gen(vtest, atest, parameters, 3);
+
+	dag.graph_insert(vtest, atest, 1);
+
+	dag.display_arcs();
+
 
 ///DAG test
 

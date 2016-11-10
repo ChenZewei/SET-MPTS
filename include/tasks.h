@@ -241,7 +241,7 @@ class DAG_Task:public Task
 					ulong period,
 					ulong deadline = 0,
 					uint priority = 0);
-		void graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, double arc_density);
+		void graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, double arc_density = 0.6);
 		void graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_node);
 		uint get_id() const;
 		void set_id(uint id);
@@ -277,6 +277,7 @@ class DAG_Task:public Task
 		bool is_arc_exist(const vector<ArcNode> &a, uint tail, uint head);
 
 		void display_arcs();
+		void display_arcs(vector<ArcNode> a);
 		void display_follow_ups(uint job_id);
 		void display_precedences(uint job_id);
 		uint get_indegrees(uint job_id) const;

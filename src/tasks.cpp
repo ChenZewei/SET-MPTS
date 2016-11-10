@@ -519,7 +519,7 @@ DAG_Task::DAG_Task(	uint task_id,
 
 cout<<"JNN:"<<JobNode_num<<endl;
 	
-	graph_gen(vnodes, arcnodes, param, JobNode_num, 0.5);
+	graph_gen(vnodes, arcnodes, param, JobNode_num);
 
 /*
 //creating vnodes
@@ -710,8 +710,8 @@ cout<<"JobNode_num:"<<n_num<<" ArcNode_num:"<<ArcNode_num<<endl;
 
 	refresh_relationship(v, a);
 
-
-	display_arcs();
+	display_arcs(a);
+	//display_arcs();
 	update_vol();
 	update_len();
 }
@@ -726,7 +726,7 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 	}
 	vector<VNode>::iterator it = vnodes.begin();
 	vnodes.insert(it + replace_node, v.begin(), v.end());
-	for(it = v.begin() + replace_node + v_num; i < v_num; i++)
+	for(it = v.begin() + replace_node + v_num; it < v.end(); it++)
 	{
 		it->job_id += v_num;
 	}
@@ -739,7 +739,8 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 		a[i].head += replace_node;
 	}
 
-	arcnodes.push_back(a.begin(), a.end());
+	for(vector<ArcNode>::iterator it = a.begin(); it < a.end(); it++)
+		arcnodes.push_back(*it);
 	
 	refresh_relationship();
 }
@@ -915,6 +916,15 @@ void DAG_Task::display_arcs()
 	{
 		cout<<arcnodes[i].tail<<"--->"<<arcnodes[i].head<<endl;
 		cout<<&arcnodes[i]<<endl;
+	}
+}
+
+void DAG_Task::display_arcs(vector<ArcNode> a)
+{
+	for(uint i = 0; i < a.size(); i++)
+	{
+		cout<<a[i].tail<<"--->"<<a[i].head<<endl;
+		//cout<<&a[i]<<endl;
 	}
 }
 
