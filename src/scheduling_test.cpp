@@ -115,7 +115,7 @@ int main(int argc,char** argv)
 
 //Paralleled
 cout<<"Insert paralleled graph."<<endl;
-	dag.graph_gen(vtest1, atest1, parameters, 2);
+	dag.graph_gen(vtest1, atest1, parameters, 4);
 
 	dag.graph_insert(vtest1, atest1, 1);
 
@@ -123,7 +123,7 @@ cout<<"Insert paralleled graph."<<endl;
 cout<<"Insert conditional graph."<<endl;
 	dag.graph_gen(vtest2, atest2, parameters, 2, G_TYPE_C);
 
-	dag.graph_insert(vtest2, atest2, 2);
+	dag.graph_insert(vtest2, atest2, 7);
 
 
 	for(uint i = 0; i < dag.get_vnode_num(); i++)
@@ -135,7 +135,6 @@ cout<<"Insert conditional graph."<<endl;
 	{
 		dag.display_precedences(i);
 	}
-
 
 ///DAG test
 

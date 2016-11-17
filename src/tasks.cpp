@@ -515,111 +515,12 @@ DAG_Task::DAG_Task(	uint task_id,
 	utilization /= period;
 	density = 0;
 	
-	uint JobNode_num = Random_Gen::uniform_integral_gen(int(max(1, int(param.job_num_range.min))),int(param.job_num_range.max));
-
-cout<<"JNN:"<<JobNode_num<<endl;
 	
+
+	//Generate basic graph
+	uint JobNode_num = Random_Gen::uniform_integral_gen(int(max(1, int(param.job_num_range.min))),int(param.job_num_range.max));
 	graph_gen(vnodes, arcnodes, param, JobNode_num);
 
-/*
-//creating vnodes
-cout<<"1"<<endl;
-	uint JobNode_num = Random_Gen::uniform_integral_gen(int(max(1, int(param.job_num_range.min))),int(param.job_num_range.max));
-	vector<ulong> sep_points;
-	sep_points.push_back(0);
-	for(uint i = 1; i < JobNode_num ; i++)
-	{
-		ulong temp;
-		do
-		{
-			temp = Random_Gen::uniform_ulong_gen(1, vol - 1);
-
-			for(uint j = 0; j < sep_points.size(); j++)
-				if(sep_points[j] == temp)
-					continue;
-			break;
-		}
-		while(true);
-		sep_points.push_back(temp);
-	}
-	sep_points.push_back(vol);
-	sort(sep_points.begin(), sep_points.end());
-
-	for(uint i = 0; i < sep_points.size(); i++)
-		cout<<sep_points[i]<<endl;
-	
-	for(uint i = 0; i < JobNode_num + 2; i++)
-		add_job(sep_points[i + 1] - sep_points[i], deadline);
-
-//creating arcs
-cout<<"2"<<endl;
-
-	uint ArcNode_num;	
-
-	if(param.is_cyclic)//cyclic graph
-		ArcNode_num = Random_Gen::uniform_integral_gen(0, JobNode_num * (JobNode_num - 1));
-	else//acyclic graph
-		ArcNode_num = Random_Gen::uniform_integral_gen(0, (JobNode_num * (JobNode_num - 1)) / 2);
-
-cout<<"JobNode_num:"<<JobNode_num<<" ArcNode_num:"<<ArcNode_num<<endl;
-	for(uint i = 0; i < ArcNode_num; i++)
-	{
-		uint tail, head, temp;
-		
-		do
-		{
-			if(param.is_cyclic)//cyclic graph
-			{
-				tail = Random_Gen::uniform_integral_gen(1, JobNode_num - 2);
-				head = Random_Gen::uniform_integral_gen(1, JobNode_num - 2);
-				if(tail == head)
-					continue;
-			}
-			else//acyclic graph
-			{
-				tail = Random_Gen::uniform_integral_gen(1, JobNode_num - 2);
-				head = Random_Gen::uniform_integral_gen(2, JobNode_num - 2);
-				if(tail == head)
-					continue;
-				else if(tail > head)
-				{
-					temp = tail;
-					tail = head;
-					head = temp;
-				}
-			}
-
-			if(is_arc_exist(tail, head))
-			{
-				display_arcs();
-				cout<<tail<<"->"<<head<<" exists."<<endl;
-				continue;
-			}
-			break;
-		}
-		while(true);
-
-		add_arc(tail, head);
-	}
-
-	for(uint i = 1; i < JobNode_num - 1; i++)
-	{
-		if(0 == vnodes[i].precedences.size())
-			add_arc(0, i);
-		if(0 == vnodes[i].follow_ups.size())
-			add_arc(i, JobNode_num - 1);
-	}
-
-	refresh_relationship();
-
-cout<<"3"<<endl;
-	display_arcs();
-cout<<"4"<<endl;
-	update_vol();
-cout<<"5"<<endl;
-	update_len();
-cout<<"6"<<endl;
-*/
 }
 
 void DAG_Task::graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, int G_TYPE, double arc_density)
@@ -661,55 +562,60 @@ void DAG_Task::graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint
 	v.push_back(polar_end);
 
 //creating arcs
-	uint ArcNode_num;	
 
-	if(param.is_cyclic)//cyclic graph
-		ArcNode_num = Random_Gen::uniform_integral_gen(0, n_num * (n_num - 1));
-	else//acyclic graph
-		ArcNode_num = Random_Gen::uniform_integral_gen(0, (n_num * (n_num - 1)) / 2);
+	if(G_TYPE_P == G_TYPE)
+	{
+		uint ArcNode_num;	
+
+		if(param.is_cyclic)//cyclic graph
+			ArcNode_num = Random_Gen::uniform_integral_gen(0, n_num * (n_num - 1));
+		else//acyclic graph
+			ArcNode_num = Random_Gen::uniform_integral_gen(0, (n_num * (n_num - 1)) / 2);
 
 cout<<"JobNode_num:"<<n_num<<" ArcNode_num:"<<ArcNode_num<<endl;
 
-	for(uint i = 0; i < ArcNode_num; i++)
-	{
-		uint tail, head, temp;
-		
-		do
+		for(uint i = 0; i < ArcNode_num; i++)
 		{
-			if(param.is_cyclic)//cyclic graph
-			{
-				tail = Random_Gen::uniform_integral_gen(1, n_num);
-				head = Random_Gen::uniform_integral_gen(1, n_num);
-				if(tail == head)
-					continue;
-			}
-			else//acyclic graph
-			{
-				tail = Random_Gen::uniform_integral_gen(1, n_num);
-				head = Random_Gen::uniform_integral_gen(1, n_num);
-				if(tail == head)
-					continue;
-				else if(tail > head)
-				{
-					temp = tail;
-					tail = head;
-					head = temp;
-				}
-			}
-
-			if(is_arc_exist(a, tail, head))
-			{
-				continue;
-			}
-			break;
-		}
-		while(true);
-
-		add_arc(a, tail, head);
+			uint tail, head, temp;
 		
-	}
+			do
+			{
+				if(param.is_cyclic)//cyclic graph
+				{
+					tail = Random_Gen::uniform_integral_gen(1, n_num);
+					head = Random_Gen::uniform_integral_gen(1, n_num);
+					if(tail == head)
+						continue;
+				}
+				else//acyclic graph
+				{
+					tail = Random_Gen::uniform_integral_gen(1, n_num);
+					head = Random_Gen::uniform_integral_gen(1, n_num);
+					if(tail == head)
+						continue;
+					else if(tail > head)
+					{
+						temp = tail;
+						tail = head;
+						head = temp;
+					}
+				}
 
-	refresh_relationship(v, a);
+				if(is_arc_exist(a, tail, head))
+				{
+					continue;
+				}
+				break;
+			}
+			while(true);
+
+			add_arc(a, tail, head);
+		
+		}
+
+		refresh_relationship(v, a);
+
+	}
 
 	for(uint i = 1; i <= n_num; i++)
 	{
@@ -722,15 +628,23 @@ cout<<"JobNode_num:"<<n_num<<" ArcNode_num:"<<ArcNode_num<<endl;
 	refresh_relationship(v, a);
 
 	display_arcs(a);
-	//display_arcs();
-//cout<<"dump!!!"<<endl;
-	//update_vol();
-//cout<<"dump!!!"<<endl;
-	//update_len();
 }
 
 void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_node)
 {
+	if(replace_node >= vnodes.size())
+	{
+		cout<<"Out of bound."<<endl;
+		return;
+	}
+
+	if(J_POINT != vnodes[replace_node].type)
+	{
+		cout<<"Only job node could be replaced."<<endl;
+		return;
+	}
+
+	
 	uint v_num = v.size();
 	uint a_num = a.size();
 	cout<<"reset id:"<<endl;
@@ -786,10 +700,7 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 	refresh_relationship();
 
 	display_arcs();
-
-//cout<<"dump!!!"<<endl;
 	update_vol();
-//cout<<"dump!!!"<<endl;
 	update_len();
 }
 	
