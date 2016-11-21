@@ -720,7 +720,7 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 		if(MAX_INT != v[i].pair)
 			v[i].pair += replace_node;
 	}
-	cout<<" before insert:"<<endl;
+	cout<<"before insert:"<<endl;
 	display_vertices();
 
 	display_arcs();
@@ -732,6 +732,12 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 		vnodes[i].job_id += gap;
 	}
 
+	for(uint i = 0; i < vnodes.size(); i++)
+	{
+		if((vnodes[i].pair > replace_node) && (MAX_INT != vnodes[i].pair))
+			vnodes[i].pair += gap;
+	}
+
 	for(uint i = 0; i < arcnodes.size(); i++)
 	{
 		if(arcnodes[i].tail >= replace_node)
@@ -740,7 +746,7 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 			arcnodes[i].head += gap;
 	}
 
-	cout<<" before insert2:"<<endl;
+	cout<<"before insert2:"<<endl;
 	display_vertices();
 
 	display_arcs();
@@ -943,7 +949,11 @@ void DAG_Task::display_vertices()
 	cout<<"display main vertices:"<<endl;
 	for(uint i = 0; i < vnodes.size(); i++)
 	{
-		cout<<vnodes[i].job_id<<":"<<vnodes[i].type<<endl;
+		cout<<vnodes[i].job_id<<":"<<vnodes[i].type;		
+		if(MAX_INT == vnodes[i].pair)
+			cout<<endl;
+		else
+			cout<<":"<<vnodes[i].pair<<endl;	
 	}
 }
 
@@ -952,7 +962,11 @@ void DAG_Task::display_vertices(vector<VNode> v)
 	cout<<"display vertices:"<<endl;
 	for(uint i = 0; i < v.size(); i++)
 	{
-		cout<<v[i].job_id<<":"<<v[i].type<<endl;
+		cout<<v[i].job_id<<":"<<v[i].type;
+		if(MAX_INT == v[i].pair)
+			cout<<endl;
+		else
+			cout<<":"<<v[i].pair<<endl;			
 	}
 }
 

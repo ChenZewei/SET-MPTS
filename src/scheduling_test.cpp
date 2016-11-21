@@ -124,8 +124,8 @@ int main(int argc,char** argv)
 
 	DAG_Task dag(0, test_r, parameters, 100, 500);
 
-	vector<VNode> vtest1, vtest2;
-	vector<ArcNode> atest1, atest2;
+	vector<VNode> vtest1, vtest2, vtest3;
+	vector<ArcNode> atest1, atest2, atest3;
 
 //Paralleled
 cout<<"Insert paralleled graph."<<endl;
@@ -138,6 +138,12 @@ cout<<"Insert conditional graph."<<endl;
 	dag.sub_graph_gen(vtest2, atest2, parameters, 2, G_TYPE_C);
 
 	dag.graph_insert(vtest2, atest2, 7);
+
+//sequential
+cout<<"Insert sequential graph."<<endl;
+	dag.sequential_graph_gen(vtest3, atest3, 2);
+
+	dag.graph_insert(vtest3, atest3, 8);
 
 
 	for(uint i = 0; i < dag.get_vnode_num(); i++)
