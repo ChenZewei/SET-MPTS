@@ -514,59 +514,101 @@ DAG_Task::DAG_Task(	uint task_id,
 	utilization = vol;
 	utilization /= period;
 	density = 0;
-	
-	
 
 	//Generate basic graph
 	uint JobNode_num = Random_Gen::uniform_integral_gen(int(max(1, int(param.job_num_range.min))),int(param.job_num_range.max));
 	graph_gen(vnodes, arcnodes, param, JobNode_num);
 
+	//Insert conditional branches
+	for(uint i = 1; i < vnodes.size() - 1; i++)
+	{
+		if(Random_Gen::probability(param.cond_prob))
+		{
+			uint cond_job_num = Random_Gen::uniform_integral_gen(2,max(2,param.max_cond_branch));
+			vector<VNode> v;
+			vector<ArcNode> a;
+			sub_graph_gen(v, a, cond_job_num, G_TYPE_C);
+			graph_insert(v, a, i);
+			break;
+		}
+	}
+	
+	//Alocate wcet
+	uint job_node_num = 0;
+	for(uint i = 0; i < vnodes.size(); i++)
+	{
+		if(J_NODE == vnodes[i].type)
+			job_node_num++;
+	}
+	vector<ulong> wcets;
+	wcets.push_back(0);
+	for(uint i = 1; i < job_node_num; i++)
+	{
+		bool test;
+		ulong temp;
+		do
+		{
+			test = false;
+			temp = Random_Gen::uniform_ulong_gen(1,vol - 1);
+			for(uint j = 0; j < wcets.size(); j++)
+				if(temp == wcets[j])
+					test = true;
+		}
+		while(test);
+		wcets.push_back(temp);
+	}
+	wcets.push_back(vol);
+	sort(wcets.begin(), wcets.end());
+	for(uint i = 0, j = 0; i < vnodes.size(); i++)
+	{
+		if(J_NODE == vnodes[i].type)
+		{
+			vnodes[i].wcet = wcets[j + 1] - wcets[j];
+			j++;
+		}
+		vnodes[i].deadline = deadline;
+	}
+//	display_vertices();
+//	display_arcs();
+	update_vol();
+	update_len();
 }
 
 void DAG_Task::graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, double arc_density)
 {
 	v.clear();
 	a.clear();
-
 //creating vnodes
 	VNode polar_start, polar_end;
 	polar_start.job_id = 0;
 	polar_end.job_id = n_num + 1;
-	polar_start.type = P_POINT|S_POINT;
-	polar_end.type = P_POINT|E_POINT;
+	polar_start.type = P_NODE|S_NODE;
+	polar_end.type = P_NODE|E_NODE;
 	polar_start.pair = polar_end.job_id;
 	polar_end.pair = polar_start.job_id;
 	polar_start.wcet = 0;
 	polar_end.wcet = 0;
 
 	v.push_back(polar_start);
-
 	for(uint i = 0; i < n_num; i++)
 	{
 		VNode temp_node;
 		temp_node.job_id = v.size();
-		temp_node.type = J_POINT;
+		temp_node.type = J_NODE;
 		temp_node.pair = MAX_INT;
 		temp_node.wcet = 0;
 		v.push_back(temp_node);
 	}
-
 	v.push_back(polar_end);
-
 //creating arcs
 	uint ArcNode_num;	
-
 	if(param.is_cyclic)//cyclic graph
 		ArcNode_num = Random_Gen::uniform_integral_gen(0, n_num * (n_num - 1));
 	else//acyclic graph
 		ArcNode_num = Random_Gen::uniform_integral_gen(0, (n_num * (n_num - 1)) / 2);
-
-cout<<"JobNode_num:"<<n_num<<" ArcNode_num:"<<ArcNode_num<<endl;
-
 	for(uint i = 0; i < ArcNode_num; i++)
 	{
-		uint tail, head, temp;
-	
+		uint tail, head, temp;	
 		do
 		{
 			if(param.is_cyclic)//cyclic graph
@@ -597,14 +639,9 @@ cout<<"JobNode_num:"<<n_num<<" ArcNode_num:"<<ArcNode_num<<endl;
 			break;
 		}
 		while(true);
-
-		add_arc(a, tail, head);
-	
+		add_arc(a, tail, head);	
 	}
-
 	refresh_relationship(v, a);
-
-
 	for(uint i = 1; i <= n_num; i++)
 	{
 		if(0 == v[i].precedences.size())
@@ -612,14 +649,12 @@ cout<<"JobNode_num:"<<n_num<<" ArcNode_num:"<<ArcNode_num<<endl;
 		if(0 == v[i].follow_ups.size())
 			add_arc(a, i, n_num + 1);
 	}
-
 	refresh_relationship(v, a);
-
-	display_arcs(a);
 }
 
-void DAG_Task::sub_graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, int G_TYPE)
+void DAG_Task::sub_graph_gen(vector<VNode> &v, vector<ArcNode> &a, uint n_num, int G_TYPE)
 {
+//cout<<"Insert sub graph."<<endl;
 	v.clear();
 	a.clear();
 
@@ -629,13 +664,13 @@ void DAG_Task::sub_graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, 
 	polar_end.job_id = n_num + 1;
 	if(G_TYPE == G_TYPE_P)
 	{
-		polar_start.type = P_POINT|S_POINT;
-		polar_end.type = P_POINT|E_POINT;
+		polar_start.type = P_NODE|S_NODE;
+		polar_end.type = P_NODE|E_NODE;
 	}
 	else
 	{
-		polar_start.type = C_POINT|S_POINT;
-		polar_end.type = C_POINT|E_POINT;
+		polar_start.type = C_NODE|S_NODE;
+		polar_end.type = C_NODE|E_NODE;
 	}
 	polar_start.pair = polar_end.job_id;
 	polar_end.pair = polar_start.job_id;
@@ -643,19 +678,16 @@ void DAG_Task::sub_graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, 
 	polar_end.wcet = 0;
 
 	v.push_back(polar_start);
-
 	for(uint i = 0; i < n_num; i++)
 	{
 		VNode temp_node;
 		temp_node.job_id = v.size();
-		temp_node.type = J_POINT;
+		temp_node.type = J_NODE;
 		temp_node.pair = MAX_INT;
 		temp_node.wcet = 0;
 		v.push_back(temp_node);
 	}
-
 	v.push_back(polar_end);
-
 //creating arcs
 	for(uint i = 1; i <= n_num; i++)
 	{
@@ -664,35 +696,27 @@ void DAG_Task::sub_graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, 
 		if(0 == v[i].follow_ups.size())
 			add_arc(a, i, n_num + 1);
 	}
-
 	refresh_relationship(v, a);
-
-	display_arcs(a);
 }
 
 void DAG_Task::sequential_graph_gen(vector<VNode> &v, vector<ArcNode> &a, uint n_num)
 {
 	v.clear();
 	a.clear();
-
 	for(uint i = 0; i < n_num; i++)
 	{
 		VNode temp_node;
 		temp_node.job_id = v.size();
-		temp_node.type = J_POINT;
+		temp_node.type = J_NODE;
 		temp_node.pair = MAX_INT;
 		temp_node.wcet = 0;
 		v.push_back(temp_node);
 	}
-
 	for(uint i = 0; i< n_num - 1; i++)
 	{
 		add_arc(a, i, i + 1);
 	}
-
 	refresh_relationship(v, a);
-
-	display_arcs(a);
 }
 
 void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_node)
@@ -702,17 +726,13 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 		cout<<"Out of bound."<<endl;
 		return;
 	}
-
-	if(J_POINT != vnodes[replace_node].type)
+	if(J_NODE != vnodes[replace_node].type)
 	{
 		cout<<"Only job node could be replaced."<<endl;
 		return;
 	}
-
-	
 	uint v_num = v.size();
 	uint a_num = a.size();
-	cout<<"reset id:"<<endl;
 	for(uint i = 0; i < v_num; i++)
 	{
 		v[i].job_id += replace_node;
@@ -720,24 +740,16 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 		if(MAX_INT != v[i].pair)
 			v[i].pair += replace_node;
 	}
-	cout<<"before insert:"<<endl;
-	display_vertices();
-
-	display_arcs();
-
 	int gap = v_num - 1;
-	
 	for(uint i = replace_node + 1; i < vnodes.size(); i++)
 	{
 		vnodes[i].job_id += gap;
 	}
-
 	for(uint i = 0; i < vnodes.size(); i++)
 	{
 		if((vnodes[i].pair > replace_node) && (MAX_INT != vnodes[i].pair))
 			vnodes[i].pair += gap;
 	}
-
 	for(uint i = 0; i < arcnodes.size(); i++)
 	{
 		if(arcnodes[i].tail >= replace_node)
@@ -745,36 +757,18 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 		if(arcnodes[i].head > replace_node)
 			arcnodes[i].head += gap;
 	}
-
-	cout<<"before insert2:"<<endl;
-	display_vertices();
-
-	display_arcs();
-
 	vnodes.insert(vnodes.begin() + replace_node + 1, v.begin(), v.end());
-
-	cout<<"after insert:"<<endl;
-	display_vertices();
-	
 	vnodes.erase(vnodes.begin() + replace_node);
-	cout<<"after erase:"<<endl;
-	display_vertices();
-
 	vector<ArcNode>::iterator it2 = arcnodes.begin();
 	for(uint i = 0; i < a_num; i++)
 	{
 		a[i].tail += replace_node;
 		a[i].head += replace_node;
 	}
-
 	for(vector<ArcNode>::iterator it = a.begin(); it < a.end(); it++)
 		arcnodes.push_back(*it);
 	
 	refresh_relationship();
-
-	display_arcs();
-	update_vol();
-	update_len();
 }
 	
 
@@ -949,7 +943,7 @@ void DAG_Task::display_vertices()
 	cout<<"display main vertices:"<<endl;
 	for(uint i = 0; i < vnodes.size(); i++)
 	{
-		cout<<vnodes[i].job_id<<":"<<vnodes[i].type;		
+		cout<<vnodes[i].job_id<<":"<<vnodes[i].wcet<<":"<<vnodes[i].type;		
 		if(MAX_INT == vnodes[i].pair)
 			cout<<endl;
 		else

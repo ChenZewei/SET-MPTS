@@ -70,14 +70,14 @@
 	<dag_job_num_range>
 		<data>
 			<min>4</min>
-			<max>4</max>
+			<max>6</max>
 		</data>
 	</dag_job_num_range>
 	<paralleled_probability>
 		<data>0.2</data>
 	</paralleled_probability>
 	<conditional_probability>
-		<data>0.2</data>
+		<data>0.1</data>
 	</conditional_probability>
 	<max_paralleled_job>
 		<data>5</data>

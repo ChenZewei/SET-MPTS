@@ -24,12 +24,12 @@
 #define JSON 	0x10
 
 //VNode type
-#define P_POINT 0x02
-#define C_POINT 0x04
-#define J_POINT 0x08
+#define P_NODE 0x02
+#define C_NODE 0x04
+#define J_NODE 0x08
 
-#define S_POINT 0x00
-#define E_POINT 0x01
+#define S_NODE 0x00
+#define E_NODE 0x01
 
 //Graph type
 #define G_TYPE_P 0 //Paralleled

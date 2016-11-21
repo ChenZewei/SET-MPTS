@@ -123,7 +123,7 @@ int main(int argc,char** argv)
 	ResourceSet test_r = ResourceSet();
 
 	DAG_Task dag(0, test_r, parameters, 100, 500);
-
+/*
 	vector<VNode> vtest1, vtest2, vtest3;
 	vector<ArcNode> atest1, atest2, atest3;
 
@@ -155,7 +155,7 @@ cout<<"Insert sequential graph."<<endl;
 	{
 		dag.display_precedences(i);
 	}
-
+*/
 ///DAG test
 
 
