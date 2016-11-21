@@ -69,12 +69,20 @@ int main(int argc,char** argv)
 	Int_Set is_cyclics;
 	Int_Set max_indegrees;
 	Int_Set max_outdegrees;
+	Double_Set para_probs, cond_probs, arc_densities;
+	Int_Set max_para_jobs, max_cond_branches;
 	
 	XML::get_ranges(&job_num_ranges, "dag_job_num_range");
 	XML::get_ranges(&arc_num_ranges, "dag_arc_num_range");
 	XML::get_integers(&is_cyclics, "is_cyclic");
 	XML::get_integers(&max_indegrees, "max_indegree");
 	XML::get_integers(&max_outdegrees, "max_outdegree");
+	XML::get_doubles(&para_probs, "paralleled_probability");
+	XML::get_doubles(&cond_probs, "conditional_probability");
+	XML::get_doubles(&arc_densities, "dag_arc_density");
+	XML::get_integers(&max_para_jobs, "max_paralleled_job");
+	XML::get_integers(&max_cond_branches, "max_conditional_branch");
+	
 	
 	//set parameters
 	parameters.lambda = lambdas[0];
@@ -99,6 +107,12 @@ int main(int argc,char** argv)
 		parameters.is_cyclic = true;	
 	parameters.max_indegree = max_indegrees[0];	
 	parameters.max_outdegree = max_outdegrees[0];
+	parameters.para_prob = para_probs[0];
+	parameters.cond_prob = cond_probs[0];
+	parameters.arc_density = arc_densities[0];
+	parameters.max_para_job = max_para_jobs[0];
+	parameters.max_cond_branch = max_cond_branches[0];
+	
 
 	Output output(parameters);
 
@@ -115,13 +129,13 @@ int main(int argc,char** argv)
 
 //Paralleled
 cout<<"Insert paralleled graph."<<endl;
-	dag.graph_gen(vtest1, atest1, parameters, 4);
+	dag.sub_graph_gen(vtest1, atest1, parameters, 2);
 
 	dag.graph_insert(vtest1, atest1, 1);
 
 //Conditional
 cout<<"Insert conditional graph."<<endl;
-	dag.graph_gen(vtest2, atest2, parameters, 2, G_TYPE_C);
+	dag.sub_graph_gen(vtest2, atest2, parameters, 2, G_TYPE_C);
 
 	dag.graph_insert(vtest2, atest2, 7);
 

@@ -32,6 +32,11 @@ class Param
 		bool is_cyclic;
 		int max_indegree;
 		int max_outdegree;
+		double para_prob;
+		double cond_prob;
+		double arc_density;
+		int max_para_job;
+		int max_cond_branch;
 	
 	public:
 		void set_lambda(int lambda);

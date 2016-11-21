@@ -207,6 +207,12 @@ typedef struct VNode
 	vector<ArcPtr> follow_ups;
 }VNode,*VNodePtr;
 
+typedef struct 
+{
+	vector<VNode> v;
+	vector<ArcNode> a;
+}Graph;
+
 class DAG_Task:public Task
 {
 	private:
@@ -241,7 +247,9 @@ class DAG_Task:public Task
 					ulong period,
 					ulong deadline = 0,
 					uint priority = 0);
-		void graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, int G_TYPE = G_TYPE_P, double arc_density = 0.6);
+		void graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, double arc_density = 0.6);
+		void sub_graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, int G_TYPE = G_TYPE_P);
+		void sequential_graph_gen(vector<VNode> &v, vector<ArcNode> &a, uint n_num);
 		void graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_node);
 		uint get_id() const;
 		void set_id(uint id);

@@ -73,6 +73,21 @@
 			<max>4</max>
 		</data>
 	</dag_job_num_range>
+	<paralleled_probability>
+		<data>0.2</data>
+	</paralleled_probability>
+	<conditional_probability>
+		<data>0.2</data>
+	</conditional_probability>
+	<max_paralleled_job>
+		<data>5</data>
+	</max_paralleled_job>
+	<max_conditional_branch>
+		<data>4</data>
+	</max_conditional_branch>
+	<dag_arc_density>
+		<data>0.6</data>
+	</dag_arc_density>
 	<dag_arc_num_range>
 		<data>
 			<min>0</min>
