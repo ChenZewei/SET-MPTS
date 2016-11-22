@@ -255,6 +255,11 @@ class DAG_Task:public Task
 		void set_id(uint id);
 		uint get_vnode_num() const;
 		uint get_arcnode_num() const;
+
+		vector<VNode>& get_vnodes();
+		VNode& get_vnode_by_id(uint job_id);
+		ulong get_deadline() const;
+		ulong get_period() const;
 		ulong get_vol() const;
 		ulong get_len() const;
 		ulong get_deadline() const;
