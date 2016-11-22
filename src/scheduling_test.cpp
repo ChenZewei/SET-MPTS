@@ -123,6 +123,10 @@ int main(int argc,char** argv)
 	ResourceSet test_r = ResourceSet();
 
 	DAG_Task dag(0, test_r, parameters, 100, 500);
+
+	DAG_TaskSet dag_taskset;
+	
+	dag_task_gen(dag_taskset, test_r, parameters, 0.1);
 /*
 	vector<VNode> vtest1, vtest2, vtest3;
 	vector<ArcNode> atest1, atest2, atest3;
