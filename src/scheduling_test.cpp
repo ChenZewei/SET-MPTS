@@ -122,7 +122,7 @@ int main(int argc,char** argv)
 
 	ResourceSet test_r = ResourceSet();
 
-	DAG_Task dag(0, test_r, parameters, 100, 500);
+	DAG_Task dag(0, test_r, parameters, 6, 10);
 
 	DAG_TaskSet dag_taskset;
 	
@@ -165,7 +165,7 @@ cout<<"Insert sequential graph."<<endl;
 	dag.display_arcs();
 	dag.display_vertices();
 
-	set<Work> work_test = precise_workload(dag,500);
+	set<Work> work_test = precise_workload(dag,10);
 
 	for(uint i = 0; i < work_test.size(); i++)
 	{

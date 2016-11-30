@@ -78,6 +78,7 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 	time_set.insert(0);
 	for(uint i = 0; i < jobs.size(); i ++)
 	{
+cout<<"release time:"<<jobs[i].r_t<<" finish time:"<<jobs[i].f_t<<endl;
 		time_set.insert(jobs[i].f_t);
 	}
 	time_set.insert(deadline);
@@ -93,16 +94,18 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 	{
 		ulong t = set_member<ulong>(time_set, i);
 		ulong exec_t = t - set_member<ulong>(time_set, i - 1);
+cout<<"t:"<<t<<" exec:"<<exec_t<<endl;
 		ulong workload = 0;
 		for(uint j = 0; j < jobs.size(); j++)
 		{
-			if((jobs[j].r_t < t) && (jobs[j].f_t <= t))
+			if((jobs[j].r_t < t) && (jobs[j].f_t >= t))
 			{
 				workload += exec_t;
 			}
 		}
 		work.time = t;
 		work.workload = workload;
+cout<<"workload:"<<workload<<endl;
 		workload_set.insert(work);
 	}
 
