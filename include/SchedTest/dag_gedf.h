@@ -95,7 +95,7 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 	{
 		ulong t = set_member<ulong>(time_set, i);
 		ulong exec_t = t - set_member<ulong>(time_set, i - 1);
-//cout<<"t:"<<t<<" exec:"<<exec_t<<endl;
+cout<<"t:"<<t<<" exec:"<<exec_t<<endl;
 		ulong workload = 0;
 		for(uint j = 0; j < jobs.size(); j++)
 		{
@@ -107,7 +107,7 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 		work.time = t;
 		work.workload = workload;
 		//work.workload = workload + set_member(workload_set, workload_set.size() - 1).workload;
-//cout<<"workload:"<<work.workload<<endl;
+cout<<"workload:"<<work.workload<<endl;
 		workload_set.insert(work);
 	}
 
@@ -115,7 +115,7 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 	uint l = T%period;
 	ulong release;
 	
-//cout<<"num:"<<num<<" l:"<<l<<endl;
+cout<<"num:"<<num<<" l:"<<l<<endl;
 
 	work.time = 0;
 	work.workload = 0;
@@ -129,7 +129,7 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 		}
 		else
 			release = period - deadline;
-//cout<<"release:"<<release<<endl;
+cout<<"release:"<<release<<endl;
 		for(uint i = 0; i < num; i++)
 		{
 			for(uint j = 1; j < workload_set.size(); j++)
@@ -140,7 +140,7 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 				workload_set_total.insert(work);
 			}
 		}
-//		cout<<"T:"<<T<<"Last deadline:"<<set_member<Work>(workload_set_total, workload_set_total.size() - 1).time<<endl;
+		cout<<"T:"<<T<<"Last deadline:"<<set_member<Work>(workload_set_total, workload_set_total.size() - 1).time<<endl;
 	}
 	else
 	{
@@ -149,7 +149,7 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 		uint begin;
 		ulong cutting_workload;
 		ulong cutting_time;
-//cout<<"cutting:"<<cutting<<endl;
+cout<<"cutting:"<<cutting<<endl;
 		for(uint i = 0; i < workload_set.size() - 1; i++)
 		{
 			if((set_member<Work>(workload_set, i).time <= cutting) && (set_member<Work>(workload_set, i + 1).time > cutting))
@@ -158,21 +158,21 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 				cutting_workload;
 				cutting_time = cutting - set_member<Work>(workload_set, i).time;
 				cutting_workload = (cutting_time*(set_member<Work>(workload_set, i + 1).workload - set_member<Work>(workload_set, i).workload))/(set_member<Work>(workload_set, i + 1).time - set_member<Work>(workload_set, i).time) + set_member<Work>(workload_set, i).workload;
-//cout<<"i:"<<i<<endl;
-//cout<<"cutting time:"<<cutting_time<<endl;
-//cout<<"cutting workload:"<<cutting_workload<<endl;
+cout<<"i:"<<i<<endl;
+cout<<"cutting time:"<<cutting_time<<endl;
+cout<<"cutting workload:"<<cutting_workload<<endl;
 				break;
 			}
 		}
 		for(uint i = begin; i < workload_set.size(); i++)
 		{
 			work.time = set_member<Work>(workload_set, i).time - cutting;
-			work.workload = set_member<Work>(workload_set, i).workload - cutting_workload;
-//cout<<"0 work.time:"<<work.time<<" work.workload:"<<work.workload<<endl;
+			work.workload = set_member<Work>(workload_set, i).workload;
+cout<<"0 work.time:"<<work.time<<" work.workload:"<<work.workload<<endl;
 			workload_set_total.insert(work);
 		}
 		ulong carry_in_workload = set_member<Work>(workload_set_total, workload_set_total.size() - 1).workload;
-//cout<<"carry_in_workload:"<<carry_in_workload<<endl;
+cout<<"carry_in_workload:"<<carry_in_workload<<endl;
 		for(uint i = 0; i < num; i++)
 		{
 			for(uint j = 0; j < workload_set.size(); j++)

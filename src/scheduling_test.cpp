@@ -121,7 +121,18 @@ int main(int argc,char** argv)
 ///DAG test
 
 	ResourceSet test_r = ResourceSet();
+	
+	DAG_Task dag(0, test_r, parameters, 6, 10, 8);
 
+	set<Work> test_result = precise_workload(dag, 16);
+
+	for(uint i = 0; i < test_result.size(); i++)
+	{
+		Work work = set_member(test_result, i);
+		cout<<"time:"<<work.time<<" workload:"<<work.workload<<endl;
+	}
+
+/*
 	uint r = 0;
 	for(uint i = 0; i < 1000; i++)
 	{
@@ -139,7 +150,7 @@ int main(int argc,char** argv)
 	rr /= 1000;
 
 	cout<<"rr:"<<rr<<endl;
-
+*/
 	double utilization = u_ranges[0].min;
 	
 	do
