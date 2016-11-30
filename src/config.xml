@@ -77,7 +77,7 @@
 		<data>0.2</data>
 	</paralleled_probability>
 	<conditional_probability>
-		<data>0.1</data>
+		<data>0</data>
 	</conditional_probability>
 	<max_paralleled_job>
 		<data>5</data>

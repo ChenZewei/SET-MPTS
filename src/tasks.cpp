@@ -777,13 +777,11 @@ void DAG_Task::set_id(uint id) { task_id = id;}
 uint DAG_Task::get_vnode_num() const {return vnodes.size();}
 uint DAG_Task::get_arcnode_num() const {return arcnodes.size();}
 vector<VNode>& DAG_Task::get_vnodes() {return vnodes;}
-VNode& DAG_Task::get_vnode_by_id(uint job_id) {return vnodes[job_id);}
+VNode& DAG_Task::get_vnode_by_id(uint job_id) {return vnodes[job_id];}
 ulong DAG_Task::get_deadline() const {return deadline;}
 ulong DAG_Task::get_period() const {return period;}
 ulong DAG_Task::get_vol() const {return vol;}
 ulong DAG_Task::get_len() const {return len;}
-ulong DAG_Task::get_deadline() const {return deadline;}
-ulong DAG_Task::get_period() const {return period;}
 fraction_t DAG_Task::get_utilization() const {return utilization;}
 fraction_t DAG_Task::get_density() const {return density;}
 

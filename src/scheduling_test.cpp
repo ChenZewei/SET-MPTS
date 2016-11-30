@@ -149,6 +149,7 @@ cout<<"Insert sequential graph."<<endl;
 
 	dag.graph_insert(vtest3, atest3, 8);
 
+	
 
 	for(uint i = 0; i < dag.get_vnode_num(); i++)
 	{
@@ -160,6 +161,19 @@ cout<<"Insert sequential graph."<<endl;
 		dag.display_precedences(i);
 	}
 */
+
+	dag.display_arcs();
+	dag.display_vertices();
+
+	set<Work> work_test = precise_workload(dag,500);
+
+	for(uint i = 0; i < work_test.size(); i++)
+	{
+		cout<<"------"<<endl;
+		cout<<"time:"<<set_member(work_test, i).time<<endl;
+		cout<<"workload:"<<set_member(work_test, i).workload<<endl;
+	}
+
 ///DAG test
 
 

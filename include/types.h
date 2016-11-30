@@ -6,6 +6,7 @@
 #include <gmpxx.h>
 #include <vector>
 #include <list>
+#include <set>
 #include <math.h>
 #include <time.h>
 

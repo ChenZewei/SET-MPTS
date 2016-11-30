@@ -262,8 +262,6 @@ class DAG_Task:public Task
 		ulong get_period() const;
 		ulong get_vol() const;
 		ulong get_len() const;
-		ulong get_deadline() const;
-		ulong get_period() const;
 		fraction_t get_utilization() const;
 		fraction_t get_density() const;
 		void add_job(ulong wcet, ulong deadline = 0);
