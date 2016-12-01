@@ -122,11 +122,13 @@ int main(int argc,char** argv)
 
 	ResourceSet test_r = ResourceSet();
 
-	DAG_Task dag(0, test_r, parameters, 6, 10);
+	DAG_Task dag(0, test_r, parameters, 6, 10, 8);
+	DAG_Task dag2(1, test_r, parameters, 6, 10, 8);
 
 	DAG_TaskSet dag_taskset;
+
 	
-	dag_task_gen(dag_taskset, test_r, parameters, 0.1);
+//	dag_task_gen(dag_taskset, test_r, parameters, 0.1);
 /*
 	vector<VNode> vtest1, vtest2, vtest3;
 	vector<ArcNode> atest1, atest2, atest3;
@@ -165,7 +167,8 @@ cout<<"Insert sequential graph."<<endl;
 	dag.display_arcs();
 	dag.display_vertices();
 
-	set<Work> work_test = precise_workload(dag,10);
+/*
+	set<Work> work_test = precise_workload(dag, 15);
 
 	for(uint i = 0; i < work_test.size(); i++)
 	{
@@ -173,6 +176,16 @@ cout<<"Insert sequential graph."<<endl;
 		cout<<"time:"<<set_member(work_test, i).time<<endl;
 		cout<<"workload:"<<set_member(work_test, i).workload<<endl;
 	}
+*/
+cout<<"11111111111111111111111111"<<endl;
+	dag_taskset.add_task(dag);
+	double test_result = approximation(dag_taskset, 50, 0.8);
+	cout<<"result:"<<test_result<<endl;
+cout<<"22222222222222222222222222"<<endl;
+	dag_taskset.add_task(dag);
+	test_result = approximation(dag_taskset, 50, 0.8);
+	cout<<"result:"<<test_result<<endl;
+	
 
 ///DAG test
 

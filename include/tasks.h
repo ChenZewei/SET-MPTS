@@ -312,6 +312,7 @@ class DAG_TaskSet
 		~DAG_TaskSet();
 
 		void add_task(ResourceSet& resourceset, Param param, long wcet, long period, long deadline = 0);
+		void add_task(DAG_Task dag_task);
 
 		DAG_Tasks& get_tasks();
 		DAG_Task& get_task_by_id(uint id);
@@ -322,7 +323,6 @@ class DAG_TaskSet
 		fraction_t get_density_sum() const;
 		fraction_t get_density_max() const;
 
-	
 		void sort_by_period();		
 };
 

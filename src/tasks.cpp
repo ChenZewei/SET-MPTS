@@ -499,6 +499,8 @@ DAG_Task::DAG_Task(	uint task_id,
 	this->vol = vol;
 	if(0 == deadline)
 		this->deadline = period;
+	else
+		this->deadline = deadline;
 	this->period = period;
 	vexnum = 0;
 	arcnum = 0;
@@ -1024,6 +1026,11 @@ void DAG_TaskSet::add_task(ResourceSet& resourceset, Param param, long wcet, lon
 	utilization_sum += get_task_by_id(task_id).get_utilization();
 }
 
+void DAG_TaskSet::add_task(DAG_Task dag_task)
+{
+	dag_tasks.push_back(dag_task);
+	utilization_sum += dag_task.get_utilization();
+}
 
 DAG_TaskSet::~DAG_TaskSet()
 {

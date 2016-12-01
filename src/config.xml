@@ -69,8 +69,8 @@
 	</total_len_factor>
 	<dag_job_num_range>
 		<data>
-			<min>4</min>
-			<max>4</max>
+			<min>3</min>
+			<max>3</max>
 		</data>
 	</dag_job_num_range>
 	<paralleled_probability>
