@@ -122,73 +122,23 @@ int main(int argc,char** argv)
 
 	ResourceSet test_r = ResourceSet();
 
-	DAG_Task dag(0, test_r, parameters, 6, 10, 8);
-	DAG_Task dag2(1, test_r, parameters, 6, 10, 8);
-
-	DAG_TaskSet dag_taskset;
-
-	
-//	dag_task_gen(dag_taskset, test_r, parameters, 0.1);
-/*
-	vector<VNode> vtest1, vtest2, vtest3;
-	vector<ArcNode> atest1, atest2, atest3;
-
-//Paralleled
-cout<<"Insert paralleled graph."<<endl;
-	dag.sub_graph_gen(vtest1, atest1, parameters, 2);
-
-	dag.graph_insert(vtest1, atest1, 1);
-
-//Conditional
-cout<<"Insert conditional graph."<<endl;
-	dag.sub_graph_gen(vtest2, atest2, parameters, 2, G_TYPE_C);
-
-	dag.graph_insert(vtest2, atest2, 7);
-
-//sequential
-cout<<"Insert sequential graph."<<endl;
-	dag.sequential_graph_gen(vtest3, atest3, 2);
-
-	dag.graph_insert(vtest3, atest3, 8);
-
-	
-
-	for(uint i = 0; i < dag.get_vnode_num(); i++)
+	uint r = 0;
+	for(uint i = 0; i < 1000; i++)
 	{
-		dag.display_follow_ups(i);
+		DAG_Task dag(0, test_r, parameters, 5, 10, 8);
+		//DAG_Task dag2(1, test_r, parameters, 4, 20, 16);
+		DAG_TaskSet dag_taskset;
+		dag_taskset.add_task(dag);
+		//dag_taskset.add_task(dag2);
+		if(dag_schedulability_test(dag_taskset, 4, 0.5))
+			r++;
 	}
 
-	for(uint i = 0; i < dag.get_vnode_num(); i++)
-	{
-		dag.display_precedences(i);
-	}
-*/
+	double rr = r;
 
-	dag.display_arcs();
-	dag.display_vertices();
+	rr /= 1000;
 
-/*
-	set<Work> work_test = precise_workload(dag, 15);
-
-	for(uint i = 0; i < work_test.size(); i++)
-	{
-		cout<<"------"<<endl;
-		cout<<"time:"<<set_member(work_test, i).time<<endl;
-		cout<<"workload:"<<set_member(work_test, i).workload<<endl;
-	}
-*/
-cout<<"11111111111111111111111111"<<endl;
-	dag_taskset.add_task(dag);
-	double test_result = approximation(dag_taskset, 50, 0.8);
-	cout<<"result:"<<test_result<<endl;
-cout<<"22222222222222222222222222"<<endl;
-	dag_taskset.add_task(dag);
-	test_result = approximation(dag_taskset, 50, 0.8);
-	cout<<"result:"<<test_result<<endl;
-	
-
-///DAG test
-
+	cout<<"rr:"<<rr<<endl;
 
 	double utilization = u_ranges[0].min;
 	
@@ -204,13 +154,13 @@ cout<<"22222222222222222222222222"<<endl;
 		for(int i = 0; i < exp_times; i++)
 		{
 			TaskSet taskset = TaskSet();
-			
+			//DAG_TaskSet dag_taskset;
 			ProcessorSet processorset = ProcessorSet(parameters);
 			ResourceSet resourceset = ResourceSet();
 			//ResourceSet2<Task> resourceset2 = ResourceSet2<Task>();
 			resource_gen(&resourceset, parameters);
 			//resource_gen2<Task>(&resourceset2, parameters);
-
+			//dag_task_gen(dag_taskset, resourceset, parameters, 0.1);
 			tast_gen(taskset, resourceset, parameters, utilization);
 			//dag_task_gen(dag_taskset, resourceset, parameters, utilization);
 			for(uint i = 0; i < parameters.get_method_num(); i++)
@@ -219,10 +169,12 @@ cout<<"22222222222222222222222222"<<endl;
 				processorset.init();
 				
 				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(i), parameters.get_test_type(i), 0))
+				//if(dag_schedulability_test(dag_taskset, 4, 0.8))
 				{	
 					success[i]++;
 				}
 			}
+			//result.x = dag_taskset.get_utilization_sum().get_d();
 			result.x = taskset.get_utilization_sum().get_d();
 		}
 		for(uint i = 0; i < test_attributes.size(); i++)

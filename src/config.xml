@@ -9,10 +9,11 @@
 		<data TEST_TYPE="0" REMARK="normal">WF-DM</data>
 		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
 		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
-<!-->
 		<data TEST_TYPE="0" REMARK="normal">WF-DM</data>
 		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
 		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
+<!-->
+		<data REMARK="normal">WF-EDF</data>
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
 	<output>
@@ -39,8 +40,8 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>100000</min>
-			<max>1000000</max>
+			<min>10</min>
+			<max>100</max>
 		</data>
 	</period_range>
 	<deadline_propotion>

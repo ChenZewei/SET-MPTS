@@ -194,7 +194,7 @@ ulong approximate_workload(DAG_Task &dag_task, ulong T)
 	return (T - dag_task.get_deadline())*dag_task.get_vol()/dag_task.get_period();
 }
 
-double approximation(DAG_TaskSet &dag_taskset, ulong T, double e)
+double approximation(DAG_TaskSet &dag_taskset, double e)
 {
 cout<<"11111"<<endl;
 	vector<set<Work>> piecewises;
@@ -327,6 +327,16 @@ cout<<"max_slope:"<<max_slope<<endl;
 		max_slope = last_slope;
 	
 	return max_slope;
+}
+
+bool dag_schedulability_test(DAG_TaskSet &dag_taskset, uint m, double e)
+{
+	double max_slope = approximation(dag_taskset, e);
+	double speed_up = e + 2 - 1/m;
+	if(max_slope*speed_up < m)
+		return true;
+	else
+		return false;
 }
 
 #endif
