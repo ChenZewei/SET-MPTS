@@ -140,12 +140,12 @@ int main(int argc,char** argv)
 	
 
 	uint r = 0;
-	for(uint i = 0; i < 1000; i++)
+	for(uint i = 0; i < 100; i++)
 	{
 		//DAG_Task dag(0, test_r, parameters, 5, 10, 8);
 		//DAG_Task dag2(1, test_r, parameters, 4, 20, 16);
 		DAG_TaskSet dag_taskset;
-		dag_task_gen(dag_taskset, test_r, parameters, 0.1);
+		dag_task_gen(dag_taskset, test_r, parameters, 0.5);
 cout<<"<=======================>"<<endl;
 for(uint i = 0; i < dag_taskset.get_taskset_size(); i++)
 {

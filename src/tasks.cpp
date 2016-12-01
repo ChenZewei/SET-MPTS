@@ -1034,10 +1034,12 @@ void DAG_TaskSet::add_task(ResourceSet& resourceset, Param param, long wcet, lon
 		utilization_max = get_task_by_id(task_id).get_utilization();
 	if(density_max < get_task_by_id(task_id).get_density())
 		density_max = get_task_by_id(task_id).get_density();
+	
 cout<<"<------------------->"<<endl;
 for(uint i = 0; i <= task_id; i++)
 {
 cout<<"task"<<i<<":"<<endl;
+	get_task_by_id(i).refresh_relationship();
 	DAG_Task dag_temp = get_task_by_id(i);
 	for(uint j = 0; j < dag_temp.get_vnode_num(); j++)
 	{
@@ -1167,7 +1169,7 @@ cout<<"DAG_Task generation, utilization:"<<utilization<<endl;
 		}
 		dag_taskset.add_task(resourceset, param, wcet, period, deadline);
 	}
-	dag_taskset.sort_by_period();
+	//dag_taskset.sort_by_period();
 /*
 	double sum = 0;
 	for(uint i = 0; i < dag_taskset.get_taskset_size(); i++)
