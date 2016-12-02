@@ -157,13 +157,19 @@ cout<<"cutting:"<<cutting<<endl;
 				begin = i + 1;
 				cutting_workload;
 				cutting_time = cutting - set_member<Work>(workload_set, i).time;
-				cutting_workload = (cutting_time*(set_member<Work>(workload_set, i + 1).workload - set_member<Work>(workload_set, i).workload))/(set_member<Work>(workload_set, i + 1).time - set_member<Work>(workload_set, i).time) + set_member<Work>(workload_set, i).workload;
+				cutting_workload = (cutting_time*(set_member<Work>(workload_set, i + 1).workload))/(set_member<Work>(workload_set, i + 1).time - set_member<Work>(workload_set, i).time);
 cout<<"i:"<<i<<endl;
 cout<<"cutting time:"<<cutting_time<<endl;
 cout<<"cutting workload:"<<cutting_workload<<endl;
 				break;
 			}
 		}
+		
+		work.time = set_member<Work>(workload_set, begin).time - cutting;
+		work.workload = set_member<Work>(workload_set, begin).workload - cutting_workload;
+		workload_set_total.insert(work);
+		begin++;
+
 		for(uint i = begin; i < workload_set.size(); i++)
 		{
 			work.time = set_member<Work>(workload_set, i).time - cutting;
