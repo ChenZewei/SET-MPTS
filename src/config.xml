@@ -40,8 +40,8 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>10</min>
-			<max>100</max>
+			<min>100</min>
+			<max>1000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>

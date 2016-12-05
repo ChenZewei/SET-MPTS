@@ -519,6 +519,8 @@ DAG_Task::DAG_Task(	uint task_id,
 
 	//Generate basic graph
 	uint JobNode_num = Random_Gen::uniform_integral_gen(int(max(1, int(param.job_num_range.min))),int(param.job_num_range.max));
+	if(JobNode_num > vol)
+		JobNode_num = vol;
 	graph_gen(vnodes, arcnodes, param, JobNode_num);
 
 	//Insert conditional branches
@@ -572,8 +574,11 @@ DAG_Task::DAG_Task(	uint task_id,
 	}
 //	display_vertices();
 //	display_arcs();
+	refresh_relationship();
 	update_vol();
 	update_len();
+	density = len;
+	density /= deadline;
 }
 
 void DAG_Task::graph_gen(vector<VNode> &v, vector<ArcNode> &a, Param param, uint n_num, double arc_density)
@@ -1024,12 +1029,33 @@ void DAG_TaskSet::add_task(ResourceSet& resourceset, Param param, long wcet, lon
 									period,
 									deadline));
 	utilization_sum += get_task_by_id(task_id).get_utilization();
+	density_sum += get_task_by_id(task_id).get_density();
+	if(utilization_max < get_task_by_id(task_id).get_utilization())
+		utilization_max = get_task_by_id(task_id).get_utilization();
+	if(density_max < get_task_by_id(task_id).get_density())
+		density_max = get_task_by_id(task_id).get_density();
+cout<<"<------------------->"<<endl;
+for(uint i = 0; i <= task_id; i++)
+{
+cout<<"task"<<i<<":"<<endl;
+	DAG_Task dag_temp = get_task_by_id(i);
+	for(uint j = 0; j < dag_temp.get_vnode_num(); j++)
+	{
+		dag_temp.display_precedences(j);
+	}
+}
+cout<<"<------------------->"<<endl;
 }
 
 void DAG_TaskSet::add_task(DAG_Task dag_task)
 {
 	dag_tasks.push_back(dag_task);
 	utilization_sum += dag_task.get_utilization();
+	density_sum += dag_task.get_density();
+	if(utilization_max < dag_task.get_utilization())
+		utilization_max = dag_task.get_utilization();
+	if(density_max < dag_task.get_density())
+		density_max = dag_task.get_density();
 }
 
 DAG_TaskSet::~DAG_TaskSet()
@@ -1075,20 +1101,20 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double ut
 		fraction_t u = Random_Gen::exponential_gen(param.lambda);
 		//fraction_t u = Random_Gen::uniform_real_gen(0.05, 0.1);
 		ulong wcet = period*u.get_d();
-		ulong deadline = 0;
-		if(fabs(param.d_range.max) < _EPS)
-		{
-			deadline = ceil(period*Random_Gen::uniform_real_gen(param.d_range.min, param.d_range.max));
-			if(deadline > period)
-				deadline = period;
-			if(deadline < wcet)
-				deadline = wcet;
-		}
-//		cout<<"wcet:"<<wcet<<" deadling:"<<deadline<<" period:"<<period<<endl;
 		if(0 == wcet)
 			wcet++;
 		else if(wcet > period)
 			wcet = period;
+		ulong deadline = 0;
+		if(fabs(param.d_range.max) > _EPS)
+		{
+			deadline = ceil(period*Random_Gen::uniform_real_gen(param.d_range.min, param.d_range.max));
+			//if(deadline > period)
+				//deadline = period;
+			if(deadline < wcet)
+				deadline = wcet;
+		}
+//		cout<<"wcet:"<<wcet<<" deadling:"<<deadline<<" period:"<<period<<endl;
 		fraction_t temp(wcet, period);
 		if(taskset.get_utilization_sum() + temp > utilization)
 		{
@@ -1109,26 +1135,26 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double ut
 
 void dag_task_gen(DAG_TaskSet& dag_taskset, ResourceSet& resourceset, Param param, double utilization)
 {
-//cout<<"DAG_Task generation, utilization:"<<utilization<<endl;
+cout<<"DAG_Task generation, utilization:"<<utilization<<endl;
 	while(dag_taskset.get_utilization_sum() < utilization)//generate tasks
 	{
 		ulong period = Random_Gen::uniform_integral_gen(int(param.p_range.min),int(param.p_range.max));
 		fraction_t u = Random_Gen::exponential_gen(param.lambda);
 		ulong wcet = period*u.get_d();
-		ulong deadline = 0;
-		if(fabs(param.d_range.max) < _EPS)
-		{
-			deadline = ceil(period*Random_Gen::uniform_real_gen(param.d_range.min, param.d_range.max));
-			if(deadline > period)
-				deadline = period;
-			if(deadline < wcet)
-				deadline = wcet;
-		}
-//		cout<<"wcet:"<<wcet<<" deadling:"<<deadline<<" period:"<<period<<endl;
 		if(0 == wcet)
 			wcet++;
 		else if(wcet > period)
 			wcet = period;
+		ulong deadline = 0;
+		if(fabs(param.d_range.max) > _EPS)
+		{
+			deadline = ceil(period*Random_Gen::uniform_real_gen(param.d_range.min, param.d_range.max));
+			//if(deadline > period)
+				//deadline = period;
+			if(deadline < wcet)
+				deadline = wcet;
+		}
+		cout<<"wcet:"<<wcet<<" deadline:"<<deadline<<" period:"<<period<<endl;
 		fraction_t temp(wcet, period);
 		if(dag_taskset.get_utilization_sum() + temp > utilization)
 		{

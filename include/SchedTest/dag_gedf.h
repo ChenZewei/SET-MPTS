@@ -60,14 +60,20 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 		er.f_t = 0;
 		jobs.push_back(er);
 	}
-
+	cout<<"dag_task "<<dag_task.get_id()<<":"<<endl;
+	dag_task.display_arcs();
+	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
+		dag_task.display_precedences(i);
+	
 	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
 	{
 		vnode = dag_task.get_vnode_by_id(i);
 		ulong latest_f_time = 0;
 		for(uint j = 0; j < vnode.precedences.size(); j++)
 		{
+			dag_task.display_precedences(i);
 			uint prenode = vnode.precedences[j]->tail;
+			
 			if(latest_f_time < jobs[prenode].f_t)
 				latest_f_time = jobs[prenode].f_t;
 		}
@@ -217,6 +223,9 @@ cout<<"11111"<<endl;
 		double slope_i = dag_task_i.get_vol();
 		slope_i /= Ti;
 		splitted_time = Ti/e + (1 + 1/e)*Di;
+cout<<"before:"<<endl;
+for(uint j = 0; j < dag_task_i.get_vnode_num(); j++)
+dag_task_i.display_precedences(j);
 		piecewises.push_back(precise_workload(dag_task_i, splitted_time));
 		last_slopes.push_back(slope_i);
 cout<<"splitted_time for task "<<i<<":"<<splitted_time<<endl;

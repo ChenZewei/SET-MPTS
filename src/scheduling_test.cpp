@@ -133,13 +133,31 @@ int main(int argc,char** argv)
 	}
 */
 
+	//DAG_TaskSet dag_taskset;
+	//dag_task_gen(dag_taskset, test_r, parameters, 0.1);
+
+
+	
+
 	uint r = 0;
 	for(uint i = 0; i < 1000; i++)
 	{
-		DAG_Task dag(0, test_r, parameters, 5, 10, 8);
+		//DAG_Task dag(0, test_r, parameters, 5, 10, 8);
 		//DAG_Task dag2(1, test_r, parameters, 4, 20, 16);
 		DAG_TaskSet dag_taskset;
-		dag_taskset.add_task(dag);
+		dag_task_gen(dag_taskset, test_r, parameters, 0.1);
+cout<<"<=======================>"<<endl;
+for(uint i = 0; i < dag_taskset.get_taskset_size(); i++)
+{
+cout<<"task"<<i<<":"<<endl;
+	DAG_Task dag_temp = dag_taskset.get_task_by_id(i);
+	for(uint j = 0; j < dag_temp.get_vnode_num(); j++)
+	{
+		dag_temp.display_precedences(j);
+	}
+}
+cout<<"<=======================>"<<endl;
+		//dag_taskset.add_task(dag);
 		//dag_taskset.add_task(dag2);
 		if(dag_schedulability_test(dag_taskset, 4, 0.5))
 			r++;
