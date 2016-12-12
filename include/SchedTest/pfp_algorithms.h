@@ -3,6 +3,7 @@
 #include "../processors.h"
 #include "../resources.h"
 #include "bin_packing.h"
+#include "lp_pfp.h"
 
 using namespace std;
 
@@ -21,6 +22,24 @@ bool is_worst_fit_dm_schedulable(TaskSet& tasks,
 			return false;
 	}
 	return true;
+}
+
+bool is_worst_fit_pfp_schedulable(TaskSet& tasks, 
+				ProcessorSet& processors,
+				ResourceSet& resources,
+				uint TEST_TYPE,//TEST_TYPE: 0-DPCP 1-MPCP
+				uint ITER_BLOCKING)
+{
+	processors.init();
+	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+	{
+		if(!worst_fit_pfp(tasks, processors, resources, t_id, TEST_TYPE, ITER_BLOCKING))
+			return false;
+	}
+	if(is_pfp_schedulable(tasks, processors, resources, TEST_TYPE, ITER_BLOCKING))
+		return true;
+	else
+		return false;
 }
 
 bool is_first_fit_dm_schedulable(TaskSet& tasks, 
