@@ -396,12 +396,12 @@ Task& TaskSet::get_task_by_id(uint id)
 
 bool TaskSet::is_implicit_deadline()
 {
-	foreach(tasks,tasks[i].get_deadline() != tasks[i].get_period());
+	foreach_condition(tasks,tasks[i].get_deadline() != tasks[i].get_period());
 	return true;
 }
 bool TaskSet::is_constrained_deadline()
 {
-	foreach(tasks,tasks[i].get_deadline() > tasks[i].get_period());
+	foreach_condition(tasks,tasks[i].get_deadline() > tasks[i].get_period());
 	return true;
 }
 bool TaskSet::is_arbitary_deadline()
