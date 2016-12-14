@@ -34,17 +34,22 @@ string get_structure_name(uint t_id, uint r_id, uint seq, int BLOCKING_TYPE)
 
 ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
-	Task& task = tasks.get_task_by_id(t_id);
+	Task& task_i = tasks.get_task_by_id(t_id);
 	Resources& r = resources.get_resources();	
-	Resource_Requests& rr = task.get_requests();
-	uint p_id = task.get_partition();//processor id
-	ulong r_i = task.get_response_time();//response time of task i(t_id)
+	Resource_Requests& rr = task_i.get_requests();
+	uint p_id = task_i.get_partition();//processor id
+	ulong r_i = task_i.get_response_time();//response time of task i(t_id)
 
 	LinearProgram local_bound;
 	
-	LinearExpression *obj = new LinearExpression();
 
-	
+	lp_dpcp_local_objective(task_i, tasks, resources, local_bound);
+
+//construct constraints
+	lp_dpcp_constraint_1(task_i, tasks, resources, local_bound);
+	lp_dpcp_constraint_2(task_i, tasks, resources, local_bound);
+
+	GLPKSolution lb_solution = new GLPKSolution(local_bound, );
 	
 }
 

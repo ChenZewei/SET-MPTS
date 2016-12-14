@@ -104,6 +104,18 @@ double GLPKSolution::get_value(unsigned int var) const
 		return glp_get_col_prim(glpk, var + 1);
 }
 
+double GLPKSolution::evaluate(const LinearExpression &exp) const
+	{
+		double sum = 0;
+		foreach(exp.get_terms(), term)
+		{
+			double coeff     = term->first;
+			unsigned int var = term->second;
+			sum += coeff * get_value(var);
+		}
+		return sum;
+	}
+
 bool GLPKSolution::is_solved() const
 {
 	return solved;

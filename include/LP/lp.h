@@ -9,7 +9,7 @@
 
 using namespace std;
 
-typedef pair<uint, double> Term;
+typedef pair<double, uint> Term;
 typedef vector<Term> Terms;
 
 class LinearExpression
@@ -117,10 +117,10 @@ class LinearProgram
 			non_default_bounds.push_back(b);
 		}
 
-		void set_objective(LinearExpression *exp)
+		void set_objective(LinearExpression *obj)
 		{
 			delete objective;
-			objective = exp;
+			objective = obj;
 		}
 
 		void add_inequality(LinearExpression *exp, double upper_bound)
