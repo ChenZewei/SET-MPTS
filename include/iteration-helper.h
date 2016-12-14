@@ -44,8 +44,12 @@
 		request_index_variable < max_request_num; \
 		request_index_variable++)
 
-#define foreach_remote_request(task_ti, requests, request, request_iter) \
+#define foreach_remote_request(task_ti, requests, request_iter) \
 		foreach(requests, request_iter)	\
 			if(task_ti.get_partition() != request_iter->get_locality())
+
+#define foreach_local_request(task_ti, requests, request_iter) \
+		foreach(requests, request_iter)	\
+			if(task_ti.get_partition() == request_iter->get_locality())
 
 #endif

@@ -29,7 +29,8 @@ class Request
 		Request(uint resource_id,
 			uint num_requests,
 			ulong max_length,
-			ulong total_length);
+			ulong total_length,
+			uint locality = MAX_INT);
 
 		uint get_resource_id() const;
 		uint get_num_requests() const;
@@ -126,7 +127,7 @@ class Task
 		void set_carry_in();
 		void clear_carry_in();
 
-		void add_request(uint res_id, uint num, ulong max_len, ulong total_len);
+		void add_request(uint res_id, uint num, ulong max_len, ulong total_len, uint locality = MAX_INT);
 		
 		uint get_max_num_jobs(ulong interval); //max number of jobs in an arbitrary length of interval
 		ulong DBF(ulong interval);//Demand Bound Function

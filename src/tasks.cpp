@@ -5,12 +5,14 @@
 Request::Request(uint resource_id,
 	uint num_requests,
 	ulong max_length,
-	ulong total_length)
+	ulong total_length,
+	uint locality = MAX_INT);
 {
 	this->resource_id = resource_id;
 	this->num_requests = num_requests;
 	this->max_length = max_length;
 	this->total_length = total_length;
+	this->locality = locality;
 }
 
 uint Request::get_resource_id() const { return resource_id; }
@@ -86,7 +88,7 @@ Task::Task(	uint id,
 		{
 			uint num = Random_Gen::uniform_integral_gen(1, param.rrn);
 			uint max_len = Random_Gen::uniform_integral_gen(param.rrr.min, param.rrr.max);
-			add_request(i, num, max_len, param.tlf*max_len);
+			add_request(i, num, max_len, param.tlf*max_len, resourceset.get_resources()[i].get_locality());
 			resourceset.add_task(i, this);
 		}
 	}
@@ -108,9 +110,9 @@ void Task::init()
 	carry_in = false;
 }
 
-void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len)
+void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len, uint locality);
 {
-	requests.push_back(Request(res_id, num, max_len, total_len));
+	requests.push_back(Request(res_id, num, max_len, total_len, locality));
 }
 
 ulong Task::DBF(ulong time)

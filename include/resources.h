@@ -8,8 +8,6 @@
 
 using namespace std;
 
-//typedef vector<uint> Request_Tasks;
-//template<class TaskModlePtr>
 class Resource
 {
 	private:
@@ -20,8 +18,9 @@ class Resource
 		//Request_Tasks tasks;
 		TaskQueue queue;
 	public:
-		Resource(uint id, uint locality = 0, bool global_resource = false, bool processor_local_resource = false);
+		Resource(uint id, uint locality = MAX_INT, bool global_resource = false, bool processor_local_resource = false);
 		uint get_resource_id() const;
+		void set_locality(uint locality);
 		uint get_locality() const;
 		bool is_global_resource() const;
 		bool is_processor_local_resource() const;
@@ -33,7 +32,6 @@ class Resource
 
 typedef vector<Resource> Resources;
 
-//template <typename TaskModlePtr>
 class ResourceSet
 {
 	private:
@@ -46,6 +44,13 @@ class ResourceSet
 		const uint& get_resourceset_size() const;
 		void add_task(uint resource_id, void* taskptr);
 };
+
+void resource_gen(ResourceSet *resourceset, Param param);
+
+/*
+ * Using next fit allocation
+ */
+void resource_alloc(ResourceSet& resources, PorcessorSet& processors);
 
 //////////////////////////for multiple task models//////////////////////////////
 template<typename TaskModle>
@@ -83,9 +88,6 @@ class ResourceSet2
 		const uint& get_resourceset_size() const;
 		void add_task(uint resource_id, TaskModle* taskptr);
 };
-
-
-void resource_gen(ResourceSet *resourceset, Param param);
 
 template <typename TaskModle>
 void resource_gen2(ResourceSet2<TaskModle> *resourceset, Param param)

@@ -1,8 +1,8 @@
 #include <iostream>
-#include <glpk.h>
-#include "../tasks.h"
-#include "../processors.h"
-#include "../resources.h"
+//#include "../tasks.h"
+//#include "../processors.h"
+//#include "../resources.h"
+#include "lp_dpcp.h"
 
 using namespace std;
 
@@ -39,55 +39,13 @@ ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resour
 	Resource_Requests& rr = task.get_requests();
 	uint p_id = task.get_partition();//processor id
 	ulong r_i = task.get_response_time();//response time of task i(t_id)
-	glp_prob *lp = glp_create_prob();
-	glp_set_prob_name(lp, "local_blocking");
-	glp_set_obj_dir(lp, GLP_MAX);
-	vector<int> ia, ja, ra;
-	vector<int> lri;//local resource id
-	ulong contant_blocking = 0;
-	vector<int> start_index;
-	Request& request;
-	start_index.push_back(1);
 
-	for(uint q = 0; q < r.size(); q++)
-	{
-		Resource& resource = r[q];
-		if(resource.get_locality() == p_id)
-		{
-			lri.push_back(q);
-			for(uint i = 0; i < rr.size(); rr++)
-			{
-				request = rr[i];
-				if(q == request.get_resource_id())
-					constant_blocking += request.get_num_requests()*request.get_max_length();
-			}
-		}
-	}
+	LinearProgram local_bound;
 	
-	for(uint x = 0; x < tasks.get_taskset_size(); x++)//get tasks except task i
-	{
-		if(t_id == x)
-		{
-			int temp = start_index(start_index.size() - 1);
-			start_index.push_back(temp);
-			continue;
-		}
-		Task& task_x = tasks.get_task_by_id(x);
-		Resource_Requests& rr_x = task_x.get_requests();
-		for(uint q = 0; q < lri.size(); q++)
-		{
-			uint resource_id = lri[q];
-			for(uint i = 0; i < rr_x.size(); i++)
-			{
-				request = rr_x[i];
-				if(resource_id == request.get_resource_id())
-				{
-					
-				}
-			}
-		}
-			
-	}
+	LinearExpression *obj = new LinearExpression();
+
+	
+	
 }
 
 ulong remote_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
