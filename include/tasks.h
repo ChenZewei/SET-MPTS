@@ -24,7 +24,7 @@ class Request
 		uint num_requests;
 		ulong max_length;
 		ulong total_length;
-
+		uint locality;
 	public:
 		Request(uint resource_id,
 			uint num_requests,
@@ -35,6 +35,7 @@ class Request
 		uint get_num_requests() const;
 		ulong get_max_length() const;
 		ulong get_total_length() const;
+		ulong get_locality() const;
 };
 
 typedef vector<Request> Resource_Requests;

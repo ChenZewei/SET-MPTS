@@ -34,5 +34,18 @@
 		}							\
 	}
 
+#define foreach_task_except(collection, ti, tx) \
+	foreach(collection, tx)						\
+		if(tx->get_id() != ti.get_id())
+
+#define foreach_request_instance(task_ti, task_tx, request_index_variable)	\
+	for(uint request_index_variable = 0, 												\
+		max_request_num = ceiling((task_ti.get_response_time() + task_tx.get_response_time())/task_tx.get_period()); \
+		request_index_variable < max_request_num; \
+		request_index_variable++)
+
+#define foreach_remote_request(task_ti, requests, request, request_iter) \
+		foreach(requests, request_iter)	\
+			if(task_ti.get_partition() != request_iter->get_locality())
 
 #endif
