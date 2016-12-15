@@ -126,7 +126,7 @@ int main(int argc,char** argv)
 
 	output.export_csv();
 
-	output.export_line_chart(1);
+	output.export_line_chart(0);
 
 	return 0;
 }
