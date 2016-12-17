@@ -34,35 +34,74 @@ string get_structure_name(uint t_id, uint r_id, uint seq, int BLOCKING_TYPE)
 
 ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
+	ulong local_blocking = 0;
 	Task& task_i = tasks.get_task_by_id(t_id);
 	Resources& r = resources.get_resources();	
 	Resource_Requests& rr = task_i.get_requests();
 	uint p_id = task_i.get_partition();//processor id
 	ulong r_i = task_i.get_response_time();//response time of task i(t_id)
-
+	VarMapper var;
 	LinearProgram local_bound;
 	
-
-	lp_dpcp_local_objective(task_i, tasks, resources, local_bound);
+	lp_dpcp_local_objective(task_i, tasks, resources, local_bound, var);
 
 //construct constraints
-	lp_dpcp_constraint_1(task_i, tasks, resources, local_bound);
-	lp_dpcp_constraint_2(task_i, tasks, resources, local_bound);
+	lp_dpcp_constraint_1(task_i, tasks, resources, local_bound, var);
+	lp_dpcp_constraint_2(task_i, tasks, resources, local_bound, var);
 
-	GLPKSolution lb_solution = new GLPKSolution(local_bound, );
+	GLPKSolution *lb_solution = new GLPKSolution(local_bound, var.get_num_vars());
+
+	if(lb_solution->is_solved())
+	{
+		local_blocking = lrint(lb_solution->evaluate(*(local_bound.get_objective())));
+	}
 	
+	task_i.set_local_blocking(local_blocking);
+	
+	delete lb_solution;
+	return local_blocking;
 }
 
 ulong remote_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
+	ulong remote_blocking = 0;
+	Task& task_i = tasks.get_task_by_id(t_id);
+	Resources& r = resources.get_resources();	
+	Resource_Requests& rr = task_i.get_requests();
+	uint p_id = task_i.get_partition();//processor id
+	ulong r_i = task_i.get_response_time();//response time of task i(t_id)
+	VarMapper var;
+	LinearProgram remote_bound;
 	
+	lp_dpcp_remote_objective(task_i, tasks, resources, remote_bound, var);
+
+//construct constraints
+	lp_dpcp_constraint_1(task_i, tasks, resources, remote_bound, var);
+	lp_dpcp_constraint_2(task_i, tasks, resources, remote_bound, var);
+
+	GLPKSolution *rb_solution = new GLPKSolution(remote_bound, var.get_num_vars());
+
+	if(rb_solution->is_solved())
+	{
+		remote_blocking = lrint(rb_solution->evaluate(*(remote_bound.get_objective())));
+	}
+
+	task_i.set_remote_blocking(remote_blocking);
+	
+	delete rb_solution;
+	return remote_blocking;
 }
 
 ulong total_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
-{
+{	
+	ulong total_blocking;
+	Task& task_i = tasks.get_task_by_id(t_id);
 	ulong blocking_l = local_blocking(t_id, tasks, processors, resources);
 	ulong blocking_r = remote_blocking(t_id, tasks, processors, resources);
-	return blocking_l + blocking_r;
+
+	total_blocking = blocking_l + blocking_r;
+	task_i.set_total_blocking(total_blocking);
+	return total_blocking;
 }
 
 ulong interference(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)

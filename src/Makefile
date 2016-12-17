@@ -7,7 +7,7 @@ CXXFLAGS      = -pipe -O2 -Wall -W -g -D_REENTRANT -fPIE $(DEFINES) -std=c++11 -
 INCPATH       = -I. -I../include -I../include/SchedTest -I../include/QCustomPlot -I../include/mathGL -I../include/LP
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = -lgmp -lgmpxx -lmgl -lpthread 
+LIBS          = -lgmp -lgmpxx -lmgl -lpthread -lglpk
 COPY          = cp -f
 COPY_FILE     = cp -f
 COPY_DIR      = cp -f -R
@@ -17,8 +17,8 @@ MOVE          = mv -f
 MKDIR         = mkdir -p
 TARGET	      = SchedulingAnalysis
 
-SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o $(LFLAGS) $(LIBS)
+SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o solution.o varmapper.o 
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o solution.o varmapper.o $(LFLAGS) $(LIBS)
 	
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
@@ -49,6 +49,12 @@ param.o:param.cpp
 
 output.o:output.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c output.cpp $(LIBS)
+
+solution.o:LP/solution.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c LP/solution.cpp $(LIBS)
+
+varmapper.o:LP/varmapper.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c LP/varmapper.cpp $(LIBS)
 
 clean:
 	rm -f *.o ${ALL}	

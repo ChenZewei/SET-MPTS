@@ -4,7 +4,6 @@
 #include <type.h>
 #include <vector>
 #include <set>
-
 #include <math-helper.h>
 
 using namespace std;

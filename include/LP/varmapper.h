@@ -2,8 +2,8 @@
 #define VARMAPPER_H
 
 #include <stdint.h>
-#include <string>
 #include <hash_map>
+#include <string>
 
 using namespace std;
 
