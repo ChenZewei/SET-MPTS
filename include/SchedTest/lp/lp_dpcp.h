@@ -1,7 +1,9 @@
 #ifndef LP_DPCP_H
 #define LP_DPCP_H
 
-//#include <lp.h>
+#include <lp.h>
+#include "iteration-helper.h"
+#include "varmapper.h"
 
 class Task;
 class TaskSet;
@@ -9,23 +11,23 @@ class Resource;
 class ResourceSet;
 class Processor;
 class ProcessorSet;
-class VarMapper;
-class LinearExpression;
-class LinearProgram;
+//class VarMapper;
 class GLPKSolution;
 
-void lp_dpcp_local_objective(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& var)
+
+
+void lp_dpcp_local_objective(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
 {
 	LinearExpression *obj = new LinearExpression();
 	uint var_id;
 
-	foreach_task_except(tasks, ti, tx)
+	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
 		uint x = tx->get_id();
-		foreach_local_request(task_ti, tx->get_requests(), request_iter)
+		foreach_local_request(ti, tx->get_requests(), request_iter)
 		{
 			uint q = request_iter->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, **tx, v)
 			{
 				var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
 				obj->add_term(var_id, request_iter->get_max_length());
@@ -40,21 +42,21 @@ void lp_dpcp_local_objective(const Task& ti, const TaskSet& tasks, const Resourc
 	}
 	
 	lp->set_objective(obj);
-	var.seal();
+	vars.seal();
 }
 
-void lp_dpcp_remote_objective(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& var)
+void lp_dpcp_remote_objective(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
 {
 	LinearExpression *obj = new LinearExpression();
 	uint var_id;
 
-	foreach_task_except(tasks, ti, tx)
+	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
 		uint x = tx->get_id();
-		foreach_remote_request(task_ti, tx->get_requests(), request_iter)
+		foreach_remote_request(ti, tx->get_requests(), request_iter)
 		{
 			uint q = request_iter->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, **tx, v)
 			{
 				var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
 				obj->add_var(var_id);
@@ -72,19 +74,19 @@ void lp_dpcp_remote_objective(const Task& ti, const TaskSet& tasks, const Resour
 	}
 
 	lp->set_objective(obj);
-	var.seal();
+	vars.seal();
 }
 
 //Constraint 1 [BrandenBurg 2013 RTAS] Xd(x,q,v) + Xi(x,q,v) + Xp(x,q,v) <= 1
-void lp_dpcp_constraint_1(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& var)
+void lp_dpcp_constraint_1(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
 {
-	foreach_task_except(tasks, ti, tx)
+	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
 		uint x = tx->get_id();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, **tx, v)
 			{
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
@@ -106,17 +108,17 @@ void lp_dpcp_constraint_1(const Task& ti, const TaskSet& tasks, const ResourceSe
 }
 
 //Constraint 2 [BrandenBurg 2013 RTAS] for any remote resource lq and task tx except ti Xp(x,q,v) = 0
-void lp_dpcp_constraint_2(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& var)
+void lp_dpcp_constraint_2(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
 {
 	LinearExpression *exp = new LinearExpression();
 
-	foreach_task_except(tasks, ti, tx)
+	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
 		uint x = tx->get_id();
 		foreach_remote_request(task_ti, tx->get_requests(), request_iter)
 		{
 			uint q = request_iter->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, **tx, v)
 			{
 				uint var_id;
 				var_id = vars.lookup(x, q, v, BLOCKING_PREEMPT);
@@ -128,7 +130,7 @@ void lp_dpcp_constraint_2(const Task& ti, const TaskSet& tasks, const ResourceSe
 }
 
 //Constraint 3 [BrandenBurg 2013 RTAS]
-void lp_dpcp_constraint_3(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& var)
+void lp_dpcp_constraint_3(const Task& ti, const TaskSet& tasks, const ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
 {
 	
 }

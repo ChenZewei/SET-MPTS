@@ -1,12 +1,16 @@
 #ifndef PROCESSORS_H
 #define PROCESSORS_H
 #include <vector>
-#include "tasks.h"
+//#include "tasks.h"
 #include "types.h"
 #include "param.h"
 
 using namespace std;
 
+class Task;
+class TaskSet;
+class DAG_Task;
+class DAG_TaskSet;
 
 class Processor
 {

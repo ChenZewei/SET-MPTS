@@ -2,6 +2,7 @@
 //#include "../tasks.h"
 //#include "../processors.h"
 //#include "../resources.h"
+#include "math-helper.h"
 #include "lp_dpcp.h"
 
 using namespace std;
@@ -104,15 +105,61 @@ ulong total_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resour
 	return total_blocking;
 }
 
-ulong interference(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
+ulong interference(Task& task, ulong interval)
 {
-	
+	return task.get_wcet() * ceiling((interval + task.get_response_time()), task.get_period());
 }
 
-bool is_pfp_schedulable(TaskSet& tasks, 
+ulong rta_lp_pfp_suspension(uint t_id,
+				TaskSet& tasks, 
 				ProcessorSet& processors,
 				ResourceSet& resources,
-				uint TEST_TYPE,
+				uint ITER_BLOCKING)
+{
+	Task& task_i = tasks.get_task_by_id(t_id);
+	ulong test_end = task_i.get_deadline();
+	ulong test_start = task_i.get_total_blocking() + task.get_wcet();
+	ulong response = test_start;
+	ulong demand = 0;
+	while (response <= test_end)
+	{
+		switch (ITER_BLOCKING)
+		{
+			case 0:
+				demand = test_start;
+				break;
+			case 1:
+				// add functions to bound "spin" and "local_blocking" here
+				// XXXXXXXX			
+				total_blocking(t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
+				demand = task_i.get_total_blocking() + task_i.get_wcet();
+				break;
+		}
+
+		ulong interference = 0;
+		for (uint th = 0; th < t_id; th ++)
+		{
+			Task& task_h = tasks.get_task_by_id(th);
+			if (task_i.get_partition() == task_h.get_partition())
+			{
+				interference += interference(task_h, response);
+			}
+		}
+//cout<<"interference1:"<<interference<<endl;
+		demand += interference;
+
+		if (response == demand)
+			return response + task_i.get_jitter();
+		else 
+			response = demand;
+	}
+	return test_end + 100;
+}
+
+bool is_rta_lp_pfp_schedulable(uint t_id,
+				TaskSet& tasks,
+				ProcessorSet& processors,
+				ResourceSet& resources,
 				uint ITER_BLOCKING)
 {
 	ulong response_bound;
@@ -125,7 +172,7 @@ bool is_pfp_schedulable(TaskSet& tasks,
 		switch(TEST_TYPE)
 		{
 			case 0://DPCP
-				
+				response_bound = rta_lp_pfp_suspension(t_id, tasks, processors, resources, ITER_BLOCKING);
 				break;
 			case 1://MPCP
 				

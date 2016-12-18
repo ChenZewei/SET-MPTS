@@ -36,10 +36,13 @@ bool is_worst_fit_pfp_schedulable(TaskSet& tasks,
 		if(!worst_fit_pfp(tasks, processors, resources, t_id, TEST_TYPE, ITER_BLOCKING))
 			return false;
 	}
-	if(is_pfp_schedulable(tasks, processors, resources, TEST_TYPE, ITER_BLOCKING))
-		return true;
+	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+	{
+		if(!is_rta_lp_pfp_schedulable(t_id, tasks, processors, resources, TEST_TYPE, ITER_BLOCKING))
+			return false;
+	}	
 	else
-		return false;
+		return true;
 }
 
 bool is_first_fit_dm_schedulable(TaskSet& tasks, 

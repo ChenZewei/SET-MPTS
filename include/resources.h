@@ -3,10 +3,17 @@
 #include <vector>
 #include <list>
 #include "types.h"
-#include "processors.h"
+//#include "processors.h"
 #include "param.h"
 
 using namespace std;
+
+class Task;
+class TaskSet;
+class DAG_Task;
+class DAG_TaskSet;
+class Processor;
+class ProcessorSet;
 
 class Resource
 {
@@ -50,7 +57,7 @@ void resource_gen(ResourceSet *resourceset, Param param);
 /*
  * Using next fit allocation
  */
-void resource_alloc(ResourceSet& resources, PorcessorSet& processors);
+void resource_alloc(ResourceSet& resources, uint p_num);
 
 //////////////////////////for multiple task models//////////////////////////////
 template<typename TaskModle>

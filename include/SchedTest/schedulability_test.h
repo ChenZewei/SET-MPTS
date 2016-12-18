@@ -7,6 +7,7 @@
 #include "pfp_algorithms.h"
 #include "rta_gfp.h"
 #include "dag_gedf.h"
+#include "lp_dpcp.h"
 
 bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
 {
@@ -33,6 +34,9 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 			break;
 		case FF_DM:
 			schedulable = is_first_fit_dm_schedulable(taskset, processorset, resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
+			break;
+		case WF_LP_PFP://7
+			is_worst_fit_pfp_schedulable(tasks, processors, resources, TEST_TYPE, ITER_BLOCKING);
 			break;
 		default:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);

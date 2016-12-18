@@ -4,7 +4,7 @@ CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -g -D_REENTRANT -fPIE $(DEFINES) -std=c++11 -std=gnu++11 -fext-numeric-literals
-INCPATH       = -I. -I../include -I../include/SchedTest -I../include/QCustomPlot -I../include/mathGL -I../include/LP
+INCPATH       = -I. -I../include -I../include/SchedTest -I../include/QCustomPlot -I../include/mathGL -I../include/LP -I../include/SchedTest/lp
 LINK          = g++
 LFLAGS        = -Wl,-O1
 LIBS          = -lgmp -lgmpxx -lmgl -lpthread -lglpk

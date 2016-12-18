@@ -13,7 +13,7 @@
 		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
 		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
 <!-->
-		<data REMARK="normal">WF-EDF</data>
+		<data TEST_TYPE="0" REMARK="normal">WF-EDF</data>
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
 	<output>
