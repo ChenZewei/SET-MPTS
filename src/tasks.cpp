@@ -1,4 +1,9 @@
 #include "tasks.h"
+#include "resources.h"
+#include "processors.h"
+#include "sort.h"
+#include "random_gen.h"
+#include "param.h"
 
 ////////////////////////////Request//////////////////////////////
 
@@ -6,7 +11,7 @@ Request::Request(uint resource_id,
 	uint num_requests,
 	ulong max_length,
 	ulong total_length,
-	uint locality = MAX_INT);
+	uint locality)
 {
 	this->resource_id = resource_id;
 	this->num_requests = num_requests;
@@ -110,7 +115,7 @@ void Task::init()
 	carry_in = false;
 }
 
-void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len, uint locality);
+void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len, uint locality)
 {
 	requests.push_back(Request(res_id, num, max_len, total_len, locality));
 }

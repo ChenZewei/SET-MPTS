@@ -1,6 +1,7 @@
 #ifndef VARMAPPER_H
 #define VARMAPPER_H
 
+#include <types.h>
 #include <stdint.h>
 #include <unordered_map>
 #include <string>

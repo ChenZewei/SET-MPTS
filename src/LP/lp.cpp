@@ -1,8 +1,7 @@
 #include "lp.h"
 
-
 ////////////////////LinearExpression////////////////////
-Terms& LinearExpression::get_terms() const
+Terms& LinearExpression::get_terms()
 {
 	return terms;
 }
@@ -35,10 +34,10 @@ void LinearExpression::sub_var(uint var_index)
 }
 
 ////////////////////Linearprogram////////////////////
-Linearprogram::LinearProgram() : objective(new LinearExpression())
+LinearProgram::LinearProgram() : objective(new LinearExpression())
 {};
 
-Linearprogram::~LinearProgram()
+LinearProgram::~LinearProgram()
 {
 	delete objective;
 	foreach(equalities, eq)
@@ -47,17 +46,17 @@ Linearprogram::~LinearProgram()
 		delete ineq->first;
 }
 
-void Linearprogram::declare_variable_integer(uint variable_index)
+void LinearProgram::declare_variable_integer(uint variable_index)
 {
 	variables_integer.insert(variable_index);
 }
 
-void Linearprogram::declare_variable_binary(uint variable_index)
+void LinearProgram::declare_variable_binary(uint variable_index)
 {
 	variables_binary.insert(variable_index);
 }
 
-void Linearprogram::declare_variable_bounds(uint variable_id, bool has_lower, double lower, bool has_upper, double upper)
+void LinearProgram::declare_variable_bounds(uint variable_id, bool has_lower, double lower, bool has_upper, double upper)
 {
 	VariableRange b;
 	b.var_index = variable_id;
@@ -68,13 +67,13 @@ void Linearprogram::declare_variable_bounds(uint variable_id, bool has_lower, do
 	non_default_bounds.push_back(b);
 }
 
-void Linearprogram::set_objective(LinearExpression *obj)
+void LinearProgram::set_objective(LinearExpression *obj)
 {
 	delete objective;
 	objective = obj;
 }
 
-void Linearprogram::add_inequality(LinearExpression *exp, double upper_bound)
+void LinearProgram::add_inequality(LinearExpression *exp, double upper_bound)
 {
 	if (exp->has_terms())
 		inequalities.push_back(Constraint(exp, upper_bound));
@@ -82,7 +81,7 @@ void Linearprogram::add_inequality(LinearExpression *exp, double upper_bound)
 		delete exp;
 }
 
-void Linearprogram::add_equality(LinearExpression *exp, double equal_to)
+void LinearProgram::add_equality(LinearExpression *exp, double equal_to)
 {
 	if (exp->has_terms())
 		equalities.push_back(Constraint(exp, equal_to));
@@ -90,52 +89,52 @@ void Linearprogram::add_equality(LinearExpression *exp, double equal_to)
 		delete exp;
 }
 
-const Linearprogram::LinearExpression *get_objective() const
+const LinearExpression* LinearProgram::get_objective() const
 {
 	return objective;
 }
 
-const Linearprogram::set<uint>& get_integer_variables() const
+const set<uint>& LinearProgram::get_integer_variables() const
 {
 	return variables_integer;
 }
 
-bool Linearprogram::has_binary_variables() const
+bool LinearProgram::has_binary_variables() const
 {
 	return !variables_binary.empty();
 }
 
-bool Linearprogram::has_integer_variables() const
+bool LinearProgram::has_integer_variables() const
 {
 	return !variables_integer.empty();
 }
 
-bool Linearprogram::is_integer_variable(unsigned int variable_id) const
+bool LinearProgram::is_integer_variable(unsigned int variable_id) const
 {
 	return variables_integer.find(variable_id) != variables_integer.end();
 }
 
-bool Linearprogram::is_binary_variable(unsigned int variable_id) const
+bool LinearProgram::is_binary_variable(unsigned int variable_id) const
 {
 	return variables_binary.find(variable_id) != variables_binary.end();
 }
 
-const Linearprogram::set<uint>& get_binary_variables() const
+const set<uint>& LinearProgram::get_binary_variables() const
 {
 	return variables_binary;
 }
 
-const Linearprogram::Constraints& get_equalities() const
+const Constraints& LinearProgram::get_equalities() const
 {
 	return equalities;
 }
 
-const Linearprogram::Constraints& get_inequalities() const
+const Constraints& LinearProgram::get_inequalities() const
 {
 	return inequalities;
 }
 
-const Linearprogram::VariableRanges& get_non_default_variable_ranges() const
+const VariableRanges& LinearProgram::get_non_default_variable_ranges() const
 {
 	return non_default_bounds;
 }

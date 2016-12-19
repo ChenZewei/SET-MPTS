@@ -1,12 +1,13 @@
 #include <solution.h>
-
+#include <lp.h>
+#include <assert.h>
 
 GLPKSolution::GLPKSolution(const LinearProgram &lp, 
 							unsigned int max_var_num, 
 							double var_lb, 
 							double var_ub):
 							glpk(glp_create_prob()),
-							linprog(lp),
+							lp(lp),
 							col_num(max_var_num),
 							row_num(lp.get_equalities().size() + lp.get_inequalities().size()),
 							coeff_num(0),
@@ -22,7 +23,10 @@ GLPKSolution::GLPKSolution(const LinearProgram &lp,
 		solved = true;
 }
 
-GLPKSolution::~GLPKSolution();
+GLPKSolution::~GLPKSolution()
+{
+	delete glpk;
+}
 
 void GLPKSolution::show_error()
 {
@@ -170,9 +174,9 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 
 void GLPKSolution::set_objective()
 {
-	assert(linprog.get_objective()->get_terms().size() <= col_num);
+	assert(lp.get_objective()->get_terms().size() <= col_num);
 
-	foreach (linprog.get_objective()->get_terms(), term)
+	foreach (lp.get_objective()->get_terms(), term)
 		glp_set_obj_coef(glpk, term->second + 1, term->first);
 }
 
@@ -187,28 +191,24 @@ void GLPKSolution::set_bounds(double col_lb, double col_ub)
 {
 	unsigned int r = 1;
 
-	foreach(linprog.get_equalities(), equ)
+	foreach(lp.get_equalities(), equ)
 	{
-		glp_set_row_bnds(glpk, r++, GLP_FX,
-				 equ->second, equ->second);
-
-	        coeff_num += equ->first->get_terms().size();
+		glp_set_row_bnds(glpk, r++, GLP_FX, equ->second, equ->second);
+		coeff_num += equ->first->get_terms().size();
 	}
 
-	foreach(linprog.get_inequalities(), inequ)
+	foreach(lp.get_inequalities(), inequ)
 	{
-		glp_set_row_bnds(glpk, r++, GLP_UP,
-				 0, inequ->second);
-
+		glp_set_row_bnds(glpk, r++, GLP_UP, 0, inequ->second);
 		coeff_num += inequ->first->get_terms().size();
 	}
 
 	for (unsigned int c = 1; c <= col_num; c++)
 		glp_set_col_bnds(glpk, c, GLP_DB, col_lb, col_ub);
 
-	foreach(linprog.get_non_default_variable_ranges(), bnds)
+	foreach(lp.get_non_default_variable_ranges(), bnds)
 	{
-		unsigned int c = bnds->variable_id + 1;
+		unsigned int c = bnds->var_index + 1;
 		int col_type;
 		col_lb = bnds->lower_bound;
 		col_ub = bnds->upper_bound;
@@ -240,7 +240,7 @@ void GLPKSolution::set_coefficients()
 
 	unsigned int r = 1, k = 1;
 
-	foreach(linprog.get_equalities(), equ)
+	foreach(lp.get_equalities(), equ)
 	{
 		foreach(equ->first->get_terms(), term)
 		{
@@ -256,7 +256,7 @@ void GLPKSolution::set_coefficients()
 	}
 
 
-	foreach(linprog.get_inequalities(), inequ)
+	foreach(lp.get_inequalities(), inequ)
 	{
 		foreach(inequ->first->get_terms(), term)
 		{
@@ -282,7 +282,7 @@ void GLPKSolution::set_column_types()
 {
 	unsigned int col_idx;
 
-	foreach(linprog.get_integer_variables(), var_id)
+	foreach(lp.get_integer_variables(), var_id)
 	{
 		col_idx = 1 + *var_id;
 		// hack: for integer variables, ignore upper bound for now
@@ -290,7 +290,7 @@ void GLPKSolution::set_column_types()
 		glp_set_col_kind(glpk, col_idx, GLP_IV);
 	}
 
-	foreach(linprog.get_binary_variables(), var_id)
+	foreach(lp.get_binary_variables(), var_id)
 	{
 		col_idx = 1 + *var_id;
 		glp_set_col_kind(glpk, col_idx, GLP_BV);

@@ -136,7 +136,7 @@ ulong rta_lp_pfp_suspension(uint t_id,
 			case 1:
 				// add functions to bound "spin" and "local_blocking" here
 				// XXXXXXXX			
-				total_blocking(t_id, tasks, processors, resources)
+				total_blocking(t_id, tasks, processors, resources);
 				demand = task_i.get_total_blocking() + task_i.get_wcet();
 				break;
 		}

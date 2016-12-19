@@ -1,19 +1,18 @@
 #ifndef TASKS_H
 #define TASKS_H
 
-#include <vector>
 #include <algorithm>
 #include <iostream>
-#include "math-helper.h"
-#include "iteration-helper.h"
 #include "types.h"
-#include "random_gen.h"
-#include "resources.h"
-#include "sort.h"
-#include "processors.h"
-#include "param.h"
 
 using namespace std;
+
+class Processor;
+class ProcessorSet;
+class Resource;
+class ResourceSet;
+class Param;
+class Random_Gen;
 
 typedef vector<fraction_t> Ratio;
 

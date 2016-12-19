@@ -1,8 +1,10 @@
 #include "resources.h"
+#include "tasks.h"
+#include "processors.h"
+#include "param.h"
+#include "random_gen.h"
 
 /////////////////////////////Resource///////////////////////////////
-
-//template<class TaskModlePtr>
 Resource::Resource(uint id, uint locality, bool global_resource, bool processor_local_resource)
 {
 	this->resource_id = id;
@@ -11,9 +13,8 @@ Resource::Resource(uint id, uint locality, bool global_resource, bool processor_
 	this->processor_local_resource = processor_local_resource;
 }
 
-
 uint Resource::get_resource_id() const { return resource_id; }
-void set_locality(uint locality) { this->locality = locality; }
+void Resource::set_locality(uint locality) { this->locality = locality; }
 uint Resource::get_locality() const { return locality; }
 
 bool Resource::is_global_resource() const { return global_resource; }
@@ -97,7 +98,7 @@ void resource_alloc(ResourceSet& resources, uint p_num)
 {
 	uint p_idx = 0;
 
-	foreach(resources, resource)
+	foreach(resources.get_resources(), resource)
 	{
 		p_idx = p_idx % p_num;
 		resource->set_locality(p_idx);

@@ -1,9 +1,12 @@
 #ifndef SOLUTION_H
 #define SOLUTION_H
 
+#include <types.h>
 #include <iostream>
-#include <lp.h>
 #include <glpk.h>
+
+class LinearExpression;
+class LinearProgram;
 
 class GLPKSolution
 {

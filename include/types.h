@@ -9,6 +9,7 @@
 #include <set>
 #include <math.h>
 #include <time.h>
+#include <assert.h>
 #include "iteration-helper.h"
 #include "math-helper.h"
 

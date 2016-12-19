@@ -1,4 +1,6 @@
 #include "varmapper.h"
+#include <sstream>
+#include <limits.h>
 
 using namespace std;
 
@@ -82,9 +84,9 @@ string VarMapperBase::key2str(uint64_t key, unsigned int var) const
 	return buf.str();
 }
 
-hashmap<unsigned int, string> VarMapperBase::get_translation_table() const
+unordered_map<unsigned int, string> VarMapperBase::get_translation_table() const
 {
-	hashmap<unsigned int, string> table;
+	unordered_map<unsigned int, string> table;
 
 	foreach(map, kv)
 	{
@@ -98,7 +100,7 @@ hashmap<unsigned int, string> VarMapperBase::get_translation_table() const
 
 
 ////////////////////VarMapper////////////////////
-static uint64_t VarMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t blocking_type)
+uint64_t VarMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t blocking_type)
 {
 	assert(task_id < (1 << 32));
 	assert(res_id < (1 << 10));
@@ -108,22 +110,22 @@ static uint64_t VarMapper::encode_request(uint64_t task_id, uint64_t res_id, uin
 	return (blocking_type << 62) | (task_id << 30) | (req_id << 10) | res_id;
 }
 
-static uint64_t VarMapper::get_task(uint64_t var)
+uint64_t VarMapper::get_task(uint64_t var)
 {
 	return (var >> 30) & (uint64_t) 0xffffffff; //32 bits
 }
 
-static uint64_t VarMapper::get_type(uint64_t var)
+uint64_t VarMapper::get_type(uint64_t var)
 {
 	return (var >> 62) & (uint64_t) 0xf; //2 bits
 }
 
-static uint64_t VarMapper::get_req_id(uint64_t var)
+uint64_t VarMapper::get_req_id(uint64_t var)
 {
 	return (var >> 10) & (uint64_t) 0xfffff; //20 bits
 }
 
-static uint64_t VarMapper::get_res_id(uint64_t var)
+uint64_t VarMapper::get_res_id(uint64_t var)
 {
 	return var & (uint64_t) 0x3ff; //10 bits
 }

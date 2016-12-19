@@ -1,4 +1,6 @@
-#include "../include/processors.h"
+#include "processors.h"
+#include "tasks.h"
+#include "param.h"
 
 ///////////////////////////Processor/////////////////////////////
 

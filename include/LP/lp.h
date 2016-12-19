@@ -13,11 +13,12 @@ class LinearExpression
 	private:
 		Terms terms;
 	public:
-		Terms& get_terms() const;
+		Terms& get_terms();
 		bool has_terms() const;
 		int get_terms_size() const;		
 		void add_term(uint var_index, double coefficient = 1);
 		void sub_term(uint var_index, double pos_coefficient = 1);
+		void add_var(uint var_index);
 		void sub_var(uint var_index);
 };
 

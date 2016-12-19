@@ -17,8 +17,8 @@ MOVE          = mv -f
 MKDIR         = mkdir -p
 TARGET	      = SchedulingAnalysis
 
-SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o solution.o varmapper.o 
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o solution.o varmapper.o $(LFLAGS) $(LIBS)
+SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o lp_dpcp.o 
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o lp_dpcp.o $(LFLAGS) $(LIBS)
 	
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
@@ -50,11 +50,17 @@ param.o:param.cpp
 output.o:output.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c output.cpp $(LIBS)
 
+lp.o:LP/lp.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c LP/lp.cpp $(LIBS)
+
 solution.o:LP/solution.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c LP/solution.cpp $(LIBS)
 
 varmapper.o:LP/varmapper.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c LP/varmapper.cpp $(LIBS)
+
+lp_dpcp.o:SchedTest/blocking/lp/lp_dpcp.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/blocking/lp/lp_dpcp.cpp $(LIBS)
 
 clean:
 	rm -f *.o ${ALL}	
