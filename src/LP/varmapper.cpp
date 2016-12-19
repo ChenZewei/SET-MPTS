@@ -1,6 +1,7 @@
 #include "varmapper.h"
 #include <sstream>
 #include <limits.h>
+#include <iostream>
 
 using namespace std;
 
@@ -8,10 +9,12 @@ using namespace std;
 void VarMapperBase::insert(uint64_t key)
 {
 	assert(next_var < UINT_MAX);
-	assert(!sealed);
-
-	unsigned int idx = next_var++;
-	map[key] = idx;
+//	assert(!sealed);
+	if(!sealed)
+	{
+		unsigned int idx = next_var++;
+		map[key] = idx;
+	}
 }
 
 bool VarMapperBase::exists(uint64_t key) const
@@ -102,10 +105,12 @@ unordered_map<unsigned int, string> VarMapperBase::get_translation_table() const
 ////////////////////VarMapper////////////////////
 uint64_t VarMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t blocking_type)
 {
-	assert(task_id < (1 << 32));
-	assert(res_id < (1 << 10));
-	assert(req_id < (1 << 20));
-	assert(blocking_type < (1 << 2));
+//cout<<task_id<<endl;
+	uint64_t one = 1;
+	assert(task_id < (one << 32));
+	assert(res_id < (one << 10));
+	assert(req_id < (one << 20));
+	assert(blocking_type < (one << 2));
 
 	return (blocking_type << 62) | (task_id << 30) | (req_id << 10) | res_id;
 }

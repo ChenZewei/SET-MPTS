@@ -12,6 +12,7 @@
 #include "xml.h"
 #include "param.h"
 #include "output.h"
+#include "random_gen.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8

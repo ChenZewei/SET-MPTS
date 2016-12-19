@@ -24,6 +24,7 @@ uint Request::get_resource_id() const { return resource_id; }
 uint Request::get_num_requests() const { return num_requests; }
 ulong Request::get_max_length() const { return max_length; }
 ulong Request::get_total_length() const { return total_length; }
+ulong Request::get_locality() const { return locality; }
 
 ////////////////////////////Task//////////////////////////////
 

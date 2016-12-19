@@ -12,7 +12,12 @@
 	for (typeof(collection.begin()) it = (collection).begin();	\
 	     it != (collection).end();					\
 		     it++)
-
+/*
+#define foreach_task(taskset, tx)						\
+	for (uint t_id = 0, task tx = taskset.get_task_by_id(t_id);	\
+	     t_id < taskset.get_task_size();					\
+		     it++)
+*/
 #define enumerate(collection, it, i)					\
 	for (typeof(collection.begin()) it = ({i = 0; (collection).begin();}); \
 	     it != (collection).end();					\
@@ -40,7 +45,7 @@
 
 #define foreach_request_instance(task_ti, task_tx, request_index_variable)	\
 	for(uint request_index_variable = 0, 												\
-		max_request_num = ceiling((task_ti.get_response_time() + task_tx.get_response_time())/task_tx.get_period()); \
+		max_request_num = ceiling(((task_ti).get_response_time() + (task_tx).get_response_time()), (task_tx).get_period()); \
 		request_index_variable < max_request_num; \
 		request_index_variable++)
 
