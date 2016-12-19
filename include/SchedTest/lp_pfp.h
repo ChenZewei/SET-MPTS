@@ -1,11 +1,15 @@
-#include <iostream>
+
 //#include "../tasks.h"
 //#include "../processors.h"
 //#include "../resources.h"
-#include "math-helper.h"
+#include <iostream>
+#include "lp.h"
 #include "lp_dpcp.h"
-
-using namespace std;
+#include "varmapper.h"
+#include "solution.h"
+#include "tasks.h"
+#include "resources.h"
+#include "processors.h"
 
 typedef struct
 {
@@ -14,9 +18,10 @@ typedef struct
 	fraction_t x_p;
 }Structure;
 
+/*
 string get_structure_name(uint t_id, uint r_id, uint seq, int BLOCKING_TYPE)
 {
-	std::ostringstream buf;
+	ostringstream buf;
 	switch(BLOCKING_TYPE)
 	{
 		case DIRECT_REQUEST_DELAY:
@@ -32,7 +37,7 @@ string get_structure_name(uint t_id, uint r_id, uint seq, int BLOCKING_TYPE)
 	buf<<t_id<<","<<r_id<<","<<seq<<"]";
 	return buf.str();
 }
-
+*/
 ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
 	ulong local_blocking = 0;
@@ -105,7 +110,7 @@ ulong total_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resour
 	return total_blocking;
 }
 
-ulong interference(Task& task, ulong interval)
+ulong get_interference(Task& task, ulong interval)
 {
 	return task.get_wcet() * ceiling((interval + task.get_response_time()), task.get_period());
 }
@@ -118,7 +123,7 @@ ulong rta_lp_pfp_suspension(uint t_id,
 {
 	Task& task_i = tasks.get_task_by_id(t_id);
 	ulong test_end = task_i.get_deadline();
-	ulong test_start = task_i.get_total_blocking() + task.get_wcet();
+	ulong test_start = task_i.get_total_blocking() + task_i.get_wcet();
 	ulong response = test_start;
 	ulong demand = 0;
 	while (response <= test_end)
@@ -131,7 +136,7 @@ ulong rta_lp_pfp_suspension(uint t_id,
 			case 1:
 				// add functions to bound "spin" and "local_blocking" here
 				// XXXXXXXX			
-				total_blocking(t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
+				total_blocking(t_id, tasks, processors, resources)
 				demand = task_i.get_total_blocking() + task_i.get_wcet();
 				break;
 		}
@@ -142,7 +147,7 @@ ulong rta_lp_pfp_suspension(uint t_id,
 			Task& task_h = tasks.get_task_by_id(th);
 			if (task_i.get_partition() == task_h.get_partition())
 			{
-				interference += interference(task_h, response);
+				interference += get_interference(task_h, response);
 			}
 		}
 //cout<<"interference1:"<<interference<<endl;
@@ -160,6 +165,7 @@ bool is_rta_lp_pfp_schedulable(uint t_id,
 				TaskSet& tasks,
 				ProcessorSet& processors,
 				ResourceSet& resources,
+				uint TEST_TYPE,
 				uint ITER_BLOCKING)
 {
 	ulong response_bound;

@@ -30,7 +30,7 @@ class GLPKSolution
 		double get_value(unsigned int var) const;
 		double evaluate(const LinearExpression &exp) const;
 		bool is_solved() const;
-}
+};
 
 
 #endif

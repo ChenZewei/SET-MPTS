@@ -41,8 +41,7 @@ bool is_worst_fit_pfp_schedulable(TaskSet& tasks,
 		if(!is_rta_lp_pfp_schedulable(t_id, tasks, processors, resources, TEST_TYPE, ITER_BLOCKING))
 			return false;
 	}	
-	else
-		return true;
+	return true;
 }
 
 bool is_first_fit_dm_schedulable(TaskSet& tasks, 

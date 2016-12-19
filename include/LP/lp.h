@@ -1,10 +1,7 @@
 #ifndef _LP_H_
 #define _LP_H_
 
-#include <type.h>
-#include <vector>
-#include <set>
-#include <math-helper.h>
+#include <types.h>
 
 using namespace std;
 
@@ -16,38 +13,13 @@ class LinearExpression
 	private:
 		Terms terms;
 	public:
-		Terms& get_terms() const
-		{
-			return terms;
-		}
-		
-		bool has_terms() const
-		{
-			return !terms.empty();
-		}
-		int get_terms_size() const
-		{
-			return terms.size();
-		}
-		
-		void add_term(uint var_index, double coefficient = 1)
-		{
-			terms.push_back(Term(coefficient, variable_index));
-		}
+		Terms& get_terms() const;
+		bool has_terms() const;
+		int get_terms_size() const;		
+		void add_term(uint var_index, double coefficient = 1);
 		void sub_term(uint var_index, double pos_coefficient = 1);
-		{
-			add_term(-pos_coefficient, variable_index);
-		}
-
-		void add_var(uint var_index)
-		{
-			add_term(1, variable_index);
-		}
-		void sub_var(uint var_index)
-		{
-			sub_term(1, variable_index);
-		}
-}
+		void sub_var(uint var_index);
+};
 
 typedef struct
 {
@@ -83,110 +55,24 @@ class LinearProgram
 		VariableRanges non_default_bounds;
 
 	public:
-		LinearProgram() : objective(new LinearExpression()) {};
-
-		~LinearProgram()
-		{
-			delete objective;
-			foreach(equalities, eq)
-				delete eq->first;
-			foreach(inequalities, ineq)
-				delete ineq->first;
-		}
-
-		void declare_variable_integer(uint variable_index)
-		{
-			variables_integer.insert(variable_index);
-		}
-
-		void declare_variable_binary(uint variable_index)
-		{
-			variables_binary.insert(variable_index);
-		}
-
-		void declare_variable_bounds(uint variable_id,
-			bool has_lower, double lower, bool has_upper, double upper)
-		{
-			VariableRange b;
-			b.variable_id = variable_id;
-			b.has_lower = has_lower;
-			b.has_upper = has_upper;
-			b.lower_bound = lower;
-			b.upper_bound = upper;
-			non_default_bounds.push_back(b);
-		}
-
-		void set_objective(LinearExpression *obj)
-		{
-			delete objective;
-			objective = obj;
-		}
-
-		void add_inequality(LinearExpression *exp, double upper_bound)
-		{
-			if (exp->has_terms())
-				inequalities.push_back(Constraint(exp, upper_bound));
-			else
-				delete exp;
-		}
-
-		void add_equality(LinearExpression *exp, double equal_to)
-		{
-			if (exp->has_terms())
-				equalities.push_back(Constraint(exp, equal_to));
-			else
-				delete exp;
-		}
-
-		const LinearExpression *get_objective() const
-		{
-			return objective;
-		}
-
-		const set<uint>& get_integer_variables() const
-		{
-			return variables_integer;
-		}
-
-		bool has_binary_variables() const
-		{
-			return !variables_binary.empty();
-		}
-
-		bool has_integer_variables() const
-		{
-			return !variables_integer.empty();
-		}
-
-		bool is_integer_variable(unsigned int variable_id) const
-		{
-			return variables_integer.find(variable_id) != variables_integer.end();
-		}
-
-		bool is_binary_variable(unsigned int variable_id) const
-		{
-			return variables_binary.find(variable_id) != variables_binary.end();
-		}
-
-		const set<uint>& get_binary_variables() const
-		{
-			return variables_binary;
-		}
-
-		const Constraints& get_equalities() const
-		{
-			return equalities;
-		}
-
-		const Constraints& get_inequalities() const
-		{
-			return inequalities;
-		}
-
-		const VariableRanges& get_non_default_variable_ranges() const
-		{
-			return non_default_bounds;
-		}	
-}
+		LinearProgram();
+		~LinearProgram();
+		void declare_variable_integer(uint variable_index);
+		void declare_variable_binary(uint variable_index);
+		void declare_variable_bounds(uint variable_id, bool has_lower, double lower, bool has_upper, double upper);
+		void set_objective(LinearExpression *obj);
+		void add_inequality(LinearExpression *exp, double upper_bound);
+		void add_equality(LinearExpression *exp, double equal_to);
+		const LinearExpression *get_objective() const;
+		const set<uint>& get_integer_variables() const;
+		bool has_binary_variables() const;
+		bool has_integer_variables() const;
+		bool is_integer_variable(unsigned int variable_id) const;
+		bool is_binary_variable(unsigned int variable_id) const;
+		const set<uint>& get_binary_variables() const;
+		const Constraints& get_equalities() const;
+		const Constraints& get_inequalities() const;
+		const VariableRanges& get_non_default_variable_ranges() const;
+};
 
 #endif

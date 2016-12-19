@@ -2,7 +2,7 @@
 #define VARMAPPER_H
 
 #include <stdint.h>
-#include <hash_map>
+#include <unordered_map>
 #include <string>
 
 using namespace std;
@@ -18,7 +18,7 @@ enum blocking_type
 class VarMapperBase 
 {
 	private:
-		hashmap<uint64_t, unsigned int> map;
+		unordered_map<uint64_t, unsigned int> map;
 		unsigned int next_var;
 		bool sealed;
 
@@ -34,7 +34,7 @@ class VarMapperBase
 		void seal();
 		unsigned int get_num_vars() const;
 		unsigned int get_next_var() const;
-		hashmap<unsigned int, string> get_translation_table() const;
+		unordered_map<unsigned int, string> get_translation_table() const;
 
 		// debugging support
 		string var2str(unsigned int var) const;
@@ -56,6 +56,6 @@ class VarMapper: public VarMapperBase
 		unsigned int lookup(unsigned int task_id, unsigned int res_id, unsigned int req_id, blocking_type type);
 		string key2str(uint64_t key, unsigned int var) const;						
 													
-}
+};
 
 #endif
