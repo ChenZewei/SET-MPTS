@@ -9,12 +9,9 @@ using namespace std;
 void VarMapperBase::insert(uint64_t key)
 {
 	assert(next_var < UINT_MAX);
-//	assert(!sealed);
-	if(!sealed)
-	{
-		unsigned int idx = next_var++;
-		map[key] = idx;
-	}
+	assert(!sealed);
+	unsigned int idx = next_var++;
+	map[key] = idx;
 }
 
 bool VarMapperBase::exists(uint64_t key) const
@@ -107,12 +104,24 @@ uint64_t VarMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t r
 {
 //cout<<task_id<<endl;
 	uint64_t one = 1;
+	uint64_t key = 0;
 	assert(task_id < (one << 32));
 	assert(res_id < (one << 10));
 	assert(req_id < (one << 20));
 	assert(blocking_type < (one << 2));
+/*
+cout<<"blocking_type:"<<blocking_type<<endl;
+cout<<"task_id:"<<task_id<<endl;
+cout<<"req_id:"<<req_id<<endl;
+cout<<"res_id:"<<res_id<<endl;
+*/
+	key |= (blocking_type << 62);
+	key |= (task_id << 30);
+	key |= (req_id << 10);
+	key |= res_id;
 
-	return (blocking_type << 62) | (task_id << 30) | (req_id << 10) | res_id;
+//cout<<"key:"<<key<<endl;
+	return key;
 }
 
 uint64_t VarMapper::get_task(uint64_t var)
@@ -140,7 +149,10 @@ VarMapper::VarMapper(unsigned int start_var): VarMapperBase(start_var) {}
 unsigned int VarMapper::lookup(unsigned int task_id, unsigned int res_id, unsigned int req_id, blocking_type type)
 {
 	uint64_t key = encode_request(task_id, res_id, req_id, type);
-	return var_for_key(key);
+	uint var = var_for_key(key);
+//cout<<"Key:"<<key<<endl;
+//cout<<"Var:"<<var<<endl;
+	return var;
 }
 
 string VarMapper::key2str(uint64_t key, unsigned int var) const

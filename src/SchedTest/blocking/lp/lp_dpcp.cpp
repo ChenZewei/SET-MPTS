@@ -5,6 +5,47 @@
 #include <lp.h>
 #include <varmapper.h>
 
+void lp_dpcp_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj)
+{
+	LinearExpression *obj = new LinearExpression();
+	uint var_id;
+
+	foreach_task_except(tasks.get_tasks(), ti, tx)
+	{
+		uint x = tx->get_id();
+		foreach(tx->get_requests(), request)
+		{
+			uint q = request->get_resource_id();
+			bool is_local = (request->get_locality() == ti.get_partition());
+			ulong length = request->get_max_length();
+			foreach_request_instance(ti, *tx, v)
+			{
+				var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
+				obj->add_term(var_id, length);
+				if (is_local && (local_obj != NULL))
+					local_obj->add_term(var_id, length);
+				else if (!is_local && (remote_obj != NULL))
+					remote_obj->add_term(var_id, length);
+
+				var_id = vars.lookup(x, q, v, BLOCKING_INDIRECT);
+				obj->add_term(var_id, length);
+				if (is_local && (local_obj != NULL))
+					local_obj->add_term(var_id, length);
+				else if (!is_local && (remote_obj != NULL))
+					remote_obj->add_term(var_id, length);
+
+				var_id = vars.lookup(x, q, v, BLOCKING_PREEMPT);
+				obj->add_term(var_id, length);
+				if (is_local && (local_obj != NULL))
+					local_obj->add_term(var_id, length);
+				else if (!is_local && (remote_obj != NULL))
+					remote_obj->add_term(var_id, length);
+			}
+		}
+	}
+	vars.seal();
+}
+
 void lp_dpcp_local_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
 {
 	LinearExpression *obj = new LinearExpression();
@@ -69,6 +110,7 @@ void lp_dpcp_remote_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, 
 //Constraint 1 [BrandenBurg 2013 RTAS] Xd(x,q,v) + Xi(x,q,v) + Xp(x,q,v) <= 1
 void lp_dpcp_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
 {
+//cout<<"Constraint 1"<<endl;
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
 		uint x = tx->get_id();
@@ -82,17 +124,28 @@ void lp_dpcp_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 
 				var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
 				exp->add_var(var_id);
-				
+//cout<<"var_id1:"<<var_id<<endl;			
 				var_id = vars.lookup(x, q, v, BLOCKING_INDIRECT);
 				exp->add_var(var_id);
-
+//cout<<"var_id2:"<<var_id<<endl;
 				var_id = vars.lookup(x, q, v, BLOCKING_PREEMPT);
 				exp->add_var(var_id);
-
+//cout<<"var_id3:"<<var_id<<endl;
 				lp.add_inequality(exp, 1);// Xd(x,q,v) + Xi(x,q,v) + Xp(x,q,v) <= 1
+//cout<<"----------inequality----------"<<endl;
+/*
+				foreach(exp->get_terms(), term)
+				{
+					cout<<"term:"<<term->first<<endl;
+					cout<<"var:"<<term->second<<endl;
+				}
+*/
+//cout<<"==========inequality=========="<<endl;
 			}
 		}
 	}
+
+	
 	
 }
 

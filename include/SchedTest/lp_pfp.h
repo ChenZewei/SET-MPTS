@@ -48,23 +48,29 @@ ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resour
 	ulong r_i = task_i.get_response_time();//response time of task i(t_id)
 	VarMapper var;
 	LinearProgram local_bound;
-	
-	lp_dpcp_local_objective(task_i, tasks, resources, local_bound, var);
-
+	LinearExpression *local_obj = new LinearExpression();
+//cout<<"111"<<endl;
+	//lp_dpcp_local_objective(task_i, tasks, resources, local_bound, var);
+	lp_dpcp_objective(task_i, tasks, resources, local_bound, var, local_obj, NULL);
+	local_bound.set_objective(local_obj);
 //construct constraints
+//cout<<"222"<<endl;
 	lp_dpcp_constraint_1(task_i, tasks, resources, local_bound, var);
 	lp_dpcp_constraint_2(task_i, tasks, resources, local_bound, var);
-
+//cout<<"333"<<endl;
 	GLPKSolution *lb_solution = new GLPKSolution(local_bound, var.get_num_vars());
+//cout<<"444"<<endl;
+	assert(lb_solution != NULL);
 
 	if(lb_solution->is_solved())
 	{
 		local_blocking = lrint(lb_solution->evaluate(*(local_bound.get_objective())));
 	}
-	
+//cout<<"lb:"<<local_blocking<<endl;
 	task_i.set_local_blocking(local_blocking);
-	
+//cout<<"555"<<endl;
 	delete lb_solution;
+//cout<<"666"<<endl;
 	return local_blocking;
 }
 
@@ -78,9 +84,10 @@ ulong remote_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resou
 	ulong r_i = task_i.get_response_time();//response time of task i(t_id)
 	VarMapper var;
 	LinearProgram remote_bound;
-	
-	lp_dpcp_remote_objective(task_i, tasks, resources, remote_bound, var);
-
+	LinearExpression *remote_obj = new LinearExpression();
+	//lp_dpcp_remote_objective(task_i, tasks, resources, remote_bound, var);
+	lp_dpcp_objective(task_i, tasks, resources, remote_bound, var, NULL, remote_obj);
+	remote_bound.set_objective(remote_obj);
 //construct constraints
 	lp_dpcp_constraint_1(task_i, tasks, resources, remote_bound, var);
 	lp_dpcp_constraint_2(task_i, tasks, resources, remote_bound, var);
@@ -102,9 +109,11 @@ ulong total_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resour
 {	
 	ulong total_blocking;
 	Task& task_i = tasks.get_task_by_id(t_id);
+//cout<<"111"<<endl;
 	ulong blocking_l = local_blocking(t_id, tasks, processors, resources);
+//cout<<"222"<<endl;
 	ulong blocking_r = remote_blocking(t_id, tasks, processors, resources);
-
+//cout<<"333"<<endl;
 	total_blocking = blocking_l + blocking_r;
 	task_i.set_total_blocking(total_blocking);
 	return total_blocking;
@@ -128,6 +137,7 @@ ulong rta_lp_pfp_suspension(uint t_id,
 	ulong demand = 0;
 	while (response <= test_end)
 	{
+//cout<<"111"<<endl;
 		switch (ITER_BLOCKING)
 		{
 			case 0:
@@ -140,7 +150,7 @@ ulong rta_lp_pfp_suspension(uint t_id,
 				demand = task_i.get_total_blocking() + task_i.get_wcet();
 				break;
 		}
-
+//cout<<"222"<<endl;
 		ulong interference = 0;
 		for (uint th = 0; th < t_id; th ++)
 		{
@@ -152,7 +162,7 @@ ulong rta_lp_pfp_suspension(uint t_id,
 		}
 //cout<<"interference1:"<<interference<<endl;
 		demand += interference;
-
+//cout<<"333"<<endl;
 		if (response == demand)
 			return response + task_i.get_jitter();
 		else 

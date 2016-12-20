@@ -139,7 +139,7 @@ int main(int argc,char** argv)
 			for(uint i = 0; i < parameters.get_method_num(); i++)
 			{
 				taskset.init();
-				processorset.init();				
+				processorset.init();			
 				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(i), parameters.get_test_type(i), 0))
 				if(is_schedulable(taskset, processorset, resourceset, 7, parameters.get_test_type(i), 1))
 				{	

@@ -25,7 +25,7 @@ GLPKSolution::GLPKSolution(const LinearProgram &lp,
 
 GLPKSolution::~GLPKSolution()
 {
-	delete glpk;
+	//delete glpk;
 }
 
 void GLPKSolution::show_error()
@@ -126,37 +126,40 @@ bool GLPKSolution::is_solved() const
 }
 void GLPKSolution::solve(double var_lb, double var_ub)
 {
+//cout<<"111"<<endl;
 	glp_term_out(GLP_OFF);
 	glp_set_obj_dir(glpk, GLP_MAX);
 	glp_add_cols(glpk, col_num);
 	glp_add_rows(glpk, row_num);
-
+//cout<<"222"<<endl;
 	set_objective();
+//cout<<"333"<<endl;
 	set_bounds(var_lb, var_ub);
+//cout<<"444"<<endl;
 	set_coefficients();
 	if (is_mip)
 		set_column_types();
-
+//cout<<"555"<<endl;
 	if (is_mip)
 	{
 		glp_iocp glpk_params;
-
+//cout<<"666"<<endl;
 		glp_init_iocp(&glpk_params);
-
+//cout<<"777"<<endl;
 		// presolver is required because otherwise
 		// GLPK expects glpk to hold an optimal solution
 		// to the relaxed LP.
 		glpk_params.presolve = GLP_ON;
-
+//cout<<"888"<<endl;
 		solved = glp_intopt(glpk, &glpk_params) == 0 &&
 			 glp_mip_status(glpk) == GLP_OPT;
 	}
 	else
 	{
 		glp_smcp glpk_params;
-
+//cout<<"666"<<endl;
 		glp_init_smcp(&glpk_params);
-
+//cout<<"777"<<endl;
 		/* Set solver options. The presolver is essential. The other two
 		 * options seem to make the solver slightly faster.
 		 *
@@ -165,11 +168,13 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 		glpk_params.presolve = GLP_ON;
 		glpk_params.pricing  = GLP_PT_STD;
 		glpk_params.r_test   = GLP_RT_STD;
-
+//cout<<"888"<<endl;
 		simplex_code = glp_simplex(glpk, &glpk_params);
+//cout<<"999"<<endl;
 		solved = simplex_code == 0 &&
 			glp_get_status(glpk) == GLP_OPT;
 	}
+//cout<<"100000"<<endl;
 }
 
 void GLPKSolution::set_objective()
@@ -270,7 +275,12 @@ void GLPKSolution::set_coefficients()
 		}
 		r += 1;
 	}
-
+/*
+for(uint i = 1; i <= coeff_num; i++)
+{
+	cout<<"["<<row_idx[i]<<","<<col_idx[i]<<"]"<<" = "<<coeff[i]<<endl;
+}
+*/
 	glp_load_matrix(glpk, coeff_num, row_idx, col_idx, coeff);
 
 	delete[] row_idx;

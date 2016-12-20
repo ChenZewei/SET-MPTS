@@ -26,11 +26,11 @@ void LinearExpression::sub_term(uint var_index, double pos_coefficient)
 
 void LinearExpression::add_var(uint var_index)
 {
-	add_term(1, var_index);
+	add_term(var_index, 1);
 }
 void LinearExpression::sub_var(uint var_index)
 {
-	sub_term(1, var_index);
+	sub_term(var_index, 1);
 }
 
 ////////////////////Linearprogram////////////////////
