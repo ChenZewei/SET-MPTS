@@ -13,7 +13,15 @@ Resource::Resource(uint id, uint locality, bool global_resource, bool processor_
 	this->processor_local_resource = processor_local_resource;
 }
 
-Resource::~Resource() {}
+Resource::~Resource() 
+{
+/*
+	foreach(queue, element)
+	{
+		delete *element;
+	}
+*/
+}
 
 uint Resource::get_resource_id() const { return resource_id; }
 void Resource::set_locality(uint locality) { this->locality = locality; }

@@ -13,6 +13,16 @@ Processor::Processor(uint id, fraction_t speedfactor)
 	tryed_assign = false;
 }
 
+Processor::~Processor()
+{
+/*
+	foreach(queue, element)
+	{
+		delete *element;
+	}
+*/
+}
+
 uint Processor::get_processor_id() const
 {
 	return processor_id;

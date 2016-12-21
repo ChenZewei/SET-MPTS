@@ -70,6 +70,12 @@ ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resour
 	task_i.set_local_blocking(local_blocking);
 //cout<<"555"<<endl;
 	//delete local_obj;
+	int peak;
+
+	glp_mem_usage(NULL, &peak, NULL, NULL);
+
+	cout<<"Peak memory usage:"<<peak<<endl; 
+
 	delete lb_solution;
 //cout<<"666"<<endl;
 	return local_blocking;
@@ -102,6 +108,12 @@ ulong remote_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resou
 
 	task_i.set_remote_blocking(remote_blocking);
 	
+	int peak;
+
+	glp_mem_usage(NULL, &peak, NULL, NULL);
+
+	cout<<"Peak memory usage:"<<peak<<endl; 
+
 	//delete remote_obj;
 	delete rb_solution;
 	return remote_blocking;

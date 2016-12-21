@@ -15,13 +15,14 @@ class Processor
 {
 	private:
 		uint processor_id;
-		TaskQueue queue;
 		fraction_t speedfactor;
 		fraction_t utilization;
 		fraction_t density;
 		bool tryed_assign;
+		TaskQueue queue;
 	public:
 		Processor(uint id, fraction_t speedfactor = 1);
+		~Processor();
 		uint get_processor_id() const;
 		fraction_t get_speedfactor() const;
 		fraction_t get_utilization() const;

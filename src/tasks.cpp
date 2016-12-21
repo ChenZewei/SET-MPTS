@@ -100,7 +100,12 @@ Task::Task(	uint id,
 	}
 }
 
-Task::~Task() {}
+Task::~Task()
+{
+//	if(affinity)
+	//	delete affinity;
+	requests.clear();
+}
 
 void Task::init()
 {
