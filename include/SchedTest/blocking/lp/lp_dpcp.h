@@ -3,12 +3,15 @@
 
 class Task;
 class TaskSet;
+class Request;
 class Resource;
 class ResourceSet;
 class ProcessorSet;
 class VarMapper;
 class LinearExpression;
 class LinearProgram;
+
+unsigned long get_max_wait_time(Task& ti, Request& rq, TaskSet& tasks, ResourceSet& resources);
 
 void lp_dpcp_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj);
 
@@ -34,6 +37,6 @@ void lp_dpcp_constraint_4(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 void lp_dpcp_constraint_5(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, VarMapper& vars);
 
 //Constraint 8 [BrandenBurg 2013 RTAS]
-void lp_dpcp_constraint_6(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, VarMapper& vars);
+void lp_dpcp_constraint_6(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars);
 
 #endif
