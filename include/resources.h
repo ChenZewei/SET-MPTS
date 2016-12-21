@@ -25,6 +25,7 @@ class Resource
 		TaskQueue queue;
 	public:
 		Resource(uint id, uint locality = MAX_INT, bool global_resource = false, bool processor_local_resource = false);
+		~Resource();
 		uint get_resource_id() const;
 		void set_locality(uint locality);
 		uint get_locality() const;

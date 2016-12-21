@@ -15,7 +15,7 @@
 <!-->
 		<data TEST_TYPE="0" REMARK="normal">WF-EDF</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>50</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -31,8 +31,8 @@
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>0</min>
-			<max>4</max>
+			<min>1.8</min>
+			<max>3</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
@@ -40,8 +40,8 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>100</min>
-			<max>1000</max>
+			<min>10000</min>
+			<max>100000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>

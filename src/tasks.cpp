@@ -100,6 +100,8 @@ Task::Task(	uint id,
 	}
 }
 
+Task::~Task() {}
+
 void Task::init()
 {
 	partition = MAX_INT;

@@ -24,19 +24,19 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 			schedulable = is_bcl_edf_schedulable(taskset, processorset);
 			break;
 		case WF_DM:
-			schedulable = is_worst_fit_dm_schedulable(taskset, processorset, resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
+			schedulable = is_worst_fit_dm_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
 			break;
 		case WF_EDF:
-			schedulable = is_worst_fit_edf_schedulable(taskset, processorset, resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
+			schedulable = is_worst_fit_edf_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
 			break;
 		case RTA_GFP:
 			schedulable = is_gfp_rta_schedulable(taskset, processorset, TEST_TYPE);
 			break;
 		case FF_DM:
-			schedulable = is_first_fit_dm_schedulable(taskset, processorset, resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
+			schedulable = is_first_fit_dm_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
 			break;
 		case WF_LP_PFP://7
-			is_worst_fit_pfp_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
+			schedulable = is_worst_fit_pfp_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
 			break;
 		default:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);

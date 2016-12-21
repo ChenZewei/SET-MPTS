@@ -69,6 +69,7 @@ ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resour
 //cout<<"lb:"<<local_blocking<<endl;
 	task_i.set_local_blocking(local_blocking);
 //cout<<"555"<<endl;
+	//delete local_obj;
 	delete lb_solution;
 //cout<<"666"<<endl;
 	return local_blocking;
@@ -101,6 +102,7 @@ ulong remote_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resou
 
 	task_i.set_remote_blocking(remote_blocking);
 	
+	//delete remote_obj;
 	delete rb_solution;
 	return remote_blocking;
 }
@@ -145,8 +147,10 @@ ulong rta_lp_pfp_suspension(uint t_id,
 				break;
 			case 1:
 				// add functions to bound "spin" and "local_blocking" here
-				// XXXXXXXX			
+				// XXXXXXXX		
+//cout<<"total blocking of task "<<t_id<<":"<<endl;	
 				total_blocking(t_id, tasks, processors, resources);
+//cout<<task_i.get_total_blocking()<<endl;																																											
 				demand = task_i.get_total_blocking() + task_i.get_wcet();
 				break;
 		}
@@ -171,12 +175,11 @@ ulong rta_lp_pfp_suspension(uint t_id,
 	return test_end + 100;
 }
 
-bool is_rta_lp_pfp_schedulable(uint t_id,
-				TaskSet& tasks,
-				ProcessorSet& processors,
-				ResourceSet& resources,
-				uint TEST_TYPE,
-				uint ITER_BLOCKING)
+bool is_rta_lp_pfp_schedulable(TaskSet& tasks,
+								ProcessorSet& processors,
+								ResourceSet& resources,
+								uint TEST_TYPE,
+								uint ITER_BLOCKING)
 {
 	ulong response_bound;
 	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)

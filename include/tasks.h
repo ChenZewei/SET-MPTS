@@ -81,6 +81,8 @@ class Task
 			ulong period,
 			ulong deadline = 0,
 			uint priority = 0);
+
+		~Task();
 		
 		void init();
 

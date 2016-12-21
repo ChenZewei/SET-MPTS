@@ -13,6 +13,8 @@ Resource::Resource(uint id, uint locality, bool global_resource, bool processor_
 	this->processor_local_resource = processor_local_resource;
 }
 
+Resource::~Resource() {}
+
 uint Resource::get_resource_id() const { return resource_id; }
 void Resource::set_locality(uint locality) { this->locality = locality; }
 uint Resource::get_locality() const { return locality; }
@@ -92,6 +94,12 @@ void resource_gen(ResourceSet *resourceset, Param param)
 	for(int i = 0; i < param.resource_num; i++)
 		resourceset->add_resource();
 	resource_alloc(*resourceset, param.p_num);
+/*
+	foreach(resourceset->get_resources(), resource)
+	{
+		cout<<"resource:"<<resource->get_resource_id()<<" locate at processor:"<<resource->get_locality()<<endl;
+	}
+*/
 }
 
 void resource_alloc(ResourceSet& resources, uint p_num)

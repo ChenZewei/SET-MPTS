@@ -43,6 +43,7 @@ void lp_dpcp_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearP
 			}
 		}
 	}
+	delete obj;
 	vars.seal();
 }
 
@@ -72,6 +73,7 @@ void lp_dpcp_local_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, L
 	}
 	
 	lp.set_objective(obj);
+	delete obj;
 	vars.seal();
 }
 
@@ -104,6 +106,7 @@ void lp_dpcp_remote_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, 
 	}
 
 	lp.set_objective(obj);
+	delete obj;
 	vars.seal();
 }
 

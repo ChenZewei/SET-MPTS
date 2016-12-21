@@ -123,7 +123,7 @@ int main(int argc,char** argv)
 	do
 	{	
 		Result result;
-		cout<<"Utilization:"<<utilization<<endl;
+cout<<"Utilization:"<<utilization<<endl;
 		vector<int> success;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
@@ -131,19 +131,21 @@ int main(int argc,char** argv)
 		}
 		for(int i = 0; i < exp_times; i++)
 		{
-			TaskSet taskset = TaskSet();
+cout<<"exp:"<<i<<endl;
+	    	TaskSet taskset = TaskSet();
 			ProcessorSet processorset = ProcessorSet(parameters);
 			ResourceSet resourceset = ResourceSet();
 			resource_gen(&resourceset, parameters);
 			tast_gen(taskset, resourceset, parameters, utilization);
-			for(uint i = 0; i < parameters.get_method_num(); i++)
+
+			for(uint j = 0; j < parameters.get_method_num(); j++)
 			{
 				taskset.init();
 				processorset.init();			
 				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(i), parameters.get_test_type(i), 0))
-				if(is_schedulable(taskset, processorset, resourceset, 7, parameters.get_test_type(i), 1))
-				{	
-					success[i]++;
+				if(is_schedulable(taskset, processorset, resourceset, 7, 0, 1))
+				{
+					success[j]++;
 				}
 			}
 			result.x = taskset.get_utilization_sum().get_d();
@@ -152,6 +154,7 @@ int main(int argc,char** argv)
 		{
 			fraction_t ratio(success[i], exp_times);
 			result.y = ratio.get_d();
+cout<<"ratio:"<<ratio.get_d()<<endl;
 			output.add_result(i, result.x, result.y);
 		}
 
