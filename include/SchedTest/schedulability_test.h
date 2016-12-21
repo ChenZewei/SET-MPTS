@@ -36,6 +36,7 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 			schedulable = is_first_fit_dm_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
 			break;
 		case WF_LP_PFP://7
+			taskset.RM_Order();
 			schedulable = is_worst_fit_pfp_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
 			break;
 		default:

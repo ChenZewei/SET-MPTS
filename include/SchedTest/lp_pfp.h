@@ -3,6 +3,7 @@
 //#include "../processors.h"
 //#include "../resources.h"
 #include <iostream>
+#include <assert.h>
 #include "lp.h"
 #include "lp_dpcp.h"
 #include "varmapper.h"
@@ -18,26 +19,6 @@ typedef struct
 	fraction_t x_p;
 }Structure;
 
-/*
-string get_structure_name(uint t_id, uint r_id, uint seq, int BLOCKING_TYPE)
-{
-	ostringstream buf;
-	switch(BLOCKING_TYPE)
-	{
-		case DIRECT_REQUEST_DELAY:
-			buf<<"Xd[";
-			break;
-		case INDIRECT_REQUEST_DELAY:
-			buf<<"Xi[";
-			break;
-		case PREEMPTION_DELAY:
-			buf<<"Xp[";
-			break;
-	}
-	buf<<t_id<<","<<r_id<<","<<seq<<"]";
-	return buf.str();
-}
-*/
 ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
 	ulong local_blocking = 0;
@@ -49,35 +30,30 @@ ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resour
 	VarMapper var;
 	LinearProgram local_bound;
 	LinearExpression *local_obj = new LinearExpression();
-//cout<<"111"<<endl;
 	//lp_dpcp_local_objective(task_i, tasks, resources, local_bound, var);
 	lp_dpcp_objective(task_i, tasks, resources, local_bound, var, local_obj, NULL);
 	local_bound.set_objective(local_obj);
 //construct constraints
-//cout<<"222"<<endl;
-	lp_dpcp_constraint_1(task_i, tasks, resources, local_bound, var);
-	lp_dpcp_constraint_2(task_i, tasks, resources, local_bound, var);
-//cout<<"333"<<endl;
+	lp_dpcp_add_constraints(task_i, tasks, processors, resources, local_bound, var);
+
 	GLPKSolution *lb_solution = new GLPKSolution(local_bound, var.get_num_vars());
-//cout<<"444"<<endl;
+
 	assert(lb_solution != NULL);
 
 	if(lb_solution->is_solved())
 	{
 		local_blocking = lrint(lb_solution->evaluate(*(local_bound.get_objective())));
 	}
-//cout<<"lb:"<<local_blocking<<endl;
+
 	task_i.set_local_blocking(local_blocking);
-//cout<<"555"<<endl;
-	//delete local_obj;
+	
+#if GLPK_MEM_USAGE_CHECK == 1
 	int peak;
-
 	glp_mem_usage(NULL, &peak, NULL, NULL);
-
 	cout<<"Peak memory usage:"<<peak<<endl; 
+#endif
 
 	delete lb_solution;
-//cout<<"666"<<endl;
 	return local_blocking;
 }
 
@@ -96,8 +72,7 @@ ulong remote_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resou
 	lp_dpcp_objective(task_i, tasks, resources, remote_bound, var, NULL, remote_obj);
 	remote_bound.set_objective(remote_obj);
 //construct constraints
-	lp_dpcp_constraint_1(task_i, tasks, resources, remote_bound, var);
-	lp_dpcp_constraint_2(task_i, tasks, resources, remote_bound, var);
+	lp_dpcp_add_constraints(task_i, tasks, processors, resources, remote_bound, var);
 
 	GLPKSolution *rb_solution = new GLPKSolution(remote_bound, var.get_num_vars());
 
@@ -108,13 +83,12 @@ ulong remote_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resou
 
 	task_i.set_remote_blocking(remote_blocking);
 	
+#if GLPK_MEM_USAGE_CHECK == 1
 	int peak;
-
 	glp_mem_usage(NULL, &peak, NULL, NULL);
-
 	cout<<"Peak memory usage:"<<peak<<endl; 
+#endif
 
-	//delete remote_obj;
 	delete rb_solution;
 	return remote_blocking;
 }
@@ -193,17 +167,20 @@ bool is_rta_lp_pfp_schedulable(TaskSet& tasks,
 								uint TEST_TYPE,
 								uint ITER_BLOCKING)
 {
-	ulong response_bound;
+	
 	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
 	{
 		Task& task = tasks.get_task_by_id(t_id);
+		ulong response_bound = task.get_response_time();
 		if(task.get_partition() == MAX_LONG)
 			continue;
 
 		switch(TEST_TYPE)
 		{
 			case 0://DPCP
-				response_bound = rta_lp_pfp_suspension(t_id, tasks, processors, resources, ITER_BLOCKING);
+				ulong temp = rta_lp_pfp_suspension(t_id, tasks, processors, resources, ITER_BLOCKING);
+				assert(temp >= response_bound);
+				response_bound = temp;
 				break;
 			case 1://MPCP
 				

@@ -186,6 +186,7 @@ class TaskSet
 
 		void sort_by_period();//increase
 		void sort_by_utilization();//decrease
+		void RM_Order();
 		ulong DBF(ulong time);
 
 		void display();

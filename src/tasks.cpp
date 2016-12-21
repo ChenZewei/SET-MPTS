@@ -463,6 +463,15 @@ void TaskSet::sort_by_utilization()
 		tasks[i].set_id(i);
 }
 
+void TaskSet::RM_Order()
+{
+	sort_by_period();
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+}
+
 void TaskSet::display()
 {
 	for(int i = 0; i < tasks.size(); i++)

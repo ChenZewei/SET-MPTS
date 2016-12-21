@@ -67,6 +67,10 @@
 
 //#endif
 
+//GLPK
+
+#define GLPK_MEM_USAGE_CHECK 0
+
 using namespace std;
 
 typedef mpz_class int_t;		//multiple precision integer

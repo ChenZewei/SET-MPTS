@@ -44,6 +44,11 @@ LinearProgram::~LinearProgram()
 		delete eq->first;
 	foreach(inequalities, ineq)
 		delete ineq->first;
+	equalities.clear();
+	inequalities.clear();
+	variables_integer.clear();
+	variables_binary.clear();
+	non_default_bounds.clear();
 }
 
 void LinearProgram::declare_variable_integer(uint variable_index)

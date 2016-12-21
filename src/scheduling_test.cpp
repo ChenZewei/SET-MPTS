@@ -131,7 +131,7 @@ cout<<"Utilization:"<<utilization<<endl;
 		}
 		for(int i = 0; i < exp_times; i++)
 		{
-cout<<"exp:"<<i<<endl;
+//cout<<"exp:"<<i<<endl;
 	    	TaskSet taskset = TaskSet();
 			ProcessorSet processorset = ProcessorSet(parameters);
 			ResourceSet resourceset = ResourceSet();
@@ -154,7 +154,7 @@ cout<<"exp:"<<i<<endl;
 		{
 			fraction_t ratio(success[i], exp_times);
 			result.y = ratio.get_d();
-cout<<"ratio:"<<ratio.get_d()<<endl;
+//cout<<"ratio:"<<ratio.get_d()<<endl;
 			output.add_result(i, result.x, result.y);
 		}
 

@@ -25,7 +25,7 @@ GLPKSolution::GLPKSolution(const LinearProgram &lp,
 
 GLPKSolution::~GLPKSolution()
 {
-	//delete glpk;
+	glp_delete_prob(glpk);
 }
 
 void GLPKSolution::show_error()
