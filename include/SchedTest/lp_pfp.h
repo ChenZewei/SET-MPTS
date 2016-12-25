@@ -1,7 +1,3 @@
-
-//#include "../tasks.h"
-//#include "../processors.h"
-//#include "../resources.h"
 #include <iostream>
 #include <assert.h>
 #include "lp.h"
@@ -12,13 +8,6 @@
 #include "resources.h"
 #include "processors.h"
 
-typedef struct
-{
-	fraction_t x_d;
-	fraction_t x_i;
-	fraction_t x_p;
-}Structure;
-
 ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
 	ulong local_blocking = 0;
@@ -27,10 +16,9 @@ ulong local_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resour
 	Resource_Requests& rr = task_i.get_requests();
 	uint p_id = task_i.get_partition();//processor id
 	ulong r_i = task_i.get_response_time();//response time of task i(t_id)
-	VarMapper var;
+	DPCPMapper var;
 	LinearProgram local_bound;
 	LinearExpression *local_obj = new LinearExpression();
-	//lp_dpcp_local_objective(task_i, tasks, resources, local_bound, var);
 	lp_dpcp_objective(task_i, tasks, resources, local_bound, var, local_obj, NULL);
 	local_bound.set_objective(local_obj);
 //construct constraints
@@ -65,10 +53,9 @@ ulong remote_blocking(uint t_id, TaskSet& tasks, ProcessorSet& processors, Resou
 	Resource_Requests& rr = task_i.get_requests();
 	uint p_id = task_i.get_partition();//processor id
 	ulong r_i = task_i.get_response_time();//response time of task i(t_id)
-	VarMapper var;
+	DPCPMapper var;
 	LinearProgram remote_bound;
 	LinearExpression *remote_obj = new LinearExpression();
-	//lp_dpcp_remote_objective(task_i, tasks, resources, remote_bound, var);
 	lp_dpcp_objective(task_i, tasks, resources, remote_bound, var, NULL, remote_obj);
 	remote_bound.set_objective(remote_obj);
 //construct constraints

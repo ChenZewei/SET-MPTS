@@ -1,11 +1,88 @@
 #include "lp_dpcp.h"
-#include <types.h>
 #include <tasks.h>
 #include <resources.h>
 #include <processors.h>
 #include <lp.h>
-#include <varmapper.h>
+#include <sstream>
 
+////////////////////DPCPMapper////////////////////
+uint64_t DPCPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type)
+{
+	uint64_t one = 1;
+	uint64_t key = 0;
+	assert(task_id < (one << 10));
+	assert(res_id < (one << 10));
+	assert(req_id < (one << 10));
+	assert(type < (one << 2));
+
+	key |= (type << 30);
+	key |= (task_id << 20);
+	key |= (res_id << 10);
+	key |= req_id;
+	return key;
+}
+
+uint64_t DPCPMapper::get_type(uint64_t var)
+{
+	return (var >> 30) & (uint64_t) 0x3; //2 bits
+}
+
+uint64_t DPCPMapper::get_task(uint64_t var)
+{
+	return (var >> 20) & (uint64_t) 0x3ff; //10 bits
+}
+
+uint64_t DPCPMapper::get_res_id(uint64_t var)
+{
+	return (var >> 10) & (uint64_t) 0x3ff; //10 bits
+}
+
+uint64_t DPCPMapper::get_req_id(uint64_t var)
+{
+	return var & (uint64_t) 0x3ff; //10 bits
+}
+
+DPCPMapper::DPCPMapper(uint start_var): VarMapperBase(start_var) {}
+
+uint DPCPMapper::lookup(uint task_id, uint res_id, uint req_id, blocking_type type)
+{
+	uint64_t key = encode_request(task_id, res_id, req_id, type);
+	uint var = var_for_key(key);
+//cout<<"Key:"<<key<<endl;
+//cout<<"Var:"<<var<<endl;
+	return var;
+}
+
+string DPCPMapper::key2str(uint64_t key, uint var) const
+{
+	std::ostringstream buf;
+
+	switch (get_type(key))
+	{
+		case BLOCKING_DIRECT:
+			buf << "Xd[";
+			break;
+		case BLOCKING_INDIRECT:
+			buf << "Xi[";
+			break;
+		case BLOCKING_PREEMPT:
+			buf << "Xp[";
+			break;
+		case BLOCKING_OTHER:
+			buf << "Xo[";
+			break;
+		default:
+			buf << "X?[";
+	}
+
+	buf << get_task(key) << ", "
+		<< get_res_id(key) << ", "
+		<< get_req_id(key) << "]";
+
+	return buf.str();
+}
+
+////////////////////Expressions////////////////////
 ulong get_max_wait_time(Task& ti, Request& rq, TaskSet& tasks, ResourceSet& resources)
 {
 	uint priority = ti.get_priority();
@@ -65,7 +142,7 @@ ulong get_max_wait_time(Task& ti, Request& rq, TaskSet& tasks, ResourceSet& reso
 	return max_wait_time;
 }
 
-void lp_dpcp_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj)
+void lp_dpcp_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj)
 {
 	//LinearExpression *obj = new LinearExpression();
 	
@@ -108,7 +185,7 @@ void lp_dpcp_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearP
 	vars.seal();
 }
 
-void lp_dpcp_local_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
+void lp_dpcp_local_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars)
 {
 	LinearExpression *obj = new LinearExpression();
 	
@@ -139,7 +216,7 @@ void lp_dpcp_local_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, L
 	vars.seal();
 }
 
-void lp_dpcp_remote_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
+void lp_dpcp_remote_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars)
 {
 	LinearExpression *obj = new LinearExpression();
 	
@@ -173,7 +250,7 @@ void lp_dpcp_remote_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, 
 	vars.seal();
 }
 
-void lp_dpcp_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
+void lp_dpcp_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars)
 {
 	lp_dpcp_constraint_1(ti, tasks, resources, lp, vars);
 	lp_dpcp_constraint_2(ti, tasks, resources, lp, vars);
@@ -184,7 +261,7 @@ void lp_dpcp_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors,
 }
 
 //Constraint 1 [BrandenBurg 2013 RTAS] Xd(x,q,v) + Xi(x,q,v) + Xp(x,q,v) <= 1
-void lp_dpcp_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
+void lp_dpcp_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars)
 {
 //cout<<"Constraint 1"<<endl;
 	foreach_task_except(tasks.get_tasks(), ti, tx)
@@ -215,7 +292,7 @@ void lp_dpcp_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 }
 
 //Constraint 2 [BrandenBurg 2013 RTAS] for any remote resource lq and task tx except ti Xp(x,q,v) = 0
-void lp_dpcp_constraint_2(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
+void lp_dpcp_constraint_2(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars)
 {
 	LinearExpression *exp = new LinearExpression();
 
@@ -237,7 +314,7 @@ void lp_dpcp_constraint_2(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 }
 
 //Constraint 3 [BrandenBurg 2013 RTAS]
-void lp_dpcp_constraint_3(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
+void lp_dpcp_constraint_3(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars)
 {
 	uint t_id = ti.get_id();	
 	uint max_arrival = 1;
@@ -266,7 +343,7 @@ void lp_dpcp_constraint_3(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 }
 
 //Constraint 6 [BrandenBurg 2013 RTAS]
-void lp_dpcp_constraint_4(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
+void lp_dpcp_constraint_4(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars)
 {
 	LinearExpression *exp = new LinearExpression();
 	uint priority = ti.get_priority();
@@ -297,7 +374,7 @@ void lp_dpcp_constraint_4(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 }
 
 //Constraint 7 [BrandenBurg 2013 RTAS]
-void lp_dpcp_constraint_5(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
+void lp_dpcp_constraint_5(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars)
 {	
 	uint priority = ti.get_priority();
 
@@ -343,7 +420,7 @@ void lp_dpcp_constraint_5(Task& ti, TaskSet& tasks, ProcessorSet& processors, Re
 }
 
 //Constraint 8 [BrandenBurg 2013 RTAS]
-void lp_dpcp_constraint_6(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, VarMapper& vars)
+void lp_dpcp_constraint_6(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, DPCPMapper& vars)
 {
 	ulong max_wait_time_l = 0;
 	ulong max_wait_time_h = 0;

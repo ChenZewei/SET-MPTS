@@ -57,15 +57,8 @@
 #define INCREASE 0
 #define DECREASE 1
 
-//Blocking type
-//#ifndef BLOCKING_TYPE
-//#define BLOCKING_TYPE
-
-#define DIRECT_REQUEST_DELAY	0
-#define INDIRECT_REQUEST_DELAY	1
-#define PREEMPTION_DELAY		2
-
-//#endif
+#define INTERFERENCE	0
+#define BLOCKING		1
 
 //GLPK
 

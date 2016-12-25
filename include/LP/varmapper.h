@@ -8,14 +8,6 @@
 
 using namespace std;
 
-enum blocking_type
-{
-	BLOCKING_DIRECT,
-	BLOCKING_INDIRECT,
-	BLOCKING_PREEMPT,
-	BLOCKING_OTHER
-};
-
 class VarMapperBase 
 {
 	private:
@@ -42,21 +34,6 @@ class VarMapperBase
 
 		// should be overridden by children
 		virtual string key2str(uint64_t key, unsigned int var) const;
-};
-
-class VarMapper: public VarMapperBase
-{
-	private:
-		static uint64_t encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t blocking_type);
-		static uint64_t get_task(uint64_t var);
-		static uint64_t get_type(uint64_t var);
-		static uint64_t get_req_id(uint64_t var);
-		static uint64_t get_res_id(uint64_t var);
-	public:
-		VarMapper(unsigned int start_var = 0);
-		unsigned int lookup(unsigned int task_id, unsigned int res_id, unsigned int req_id, blocking_type type);
-		string key2str(uint64_t key, unsigned int var) const;						
-													
 };
 
 #endif
