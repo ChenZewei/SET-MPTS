@@ -108,10 +108,11 @@ bool is_global_pip_schedulable(TaskSet& tasks, ProcessorSet& processors, Resourc
 			ulong response_time = ti->get_response_time();
 		
 			ulong temp = get_response_time(*ti, tasks, processors, resources);
-cout<<"last response time:"<<response_time<<" current response time:"<<temp<<endl;
+
 			assert(temp >= response_time);
 			if(temp > response_time)
 			{
+//cout<<"last response time:"<<response_time<<" current response time:"<<temp<<endl;
 				response_time = temp;
 				update = true;
 			}
@@ -138,7 +139,11 @@ ulong get_response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors, Reso
 
 	lp_pip_objective(ti, tasks, processors, response_bound, vars, obj);
 
+	response_bound.set_objective(obj);
+
 	lp_pip_add_constraints(ti, tasks, processors, resources, response_bound, vars);
+
+	vars.seal();
 
 	GLPKSolution *rb_solution = new GLPKSolution(response_bound, vars.get_num_vars());
 
@@ -146,8 +151,8 @@ ulong get_response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors, Reso
 
 	if(rb_solution->is_solved())
 	{
-cout<<"solved."<<endl;
-		reponse_time = lrint(rb_solution->evaluate(*(response_bound.get_objective())));
+//cout<<"solved."<<endl;
+		reponse_time = ti.get_wcet() + lrint(rb_solution->evaluate(*(response_bound.get_objective())));
 	}
 	else
 cout<<"unsolved."<<endl;
@@ -280,6 +285,8 @@ void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, Linear
 	vars.seal();
 }
 */
+
+/*
 void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, PIPMapper& vars, LinearExpression *obj)
 {
 	uint p_num = processors.get_processor_num();
@@ -291,21 +298,61 @@ void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, Linear
 		
 		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
 		obj->add_term(var_id, 1/p_num);
+		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
 		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
 		obj->add_term(var_id, 1/p_num);
+		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 		
 		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
 		obj->add_term(var_id, 1/p_num);
+		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 		
-		lp_pip_directed_blocking(ti, *tx, tasks, vars, obj, 1/p_num);
+		lp_pip_directed_blocking(ti, *tx, tasks, vars, obj, 1);
 
 		lp_pip_indirected_blocking(ti, *tx, tasks, vars, obj, 1/p_num);
 
 		lp_pip_preemption_blocking(ti, *tx, tasks, vars, obj, 1/p_num);
 	}
-	
+
 	vars.seal();
+}
+*/
+
+void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, PIPMapper& vars, LinearExpression *obj)
+{
+	uint p_num = processors.get_processor_num();
+	uint var_id;
+
+	foreach_higher_priority_task(tasks.get_tasks(), ti, th)
+	{
+		uint h = th->get_id();
+		
+		var_id = vars.lookup(h, 0, 0, PIPMapper::INTERF_REGULAR);
+		obj->add_term(var_id, 1/p_num);
+	}
+
+	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
+	{
+		uint l = tl->get_id();
+		
+		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+		obj->add_term(var_id, 1/p_num);
+		
+		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_STALLING);
+		obj->add_term(var_id, 1/p_num);
+
+		lp_pip_indirected_blocking(ti, *tl, tasks, vars, obj, 1/p_num);
+
+		lp_pip_preemption_blocking(ti, *tl, tasks, vars, obj, 1/p_num);
+	}
+
+	foreach_task_except(tasks.get_tasks(), ti, tx)
+	{
+		lp_pip_directed_blocking(ti, *tx, tasks, vars, obj, 1);
+	}
+
+//	vars.seal();
 }
 
 ulong workload_bound(Task& tx, ulong Ri)
