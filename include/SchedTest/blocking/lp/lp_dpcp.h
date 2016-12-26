@@ -13,13 +13,6 @@ class ProcessorSet;
 class LinearExpression;
 class LinearProgram;
 
-enum blocking_type
-{
-	BLOCKING_DIRECT,
-	BLOCKING_INDIRECT,
-	BLOCKING_PREEMPT,
-	BLOCKING_OTHER
-};
 
 /*
 |________________|_____________________|______________________|______________________|______________________|
@@ -29,7 +22,16 @@ enum blocking_type
 */
 class DPCPMapper: public VarMapperBase
 {
+	public:
+		enum var_type
+		{
+			BLOCKING_DIRECT,//0x000
+			BLOCKING_INDIRECT,//0x001
+			BLOCKING_PREEMPT,//0x010
+			BLOCKING_OTHER,//0x011
+		};
 	private:
+		
 		static uint64_t encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type);
 		static uint64_t get_type(uint64_t var);
 		static uint64_t get_task(uint64_t var);
@@ -37,7 +39,7 @@ class DPCPMapper: public VarMapperBase
 		static uint64_t get_req_id(uint64_t var);
 	public:
 		DPCPMapper(uint start_var = 0);
-		uint lookup(uint task_id, uint res_id, uint req_id, blocking_type type);
+		uint lookup(uint task_id, uint res_id, uint req_id, var_type type);
 		string key2str(uint64_t key, uint var) const;						
 													
 };

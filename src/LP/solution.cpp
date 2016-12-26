@@ -275,12 +275,12 @@ void GLPKSolution::set_coefficients()
 		}
 		r += 1;
 	}
-/*
+
 for(uint i = 1; i <= coeff_num; i++)
 {
 	cout<<"["<<row_idx[i]<<","<<col_idx[i]<<"]"<<" = "<<coeff[i]<<endl;
 }
-*/
+
 	glp_load_matrix(glpk, coeff_num, row_idx, col_idx, coeff);
 
 	delete[] row_idx;

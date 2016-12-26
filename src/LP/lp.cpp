@@ -10,18 +10,59 @@ bool LinearExpression::has_terms() const
 {
 	return !terms.empty();
 }
+
+
+bool LinearExpression::term_exist(uint var_index)
+{
+	foreach(terms, term)
+	{
+		if(var_index == term->second)
+			return true;
+	}
+	return false;
+}
+
 int LinearExpression::get_terms_size() const
 {
 	return terms.size();
 }
 
+double LinearExpression::get_term(uint var_index)
+{
+	foreach(terms, term)
+	{
+		if(var_index == term->second)
+		{
+			return term->first;
+		}
+	}
+	return 0;
+}
+
+void LinearExpression::set_term(uint var_index, double coefficient)
+{
+	foreach(terms, term)
+	{
+		if(var_index == term->second)
+		{
+			term->first = coefficient;
+		}
+	}
+}
+
 void LinearExpression::add_term(uint var_index, double coefficient)
 {
-	terms.push_back(Term(coefficient, var_index));
+	if(term_exist(var_index))
+	{
+		double coef = get_term(var_index);
+		set_term(var_index, coef + coefficient);
+	}
+	else
+		terms.push_back(Term(coefficient, var_index));
 }
 void LinearExpression::sub_term(uint var_index, double pos_coefficient)
 {
-	add_term(-pos_coefficient, var_index);
+	add_term(var_index, -pos_coefficient);
 }
 
 void LinearExpression::add_var(uint var_index)

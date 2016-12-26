@@ -44,7 +44,7 @@ uint64_t DPCPMapper::get_req_id(uint64_t var)
 
 DPCPMapper::DPCPMapper(uint start_var): VarMapperBase(start_var) {}
 
-uint DPCPMapper::lookup(uint task_id, uint res_id, uint req_id, blocking_type type)
+uint DPCPMapper::lookup(uint task_id, uint res_id, uint req_id, var_type type)
 {
 	uint64_t key = encode_request(task_id, res_id, req_id, type);
 	uint var = var_for_key(key);
@@ -55,20 +55,20 @@ uint DPCPMapper::lookup(uint task_id, uint res_id, uint req_id, blocking_type ty
 
 string DPCPMapper::key2str(uint64_t key, uint var) const
 {
-	std::ostringstream buf;
+	ostringstream buf;
 
 	switch (get_type(key))
 	{
-		case BLOCKING_DIRECT:
+		case DPCPMapper::BLOCKING_DIRECT:
 			buf << "Xd[";
 			break;
-		case BLOCKING_INDIRECT:
+		case DPCPMapper::BLOCKING_INDIRECT:
 			buf << "Xi[";
 			break;
-		case BLOCKING_PREEMPT:
+		case DPCPMapper::BLOCKING_PREEMPT:
 			buf << "Xp[";
 			break;
-		case BLOCKING_OTHER:
+		case DPCPMapper::BLOCKING_OTHER:
 			buf << "Xo[";
 			break;
 		default:
@@ -158,21 +158,21 @@ void lp_dpcp_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearP
 			{
 				uint var_id;
 
-				var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_DIRECT);
 				//obj->add_term(var_id, length);
 				if (is_local && (local_obj != NULL))
 					local_obj->add_term(var_id, length);
 				else if (!is_local && (remote_obj != NULL))
 					remote_obj->add_term(var_id, length);
 
-				var_id = vars.lookup(x, q, v, BLOCKING_INDIRECT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_INDIRECT);
 				//obj->add_term(var_id, length);
 				if (is_local && (local_obj != NULL))
 					local_obj->add_term(var_id, length);
 				else if (!is_local && (remote_obj != NULL))
 					remote_obj->add_term(var_id, length);
 
-				var_id = vars.lookup(x, q, v, BLOCKING_PREEMPT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_PREEMPT);
 				//obj->add_term(var_id, length);
 				if (is_local && (local_obj != NULL))
 					local_obj->add_term(var_id, length);
@@ -199,13 +199,13 @@ void lp_dpcp_local_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, L
 			{
 				uint var_id;
 
-				var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_DIRECT);
 				obj->add_term(var_id, request_iter->get_max_length());
 
-				var_id = vars.lookup(x, q, v, BLOCKING_INDIRECT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_INDIRECT);
 				obj->add_term(var_id, request_iter->get_max_length());
 
-				var_id = vars.lookup(x, q, v, BLOCKING_PREEMPT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_PREEMPT);
 				obj->add_term(var_id, request_iter->get_max_length());
 			}
 		}
@@ -230,15 +230,15 @@ void lp_dpcp_remote_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, 
 			{
 				uint var_id;
 
-				var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_DIRECT);
 				obj->add_var(var_id);
 				obj->add_term(var_id, request_iter->get_max_length());
 
-				var_id = vars.lookup(x, q, v, BLOCKING_INDIRECT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_INDIRECT);
 				obj->add_var(var_id);
 				obj->add_term(var_id, request_iter->get_max_length());
 
-				var_id = vars.lookup(x, q, v, BLOCKING_PREEMPT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_PREEMPT);
 				obj->add_var(var_id);
 				obj->add_term(var_id, request_iter->get_max_length());
 			}
@@ -275,13 +275,13 @@ void lp_dpcp_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
 
-				var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_DIRECT);
 				exp->add_var(var_id);
 		
-				var_id = vars.lookup(x, q, v, BLOCKING_INDIRECT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_INDIRECT);
 				exp->add_var(var_id);
 
-				var_id = vars.lookup(x, q, v, BLOCKING_PREEMPT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_PREEMPT);
 				exp->add_var(var_id);
 
 				lp.add_inequality(exp, 1);// Xd(x,q,v) + Xi(x,q,v) + Xp(x,q,v) <= 1
@@ -305,7 +305,7 @@ void lp_dpcp_constraint_2(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 			foreach_request_instance(ti, *tx, v)
 			{
 				uint var_id;
-				var_id = vars.lookup(x, q, v, BLOCKING_PREEMPT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_PREEMPT);
 				exp->add_var(var_id);
 			}
 		}
@@ -334,7 +334,7 @@ void lp_dpcp_constraint_3(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 			foreach_request_instance(ti, *tx, v)
 			{
 				uint var_id;
-				var_id = vars.lookup(x, q, v, BLOCKING_PREEMPT);
+				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_PREEMPT);
 				exp->add_var(var_id);
 			}
 		}
@@ -361,10 +361,10 @@ void lp_dpcp_constraint_4(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 				{
 					uint var_id;
 
-					var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
+					var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_DIRECT);
 					exp->add_var(var_id);
 
-					var_id = vars.lookup(x, q, v, BLOCKING_INDIRECT);
+					var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_INDIRECT);
 					exp->add_var(var_id);
 				}
 			}
@@ -405,10 +405,10 @@ void lp_dpcp_constraint_5(Task& ti, TaskSet& tasks, ProcessorSet& processors, Re
 					{
 						uint var_id;
 
-						var_id = vars.lookup(x, q, v, BLOCKING_DIRECT);
+						var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_DIRECT);
 						exp->add_var(var_id);
 
-						var_id = vars.lookup(x, q, v, BLOCKING_INDIRECT);
+						var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_INDIRECT);
 						exp->add_var(var_id);
 					}
 				}
@@ -450,10 +450,10 @@ void lp_dpcp_constraint_6(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 			{
 				uint var_id;
 
-				var_id = vars.lookup(x, y, v, BLOCKING_DIRECT);
+				var_id = vars.lookup(x, y, v, DPCPMapper::BLOCKING_DIRECT);
 				exp->add_var(var_id);
 
-				var_id = vars.lookup(x, y, v, BLOCKING_INDIRECT);
+				var_id = vars.lookup(x, y, v, DPCPMapper::BLOCKING_INDIRECT);
 				exp->add_var(var_id);
 			}
 			lp.add_inequality(exp, max_request_num);

@@ -183,6 +183,16 @@ Request& Task::get_request_by_id(uint id)
 	}
 	return *result;
 }
+
+bool Task::is_request_exist(uint resource_id)
+{
+	for(uint i = 0; i  < requests.size(); i++)
+	{
+		if(resource_id == requests[i].get_resource_id())
+			return true;
+	}
+	return false;
+}
 ulong Task::get_wcet_critical_sections() const { return wcet_critical_sections; }
 void Task::set_wcet_critical_sections(ulong csl) { wcet_critical_sections = csl; }
 ulong Task::get_wcet_non_critical_sections() const {	return wcet_non_critical_sections; }

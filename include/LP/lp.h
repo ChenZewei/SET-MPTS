@@ -15,7 +15,10 @@ class LinearExpression
 	public:
 		Terms& get_terms();
 		bool has_terms() const;
-		int get_terms_size() const;		
+		bool term_exist(uint var_index);
+		int get_terms_size() const;
+		double get_term(uint var_index);
+		void set_term(uint var_index, double coefficient);
 		void add_term(uint var_index, double coefficient = 1);
 		void sub_term(uint var_index, double pos_coefficient = 1);
 		void add_var(uint var_index);

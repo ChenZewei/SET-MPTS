@@ -95,6 +95,7 @@ class Task
 
 		Resource_Requests& get_requests();
 		Request& get_request_by_id(uint id);
+		bool is_request_exist(uint resource_id);
 
 		ulong get_wcet_critical_sections() const;
 		void set_wcet_critical_sections(ulong csl);
