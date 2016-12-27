@@ -47,9 +47,17 @@
 	foreach(tasks, tx)				       \
 	if (tx->get_priority() < ti.get_priority())
 
+#define foreach_higher_priority_task_then(tasks, priority, tx) \
+	foreach(tasks, tx)				       \
+	if (tx->get_priority() < priority)
+
 #define foreach_lower_priority_task(tasks, ti, tx) \
 	foreach(tasks, tx)				       \
 	if (tx->get_priority() > ti.get_priority())
+
+#define foreach_lower_priority_task_then(tasks, priority, tx) \
+	foreach(tasks, tx)				       \
+	if (tx->get_priority() > priority)
 
 #define foreach_request_instance(task_ti, task_tx, request_index_variable)	\
 	for(uint request_index_variable = 0, 												\

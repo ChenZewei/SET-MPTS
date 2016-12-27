@@ -60,7 +60,13 @@ void lp_pip_OD(Task& ti, TaskSet& tasks, ProcessorSet& processors, PIPMapper& va
 
 void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, PIPMapper& vars, LinearExpression *obj);
 
+uint max_job_num(Task& tx, ulong interval);
+
 ulong workload_bound(Task& tx, ulong Ri);
+
+ulong holding_bound(Task& ti, Task& tx, uint resource_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+
+ulong wait_time_bound(Task& ti, uint resource_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
 
 void lp_pip_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
 
