@@ -375,6 +375,9 @@ void lp_pip_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors, 
 	lp_pip_constraint_3(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_4(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_5(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_6(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_7(ti, tasks, processors, resources, lp, vars);
+	lp_pip_constraint_8(ti, tasks, resources, lp, vars);
 }
 
 void lp_pip_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
@@ -406,13 +409,10 @@ void lp_pip_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, Linea
 }
 
 void lp_pip_constraint_2(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
-{
-	
-	
+{	
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
 		LinearExpression *exp = new LinearExpression();
-
 		uint var_id;
 		uint x = tx->get_id();
 
@@ -507,13 +507,85 @@ void lp_pip_constraint_5(Task& ti, TaskSet& tasks, ResourceSet& resources, Linea
 	lp.add_equality(exp, 0);
 }
 
+void lp_pip_constraint_6(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
+{
+	LinearExpression *exp = new LinearExpression();
 
+	foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
+	{
+		uint var_id;
+		uint x = tx->get_id();
 
+		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+		exp->add_var(var_id);
+	}
+	
+	lp.add_equality(exp, 0);
+}
 
+void lp_pip_constraint_7(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
+{
+	uint p_num = processors.get_processor_num();
 
+	if(p_num >= ti.get_id())
+	{
+		foreach_task_except(tasks.get_tasks(), ti, tx)
+		{
+			LinearExpression *exp = new LinearExpression();
 
+			uint var_id;
+			uint x = tx->get_id();
+				
+			var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
+			exp->add_var(var_id);
 
+			var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+			exp->add_var(var_id);
 
+			var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
+			exp->add_var(var_id);
+		
+			lp_pip_indirected_blocking(ti, *tx, tasks, vars, exp);
+
+			lp_pip_preemption_blocking(ti, *tx, tasks, vars, exp);
+
+			lp.add_equality(exp, 0);
+		}
+	}
+}
+
+void lp_pip_constraint_8(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
+{
+	foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
+	{
+		uint x = tx->get_id();
+		foreach(tx->get_requests(), request)
+		{
+			uint q = request->get_resource_id();
+			uint N_i_q;
+			if(ti.is_request_exist(q))
+				N_i_q = ti.get_request_by_id(q).get_num_requests();
+			else
+				N_i_q = 0;
+
+			LinearExpression *exp = new LinearExpression();
+			foreach_request_instance(ti, *tx, v)
+			{
+				uint var_id;
+				
+				var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_DIRECT);
+				exp->add_var(var_id);
+			}
+
+			lp.add_inequality(exp, N_i_q);		
+		}
+	}
+}
+
+void lp_pip_constraint_9(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
+{
+	
+}
 
 
 

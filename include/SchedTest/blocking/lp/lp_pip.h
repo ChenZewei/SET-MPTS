@@ -79,4 +79,15 @@ void lp_pip_constraint_4(Task& ti, TaskSet& tasks, ResourceSet& resources, Linea
 //Constraint 5 [Maolin 2015 RTSS]
 void lp_pip_constraint_5(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
 
+//Constraint 6 [Maolin 2015 RTSS]
+void lp_pip_constraint_6(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
+
+//Constraint 7 [Maolin 2015 RTSS]
+void lp_pip_constraint_7(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
+
+//Constraint 9 [Maolin 2015 RTSS]
+void lp_pip_constraint_8(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
+
+//Constraint 10 [Maolin 2015 RTSS]
+void lp_pip_constraint_9(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
 #endif
