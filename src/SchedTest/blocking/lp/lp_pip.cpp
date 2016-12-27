@@ -371,10 +371,10 @@ ulong workload_bound(Task& tx, ulong Ri)
 void lp_pip_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
 {
 	lp_pip_constraint_1(ti, tasks, resources, lp, vars);
-//	lp_pip_constraint_2(ti, tasks, processors, resources, lp, vars);
-//	lp_pip_constraint_3(ti, tasks, resources, lp, vars);
-//	lp_pip_constraint_4(ti, tasks, resources, lp, vars);
-//	lp_pip_constraint_5(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_2(ti, tasks, processors, resources, lp, vars);
+	lp_pip_constraint_3(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_4(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_5(ti, tasks, resources, lp, vars);
 }
 
 void lp_pip_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
