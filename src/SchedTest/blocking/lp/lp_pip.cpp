@@ -420,6 +420,9 @@ ulong holding_bound(Task& ti, Task& tx, uint resource_id, TaskSet& tasks, Proces
 
 			assert(temp >= holding_time);
 
+			if(temp > ti.get_deadline())
+				return MAX_LONG;
+
 			if(temp > holding_time)
 			{
 				update = true;
@@ -696,7 +699,43 @@ void lp_pip_constraint_8(Task& ti, TaskSet& tasks, ResourceSet& resources, Linea
 
 void lp_pip_constraint_9(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
 {
-	
+	foreach_higher_priority_task(tasks.get_tasks(), ti, tx)
+	{
+		uint x = tx.get_id();
+		foreach(resources.get_resources(), resource)
+		{
+			uint q = resource.get_resource_id();
+			if(tx->is_request_exist(q) && ti.is_request_exist(q))
+			{
+				LinearExpression *exp = new LinearExpression();
+				Request& request = tx->get_request_by_id(q);
+				uint N_x_q = request.get_num_requests();
+				request = ti.get_request_by_id(q);
+				uint N_i_q = request.get_num_requests();
+
+				ulong W_i_q = wait_time_bound(ti, q, tasks, processors, resources);
+
+				if(MAX_LONG == W_i_q)
+				{
+					delete exp;
+					continue;
+				}
+
+				ulong bound = N_i_q*max_job_num(*tx, W_i_q)*N_x_q;
+
+				foreach_request_instance(ti, *tx, v)
+				{
+					
+					uint var_id;
+
+					var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_DIRECT);
+					exp->add_var(var_id);
+				}
+				
+				lp.add_inequality(exp, bound);
+			}
+		}
+	}
 }
 
 
