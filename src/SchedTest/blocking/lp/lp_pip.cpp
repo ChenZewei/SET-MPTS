@@ -134,7 +134,7 @@ bool is_global_pip_schedulable(TaskSet& tasks, ProcessorSet& processors, Resourc
 
 ulong get_response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
-	ulong reponse_time = 0;
+	ulong response_time = 0;
 
 	PIPMapper vars;
 	LinearProgram response_bound;
@@ -155,10 +155,29 @@ ulong get_response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors, Reso
 	if(rb_solution->is_solved())
 	{
 //cout<<"solved."<<endl;
-		reponse_time = ti.get_wcet() + lrint(rb_solution->evaluate(*(response_bound.get_objective())));
+		assert(ti.get_response_time() >= ti.get_wcet());
+		ulong gap = ti.get_response_time() - ti.get_wcet();
+		double result = rb_solution->evaluate(*(response_bound.get_objective()));
+//cout<<"original gap:"<<gap<<endl;
+//cout<<"lp result:"<<result<<endl;
+
+		if((result < gap) && (gap - result < _EPS))
+		{
+			response_time = ti.get_response_time();
+//cout<<"bingo!!!"<<endl;
+		}
+		else
+		{
+			response_time = result + ti.get_wcet();
+			assert(response_time < MAX_LONG);
+		}
 	}
 	else
+	{
 cout<<"unsolved."<<endl;
+		delete rb_solution;
+		return MAX_LONG;
+	}
 
 #if GLPK_MEM_USAGE_CHECK == 1
 	int peak;
@@ -167,7 +186,7 @@ cout<<"unsolved."<<endl;
 #endif
 
 	delete rb_solution;
-	return reponse_time;
+	return response_time;
 }
 
 ////////////////////Expressions////////////////////
@@ -374,7 +393,7 @@ void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, Linear
 
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		lp_pip_directed_blocking(ti, *tx, tasks, vars, obj, 1);
+		lp_pip_directed_blocking(ti, *tx, tasks, vars, obj, 1.0);
 	}
 
 //	vars.seal();
@@ -520,13 +539,13 @@ void lp_pip_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors, 
 	lp_pip_constraint_4(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_5(ti, tasks, resources, lp, vars);
 vars.seal();
-	lp_pip_declare_variable_bounds(ti, tasks, lp, vars);
-	lp_pip_constraint_6(ti, tasks, resources, lp, vars);
-	lp_pip_constraint_7(ti, tasks, processors, resources, lp, vars);
-	lp_pip_constraint_8(ti, tasks, resources, lp, vars);
-	lp_pip_constraint_9(ti, tasks, processors, resources, lp, vars);
-	lp_pip_constraint_10(ti, tasks, resources, lp, vars);
-	lp_pip_constraint_11(ti, tasks, resources, lp, vars);
+//	lp_pip_declare_variable_bounds(ti, tasks, lp, vars);
+//	lp_pip_constraint_6(ti, tasks, resources, lp, vars);
+//	lp_pip_constraint_7(ti, tasks, processors, resources, lp, vars);
+//	lp_pip_constraint_8(ti, tasks, resources, lp, vars);
+//	lp_pip_constraint_9(ti, tasks, processors, resources, lp, vars);
+//	lp_pip_constraint_10(ti, tasks, resources, lp, vars);
+//	lp_pip_constraint_11(ti, tasks, resources, lp, vars);
 }
 
 void lp_pip_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
