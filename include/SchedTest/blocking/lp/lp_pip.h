@@ -58,6 +58,8 @@ void lp_pip_preemption_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& v
 
 void lp_pip_OD(Task& ti, TaskSet& tasks, ProcessorSet& processors, PIPMapper& vars, LinearExpression *exp, double coef = 1);
 
+void lp_pip_declare_variable_bounds(Task& ti, TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, PIPMapper& vars);
+
 void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, PIPMapper& vars, LinearExpression *obj);
 
 ulong workload_bound(Task& tx, ulong Ri);

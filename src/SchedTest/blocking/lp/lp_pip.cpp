@@ -146,7 +146,7 @@ ulong get_response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors, Reso
 
 	lp_pip_add_constraints(ti, tasks, processors, resources, response_bound, vars);
 
-	vars.seal();
+	//vars.seal();
 
 	GLPKSolution *rb_solution = new GLPKSolution(response_bound, vars.get_num_vars());
 
@@ -173,6 +173,7 @@ cout<<"unsolved."<<endl;
 ////////////////////Expressions////////////////////
 void lp_pip_directed_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& vars, LinearExpression *exp, double coef)
 {
+//cout<<"coef:"<<coef<<endl;
 	uint x = tx.get_id();
 	foreach(tx.get_requests(), request)
 	{
@@ -190,6 +191,7 @@ void lp_pip_directed_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& var
 
 void lp_pip_indirected_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& vars, LinearExpression *exp, double coef)
 {
+//cout<<"coef:"<<coef<<endl;
 	uint x = tx.get_id();
 	foreach(tx.get_requests(), request)
 	{
@@ -207,6 +209,7 @@ void lp_pip_indirected_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& v
 
 void lp_pip_preemption_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& vars, LinearExpression *exp, double coef)
 {
+//cout<<"coef:"<<coef<<endl;
 	uint x = tx.get_id();
 	foreach(tx.get_requests(), request)
 	{
@@ -225,6 +228,7 @@ void lp_pip_preemption_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& v
 
 void lp_pip_OD(Task& ti, TaskSet& tasks, ProcessorSet& processors, PIPMapper& vars, LinearExpression *exp, double coef)
 {
+//cout<<"coef:"<<coef<<endl;
 	uint p_num = processors.get_processor_num();
 	uint var_id;
 
@@ -233,7 +237,7 @@ void lp_pip_OD(Task& ti, TaskSet& tasks, ProcessorSet& processors, PIPMapper& va
 		uint h = th->get_id();
 		
 		var_id = vars.lookup(h, 0, 0, PIPMapper::INTERF_REGULAR);
-		exp->add_term(var_id, coef*(1/p_num));
+		exp->add_term(var_id, coef*(1.0/p_num));
 	}
 
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
@@ -241,14 +245,14 @@ void lp_pip_OD(Task& ti, TaskSet& tasks, ProcessorSet& processors, PIPMapper& va
 		uint l = tl->get_id();
 		
 		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
-		exp->add_term(var_id, coef*(1/p_num));
+		exp->add_term(var_id, coef*(1.0/p_num));
 		
 		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_STALLING);
-		exp->add_term(var_id, coef*(1/p_num));
+		exp->add_term(var_id, coef*(1.0/p_num));
 
-		lp_pip_indirected_blocking(ti, *tl, tasks, vars, exp, coef*(1/p_num));
+		lp_pip_indirected_blocking(ti, *tl, tasks, vars, exp, coef*(1.0/p_num));
 
-		lp_pip_preemption_blocking(ti, *tl, tasks, vars, exp, coef*(1/p_num));
+		lp_pip_preemption_blocking(ti, *tl, tasks, vars, exp, coef*(1.0/p_num));
 	}
 }
 /*
@@ -322,6 +326,24 @@ void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, Linear
 }
 */
 
+void lp_pip_declare_variable_bounds(Task& ti, TaskSet& tasks, LinearProgram& lp, PIPMapper& vars)
+{
+	foreach_task_except(tasks.get_tasks(), ti, tx)
+	{
+		uint x = tx->get_id();
+		uint var_id;
+	
+		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
+		lp.declare_variable_bounds(var_id, true, 0, false, -1);
+		
+		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+		lp.declare_variable_bounds(var_id, true, 0, false, -1);
+
+		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
+		lp.declare_variable_bounds(var_id, true, 0, false, -1);
+	}
+}
+
 void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, PIPMapper& vars, LinearExpression *obj)
 {
 	uint p_num = processors.get_processor_num();
@@ -332,7 +354,7 @@ void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, Linear
 		uint h = th->get_id();
 		
 		var_id = vars.lookup(h, 0, 0, PIPMapper::INTERF_REGULAR);
-		obj->add_term(var_id, 1/p_num);
+		obj->add_term(var_id, 1.0/p_num);
 	}
 
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
@@ -340,14 +362,14 @@ void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, Linear
 		uint l = tl->get_id();
 		
 		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
-		obj->add_term(var_id, 1/p_num);
+		obj->add_term(var_id, 1.0/p_num);
 		
 		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_STALLING);
-		obj->add_term(var_id, 1/p_num);
+		obj->add_term(var_id, 1.0/p_num);
 
-		lp_pip_indirected_blocking(ti, *tl, tasks, vars, obj, 1/p_num);
+		lp_pip_indirected_blocking(ti, *tl, tasks, vars, obj, 1.0/p_num);
 
-		lp_pip_preemption_blocking(ti, *tl, tasks, vars, obj, 1/p_num);
+		lp_pip_preemption_blocking(ti, *tl, tasks, vars, obj, 1.0/p_num);
 	}
 
 	foreach_task_except(tasks.get_tasks(), ti, tx)
@@ -497,6 +519,8 @@ void lp_pip_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors, 
 	lp_pip_constraint_3(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_4(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_5(ti, tasks, resources, lp, vars);
+vars.seal();
+	lp_pip_declare_variable_bounds(ti, tasks, lp, vars);
 	lp_pip_constraint_6(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_7(ti, tasks, processors, resources, lp, vars);
 	lp_pip_constraint_8(ti, tasks, resources, lp, vars);
