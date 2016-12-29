@@ -143,7 +143,7 @@ cout<<"Utilization:"<<utilization<<endl;
 				taskset.init();
 				processorset.init();			
 				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(i), parameters.get_test_type(i), 0))
-				if(is_schedulable(taskset, processorset, resourceset, 8, 0, 1))
+				if(is_schedulable(taskset, processorset, resourceset, j+7, 0, 1))
 				{
 					success[j]++;
 				}

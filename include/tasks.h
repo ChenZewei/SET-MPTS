@@ -131,7 +131,8 @@ class Task
 
 		void add_request(uint res_id, uint num, ulong max_len, ulong total_len, uint locality = MAX_INT);
 		
-		uint get_max_num_jobs(ulong interval); //max number of jobs in an arbitrary length of interval
+		uint get_max_job_num(ulong interval); //max number of jobs in an arbitrary length of interval
+		uint get_max_request_num(uint resource_id, ulong interval);
 		ulong DBF(ulong interval);//Demand Bound Function
 		void DBF();
 		fraction_t get_utilization() const;

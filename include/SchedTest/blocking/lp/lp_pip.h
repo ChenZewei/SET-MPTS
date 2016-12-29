@@ -60,8 +60,6 @@ void lp_pip_OD(Task& ti, TaskSet& tasks, ProcessorSet& processors, PIPMapper& va
 
 void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, PIPMapper& vars, LinearExpression *obj);
 
-uint max_job_num(Task& tx, ulong interval);
-
 ulong workload_bound(Task& tx, ulong Ri);
 
 ulong holding_bound(Task& ti, Task& tx, uint resource_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
@@ -95,5 +93,11 @@ void lp_pip_constraint_7(Task& ti, TaskSet& tasks, ProcessorSet& processors, Res
 void lp_pip_constraint_8(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
 
 //Constraint 10 [Maolin 2015 RTSS]
-void lp_pip_constraint_9(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
+void lp_pip_constraint_9(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
+
+//Constraint 11 [Maolin 2015 RTSS]
+void lp_pip_constraint_10(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
+
+//Constraint 12 [Maolin 2015 RTSS]
+void lp_pip_constraint_11(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars);
 #endif

@@ -154,7 +154,7 @@ void lp_dpcp_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearP
 			uint q = request->get_resource_id();
 			bool is_local = (request->get_locality() == ti.get_partition());
 			ulong length = request->get_max_length();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, *tx, q, v)
 			{
 				uint var_id;
 
@@ -195,7 +195,7 @@ void lp_dpcp_local_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, L
 		foreach_local_request(ti, tx->get_requests(), request_iter)
 		{
 			uint q = request_iter->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, *tx, q, v)
 			{
 				uint var_id;
 
@@ -226,7 +226,7 @@ void lp_dpcp_remote_objective(Task& ti, TaskSet& tasks, ResourceSet& resources, 
 		foreach_remote_request(ti, tx->get_requests(), request_iter)
 		{
 			uint q = request_iter->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, *tx, q, v)
 			{
 				uint var_id;
 
@@ -270,7 +270,7 @@ void lp_dpcp_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, *tx, q, v)
 			{
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
@@ -302,7 +302,7 @@ void lp_dpcp_constraint_2(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 		foreach_remote_request(ti, tx->get_requests(), request_iter)
 		{
 			uint q = request_iter->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, *tx, q, v)
 			{
 				uint var_id;
 				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_PREEMPT);
@@ -331,7 +331,7 @@ void lp_dpcp_constraint_3(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 		foreach_local_request(ti, tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, *tx, q, v)
 			{
 				uint var_id;
 				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_PREEMPT);
@@ -357,7 +357,7 @@ void lp_dpcp_constraint_4(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 			Resource& resource = resources.get_resources()[q];
 			if(resource.get_ceiling() > priority)
 			{
-				foreach_request_instance(ti, *tx, v)
+				foreach_request_instance(ti, *tx, q, v)
 				{
 					uint var_id;
 
@@ -401,7 +401,7 @@ void lp_dpcp_constraint_5(Task& ti, TaskSet& tasks, ProcessorSet& processors, Re
 				Resource& resource = resources.get_resources()[q];
 				if((resource.get_ceiling() > priority) && (resource.get_locality() == p_id))
 				{
-					foreach_request_instance(ti, *tx, v)
+					foreach_request_instance(ti, *tx, q, v)
 					{
 						uint var_id;
 
@@ -446,7 +446,7 @@ void lp_dpcp_constraint_6(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 				}
 			}
 
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, *tx, y, v)
 			{
 				uint var_id;
 

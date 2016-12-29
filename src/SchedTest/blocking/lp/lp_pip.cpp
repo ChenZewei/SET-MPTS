@@ -106,8 +106,11 @@ bool is_global_pip_schedulable(TaskSet& tasks, ProcessorSet& processors, Resourc
 		{
 			
 			ulong response_time = ti->get_response_time();
-		
+//cout<<"original response time:"<<response_time<<endl;
 			ulong temp = get_response_time(*ti, tasks, processors, resources);
+
+
+//cout<<"current response time:"<<temp<<endl;
 
 			assert(temp >= response_time);
 			if(temp > response_time)
@@ -175,7 +178,7 @@ void lp_pip_directed_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& var
 	{
 		uint q = request->get_resource_id();
 		ulong length = request->get_max_length();
-		foreach_request_instance(ti, tx, v)
+		foreach_request_instance(ti, tx, q, v)
 		{
 			uint var_id;
 
@@ -192,7 +195,7 @@ void lp_pip_indirected_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& v
 	{
 		uint q = request->get_resource_id();
 		ulong length = request->get_max_length();
-		foreach_request_instance(ti, tx, v)
+		foreach_request_instance(ti, tx, q, v)
 		{
 			uint var_id;
 
@@ -209,7 +212,7 @@ void lp_pip_preemption_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& v
 	{
 		uint q = request->get_resource_id();
 		ulong length = request->get_max_length();
-		foreach_request_instance(ti, tx, v)
+		foreach_request_instance(ti, tx, q, v)
 		{
 			uint var_id;
 
@@ -355,11 +358,6 @@ void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, Linear
 //	vars.seal();
 }
 
-uint max_job_num(Task& tx, ulong interval)
-{
-	return ceiling((tx.get_response_time() + interval), tx.get_period());
-}
-
 ulong workload_bound(Task& tx, ulong Ri)
 {
 	ulong e = tx.get_wcet();
@@ -375,6 +373,7 @@ ulong workload_bound(Task& tx, ulong Ri)
 
 ulong holding_bound(Task& ti, Task& tx, uint resource_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
+
 	uint x = tx.get_id(), q = resource_id;
 	uint p_num = processors.get_processor_num();
 	ulong L_x_q = tx.get_request_by_id(q).get_max_length();
@@ -383,8 +382,7 @@ ulong holding_bound(Task& ti, Task& tx, uint resource_id, TaskSet& tasks, Proces
 	if(p_num < tx.get_id())
 	{
 		uint y = min(ti.get_id(), tx.get_id());
-		uint z = max(ti.get_id(), tx.get_id());
-		
+		uint z = max(ti.get_id(), tx.get_id());	
 		bool update;
 		do
 		{
@@ -399,7 +397,7 @@ ulong holding_bound(Task& ti, Task& tx, uint resource_id, TaskSet& tasks, Proces
 			foreach_lower_priority_task_then(tasks.get_tasks(), y, tl)
 			{
 				uint l = tl->get_id();
-				if(z != tl.get_id())
+				if(z != l)
 				{
 					foreach(tl->get_requests(), request)
 					{
@@ -409,17 +407,14 @@ ulong holding_bound(Task& ti, Task& tx, uint resource_id, TaskSet& tasks, Proces
 						{
 							uint N_l_u = request->get_num_requests();
 							uint L_l_u = request->get_max_length();
-							temp += max_job_num(*tl, holding_time)*N_l_u*L_l_u;
+							temp += tl->get_max_job_num(holding_time)*N_l_u*L_l_u;
 						}
 					}
 				}
-			}
-			
+			}	
 			temp /= p_num;
 			temp += L_x_q;
-
 			assert(temp >= holding_time);
-
 			if(temp > ti.get_deadline())
 				return MAX_LONG;
 
@@ -437,18 +432,26 @@ ulong holding_bound(Task& ti, Task& tx, uint resource_id, TaskSet& tasks, Proces
 
 ulong wait_time_bound(Task& ti, uint resource_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
-	ulong wait_time = 1;
+	ulong wait_time = 0;
 	ulong holding_time_l = 0;
 
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
 	{
-		ulong temp = holding_bound(ti, *tl, resource_id, tasks, processors, resources);
+
+		ulong temp = 0;
+
+		if(tl->is_request_exist(resource_id))
+			temp = holding_bound(ti, *tl, resource_id, tasks, processors, resources);
+
 		if(temp > holding_time_l)
 			holding_time_l = temp;
 	}
 
 	if(holding_time_l == MAX_LONG)
+	{
+//cout<<"holding_time_l:"<<holding_time_l<<endl;
 		return MAX_LONG;
+	}
 
 	bool update;
 	do
@@ -456,20 +459,24 @@ ulong wait_time_bound(Task& ti, uint resource_id, TaskSet& tasks, ProcessorSet& 
 		update = false;
 		ulong temp = 1 + holding_time_l;
 
-		if(temp > ti.get_deadline())
-			return MAX_LONG;
-
 		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 		{
 			if(th->is_request_exist(resource_id))
 			{
-				Request& request = th->get_request_by_id(resource_id);
-				uint N_h_q = request.get_num_requests();
+				uint N_h_q = th->get_request_by_id(resource_id).get_num_requests();
 				ulong H_h_q = holding_bound(ti, *th, resource_id, tasks, processors, resources);
-				temp += max_job_num(*th, wait_time)*N_h_q *H_h_q;
+				temp += th->get_max_job_num(wait_time)*N_h_q *H_h_q;
 			}
 		}
-		
+
+		if(temp > ti.get_deadline())
+		{
+//cout<<"temp > ti.get_deadline():"<<temp<<" > "<<ti.get_deadline()<<endl;
+			return MAX_LONG;
+		}
+
+//cout<<"temp:"<<temp<<endl;
+//cout<<"wait_time:"<<wait_time<<endl;
 		assert(temp >= wait_time);
 
 		if(temp != wait_time)
@@ -493,6 +500,9 @@ void lp_pip_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors, 
 	lp_pip_constraint_6(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_7(ti, tasks, processors, resources, lp, vars);
 	lp_pip_constraint_8(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_9(ti, tasks, processors, resources, lp, vars);
+	lp_pip_constraint_10(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_11(ti, tasks, resources, lp, vars);
 }
 
 void lp_pip_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
@@ -558,7 +568,7 @@ void lp_pip_constraint_3(Task& ti, TaskSet& tasks, ResourceSet& resources, Linea
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, *tx, q, v)
 			{
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
@@ -608,7 +618,7 @@ void lp_pip_constraint_5(Task& ti, TaskSet& tasks, ResourceSet& resources, Linea
 			uint q = request->get_resource_id();
 			if(!ti.is_request_exist(q))
 			{
-				foreach_request_instance(ti, *tx, v)
+				foreach_request_instance(ti, *tx, q, v)
 				{
 					uint var_id;
 				
@@ -684,7 +694,7 @@ void lp_pip_constraint_8(Task& ti, TaskSet& tasks, ResourceSet& resources, Linea
 				N_i_q = 0;
 
 			LinearExpression *exp = new LinearExpression();
-			foreach_request_instance(ti, *tx, v)
+			foreach_request_instance(ti, *tx, q, v)
 			{
 				uint var_id;
 				
@@ -697,35 +707,47 @@ void lp_pip_constraint_8(Task& ti, TaskSet& tasks, ResourceSet& resources, Linea
 	}
 }
 
-void lp_pip_constraint_9(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
+void lp_pip_constraint_9(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
 {
+
 	foreach_higher_priority_task(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx.get_id();
+		uint x = tx->get_id();
 		foreach(resources.get_resources(), resource)
 		{
-			uint q = resource.get_resource_id();
-			if(tx->is_request_exist(q) && ti.is_request_exist(q))
+			
+			uint q = resource->get_resource_id();
+			uint N_i_q;
+			ulong W_i_q;
+			
+			if(ti.is_request_exist(q))
 			{
-				LinearExpression *exp = new LinearExpression();
-				Request& request = tx->get_request_by_id(q);
-				uint N_x_q = request.get_num_requests();
-				request = ti.get_request_by_id(q);
-				uint N_i_q = request.get_num_requests();
 
-				ulong W_i_q = wait_time_bound(ti, q, tasks, processors, resources);
+				N_i_q = ti.get_request_by_id(q).get_num_requests();
 
+				W_i_q = wait_time_bound(ti, q, tasks, processors, resources);
 				if(MAX_LONG == W_i_q)
 				{
-					delete exp;
 					continue;
 				}
 
-				ulong bound = N_i_q*max_job_num(*tx, W_i_q)*N_x_q;
+			}
+			else
+			{
+				N_i_q = 0;
+				W_i_q = 0;
+			}
+			
+			if(tx->is_request_exist(q))
+			{
+				LinearExpression *exp = new LinearExpression();
 
-				foreach_request_instance(ti, *tx, v)
+				uint N_x_q = tx->get_request_by_id(q).get_num_requests();
+
+				ulong bound = N_i_q*(tx->get_max_job_num(W_i_q))*N_x_q;
+
+				foreach_request_instance(ti, *tx, q, v)
 				{
-					
 					uint var_id;
 
 					var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_DIRECT);
@@ -734,13 +756,72 @@ void lp_pip_constraint_9(Task& ti, TaskSet& tasks, ResourceSet& resources, Linea
 				
 				lp.add_inequality(exp, bound);
 			}
+			
 		}
 	}
+
 }
 
+void lp_pip_constraint_10(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
+{
+	LinearExpression *exp = new LinearExpression();
 
+	foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
+	{
+		uint x = tx->get_id();
+		uint var_id;
 
+		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
+		exp->add_var(var_id);
+	}
+	lp.add_equality(exp, 0);
+}
 
+void lp_pip_constraint_11(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)
+{
+	ulong bound = 0;
+	ulong R_i = ti.get_response_time();
+
+	foreach(resources.get_resources(), resource)
+	{
+		LinearExpression *exp = new LinearExpression();
+		uint q = resource->get_resource_id();
+
+		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
+		{
+			uint x = tx->get_id();
+			if(tx->is_request_exist(q))
+			{
+				uint x = tx->get_id();
+				
+				foreach_request_instance(ti, *tx, q, v)
+				{
+					uint var_id;
+
+					var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_INDIRECT);
+					exp->add_var(var_id);
+
+					var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_PREEMPT);
+					exp->add_var(var_id);
+				}
+			}
+			else
+			{
+				//delete exp;
+				continue;
+			}
+		}
+
+		ulong bound = 0;
+
+		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
+		{
+			bound += th->get_max_request_num(q, R_i);
+		}
+
+		lp.add_inequality(exp, bound);
+	}
+}
 
 
 

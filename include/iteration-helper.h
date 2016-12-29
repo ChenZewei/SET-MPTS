@@ -59,9 +59,9 @@
 	foreach(tasks, tx)				       \
 	if (tx->get_priority() > priority)
 
-#define foreach_request_instance(task_ti, task_tx, request_index_variable)	\
+#define foreach_request_instance(task_ti, task_tx, resource_id, request_index_variable)	\
 	for(uint request_index_variable = 0, 												\
-		max_request_num = ceiling(((task_ti).get_response_time() + (task_tx).get_response_time()), (task_tx).get_period()); \
+		max_request_num = (task_tx).get_max_request_num(resource_id, (task_ti).get_response_time()); \
 		request_index_variable < max_request_num; \
 		request_index_variable++)
 

@@ -136,11 +136,22 @@ ulong Task::DBF(ulong time)
 		return 0;
 }
 
-uint Task::get_max_num_jobs(ulong interval)
+uint Task::get_max_job_num(ulong interval)
 {
 	uint num_jobs;
 	num_jobs = ceiling(interval + get_response_time(), get_period());
 	return num_jobs;
+}
+
+uint Task::get_max_request_num(uint resource_id, ulong interval)
+{
+	if(is_request_exist(resource_id))
+	{
+		Request& request = get_request_by_id(resource_id);
+		return get_max_job_num(interval)*request.get_num_requests();
+	}
+	else
+		return 0;
 }
 
 fraction_t Task::get_utilization() const
