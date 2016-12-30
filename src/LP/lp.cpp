@@ -52,6 +52,7 @@ void LinearExpression::set_term(uint var_index, double coefficient)
 
 void LinearExpression::add_term(uint var_index, double coefficient)
 {
+//cout<<"Term:"<<coefficient<<endl;
 	if(term_exist(var_index))
 	{
 		double coef = get_term(var_index);

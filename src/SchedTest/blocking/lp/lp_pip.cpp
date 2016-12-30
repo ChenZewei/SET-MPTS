@@ -194,6 +194,7 @@ void lp_pip_directed_blocking(Task& ti, Task& tx, TaskSet& tasks, PIPMapper& var
 {
 //cout<<"coef:"<<coef<<endl;
 	uint x = tx.get_id();
+//cout<<"task:"<<x<<endl
 	foreach(tx.get_requests(), request)
 	{
 		uint q = request->get_resource_id();
@@ -367,19 +368,19 @@ void lp_pip_objective(Task& ti, TaskSet& tasks, ProcessorSet& processors, Linear
 {
 	uint p_num = processors.get_processor_num();
 	uint var_id;
-
+//cout<<"foreach higher priority task then:"<<ti.get_id()<<endl;
 	foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 	{
 		uint h = th->get_id();
-		
+//cout<<"task:"<<h<<endl;
 		var_id = vars.lookup(h, 0, 0, PIPMapper::INTERF_REGULAR);
 		obj->add_term(var_id, 1.0/p_num);
 	}
-
+//cout<<"foreach lower priority task then:"<<ti.get_id()<<endl;
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
 	{
 		uint l = tl->get_id();
-		
+//cout<<"task:"<<l<<endl;	
 		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
 		obj->add_term(var_id, 1.0/p_num);
 		
@@ -539,13 +540,13 @@ void lp_pip_add_constraints(Task& ti, TaskSet& tasks, ProcessorSet& processors, 
 	lp_pip_constraint_4(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_5(ti, tasks, resources, lp, vars);
 vars.seal();
-//	lp_pip_declare_variable_bounds(ti, tasks, lp, vars);
-//	lp_pip_constraint_6(ti, tasks, resources, lp, vars);
-//	lp_pip_constraint_7(ti, tasks, processors, resources, lp, vars);
-//	lp_pip_constraint_8(ti, tasks, resources, lp, vars);
+	lp_pip_declare_variable_bounds(ti, tasks, lp, vars);
+	lp_pip_constraint_6(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_7(ti, tasks, processors, resources, lp, vars);
+	lp_pip_constraint_8(ti, tasks, resources, lp, vars);
 //	lp_pip_constraint_9(ti, tasks, processors, resources, lp, vars);
-//	lp_pip_constraint_10(ti, tasks, resources, lp, vars);
-//	lp_pip_constraint_11(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_10(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_11(ti, tasks, resources, lp, vars);
 }
 
 void lp_pip_constraint_1(Task& ti, TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, PIPMapper& vars)

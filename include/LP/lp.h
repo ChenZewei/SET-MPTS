@@ -2,6 +2,7 @@
 #define _LP_H_
 
 #include <types.h>
+#include <iostream>
 
 using namespace std;
 
