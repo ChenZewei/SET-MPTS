@@ -544,8 +544,8 @@ vars.seal();
 	lp_pip_constraint_6(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_7(ti, tasks, processors, resources, lp, vars);
 	lp_pip_constraint_8(ti, tasks, resources, lp, vars);
-//	lp_pip_constraint_9(ti, tasks, processors, resources, lp, vars);
-//	lp_pip_constraint_10(ti, tasks, resources, lp, vars);
+	lp_pip_constraint_9(ti, tasks, processors, resources, lp, vars);
+	lp_pip_constraint_10(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_11(ti, tasks, resources, lp, vars);
 }
 
@@ -854,6 +854,12 @@ void lp_pip_constraint_11(Task& ti, TaskSet& tasks, ResourceSet& resources, Line
 				//delete exp;
 				continue;
 			}
+		}
+		
+		if(!exp->has_terms())
+		{
+			delete exp;
+			continue;
 		}
 
 		ulong bound = 0;
