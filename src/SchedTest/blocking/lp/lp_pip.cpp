@@ -545,7 +545,7 @@ vars.seal();
 	lp_pip_constraint_7(ti, tasks, processors, resources, lp, vars);
 	lp_pip_constraint_8(ti, tasks, resources, lp, vars);
 //	lp_pip_constraint_9(ti, tasks, processors, resources, lp, vars);
-	lp_pip_constraint_10(ti, tasks, resources, lp, vars);
+//	lp_pip_constraint_10(ti, tasks, resources, lp, vars);
 	lp_pip_constraint_11(ti, tasks, resources, lp, vars);
 }
 
