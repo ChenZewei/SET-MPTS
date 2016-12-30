@@ -13,10 +13,10 @@
 		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
 		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
 <!-->
-		<data TEST_TYPE="1" REMARK="normal">WF-DM</data>
-		<data TEST_TYPE="1" REMARK="normal">WF-EDF</data>
+		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
+		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
 	</schedulability_test>
-	<experiment_times>100</experiment_times>
+	<experiment_times>1</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>

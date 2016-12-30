@@ -90,6 +90,15 @@ string Output::get_method_name(Test_Attribute ta)
 		case 5:
 			name = "RTA-GFP";
 			break;
+		case 6:
+			name = "FF-DM";
+			break;
+		case 7:
+			name = "LP-PFP";
+			break;
+		case 8:
+			name = "LP-GFP";
+			break;
 	}
 	return name + "-" + ta.remark;
 }

@@ -46,8 +46,8 @@
 #define WF_EDF 4
 #define RTA_GFP 5
 #define FF_DM 6
-#define WF_LP_PFP 7
-#define LP_PIP 8
+#define LP_PFP 7
+#define LP_GFP 8
 
 
 #define TPS_TASK_MODEL 0 //Three Parameters Sporadic Task Model

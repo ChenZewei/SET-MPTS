@@ -26,6 +26,7 @@ void XML::get_method(Test_Attribute_Set *t_set)
 	while(subtitle)
 	{
 		content = subtitle->GetText();
+cout<<content<<endl;
 		Test_Attribute ta;
 		int test_type = subtitle->IntAttribute("TEST_TYPE");
 		string remark;
@@ -61,6 +62,16 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		else if(0 == strcmp(content,"FF-DM"))
 		{
 			transform = 6;
+		}
+		else if(0 == strcmp(content,"LP-PFP"))
+		{
+cout<<7<<endl;
+			transform = 7;
+		}
+		else if(0 == strcmp(content,"LP-GFP"))
+		{
+cout<<8<<endl;
+			transform = 8;
 		}
 		else
 		{

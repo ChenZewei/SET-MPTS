@@ -5,6 +5,7 @@
 #include <string>
 #include <iomanip>
 #include <unistd.h>
+#include <ctime>
 #include "tasks.h"
 #include "schedulability_test.h"
 #include "processors.h"
@@ -119,7 +120,13 @@ int main(int argc,char** argv)
 	Random_Gen::uniform_integral_gen(0,10);
 
 	double utilization = u_ranges[0].min;
+
+	time_t start, end;
 	
+	start = time(NULL);
+
+cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
+
 	do
 	{	
 		Result result;
@@ -141,9 +148,11 @@ cout<<"Utilization:"<<utilization<<endl;
 			for(uint j = 0; j < parameters.get_method_num(); j++)
 			{
 				taskset.init();
-				processorset.init();			
-				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(i), parameters.get_test_type(i), 0))
-				if(is_schedulable(taskset, processorset, resourceset, j+7, 0, 1))
+				processorset.init();	
+//cout<<"j:"<<j<<endl;
+//cout<<"test method:"<<parameters.get_test_method(i)<<endl;
+				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
+				//if(is_schedulable(taskset, processorset, resourceset, j+7, 0, 1))
 				{
 					success[j]++;
 				}
@@ -162,6 +171,16 @@ cout<<"Utilization:"<<utilization<<endl;
 
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < _EPS);
+
+	time(&end);
+	cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
+
+	ulong gap = difftime(end, start);
+	uint hour = gap/3600;
+	uint min = (gap%3600)/60;
+	uint sec = (gap%3600)%60;
+
+	cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
 
 	XML::SaveConfig((output.get_path() + "config.xml").data());
 
