@@ -19,6 +19,7 @@ typedef vector<fraction_t> Ratio;
 class Request
 {
 	private:
+		uint task_model = TPS_TASK_MODEL;
 		uint resource_id;
 		uint num_requests;
 		ulong max_length;
@@ -85,6 +86,8 @@ class Task
 		~Task();
 		
 		void init();
+
+		uint task_model();
 
 		uint get_id() const;
 		void set_id(uint id);
@@ -222,6 +225,7 @@ typedef struct
 class DAG_Task:public Task
 {
 	private:
+		uint task_model = DAG_TASK_MODEL;
 		uint task_id;
 		vector<VNode> vnodes;
 		vector<ArcNode> arcnodes;
@@ -257,6 +261,9 @@ class DAG_Task:public Task
 		void sub_graph_gen(vector<VNode> &v, vector<ArcNode> &a, uint n_num, int G_TYPE = G_TYPE_P);
 		void sequential_graph_gen(vector<VNode> &v, vector<ArcNode> &a, uint n_num);
 		void graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_node);
+
+		uint task_model();		
+		
 		uint get_id() const;
 		void set_id(uint id);
 		uint get_vnode_num() const;

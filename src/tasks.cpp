@@ -123,6 +123,11 @@ void Task::init()
 	carry_in = false;
 }
 
+uint Task::task_model()
+{
+	return task_model;
+}
+
 void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len, uint locality)
 {
 	requests.push_back(Request(res_id, num, max_len, total_len, locality));
@@ -823,6 +828,10 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 	refresh_relationship();
 }
 	
+uint task_model()
+{
+	return task_model;
+}
 
 uint DAG_Task::get_id() const {return task_id;}
 void DAG_Task::set_id(uint id) { task_id = id;}

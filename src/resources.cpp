@@ -11,6 +11,7 @@ Resource::Resource(uint id, uint locality, bool global_resource, bool processor_
 	this->locality = locality;
 	this->global_resource = global_resource;
 	this->processor_local_resource = processor_local_resource;
+	this->utilization = 0;
 }
 
 Resource::~Resource() 
@@ -23,9 +24,19 @@ Resource::~Resource()
 */
 }
 
+void init()
+{
+	locality = MAX_INT;
+	global_resource = false;
+	processor_local_resource = false;
+	utilization = 0;
+	queue.clear();
+}
+
 uint Resource::get_resource_id() const { return resource_id; }
 void Resource::set_locality(uint locality) { this->locality = locality; }
 uint Resource::get_locality() const { return locality; }
+fraction_t Resource::get_utilization() const { return utilization; }
 
 bool Resource::is_global_resource() const { return global_resource; }
 
@@ -42,6 +53,24 @@ TaskQueue& Resource::get_taskqueue()
 void Resource::add_task(void* taskptr)
 {
 	queue.push_back(taskptr);
+	fraction_t u;
+	switch(taskptr->task_model())
+	{
+		case TPS_TASK_MODEL:
+			u = (Task*)taskptr->get_request_by_id(resource_id).get_max_length();
+			u /= (Task*)taskptr->get_period();
+			utilization += u;
+			break;
+		case DAG_TASK_MODEL:
+			u = (DAG_Task*)taskptr->get_request_by_id(resource_id).get_max_length();
+			u /= (DAG_Task*)taskptr->get_period();
+			utilization += u;
+			break;
+		default:
+			u = (Task*)taskptr->get_request_by_id(resource_id).get_max_length();
+			u /= (Task*)taskptr->get_period();
+			utilization += u;
+	}
 }
 
 uint Resource::get_ceiling()
@@ -61,6 +90,13 @@ uint Resource::get_ceiling()
 
 ResourceSet::ResourceSet(){}
 
+void ResourceSet::init()
+{
+	foreach(resources, resource)
+	{
+		resource->init();
+	}
+}
 
 void ResourceSet::add_resource()
 {
@@ -69,7 +105,6 @@ void ResourceSet::add_resource()
 		global = true;
 	resources.push_back(Resource(resources.size(), 0, global));
 }
-
 
 uint ResourceSet::size() const
 {
@@ -82,18 +117,21 @@ void ResourceSet::add_task(uint resource_id, void* taskptr)
 	resources[resource_id].add_task(taskptr);
 }
 
-
 Resources& ResourceSet::get_resources()
 {
 	return resources;
 }
-
 
 const uint& ResourceSet::get_resourceset_size() const
 {
 	return resources.size();
 }
 
+
+void ResourceSet::sort_by_utilization()
+{
+	sort(resources.begin(), resources.end(), period_increase<Resource>);
+}
 
 /////////////////////////////Others///////////////////////////////
 

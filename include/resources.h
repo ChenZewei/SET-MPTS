@@ -19,6 +19,7 @@ class Resource
 	private:
 		uint resource_id;
 		uint locality;
+		fraction_t utilization;
 		bool global_resource;
 		bool processor_local_resource;
 		//Request_Tasks tasks;
@@ -26,9 +27,11 @@ class Resource
 	public:
 		Resource(uint id, uint locality = MAX_INT, bool global_resource = false, bool processor_local_resource = false);
 		~Resource();
+		void init();
 		uint get_resource_id() const;
 		void set_locality(uint locality);
 		uint get_locality() const;
+		fraction_t get_utilization() const;
 		bool is_global_resource() const;
 		bool is_processor_local_resource() const;
 		//Request_Tasks get_tasks() const;
@@ -45,11 +48,13 @@ class ResourceSet
 		vector<Resource> resources;
 	public:
 		ResourceSet();
+		void init();
 		void add_resource();
 		uint size() const;
 		Resources& get_resources();
 		const uint& get_resourceset_size() const;
 		void add_task(uint resource_id, void* taskptr);
+		void sort_by_utilization();
 };
 
 void resource_gen(ResourceSet *resourceset, Param param);
