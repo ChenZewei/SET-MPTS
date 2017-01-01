@@ -30,8 +30,8 @@ void Resource::init()
 	locality = MAX_INT;
 	global_resource = false;
 	processor_local_resource = false;
-	utilization = 0;
-	queue.clear();
+	//utilization = 0;
+	//queue.clear();
 }
 
 uint Resource::get_resource_id() const { return resource_id; }
