@@ -125,7 +125,7 @@ void Task::init()
 
 uint Task::task_model()
 {
-	return task_model;
+	return model;
 }
 
 void Task::add_request(uint res_id, uint num, ulong max_len, ulong total_len, uint locality)
@@ -828,9 +828,9 @@ void DAG_Task::graph_insert(vector<VNode> &v, vector<ArcNode> &a, uint replace_n
 	refresh_relationship();
 }
 	
-uint task_model()
+uint DAG_Task::task_model()
 {
-	return task_model;
+	return model;
 }
 
 uint DAG_Task::get_id() const {return task_id;}

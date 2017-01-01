@@ -19,7 +19,6 @@ typedef vector<fraction_t> Ratio;
 class Request
 {
 	private:
-		uint task_model = TPS_TASK_MODEL;
 		uint resource_id;
 		uint num_requests;
 		ulong max_length;
@@ -45,6 +44,7 @@ typedef vector<uint> CPU_Set;
 class Task
 {
 	private:
+		uint model = TPS_TASK_MODEL;
 		uint id;
 		ulong wcet;
 		ulong wcet_critical_sections;
@@ -225,7 +225,7 @@ typedef struct
 class DAG_Task:public Task
 {
 	private:
-		uint task_model = DAG_TASK_MODEL;
+		uint model = DAG_TASK_MODEL;
 		uint task_id;
 		vector<VNode> vnodes;
 		vector<ArcNode> arcnodes;

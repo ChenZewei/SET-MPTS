@@ -3,6 +3,7 @@
 #include "processors.h"
 #include "param.h"
 #include "random_gen.h"
+#include "sort.h"
 
 /////////////////////////////Resource///////////////////////////////
 Resource::Resource(uint id, uint locality, bool global_resource, bool processor_local_resource)
@@ -24,7 +25,7 @@ Resource::~Resource()
 */
 }
 
-void init()
+void Resource::init()
 {
 	locality = MAX_INT;
 	global_resource = false;
@@ -54,21 +55,21 @@ void Resource::add_task(void* taskptr)
 {
 	queue.push_back(taskptr);
 	fraction_t u;
-	switch(taskptr->task_model())
+	switch(((Task*)taskptr)->task_model())
 	{
 		case TPS_TASK_MODEL:
-			u = (Task*)taskptr->get_request_by_id(resource_id).get_max_length();
-			u /= (Task*)taskptr->get_period();
+			u = ((Task*)taskptr)->get_request_by_id(resource_id).get_max_length();
+			u /= ((Task*)taskptr)->get_period();
 			utilization += u;
 			break;
 		case DAG_TASK_MODEL:
-			u = (DAG_Task*)taskptr->get_request_by_id(resource_id).get_max_length();
-			u /= (DAG_Task*)taskptr->get_period();
+			u = ((DAG_Task*)taskptr)->get_request_by_id(resource_id).get_max_length();
+			u /= ((DAG_Task*)taskptr)->get_period();
 			utilization += u;
 			break;
 		default:
-			u = (Task*)taskptr->get_request_by_id(resource_id).get_max_length();
-			u /= (Task*)taskptr->get_period();
+			u = ((Task*)taskptr)->get_request_by_id(resource_id).get_max_length();
+			u /= ((Task*)taskptr)->get_period();
 			utilization += u;
 	}
 }
@@ -130,7 +131,7 @@ const uint& ResourceSet::get_resourceset_size() const
 
 void ResourceSet::sort_by_utilization()
 {
-	sort(resources.begin(), resources.end(), period_increase<Resource>);
+	sort(resources.begin(), resources.end(), utilization_decrease<Resource>);
 }
 
 /////////////////////////////Others///////////////////////////////
