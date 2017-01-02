@@ -8,6 +8,7 @@
 #include "rta_gfp.h"
 #include "dag_gedf.h"
 #include "lp_gfp.h"
+#include "ro_pfp.h"
 
 bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
 {
@@ -43,6 +44,9 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 		case LP_GFP://8
 			taskset.RM_Order();
 			schedulable = is_lp_gfp_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
+			break;
+		case RO_PFP:
+			schedulable = is_ro_pfp_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
 			break;
 		default:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);

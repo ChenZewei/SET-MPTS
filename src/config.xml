@@ -12,9 +12,12 @@
 		<data TEST_TYPE="0" REMARK="normal">WF-DM</data>
 		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
 		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
-<!-->
 		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
 		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
+		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
+<!-->
+		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
+		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
 	<output>
@@ -55,10 +58,10 @@
 		<data>4</data>
 	</resource_num>
 	<rrp>//resource_request_probability
-		<data>0.5</data>
+		<data>0</data>
 	</rrp>
 	<rrn>//resource_request_number
-		<data>5</data>
+		<data>1</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>

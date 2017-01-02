@@ -141,6 +141,14 @@ cout<<"Utilization:"<<utilization<<endl;
 //cout<<"exp:"<<i<<endl;
 	    	TaskSet taskset = TaskSet();
 			ProcessorSet processorset = ProcessorSet(parameters);
+/*
+cout<<"------------------"<<endl;
+for(uint k = 0; k < processorset.get_processor_num(); k++)
+			{
+				Processor& p_temp = processorset.get_processors()[k];
+				cout<<"utilization of processor "<<p_temp.get_processor_id()<<":"<<p_temp.get_utilization().get_d()<<endl;
+			}
+*/
 			ResourceSet resourceset = ResourceSet();
 			resource_gen(&resourceset, parameters);
 			tast_gen(taskset, resourceset, parameters, utilization);
@@ -149,10 +157,19 @@ cout<<"Utilization:"<<utilization<<endl;
 			{
 				taskset.init();
 				processorset.init();	
+				resourceset.init();
+	/*		
+cout<<"11111"<<endl;
+for(uint k = 0; k < processorset.get_processor_num(); k++)
+			{
+				Processor& p_temp_1 = processorset.get_processors()[k];
+				cout<<"utilization of processor "<<p_temp_1.get_processor_id()<<":"<<p_temp_1.get_utilization().get_d()<<endl;
+			}
+*/
 //cout<<"j:"<<j<<endl;
 //cout<<"test method:"<<parameters.get_test_method(i)<<endl;
 				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
-				//if(is_schedulable(taskset, processorset, resourceset, j+7, 0, 1))
+				//if(is_schedulable(taskset, processorset, resourceset, 9, 0, 1))
 				{
 					success[j]++;
 				}

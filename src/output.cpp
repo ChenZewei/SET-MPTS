@@ -99,8 +99,14 @@ string Output::get_method_name(Test_Attribute ta)
 		case 8:
 			name = "LP-GFP";
 			break;
+		case 9:
+			name = "RO-PFP";
+			break;
 	}
-	return name + "-" + ta.remark;
+	if(0 == strcmp(ta.remark.data(), ""))
+		return name;
+	else
+		return name + "-" + ta.remark;
 }
 
 //export to csv

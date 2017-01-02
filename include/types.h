@@ -48,6 +48,7 @@
 #define FF_DM 6
 #define LP_PFP 7
 #define LP_GFP 8
+#define RO_PFP 9
 
 
 #define TPS_TASK_MODEL 0 //Three Parameters Sporadic Task Model

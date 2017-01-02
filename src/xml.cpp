@@ -65,13 +65,15 @@ cout<<content<<endl;
 		}
 		else if(0 == strcmp(content,"LP-PFP"))
 		{
-cout<<7<<endl;
 			transform = 7;
 		}
 		else if(0 == strcmp(content,"LP-GFP"))
 		{
-cout<<8<<endl;
 			transform = 8;
+		}
+		else if(0 == strcmp(content,"RO-PFP"))
+		{
+			transform = 9;
 		}
 		else
 		{

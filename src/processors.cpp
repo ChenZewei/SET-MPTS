@@ -1,5 +1,6 @@
 #include "processors.h"
 #include "tasks.h"
+#include "resources.h"
 #include "param.h"
 
 ///////////////////////////Processor/////////////////////////////
@@ -87,11 +88,11 @@ ResourceQueue& Processor::get_resourcequeue()
 	return rQueue;
 }
 
-bool Processor::add_resource(void* resourceptr);
+bool Processor::add_resource(void* resourceptr)
 {
 	if(1 < resource_utilization + ((Resource*)resourceptr)->get_utilization())
 			return false;
-		rQueue.push_back(taskptr);
+		rQueue.push_back(resourceptr);
 		resource_utilization += ((Resource*)resourceptr)->get_utilization();
 		return true;
 }
@@ -112,11 +113,12 @@ bool Processor::remove_resource(void* resourceptr)
 
 void Processor::init()
 {
-	tQueue.clear();
 	utilization = 0;
 	resource_utilization = 0;
 	density = 0;
 	tryed_assign = false;
+	tQueue.clear();
+	rQueue.clear();
 }
 ///////////////////////////ProcessorSet/////////////////////////////
 

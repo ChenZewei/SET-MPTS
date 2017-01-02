@@ -4,7 +4,7 @@
 //Resource-Oriented Partitioned Scheduling
 #include <iostream>
 #include <assert.h>
-#include "type.h"
+#include "types.h"
 #include <tasks.h>
 #include <resources.h>
 #include <processors.h>
@@ -39,14 +39,14 @@ ulong ro_get_bloking(Task& ti, TaskSet& tasks, ResourceSet& resources)
 		if(p_i == p_r)
 			continue;
 		uint ceiling_r = resource_r.get_ceiling();
-		foreach_lower_priority_task(tasks.get_tasks(), tx)
+		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 		{
 			foreach(tx->get_requests(), request_u)
 			{
 				Resource& resource_u = resources.get_resources()[request_u->get_resource_id()];
 				uint p_u = resource_u.get_locality();
 				uint ceiling_u = resource_u.get_ceiling();
-				ulong L_x_u = request_u.get_max_length();
+				ulong L_x_u = request_u->get_max_length();
 				if(p_u == p_r && ceiling_u < ceiling_r && L_x_u > b_i_r)
 				{
 					b_i_r = L_x_u;
@@ -60,7 +60,7 @@ ulong ro_get_bloking(Task& ti, TaskSet& tasks, ResourceSet& resources)
 
 ulong ro_get_interference_R(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, ulong interval)
 {
-	ulont IR_i = 0;
+	ulong IR_i = 0;
 	uint p_i = ti.get_partition();
 	foreach(processors.get_processors(), processor)
 	{
@@ -95,9 +95,10 @@ ulong ro_get_interference_R(Task& ti, TaskSet& tasks, ProcessorSet& processors, 
 ulong ro_get_interference_AC(Task& ti, TaskSet& tasks, ResourceSet& resources, ulong interval)
 {
 	ulong IAC_i = 0;
-	foreach_higher_priority_task(tasks.get_tasks(), th)
+	foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 	{
-		IAC_i += ro_workload(*th, interval);
+		if(th->get_partition() == ti.get_partition())
+			IAC_i += ro_workload(*th, interval);
 	}
 	return IAC_i;
 }
@@ -106,15 +107,16 @@ ulong ro_get_interference_UC(Task& ti, TaskSet& tasks, ResourceSet& resources, u
 {
 	uint p_i = ti.get_partition();
 	ulong IAC_i = 0;
-	foreach_higher_priority_task(tasks.get_tasks(), th)
+	foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 	{
-		IAC_i += ro_workload(*th, interval);
+		if(th->get_partition() == ti.get_partition())
+			IAC_i += ro_workload(*th, interval);
 	}
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
 		foreach(tx->get_requests(), request)
 		{
-			uint r = request->get_resource_id()
+			uint r = request->get_resource_id();
 			Resource& resource = resources.get_resources()[r];
 			if(p_i == resource.get_locality())
 			{
@@ -144,19 +146,30 @@ ulong rta_ro(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& re
 	ulong test_bound = ti.get_deadline();
 	ulong test_start = ti.get_wcet() + ro_get_bloking(ti, tasks, resources);
 	ulong response_time = test_start;
+//cout<<"response time1:"<<response_time<<endl;
+//cout<<"deadline1:"<<test_bound<<endl;
 	while(response_time <= test_bound)
 	{
 		ulong interf_C = ro_get_interference(ti, tasks, processors, resources, response_time);
 		ulong interf_R = ro_get_interference_R(ti, tasks, processors, resources, response_time);
+/*
+cout<<"Deadline:"<<test_bound<<endl;
+cout<<"WCET:"<<ti.get_wcet()<<endl;
+cout<<"interf_C:"<<interf_C<<endl;
+cout<<"interf_R:"<<interf_R<<endl;
+*/
 		ulong temp = test_start + interf_C + interf_R;
 
 		assert(temp >= response_time);
 
 		if(temp > response_time)
 			response_time = temp;
-		if(temp == response_time)
+		else if(temp == response_time)
 			return response_time;
 	}
+//cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+//cout<<"response time2:"<<response_time<<endl;
+//cout<<"deadline2:"<<test_bound<<endl;
 	return test_bound + 100;
 }
 
@@ -166,13 +179,20 @@ bool is_ro_pfp_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet
 	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
 	{
 		Task& task = tasks.get_task_by_id(t_id);
-		if(task.get_partition() == 0XFFFFFFFF)
+//cout<<"task id:"<<t_id<<endl;
+		if(task.get_partition() == MAX_INT)
 			continue;
 		response_bound = rta_ro(task, tasks, processors, resources);
-		if(response_bound <= tasks.get_deadline())
+		if(response_bound <= task.get_deadline())
+		{
 			task.set_response_time(response_bound);
+		}
 		else
+		{
+//cout<<"response time3:"<<response_bound<<endl;
+//cout<<"deadline3:"<<task.get_deadline()<<endl;	
 			return false;
+		}
 	}
 	return true;
 }
@@ -183,47 +203,54 @@ bool worst_fit_for_resources(ResourceSet& resources, ProcessorSet& processors, u
 
 	foreach(resources.get_resources(), resource)
 	{
-		Processor& processor;
 		fraction_t r_utilization = 1;
 		uint assignment = 0;
 		for(uint i = 0; i < active_processor_num; i++)
 		{
-			processor = processors.get_processors()[i];
+			Processor& processor = processors.get_processors()[i];
 			if(r_utilization > processor.get_resource_utilization())
 			{
-				r_utilization = procesor.get_resource_utilization();
-				assignmeng = i;
+				r_utilization = processor.get_resource_utilization();
+				assignment = i;
 			}
 		}
-		processor = processors.get_processors()[assignment];
-		if(processor.add_resource(resource))
+		Processor& processor = processors.get_processors()[assignment];
+		if(processor.add_resource(&(*resource)))
 		{
 			resource->set_locality(assignment);
 		}
 		else
+		{
+//cout<<"false"<<endl;
 			return false;
+		}
 	}
 	return true;
 }
 
 bool is_first_fit_for_tasks_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint start_processor, uint TEST_TYPE, uint ITER_BLOCKING)
 {
+
 	bool schedulable;
 	uint p_num = processors.get_processor_num();
 	tasks.RM_Order();
-
-	foreach(tasks.get-tasks(), ti)
+//cout<<"First-fit. Start from processor "<<start_processor<<endl;
+	foreach(tasks.get_tasks(), ti)
 	{
-		Processor& processor;
+		//Processor& processor = processors.get_processors()[0];
 		uint assignment;
 		schedulable = false;
+//cout<<"task "<<ti->get_id()<<endl;
 		for(uint i = start_processor; i < start_processor + p_num; i++)
 		{
 			assignment = i%p_num;
-			processor = processors.get_processors()[assignment];
-			if(processor.add_task(ti))
+//cout<<"Assignment:"<<assignment<<endl;
+			Processor& processor = processors.get_processors()[assignment];
+//cout<<"Processor id:"<<processor.get_processor_id()<<endl;
+			if(processor.add_task(&(*ti)))
 			{
 				ti->set_partition(assignment);
+//cout<<"get_partition:"<<ti->get_partition()<<endl;
 				if(is_ro_pfp_schedulable(tasks, processors, resources))
 				{
 					schedulable = true;
@@ -231,22 +258,58 @@ bool is_first_fit_for_tasks_schedulable(TaskSet& tasks, ProcessorSet& processors
 				}
 				else
 				{
+//cout<<"remove task "<<ti->get_id()<<endl;
 					ti->init();
-					processor.remove_task(ti);
+/*
+		cout<<"task(before remove): ";
+	foreach(processor.get_taskqueue(), tx)
+	{
+		cout<<((Task*)(*tx))->get_id()<<" ";
+	}
+		cout<<endl;
+*/
+					processor.remove_task(&(*ti));
+/*
+	cout<<"task(after remocve): ";
+	foreach(processor.get_taskqueue(), tx)
+	{
+		cout<<((Task*)(*tx))->get_id()<<" ";
+	}
+		cout<<endl;
+*/
 				}
+			}
+			else
+			{
+//				cout<<"assigned failed!"<<endl;
+//				cout<<"task utilization:"<<ti->get_utilization()<<endl;
+//				cout<<"processor utilization:"<<processor.get_utilization()<<endl;
 			}
 		}
 
 		if(!schedulable)
+		{
+/*
+cout<<"ffffffffffffffffffffffffffffffffff."<<endl;
+
+			for(uint i = 0; i < p_num; i++)
+			{
+cout<<"i:"<<i<<endl;
+				Processor& p_temp_f = processors.get_processors()[i];
+				cout<<"utilization of processor "<<p_temp_f.get_processor_id()<<":"<<p_temp_f.get_utilization().get_d()<<endl;
+			}
+*/
 			return schedulable;
+		}
 	}
-	
+
 	return schedulable;
 }
 
-bool is_ro_pfp_schedulable(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
+bool is_ro_pfp_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
 {
 	bool schedulable;
+
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
 	
@@ -254,12 +317,19 @@ bool is_ro_pfp_schedulable(Task& ti, TaskSet& tasks, ProcessorSet& processors, R
 	{
 		//initialzation
 		tasks.init();
-		processor.init();
+		processors.init();
 		resources.init();
 		
-		if(!worst_fit_for_resources(resources, procesors, i))
+		if(!worst_fit_for_resources(resources, processors, i))
 			continue;
-
+/*
+cout<<"22222"<<endl;
+for(uint k = 0; k < processors.get_processor_num(); k++)
+			{
+				Processor& p_temp_2 = processors.get_processors()[k];
+				cout<<"utilization of processor "<<p_temp_2.get_processor_id()<<":"<<p_temp_2.get_utilization().get_d()<<endl;
+			}
+*/
 		schedulable = is_first_fit_for_tasks_schedulable(tasks, processors, resources, i%p_num, TEST_TYPE, ITER_BLOCKING);
 		if(schedulable)
 			return schedulable;
