@@ -2,8 +2,180 @@
 #define RO_PFP_H
 
 //Resource-Oriented Partitioned Scheduling
-
+#include <iostream>
+#include <assert.h>
 #include "type.h"
+#include <tasks.h>
+#include <resources.h>
+#include <processors.h>
+
+ulong ro_workload(Task& ti, ulong interval)
+{
+	ulong e = ti.get_wcet();
+	ulong p = ti.get_period();
+	ulong r = ti.get_response_time();
+	return ceiling((interval + r - e), p) * e;
+}
+
+ulong ro_agent_workload(Task& ti, uint resource_id, ulong interval)
+{
+	ulong p = ti.get_period();
+	ulong r = ti.get_response_time();
+	Request& request = ti.get_request_by_id(resource_id);
+	ulong agent_length = request.get_total_length();
+	return ceiling((interval + r - agent_length), p) * agent_length;
+}
+
+ulong ro_get_bloking(Task& ti, TaskSet& tasks, ResourceSet& resources)
+{
+	uint p_i = ti.get_partition();
+	ulong blocking = 0;
+	foreach(ti.get_requests(), request_r)
+	{
+		ulong b_i_r = 0;
+		uint N_i_r = request_r->get_num_requests();
+		Resource& resource_r = resources.get_resources()[request_r->get_resource_id()];
+		uint p_r = resource_r.get_locality();
+		if(p_i == p_r)
+			continue;
+		uint ceiling_r = resource_r.get_ceiling();
+		foreach_lower_priority_task(tasks.get_tasks(), tx)
+		{
+			foreach(tx->get_requests(), request_u)
+			{
+				Resource& resource_u = resources.get_resources()[request_u->get_resource_id()];
+				uint p_u = resource_u.get_locality();
+				uint ceiling_u = resource_u.get_ceiling();
+				ulong L_x_u = request_u.get_max_length();
+				if(p_u == p_r && ceiling_u < ceiling_r && L_x_u > b_i_r)
+				{
+					b_i_r = L_x_u;
+				}
+			}
+		}
+		blocking += b_i_r * N_i_r;
+	}
+	return blocking;
+}
+
+ulong ro_get_interference_R(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, ulong interval)
+{
+	ulont IR_i = 0;
+	uint p_i = ti.get_partition();
+	foreach(processors.get_processors(), processor)
+	{
+		uint p_k = processor->get_processor_id();
+		if(p_i != p_k)
+		{
+			foreach(ti.get_requests(), request_r)
+			{
+				uint r = request_r->get_resource_id();
+				if(p_k == request_r->get_locality())
+				{
+					foreach_higher_priority_task(tasks.get_tasks(), ti, th)
+					{
+						foreach(th->get_requests(), request_u)
+						{
+							uint u = request_u->get_resource_id();
+							uint p_h_u = request_u->get_locality();
+							if(p_h_u == p_k)
+							{
+								IR_i += ro_agent_workload(*th, u, interval);
+							}
+						}
+
+					}
+				}
+			}
+		}
+	}
+	return IR_i;
+}
+
+ulong ro_get_interference_AC(Task& ti, TaskSet& tasks, ResourceSet& resources, ulong interval)
+{
+	ulong IAC_i = 0;
+	foreach_higher_priority_task(tasks.get_tasks(), th)
+	{
+		IAC_i += ro_workload(*th, interval);
+	}
+	return IAC_i;
+}
+
+ulong ro_get_interference_UC(Task& ti, TaskSet& tasks, ResourceSet& resources, ulong interval)
+{
+	uint p_i = ti.get_partition();
+	ulong IAC_i = 0;
+	foreach_higher_priority_task(tasks.get_tasks(), th)
+	{
+		IAC_i += ro_workload(*th, interval);
+	}
+	foreach_task_except(tasks.get_tasks(), ti, tx)
+	{
+		foreach(tx->get_requests(), request)
+		{
+			uint r = request->get_resource_id()
+			Resource& resource = resources.get_resources()[r];
+			if(p_i == resource.get_locality())
+			{
+				IAC_i += ro_agent_workload(*tx, r, interval);
+			}
+		}
+	}
+	return IAC_i;
+}
+
+ulong ro_get_interference(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, ulong interval)
+{
+	uint p_i = ti.get_partition();
+	Processor& processor = processors.get_processors()[p_i];
+	if(0 == processor.get_resourcequeue().size())//Application Core
+	{
+		return ro_get_interference_AC(ti, tasks, resources, interval);
+	}
+	else//Universal Core
+	{
+		return ro_get_interference_UC(ti, tasks, resources, interval);
+	}
+}
+
+ulong rta_ro(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
+{
+	ulong test_bound = ti.get_deadline();
+	ulong test_start = ti.get_wcet() + ro_get_bloking(ti, tasks, resources);
+	ulong response_time = test_start;
+	while(response_time <= test_bound)
+	{
+		ulong interf_C = ro_get_interference(ti, tasks, processors, resources, response_time);
+		ulong interf_R = ro_get_interference_R(ti, tasks, processors, resources, response_time);
+		ulong temp = test_start + interf_C + interf_R;
+
+		assert(temp >= response_time);
+
+		if(temp > response_time)
+			response_time = temp;
+		if(temp == response_time)
+			return response_time;
+	}
+	return test_bound + 100;
+}
+
+bool is_ro_pfp_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
+{
+	ulong response_bound;
+	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+	{
+		Task& task = tasks.get_task_by_id(t_id);
+		if(task.get_partition() == 0XFFFFFFFF)
+			continue;
+		response_bound = rta_ro(task, tasks, processors, resources);
+		if(response_bound <= tasks.get_deadline())
+			task.set_response_time(response_bound);
+		else
+			return false;
+	}
+	return true;
+}
 
 bool worst_fit_for_resources(ResourceSet& resources, ProcessorSet& processors, uint active_processor_num)
 {
@@ -34,8 +206,6 @@ bool worst_fit_for_resources(ResourceSet& resources, ProcessorSet& processors, u
 	return true;
 }
 
-bool is_pfp_schedulable();
-
 bool is_first_fit_for_tasks_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint start_processor, uint TEST_TYPE, uint ITER_BLOCKING)
 {
 	bool schedulable;
@@ -54,7 +224,7 @@ bool is_first_fit_for_tasks_schedulable(TaskSet& tasks, ProcessorSet& processors
 			if(processor.add_task(ti))
 			{
 				ti->set_partition(assignment);
-				if(is_pfp_schedulable())
+				if(is_ro_pfp_schedulable(tasks, processors, resources))
 				{
 					schedulable = true;
 					break;
