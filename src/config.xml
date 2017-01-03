@@ -20,7 +20,7 @@
 		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
 		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>200</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -32,7 +32,7 @@
 		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.1</data>
+		<data>0.2</data>
 	</step>
 	<init_utilization_range>
 		<data>
