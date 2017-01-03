@@ -112,7 +112,7 @@ bool is_global_pip_schedulable(TaskSet& tasks, ProcessorSet& processors, Resourc
 
 //cout<<"current response time:"<<temp<<endl;
 
-			assert(temp >= response_time);
+			//assert(temp >= response_time);
 			if(temp > response_time)
 			{
 //cout<<"last response time:"<<response_time<<" current response time:"<<temp<<endl;
@@ -519,7 +519,7 @@ ulong wait_time_bound(Task& ti, uint resource_id, TaskSet& tasks, ProcessorSet& 
 
 //cout<<"temp:"<<temp<<endl;
 //cout<<"wait_time:"<<wait_time<<endl;
-		assert(temp >= wait_time);
+		//assert(temp >= wait_time);
 
 		if(temp != wait_time)
 		{

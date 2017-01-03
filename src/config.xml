@@ -17,9 +17,10 @@
 		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
 <!-->
 		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
+		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
 		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>200</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -31,16 +32,16 @@
 		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.1</data>
+		<data>0.2</data>
 	</step>
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>4</max>
+			<max>8</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>4</data>	
+		<data>8</data>	
 	</processor_num>
 	<period_range>
 		<data>
@@ -55,13 +56,13 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>4</data>
+		<data>8</data>
 	</resource_num>
 	<rrp>//resource_request_probability
-		<data>0</data>
+		<data>0.25</data>
 	</rrp>
 	<rrn>//resource_request_number
-		<data>1</data>
+		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
