@@ -21,3 +21,13 @@ bool SchedTestMapper::exists(uint64_t key) const
 
 uint SchedTestMapper::get(uint64_t key) { return map[key];}
 
+uint SchedTestMapper::get_methord_id(uint64_t key)
+{
+	
+}
+
+string SchedTestMapper::key2str(uint64_t key, uint var) const
+{
+	
+}
+
