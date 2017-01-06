@@ -32,12 +32,13 @@ class ILPSpinLockMapper: public VarMapperBase
 			MAX_PREEMEPT,//,//H_i_x 
 			INTERFERENCE,//I_i
 			SPIN_TIME,//S_i_k
-			BLOCKING,//B_i
+			BLOCKING_TIME,//B_i
+			AB_DEISION,//Z_i_q
 			RESPONSE_TIME//R_i
 			
 		}
 	private:
-		static uint64_t encode_request(uint64_t type, uint64_t task_i = 0, uint64_t task_x = 0, uint64_t processor = 0, uint64_t priority = 0);
+		static uint64_t encode_request(uint64_t type, uint64_t part_1 = 0, uint64_t part_2 = 0, uint64_t part_3 = 0, uint64_t part_4 = 0);
 		static uint64_t get_type(uint64_t var);
 		static uint64_t get_task_i(uint64_t var);
 		static uint64_t get_task_x(uint64_t var);
@@ -45,7 +46,7 @@ class ILPSpinLockMapper: public VarMapperBase
 		static uint64_t get_priority(uint64_t var);
 	public:
 		ILPSpinLockMapper(uint start_var = 0);
-		uint lookup(uint type, uint task_i, uint task_x, uint processor, uint priority);
+		uint lookup(uint type, uint part_1, uint part_2, uint part_3, uint part_4);
 		string key2str(uint64_t key, uint var) const;
 };
 
@@ -92,12 +93,16 @@ void ILP_SpinLock_constraint_11(TaskSet& tasks, ProcessorSet& processors, Linear
 void ILP_SpinLock_constraint_12(TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, ILPSpinLockMapper& vars);
 
 //C13 2013 SIES Alexander
-void ILP_SpinLock_constraint_13(TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, ILPSpinLockMapper& vars);
+void ILP_SpinLock_constraint_13(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, ILPSpinLockMapper& vars);
 
+/*
+Lower bound of arrival blocking B_i
+*/
+//C14 2013 SIES Alexander
+void ILP_SpinLock_constraint_14(TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, ILPSpinLockMapper& vars);
 
-
-
-
+//C15 2013 SIES Alexander
+void ILP_SpinLock_constraint_15(TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, ILPSpinLockMapper& vars);
 
 
 

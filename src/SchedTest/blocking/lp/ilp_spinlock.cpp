@@ -103,7 +103,7 @@ void ILP_SpinLock_constraint_3(TaskSet& tasks, ProcessorSet& processors, LinearP
 
 void ILP_SpinLock_constraint_4(TaskSet& tasks, LinearProgram& lp, ILPSpinLockMapper& vars)
 {
-	uint t_num = tasks.get_tasks().size();
+	uint t_num = tasks.get_taskset_size();
 	
 	foreach(tasks.get_tasks(), ti)
 	{
@@ -183,7 +183,7 @@ void ILP_SpinLock_constraint_7(TaskSet& tasks, LinearProgram& lp, ILPSpinLockMap
 		var_id = vars.lookup(RESPONSE_TIME, i);
 		exp->add_term(var_id, 1);
 
-		var_id = vars.lookup(BLOCKING, i);
+		var_id = vars.lookup(BLOCKING_TIME, i);
 		exp->sub_term(var_id, 1);
 
 		var_id = vars.lookup(SPIN_TIME, i);
@@ -321,8 +321,25 @@ void ILP_SpinLock_constraint_12(TaskSet& tasks, ProcessorSet& processors, Resour
 
 void ILP_SpinLock_constraint_13(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources LinearProgram& lp, ILPSpinLockMapper& vars)
 {
+	uint t_num = tasks.get_taskset_size();
 	uint p_num = processor.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
+	
+	ulong max_L = 0;
+	uint max_N = 0;
+
+	foreach(tasks.get_tasks(), tx)
+	{
+		foreach(tx->get_requests(), request)
+		{
+			if(request->get_num_requests() > max_N)
+				max_N = request->get_num_requests();
+			if(request->get_max_length() > max_L)
+				max_L = request->get_max_length();
+		}
+	}
+	ulong M = max_L * t_num * max_N;
+
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint i = ti->get_id();
@@ -334,6 +351,7 @@ void ILP_SpinLock_constraint_13(TaskSet& tasks, ProcessorSet& processors, Resour
 			{
 				ulong L_x_q;
 				uint N_x_q;
+				uint N_i_q;
 				if(tx->is_request_exist(q - 1))
 				{
 					Request& request_x = tx->get_request_by_id(q - 1);
@@ -346,15 +364,105 @@ void ILP_SpinLock_constraint_13(TaskSet& tasks, ProcessorSet& processors, Resour
 					N_x_q = 0;
 				}
 
-				
+				if(ti->is_request_exist(q - 1))
+				{	
+					Request& request_i = ti->get_request_by_id(q - 1);		
+					N_i_q = request_i.get_num_requests();
+				}
+				else
+				{
+					N_i_q = 0;
+				}
+
+				for(uint k = 1; k <= p_num; k++)
+				{
+					LinearExpression *exp = new LinearExpression();
+					uint var_id;
+
+					var_id = vars.lookup(LOCALITY_ASSIGNMENT, x, k);
+					exp->add_term(var_id, M);
+
+					foreach_higher_priority_task(tasks.get_tasks(), *ti, th)
+					{
+						uint N_h_q;
+						if(th->is_request_exist(q - 1))
+						{	
+							Request& request_h = th->get_request_by_id(q - 1);		
+							N_h_q = request_h.get_num_requests();
+						}
+						else
+						{
+							N_h_q = 0;
+						}
+						
+						var_id = vars.lookup(MAX_PREEMEPT, i, h);
+						exp->add_term(var_id, L_x_q*N_h_q);
+					}
+
+					var_id = vars.lookup(SPIN_TIME, i, k, q);
+					exp->sub_term(var_id, 1);
+
+					lp.add_inequality(exp, M - L_x_q*N_i_q);
+				}
 			}
 		}
 	}
 }
 
+void ILP_SpinLock_constraint_14(TaskSet& tasks, ResourceSet& resources, LinearProgram& lp, ILPSpinLockMapper& vars)
+{
+	uint r_num = resources.get_resourceset_size();
 
+	foreach(tasks.get_tasks(), ti)
+	{
+		uint i = ti->get_id();
+		uint var_id;
+		var_id = vars.lookup(BLOCKING_TIME, i);
+		lp.declare_variable_integer(var_id);
 
+		for(uint q = 1; q <= r_num; q++)
+		{
+			LinearExpression *exp = new LinearExpression();
 
+			var_id = vars.lookup(BLOCKING_TIME, i);
+			exp->sub_term(var_id, 1);
+
+			var_id = vars.lookup(BLOCKING_TIME, i, q);
+			exp->add_term(var_id, 1);
+			lp.declare_variable_integer(var_id);
+
+			lp.add_inequality(exp, 0);
+		}
+	}
+}
+
+void ILP_SpinLock_constraint_15(TaskSet& tasks, ProcessorSet& processors, LinearProgram& lp, ILPSpinLockMapper& vars)
+{
+	uint p_num = processor.get_processor_num();
+	uint r_num = resources.get_resourceset_size();
+
+	foreach(tasks.get_tasks(), ti)
+	{
+		uint i = ti->get_id();
+
+		for(uint q = 1; q <= r_num; q++)
+		{
+			LinearExpression *exp = new LinearExpression();
+			uint var_id;
+
+			var_id = vars.lookup(BLOCKING_TIME, i, q);
+			exp->sub_term(var_id, 1);
+
+			for(uint k = 1; k <= r_num; k++)
+			{
+				var_id = vars.lookup(BLOCKING_TIME, i, q, k);
+				exp->add_term(var_id, 1);
+			}
+
+			lp.add_equality(exp, 0);
+		}
+	}
+}
 
 
 
