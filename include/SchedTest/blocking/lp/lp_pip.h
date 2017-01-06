@@ -2,7 +2,7 @@
 #define LP_PIP_H
 
 #include <types.h>
-#include <varmapper.h>
+#include "varmapper.h"
 
 class Task;
 class TaskSet;
@@ -43,7 +43,7 @@ class PIPMapper: public VarMapperBase
 	public:
 		PIPMapper(uint start_var = 0);
 		uint lookup(uint task_id, uint res_id, uint req_id, var_type type);
-		string key2str(uint64_t key, uint var) const;															
+		string key2str(uint64_t key, uint var) const;
 };
 
 bool is_global_pip_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
