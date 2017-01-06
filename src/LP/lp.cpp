@@ -123,9 +123,15 @@ void LinearProgram::set_objective(LinearExpression *obj)
 void LinearProgram::add_inequality(LinearExpression *exp, double upper_bound)
 {
 	if (exp->has_terms())
+	{
+//cout<<"has term"<<endl;
 		inequalities.push_back(Constraint(exp, upper_bound));
+	}
 	else
+	{
+//cout<<"no term"<<endl;
 		delete exp;
+	}
 }
 
 void LinearProgram::add_equality(LinearExpression *exp, double equal_to)

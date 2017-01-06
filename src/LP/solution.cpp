@@ -5,14 +5,16 @@
 GLPKSolution::GLPKSolution(const LinearProgram &lp, 
 							unsigned int max_var_num, 
 							double var_lb, 
-							double var_ub):
+							double var_ub,
+							uint dir):
 							glpk(glp_create_prob()),
 							lp(lp),
 							col_num(max_var_num),
 							row_num(lp.get_equalities().size() + lp.get_inequalities().size()),
 							coeff_num(0),
 							is_mip(lp.has_binary_variables() || lp.has_integer_variables()),
-	  						solved(false)
+	  						solved(false),
+							dir(dir)
 {
 	if (col_num)
 		solve(var_lb, var_ub);
@@ -128,8 +130,19 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 {
 //cout<<"111"<<endl;
 	glp_term_out(GLP_OFF);
-	glp_set_obj_dir(glpk, GLP_MAX);
+	switch(dir)
+	{
+		case 0:
+			glp_set_obj_dir(glpk, GLP_MAX);
+			break;
+		case 1:
+			glp_set_obj_dir(glpk, GLP_MIN);
+			break;
+		default:
+			glp_set_obj_dir(glpk, GLP_MAX);
+	}
 	glp_add_cols(glpk, col_num);
+//cout<<row_num<<endl;
 	glp_add_rows(glpk, row_num);
 //cout<<"222"<<endl;
 	set_objective();

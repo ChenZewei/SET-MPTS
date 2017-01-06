@@ -123,7 +123,7 @@ Resources& ResourceSet::get_resources()
 	return resources;
 }
 
-const uint& ResourceSet::get_resourceset_size() const
+uint ResourceSet::get_resourceset_size() const
 {
 	return resources.size();
 }

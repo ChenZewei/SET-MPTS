@@ -168,8 +168,8 @@ for(uint k = 0; k < processorset.get_processor_num(); k++)
 */
 //cout<<"j:"<<j<<endl;
 //cout<<"test method:"<<parameters.get_test_method(i)<<endl;
-				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
-				//if(is_schedulable(taskset, processorset, resourceset, 9, 0, 1))
+				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j) + 9, parameters.get_test_type(j), 0))
+				//if(is_schedulable(taskset, processorset, resourceset, 10, 0, 1))
 				{
 					success[j]++;
 				}

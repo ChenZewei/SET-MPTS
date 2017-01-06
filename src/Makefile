@@ -17,8 +17,8 @@ MOVE          = mv -f
 MKDIR         = mkdir -p
 TARGET	      = SchedulingAnalysis
 
-SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o lp_dpcp.o lp_pip.o 
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o lp_dpcp.o lp_pip.o $(LFLAGS) $(LIBS)
+SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o lp_dpcp.o lp_pip.o ilp_spinlock.o 
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o lp_dpcp.o lp_pip.o ilp_spinlock.o $(LFLAGS) $(LIBS)
 	
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
@@ -64,6 +64,9 @@ lp_dpcp.o:SchedTest/blocking/lp/lp_dpcp.cpp
 
 lp_pip.o:SchedTest/blocking/lp/lp_pip.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/blocking/lp/lp_pip.cpp $(LIBS)
+
+ilp_spinlock.o:SchedTest/blocking/lp/ilp_spinlock.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/blocking/lp/ilp_spinlock.cpp $(LIBS)
 
 clean:
 	rm -f *.o ${ALL}	

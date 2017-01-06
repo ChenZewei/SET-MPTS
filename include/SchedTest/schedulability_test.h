@@ -9,6 +9,7 @@
 #include "dag_gedf.h"
 #include "lp_gfp.h"
 #include "ro_pfp.h"
+#include "ilp_spinlock.h"
 
 bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
 {
@@ -47,6 +48,9 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 			break;
 		case RO_PFP:
 			schedulable = is_ro_pfp_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
+			break;
+		case ILP_SPINLOCK:
+			schedulable = is_ILP_SpinLock_schedulable(taskset, processorset, resourceset);
 			break;
 		default:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);
