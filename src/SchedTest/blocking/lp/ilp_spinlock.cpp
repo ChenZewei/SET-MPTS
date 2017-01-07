@@ -474,7 +474,7 @@ void ILP_SpinLock_constraint_11(TaskSet& tasks, ProcessorSet& processors, Resour
 		uint var_id;
 		var_id = vars.lookup(ILPSpinLockMapper::SPIN_TIME, i);
 		exp->add_term(var_id, 1);
-
+		
 		for(uint k = 1; k <= p_num; k++)
 		{
 			var_id = vars.lookup(ILPSpinLockMapper::SPIN_TIME, i, k);
@@ -520,25 +520,26 @@ void ILP_SpinLock_constraint_13(TaskSet& tasks, ProcessorSet& processors, Resour
 	uint t_num = tasks.get_taskset_size();
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
-	
-	ulong max_L = 0;
-	uint max_N = 0;
-
-	foreach(tasks.get_tasks(), tx)
-	{
-		foreach(tx->get_requests(), request)
-		{
-			if(request->get_num_requests() > max_N)
-				max_N = request->get_num_requests();
-			if(request->get_max_length() > max_L)
-				max_L = request->get_max_length();
-		}
-	}
-	ulong M = max_L * t_num * max_N;
 
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint i = ti->get_id();
+
+		ulong max_L = 0;
+		uint max_N = 0;
+
+		foreach_task_except(tasks.get_tasks(), (*ti), tx)
+		{
+			foreach(tx->get_requests(), request)
+			{
+				if(request->get_num_requests() > max_N)
+					max_N = request->get_num_requests();
+				if(request->get_max_length() > max_L)
+					max_L = request->get_max_length();
+			}
+		}
+		ulong M = max_L * t_num * max_N;
+
 		foreach_task_except(tasks.get_tasks(), (*ti), tx)
 		{
 			uint x = tx->get_id();
@@ -546,18 +547,15 @@ void ILP_SpinLock_constraint_13(TaskSet& tasks, ProcessorSet& processors, Resour
 			for(uint q = 1; q <= r_num; q++)
 			{
 				ulong L_x_q;
-				uint N_x_q;
 				uint N_i_q;
 				if(tx->is_request_exist(q - 1))
 				{
 					Request& request_x = tx->get_request_by_id(q - 1);
 					L_x_q = request_x.get_max_length();
-					N_x_q = request_x.get_num_requests();
 				}
 				else
 				{
 					L_x_q = 0;
-					N_x_q = 0;
 				}
 
 				if(ti->is_request_exist(q - 1))
@@ -613,14 +611,11 @@ void ILP_SpinLock_constraint_14(TaskSet& tasks, ProcessorSet& processors, Resour
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint i = ti->get_id();
-		uint var_id;
-		var_id = vars.lookup(ILPSpinLockMapper::BLOCKING_TIME, i);
-		lp.declare_variable_integer(var_id);
-		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
 		for(uint q = 1; q <= r_num; q++)
 		{
 			LinearExpression *exp = new LinearExpression();
+			uint var_id;
 
 			var_id = vars.lookup(ILPSpinLockMapper::BLOCKING_TIME, i);
 			exp->sub_term(var_id, 1);
@@ -674,45 +669,40 @@ void ILP_SpinLock_constraint_16(TaskSet& tasks, ProcessorSet& processors, Resour
 		uint i = ti->get_id();
 		for(uint q = 1; q <= r_num; q++)
 		{
-			if(ti->is_request_exist(q - 1))
+			uint var_id;
+			
+			var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
+			lp.declare_variable_binary(var_id);
+
+			foreach_task_except(tasks.get_tasks(), (*ti), tx)
 			{
-				
-				uint var_id;
-				
-				var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
-				lp.declare_variable_binary(var_id);
-
-				foreach_lower_priority_task(tasks.get_tasks(), (*ti), tx)
+				uint x = tx->get_id();
+				if(tx->is_request_exist(q - 1))
 				{
-					uint x = tx->get_id();
-					if(tx->is_request_exist(q - 1))
+					foreach_higher_priority_task(tasks.get_tasks(), (*ti), th)
 					{
-						foreach_higher_priority_task(tasks.get_tasks(), (*ti), th)
+						uint h = th->get_id();
+
+						if(th->is_request_exist(q - 1))
 						{
-							uint h = th->get_id();
+							LinearExpression *exp = new LinearExpression();
+							
+							var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
+							exp->sub_term(var_id, 1);
 
-							if(th->is_request_exist(q - 1))
-							{
-								LinearExpression *exp = new LinearExpression();
-								
-								var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
-								exp->sub_term(var_id, 1);
-								lp.declare_variable_binary(var_id);
+							var_id = vars.lookup(ILPSpinLockMapper::SAME_LOCALITY, x, i);
+							exp->add_term(var_id, 1);
 
-								var_id = vars.lookup(ILPSpinLockMapper::SAME_LOCALITY, x, i);
-								exp->add_term(var_id, 1);
+							var_id = vars.lookup(ILPSpinLockMapper::SAME_LOCALITY, i, h);
+							exp->add_term(var_id, 1);
 
-								var_id = vars.lookup(ILPSpinLockMapper::SAME_LOCALITY, i, h);
-								exp->add_term(var_id, 1);
+							var_id = vars.lookup(ILPSpinLockMapper::HIGHER_PRIORITY, i, x);
+							exp->add_term(var_id, 1);
 
-								var_id = vars.lookup(ILPSpinLockMapper::HIGHER_PRIORITY, i, x);
-								exp->add_term(var_id, 1);
+							var_id = vars.lookup(ILPSpinLockMapper::HIGHER_PRIORITY, i, h);
+							exp->sub_term(var_id, 1);
 
-								var_id = vars.lookup(ILPSpinLockMapper::HIGHER_PRIORITY, i, h);
-								exp->sub_term(var_id, 1);
-
-								lp.add_inequality(exp, 2);
-							}
+							lp.add_inequality(exp, 2);
 						}
 					}
 				}
@@ -730,41 +720,37 @@ void ILP_SpinLock_constraint_17(TaskSet& tasks, ProcessorSet& processors, Resour
 		uint i = ti->get_id();
 		for(uint q = 1; q <= r_num; q++)
 		{
-			if(ti->is_request_exist(q - 1))
+			uint var_id;
+			
+			var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
+			lp.declare_variable_binary(var_id);
+
+			foreach_task_except(tasks.get_tasks(), (*ti), tx)
 			{
-				
-				uint var_id;
-				
-				var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
-				lp.declare_variable_binary(var_id);
-
-				foreach_lower_priority_task(tasks.get_tasks(), (*ti), tx)
+				uint x = tx->get_id();
+				if(tx->is_request_exist(q - 1))
 				{
-					uint x = tx->get_id();
-					if(tx->is_request_exist(q - 1))
+					foreach_higher_priority_task(tasks.get_tasks(), (*ti), th)
 					{
-						foreach_higher_priority_task(tasks.get_tasks(), (*ti), th)
+						uint h = th->get_id();
+
+						if(th->is_request_exist(q - 1))
 						{
-							uint h = th->get_id();
+							LinearExpression *exp = new LinearExpression();
+							
+							var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
+							exp->sub_term(var_id, 1);
 
-							if(th->is_request_exist(q - 1))
-							{
-								LinearExpression *exp = new LinearExpression();
-								
-								var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
-								exp->sub_term(var_id, 1);
+							var_id = vars.lookup(ILPSpinLockMapper::SAME_LOCALITY, x, i);
+							exp->add_term(var_id, 1);
 
-								var_id = vars.lookup(ILPSpinLockMapper::SAME_LOCALITY, x, i);
-								exp->add_term(var_id, 1);
+							var_id = vars.lookup(ILPSpinLockMapper::SAME_LOCALITY, h, i);
+							exp->sub_term(var_id, 1);
 
-								var_id = vars.lookup(ILPSpinLockMapper::SAME_LOCALITY, h, i);
-								exp->sub_term(var_id, 1);
+							var_id = vars.lookup(ILPSpinLockMapper::HIGHER_PRIORITY, i, x);
+							exp->add_term(var_id, 1);
 
-								var_id = vars.lookup(ILPSpinLockMapper::HIGHER_PRIORITY, i, x);
-								exp->add_term(var_id, 1);
-
-								lp.add_inequality(exp, 1);
-							}
+							lp.add_inequality(exp, 1);
 						}
 					}
 				}
@@ -783,40 +769,37 @@ void ILP_SpinLock_constraint_18(TaskSet& tasks, ProcessorSet& processors, Resour
 		uint i = ti->get_id();
 		for(uint q = 1; q <= r_num; q++)
 		{
-			if(ti->is_request_exist(q - 1))
+			for(uint k = 1; k <= p_num; k++)
 			{
-				for(uint k = 1; k <= p_num; k++)
+				foreach(tasks.get_tasks(), tx)
 				{
-					foreach(tasks.get_tasks(), tx)
+					LinearExpression *exp = new LinearExpression();
+					uint var_id;
+
+					uint x = tx->get_id();
+					ulong L_x_q = 0;
+					if(tx->is_request_exist(q - 1))
 					{
-						LinearExpression *exp = new LinearExpression();
-						uint var_id;
-
-						uint x = tx->get_id();
-						ulong L_x_q = 0;
-						if(tx->is_request_exist(q - 1))
-						{
-							Request& request = tx->get_request_by_id(q - 1);
-							L_x_q = request.get_max_length();
-						}
-
-						var_id = vars.lookup(ILPSpinLockMapper::LOCALITY_ASSIGNMENT, x, k);
-						exp->sub_term(var_id, L_x_q);
-
-						var_id = vars.lookup(ILPSpinLockMapper::LOCALITY_ASSIGNMENT, i, k);
-						exp->add_term(var_id, L_x_q);
-
-						var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
-						exp->add_term(var_id, L_x_q);
-
-						var_id = vars.lookup(ILPSpinLockMapper::HIGHER_PRIORITY, x, i);
-						exp->sub_term(var_id, L_x_q);
-
-						var_id = vars.lookup(ILPSpinLockMapper::BLOCKING_TIME, i, q, k);
-						exp->sub_term(var_id, 1);
-
-						lp.add_inequality(exp, L_x_q);
+						Request& request = tx->get_request_by_id(q - 1);
+						L_x_q = request.get_max_length();
 					}
+
+					var_id = vars.lookup(ILPSpinLockMapper::LOCALITY_ASSIGNMENT, x, k);
+					exp->sub_term(var_id, L_x_q);
+
+					var_id = vars.lookup(ILPSpinLockMapper::LOCALITY_ASSIGNMENT, i, k);
+					exp->add_term(var_id, L_x_q);
+
+					var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
+					exp->add_term(var_id, L_x_q);
+
+					var_id = vars.lookup(ILPSpinLockMapper::HIGHER_PRIORITY, x, i);
+					exp->sub_term(var_id, L_x_q);
+
+					var_id = vars.lookup(ILPSpinLockMapper::BLOCKING_TIME, i, q, k);
+					exp->sub_term(var_id, 1);
+
+					lp.add_inequality(exp, L_x_q);
 				}
 			}
 		}
@@ -833,37 +816,34 @@ void ILP_SpinLock_constraint_19(TaskSet& tasks, ProcessorSet& processors, Resour
 		uint i = ti->get_id();
 		for(uint q = 1; q <= r_num; q++)
 		{
-			if(ti->is_request_exist(q - 1))
+			for(uint k = 1; k <= p_num; k++)
 			{
-				for(uint k = 1; k <= p_num; k++)
+				foreach(tasks.get_tasks(), tx)
 				{
-					foreach(tasks.get_tasks(), tx)
+					LinearExpression *exp = new LinearExpression();
+					uint var_id;
+
+					uint x = tx->get_id();
+					ulong L_x_q = 0;
+					if(tx->is_request_exist(q - 1))
 					{
-						LinearExpression *exp = new LinearExpression();
-						uint var_id;
-
-						uint x = tx->get_id();
-						ulong L_x_q = 0;
-						if(tx->is_request_exist(q - 1))
-						{
-							Request& request = tx->get_request_by_id(q - 1);
-							L_x_q = request.get_max_length();
-						}
-
-						var_id = vars.lookup(ILPSpinLockMapper::LOCALITY_ASSIGNMENT, x, k);
-						exp->sub_term(var_id, L_x_q);
-
-						var_id = vars.lookup(ILPSpinLockMapper::LOCALITY_ASSIGNMENT, i, k);
-						exp->sub_term(var_id, L_x_q);
-
-						var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
-						exp->add_term(var_id, L_x_q);
-
-						var_id = vars.lookup(ILPSpinLockMapper::BLOCKING_TIME, i, q, k);
-						exp->sub_term(var_id, 1);
-
-						lp.add_inequality(exp, L_x_q);
+						Request& request = tx->get_request_by_id(q - 1);
+						L_x_q = request.get_max_length();
 					}
+
+					var_id = vars.lookup(ILPSpinLockMapper::LOCALITY_ASSIGNMENT, x, k);
+					exp->add_term(var_id, L_x_q);
+
+					var_id = vars.lookup(ILPSpinLockMapper::LOCALITY_ASSIGNMENT, i, k);
+					exp->sub_term(var_id, L_x_q);
+
+					var_id = vars.lookup(ILPSpinLockMapper::AB_DEISION, i, q);
+					exp->add_term(var_id, L_x_q);
+
+					var_id = vars.lookup(ILPSpinLockMapper::BLOCKING_TIME, i, q, k);
+					exp->sub_term(var_id, 1);
+
+					lp.add_inequality(exp, L_x_q);
 				}
 			}
 		}
