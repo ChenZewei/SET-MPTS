@@ -250,7 +250,7 @@ void GLPKSolution::set_bounds(double col_lb, double col_ub)
 			col_type = GLP_UP;
 		else
 			col_type = GLP_LO;
-
+//cout<<"var_id:"<<bnds->var_index<<" lb:"<<col_lb<<" ub:"<<col_ub<<endl;
 		glp_set_col_bnds(glpk, c, col_type, col_lb, col_ub);
 	}
 }

@@ -19,11 +19,21 @@ static uint64_t ILPSpinLockMapper::encode_request(uint64_t type, uint64_t part_1
 	assert(part_3 < (one << 10));
 	assert(part_4 < (one << 10));
 
+
 	key |= (type << 40);
 	key |= (part_1 << 30);
 	key |= (part_2 << 20);
 	key |= (part_3 << 10);
 	key |= part_4;
+
+/*
+cout<<"type:"<<type<<endl;
+cout<<"part_1:"<<part_1<<endl;
+cout<<"part_2:"<<part_2<<endl;
+cout<<"part_3:"<<part_3<<endl;
+cout<<"part_4:"<<part_4<<endl;
+cout<<"key:"<<key<<endl;
+*/
 	return key;
 }
 
@@ -44,7 +54,7 @@ static uint64_t ILPSpinLockMapper::get_part_2(uint64_t var)
 
 static uint64_t ILPSpinLockMapper::get_part_3(uint64_t var)
 {
-	return (var >> 30) & (uint64_t) 0x3ff; //10 bits
+	return (var >> 10) & (uint64_t) 0x3ff; //10 bits
 }
 
 static uint64_t ILPSpinLockMapper::get_part_4(uint64_t var)
@@ -57,12 +67,14 @@ ILPSpinLockMapper::ILPSpinLockMapper(uint start_var): VarMapperBase(start_var) {
 uint ILPSpinLockMapper::lookup(uint type, uint part_1, uint part_2, uint part_3, uint part_4)
 {
 	uint64_t key = encode_request(type, part_1, part_2, part_3, part_4);
+	
+//cout<<"string:"<<key2str(key)<<endl;
 	uint var = var_for_key(key);
 	return var;
 }
 
 
-string ILPSpinLockMapper::key2str(uint64_t key, uint var) const
+string ILPSpinLockMapper::key2str(uint64_t key) const
 {
 	ostringstream buf;
 
@@ -135,9 +147,12 @@ bool is_ILP_SpinLock_schedulable(TaskSet& tasks, ProcessorSet& processors, Resou
 
 	if(rb_solution->is_solved())
 	{	
-		double result = rb_solution->evaluate(*(response_bound.get_objective()));
-//cout<<"response time for task 0:"<<result<<endl;
+		LinearExpression *exp = new LinearExpression();
+		ILP_SpinLock_construct_exp(vars, exp);
+		double result = rb_solution->evaluate(*exp);
+cout<<"result:"<<result<<endl;
 //cout<<"deadline:"<<tasks.get_tasks()[0].get_deadline()<<endl;
+		delete exp;
 		delete rb_solution;
 		return true;
 	}
@@ -150,6 +165,14 @@ bool is_ILP_SpinLock_schedulable(TaskSet& tasks, ProcessorSet& processors, Resou
 	return false;
 }
 
+void ILP_SpinLock_construct_exp(ILPSpinLockMapper& vars, LinearExpression *exp)
+{
+	uint var_id;
+
+	var_id = vars.lookup(ILPSpinLockMapper::RESPONSE_TIME, 0);
+	exp->add_term(var_id, 1);
+}
+
 void ILP_SpinLock_set_objective(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, ILPSpinLockMapper& vars)
 {
 	//any objective function is okay.
@@ -158,7 +181,7 @@ void ILP_SpinLock_set_objective(TaskSet& tasks, ProcessorSet& processors, Resour
 	LinearExpression *obj = new LinearExpression();
 	uint var_id;
 
-	var_id = vars.lookup(0, 0, 0, ILPSpinLockMapper::RESPONSE_TIME);
+	var_id = vars.lookup(ILPSpinLockMapper::RESPONSE_TIME, 0, 0, 0);
 	obj->add_term(var_id, 1);
 
 	lp.set_objective(obj);
@@ -348,6 +371,8 @@ void ILP_SpinLock_constraint_6(TaskSet& tasks, ProcessorSet& processors, Resourc
 		var_id = vars.lookup(ILPSpinLockMapper::RESPONSE_TIME, i);
 		exp->add_term(var_id, 1);
 		lp.declare_variable_integer(var_id);
+//cout<<"var_id:"<<var_id<<endl;
+//cout<<"R_"<<i<<" lower bound:"<<task->get_wcet()<<endl;
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
 		lp.add_inequality(exp, upper_bound);		
@@ -379,7 +404,7 @@ void ILP_SpinLock_constraint_7(TaskSet& tasks, ProcessorSet& processors, Resourc
 		exp->sub_term(var_id, 1);
 		lp.declare_variable_integer(var_id);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
-
+//cout<<"wcet:"<<task->get_wcet()<<endl;
 		lp.add_equality(exp, task->get_wcet());
 	}
 }

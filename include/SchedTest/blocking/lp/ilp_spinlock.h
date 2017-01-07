@@ -46,11 +46,13 @@ class ILPSpinLockMapper: public VarMapperBase
 	public:
 		ILPSpinLockMapper(uint start_var = 0);
 		uint lookup(uint type, uint part_1 = 0, uint part_2 = 0, uint part_3 = 0, uint part_4 = 0);
-		string key2str(uint64_t key, uint var) const;
+		string key2str(uint64_t key) const;
 };
 
 ////////////////////SchedulabilityTest////////////////////
 bool is_ILP_SpinLock_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+
+void ILP_SpinLock_construct_exp(ILPSpinLockMapper& vars, LinearExpression *exp);
 
 void ILP_SpinLock_set_objective(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, ILPSpinLockMapper& vars);
 
