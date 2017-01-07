@@ -19,7 +19,7 @@
 		<data TEST_TYPE="0" REMARK="RO">P-EDF</data>
 		<data TEST_TYPE="0" REMARK="SPIN">BCL-FTP</data>
 	</schedulability_test>
-	<experiment_times>50</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -31,12 +31,12 @@
 		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.4</data>
+		<data>0.1</data>
 	</step>
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>3</max>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
@@ -58,10 +58,10 @@
 		<data>4</data>
 	</resource_num>
 	<rrp>//resource_request_probability
-		<data>0.25</data>
+		<data>0.5</data>
 	</rrp>
 	<rrn>//resource_request_number
-		<data>3</data>
+		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>

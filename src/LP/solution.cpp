@@ -6,7 +6,8 @@ GLPKSolution::GLPKSolution(const LinearProgram &lp,
 							unsigned int max_var_num, 
 							double var_lb, 
 							double var_ub,
-							uint dir):
+							uint dir,
+							uint aim):
 							glpk(glp_create_prob()),
 							lp(lp),
 							col_num(max_var_num),
@@ -14,7 +15,8 @@ GLPKSolution::GLPKSolution(const LinearProgram &lp,
 							coeff_num(0),
 							is_mip(lp.has_binary_variables() || lp.has_integer_variables()),
 	  						solved(false),
-							dir(dir)
+							dir(dir),
+							aim(aim)
 {
 	if (col_num)
 		solve(var_lb, var_ub);
@@ -35,9 +37,9 @@ void GLPKSolution::show_error()
 	if (!solved)
 	{
 		std::cerr << "NOT SOLVED => status: "
-			<< glp_get_status(glpk)
+			<< (is_mip?glp_mip_status(glpk):glp_get_status(glpk))
 			<< " (";
-		switch (glp_get_status(glpk))
+		switch (is_mip?glp_mip_status(glpk):glp_get_status(glpk))
 		{
 			case GLP_OPT:
 				std::cerr << "GLP_OPT";
@@ -60,45 +62,47 @@ void GLPKSolution::show_error()
 			default:
 				std::cerr << "???";
 		}
-		std::cerr << ") simplex: " << simplex_code << " (";
-		switch (glp_get_status(glpk))
+		if(!is_mip)
 		{
-			case GLP_EBADB:
-				std::cerr << "GLP_EBADB";
-				break;
-			case GLP_ESING:
-				std::cerr << "GLP_ESING";
-				break;
-			case GLP_ECOND:
-				std::cerr << "GLP_ECOND";
-				break;
-			case GLP_EBOUND:
-				std::cerr << "GLP_EBOUND";
-				break;
-			case GLP_EFAIL:
-				std::cerr << "GLP_EFAIL";
-				break;
-			case GLP_EOBJLL:
-				std::cerr << "GLP_EOBJLL";
-				break;
-			case GLP_EOBJUL:
-				std::cerr << "GLP_EOBJUL";
-				break;
-			case GLP_EITLIM:
-				std::cerr << "GLP_EITLIM";
-				break;
-			case GLP_ENOPFS:
-				std::cerr << "GLP_ENOPFS";
-				break;
-			case GLP_ENODFS:
-				std::cerr << "GLP_ENODFS";
-				break;
-			default:
-				std::cerr << "???";
+			std::cerr << ") simplex: " << simplex_code << " (";
+			switch (glp_get_status(glpk))
+			{
+				case GLP_EBADB:
+					std::cerr << "GLP_EBADB";
+					break;
+				case GLP_ESING:
+					std::cerr << "GLP_ESING";
+					break;
+				case GLP_ECOND:
+					std::cerr << "GLP_ECOND";
+					break;
+				case GLP_EBOUND:
+					std::cerr << "GLP_EBOUND";
+					break;
+				case GLP_EFAIL:
+					std::cerr << "GLP_EFAIL";
+					break;
+				case GLP_EOBJLL:
+					std::cerr << "GLP_EOBJLL";
+					break;
+				case GLP_EOBJUL:
+					std::cerr << "GLP_EOBJUL";
+					break;
+				case GLP_EITLIM:
+					std::cerr << "GLP_EITLIM";
+					break;
+				case GLP_ENOPFS:
+					std::cerr << "GLP_ENOPFS";
+					break;
+				case GLP_ENODFS:
+					std::cerr << "GLP_ENODFS";
+					break;
+				default:
+					std::cerr << "???";
+			}
 		}
 
 		std::cerr << ")" << std::endl;
-
 	}
 }
 
@@ -164,8 +168,13 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 		// to the relaxed LP.
 		glpk_params.presolve = GLP_ON;
 //cout<<"888"<<endl;
-		solved = glp_intopt(glpk, &glpk_params) == 0 &&
-			 glp_mip_status(glpk) == GLP_OPT;
+		if(0 == aim)
+			solved = glp_intopt(glpk, &glpk_params) == 0 && glp_mip_status(glpk) == GLP_OPT;
+		else if(1 == aim)
+		{
+			solved = glp_intopt(glpk, &glpk_params) == 0 && glp_mip_status(glpk) == GLP_FEAS;
+cout<<"mip status:"<<glp_mip_status(glpk)<<endl;
+		}
 	}
 	else
 	{
@@ -184,8 +193,10 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 //cout<<"888"<<endl;
 		simplex_code = glp_simplex(glpk, &glpk_params);
 //cout<<"999"<<endl;
-		solved = simplex_code == 0 &&
-			glp_get_status(glpk) == GLP_OPT;
+		if(0 == aim)
+			solved = simplex_code == 0 && glp_get_status(glpk) == GLP_OPT;
+		else if(1 == aim)
+			solved = simplex_code == 0 && glp_get_status(glpk) == GLP_FEAS;
 	}
 //cout<<"100000"<<endl;
 }
