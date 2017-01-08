@@ -138,6 +138,8 @@ cout<<"Utilization:"<<utilization<<endl;
 		}
 		for(int i = 0; i < exp_times; i++)
 		{
+cout<<".";
+cout<<flush;
 //cout<<"exp:"<<i<<endl;
 	    	TaskSet taskset = TaskSet();
 			ProcessorSet processorset = ProcessorSet(parameters);
@@ -168,20 +170,22 @@ for(uint k = 0; k < processorset.get_processor_num(); k++)
 */
 //cout<<"j:"<<j<<endl;
 //cout<<"test method:"<<parameters.get_test_method(i)<<endl;
-				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j) + 9, parameters.get_test_type(j), 0))
-				//if(is_schedulable(taskset, processorset, resourceset, 10, 0, 1))
+				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j) + 9, parameters.get_test_type(j), 0))
+				if(is_schedulable(taskset, processorset, resourceset, 10, 0, 1))
 				{
 					success[j]++;
 				}
 			}
 			result.x = taskset.get_utilization_sum().get_d();
 		}
+cout<<endl;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp_times);
 			result.y = ratio.get_d();
 //cout<<"ratio:"<<ratio.get_d()<<endl;
 			output.add_result(i, result.x, result.y);
+cout<<"Method "<<i<<": exp_times("<<exp_times<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
 		}
 
 		utilization += steps[0];

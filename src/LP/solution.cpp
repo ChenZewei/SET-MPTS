@@ -133,7 +133,12 @@ bool GLPKSolution::is_solved() const
 void GLPKSolution::solve(double var_lb, double var_ub)
 {
 //cout<<"111"<<endl;
+#if GLPK_TERM_OUT == 0
 	glp_term_out(GLP_OFF);
+#else if GLPK_TERM_OUT == 1
+	glp_term_out(GLP_ON);
+#endif
+
 	switch(dir)
 	{
 		case 0:
@@ -172,8 +177,8 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 			solved = glp_intopt(glpk, &glpk_params) == 0 && glp_mip_status(glpk) == GLP_OPT;
 		else if(1 == aim)
 		{
-			solved = glp_intopt(glpk, &glpk_params) == 0 && glp_mip_status(glpk) == GLP_FEAS;
-cout<<"mip status:"<<glp_mip_status(glpk)<<endl;
+			solved = glp_intopt(glpk, &glpk_params) == 0 && (glp_mip_status(glpk) == GLP_FEAS || glp_mip_status(glpk) == GLP_OPT);
+//cout<<"mip status:"<<glp_mip_status(glpk)<<endl;
 		}
 	}
 	else
@@ -196,7 +201,7 @@ cout<<"mip status:"<<glp_mip_status(glpk)<<endl;
 		if(0 == aim)
 			solved = simplex_code == 0 && glp_get_status(glpk) == GLP_OPT;
 		else if(1 == aim)
-			solved = simplex_code == 0 && glp_get_status(glpk) == GLP_FEAS;
+			solved = simplex_code == 0 && (glp_get_status(glpk) == GLP_FEAS || glp_get_status(glpk) == GLP_OPT);
 	}
 //cout<<"100000"<<endl;
 }

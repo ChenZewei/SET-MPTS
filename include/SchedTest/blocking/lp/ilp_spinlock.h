@@ -46,13 +46,14 @@ class ILPSpinLockMapper: public VarMapperBase
 	public:
 		ILPSpinLockMapper(uint start_var = 0);
 		uint lookup(uint type, uint part_1 = 0, uint part_2 = 0, uint part_3 = 0, uint part_4 = 0);
+		string var2str(unsigned int var) const;
 		string key2str(uint64_t key) const;
 };
 
 ////////////////////SchedulabilityTest////////////////////
 bool is_ILP_SpinLock_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
 
-void ILP_SpinLock_construct_exp(ILPSpinLockMapper& vars, LinearExpression *exp);
+void ILP_SpinLock_construct_exp(ILPSpinLockMapper& vars, LinearExpression *exp, uint type, uint part_1 = 0, uint part_2 = 0, uint part_3 = 0, uint part_4 = 0);
 
 void ILP_SpinLock_set_objective(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, ILPSpinLockMapper& vars);
 
@@ -64,6 +65,10 @@ void ILP_SpinLock_constraint_1(TaskSet& tasks, ProcessorSet& processors, Resourc
 
 //C2 2013 SIES Alexander
 void ILP_SpinLock_constraint_2(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, ILPSpinLockMapper& vars);
+
+//C2-1 2013 SIES Alexander
+void ILP_SpinLock_constraint_2_1(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, ILPSpinLockMapper& vars);
+
 
 //C3 2013 SIES Alexander
 void ILP_SpinLock_constraint_3(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, LinearProgram& lp, ILPSpinLockMapper& vars);
