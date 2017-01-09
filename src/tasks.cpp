@@ -88,14 +88,23 @@ Task::Task(	uint id,
 	wcet_critical_sections = 0;
 	carry_in = false;
 
+	uint critical_section_num = 0;
+
 	for(int i = 0; i < resourceset.size(); i++)
 	{
-		if(Random_Gen::probability(param.rrp))
+		if(param.mcsn > critical_section_num)
 		{
-			uint num = Random_Gen::uniform_integral_gen(1, param.rrn);
-			uint max_len = Random_Gen::uniform_integral_gen(param.rrr.min, param.rrr.max);
-			add_request(i, num, max_len, param.tlf*max_len, resourceset.get_resources()[i].get_locality());
-			resourceset.add_task(i, this);
+			if(Random_Gen::probability(param.rrp))
+			{
+				uint num = Random_Gen::uniform_integral_gen(1, min(param.rrn, param.mcsn - critical_section_num));
+				critical_section_num += num;
+				uint max_len = Random_Gen::uniform_integral_gen(param.rrr.min, param.rrr.max);
+				ulong length = num * max_len;
+				wcet_non_critical_sections -= length;
+				wcet_critical_sections += length;
+				add_request(i, num, max_len, param.tlf*max_len, resourceset.get_resources()[i].get_locality());
+				resourceset.add_task(i, this);
+			}
 		}
 	}
 }
