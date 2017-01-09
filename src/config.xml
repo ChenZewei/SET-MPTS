@@ -34,12 +34,12 @@
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>2.8</min>
-			<max>4</max>
+			<min>0</min>
+			<max>2</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>4</data>	
+		<data>2</data>	
 	</processor_num>
 	<period_range>
 		<data>

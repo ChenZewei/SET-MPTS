@@ -250,7 +250,7 @@ void ILP_SpinLock_add_constraints(TaskSet& tasks, ProcessorSet& processors, Reso
 //cout<<"Set C2"<<endl;
 	ILP_SpinLock_constraint_2(tasks, processors, resources, lp, vars);
 //cout<<"Set C2-1"<<endl;
-	ILP_SpinLock_constraint_2_1(tasks, processors, resources, lp, vars);
+//	ILP_SpinLock_constraint_2_1(tasks, processors, resources, lp, vars);
 //cout<<"Set C3"<<endl;
 	ILP_SpinLock_constraint_3(tasks, processors, resources, lp, vars);
 //cout<<"Set C4"<<endl;
@@ -547,7 +547,7 @@ void ILP_SpinLock_constraint_10(TaskSet& tasks, ProcessorSet& processors, Resour
 			uint var_id;
 			
 			uint c1 = ceiling(ti->get_deadline(), tx->get_period());
-			double c2 = (ti->get_response_time())/(tx->get_period());
+			double c2 = double(ti->get_response_time())/(tx->get_period());
 
 			var_id = vars.lookup(ILPSpinLockMapper::SAME_LOCALITY, i, x);
 			exp->add_term(var_id, c1);
