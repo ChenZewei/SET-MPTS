@@ -34,13 +34,8 @@
 	</step>
 	<init_utilization_range>
 		<data>
-<<<<<<< HEAD
 			<min>0</min>
 			<max>2</max>
-=======
-			<min>4</min>
-			<max>4</max>
->>>>>>> 36de06d0b3f501f859f3c32754317010aa61b498
 		</data>
 	</init_utilization_range>
 	<processor_num>
