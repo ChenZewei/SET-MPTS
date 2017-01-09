@@ -22,6 +22,7 @@ class Param
 		uint exp_times;
 		//resource parameters
 		int resource_num;
+		int mcsn;
 		int rrn;
 		double rrp;
 		double tlf;

@@ -56,7 +56,7 @@ int main(int argc,char** argv)
 	XML::get_step(&steps);	
 
 	//resource parameter
-	Int_Set resource_num, rrns;
+	Int_Set resource_num, rrns, mcsns;
 	Double_Set rrps, tlfs;
 	Range_Set rrrs;
 	XML::get_resource_num(&resource_num);
@@ -64,6 +64,7 @@ int main(int argc,char** argv)
 	XML::get_resource_request_num(&rrns);
 	XML::get_resource_request_range(&rrrs);
 	XML::get_total_len_factor(&tlfs);
+	XML::get_integers(&mcsns, "mcsn");
 
 	//graph parameters
 	Range_Set job_num_ranges;
@@ -96,6 +97,7 @@ int main(int argc,char** argv)
 	parameters.test_attributes = test_attributes;
 	parameters.exp_times = exp_times;
 	parameters.resource_num = resource_num[0];
+	parameters.mcsn = mcsns[0];
 	parameters.rrn = rrns[0];
 	parameters.rrp = rrps[0];
 	parameters.tlf = tlfs[0];
