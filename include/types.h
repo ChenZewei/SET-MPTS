@@ -68,7 +68,7 @@
 
 #define GLPK_MEM_USAGE_CHECK 0
 #define GLPK_TERM_OUT 0
-#define ILP_SOLUTION_VAR_CHECK 1
+#define ILP_SOLUTION_VAR_CHECK 0
 
 
 using namespace std;
