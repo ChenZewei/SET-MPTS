@@ -142,10 +142,12 @@ ulong ro_get_interference(Task& ti, TaskSet& tasks, ProcessorSet& processors, Re
 	Processor& processor = processors.get_processors()[p_i];
 	if(0 == processor.get_resourcequeue().size())//Application Core
 	{
+//cout<<"AC"<<endl;
 		return ro_get_interference_AC(ti, tasks, resources, interval);
 	}
 	else//Universal Core
 	{
+//cout<<"UC"<<endl;
 		return ro_get_interference_UC(ti, tasks, resources, interval);
 	}
 }
@@ -163,11 +165,14 @@ ulong rta_ro(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& re
 		ulong interf_R = ro_get_interference_R(ti, tasks, processors, resources, response_time);
 /*
 cout<<"Deadline:"<<test_bound<<endl;
-cout<<"WCET:"<<ti.get_wcet_non_critical_sections()<<endl;
+cout<<"WCET:"<<ti.get_wcet()<<endl;
 cout<<"interf_C:"<<interf_C<<endl;
 cout<<"interf_R:"<<interf_R<<endl;
 */
 		ulong temp = test_start + interf_C + interf_R;
+
+		//if(temp < response_time)
+//			cout<<temp<<" "<<response_time<<endl;
 
 		assert(temp >= response_time);
 

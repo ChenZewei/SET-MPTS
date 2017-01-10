@@ -54,6 +54,7 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 			schedulable = is_ILP_SpinLock_schedulable(taskset, processorset, resourceset);
 			break;
 		case GEDF_NON_PREEMPT:
+			taskset.RM_Order();
 			schedulable = is_gedf_non_preempt_schedulable(taskset, processorset, resourceset);
 			break;
 		default:

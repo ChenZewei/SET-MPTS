@@ -125,7 +125,7 @@ int main(int argc,char** argv)
 	double utilization = u_ranges[0].min;
 
 /////
-
+/*
 			TaskSet testt = TaskSet();
 			ProcessorSet testp = ProcessorSet(parameters);
 			ResourceSet testr = ResourceSet();
@@ -145,7 +145,7 @@ cout<<ti->get_wcet()<<" "<<ti->get_wcet_critical_sections()<<" "<<ti->get_wcet_n
 			cout<<"request for resource "<<q<<":"<<"N"<<request->get_num_requests()<<" L:"<<request->get_max_length()<<endl;
 		}
 	}
-
+*/
 
 /////
 	time_t start, end;

@@ -18,7 +18,7 @@ set<ulong> delta(Task& ti, TaskSet& tasks)
 		ulong p_x = tx->get_period();
 		for(uint i = 1; i <= p_i/p_x; i++)
 		{
-			if((i*p_x + 1) <= p_i)
+			if((i*p_x + 1) < p_i)
 			{
 				delta_set.insert(i*p_x + 1);
 			}
@@ -53,10 +53,11 @@ ulong gedf_non_preempt_psi(Task& ti, Task& tk, ProcessorSet& processors, Resourc
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
 
-	ulong element1 = ((4*p_num + 3*r_num)*e_k)/(2*p_num);
+	ulong element1 = double((4*p_num + 3*r_num)*e_k)/(2*p_num);
 	ulong element2 = interval - dbf_i_k*(double(2*p_num*p_i)/((4*p_num + 3*r_num)*e_k));
 	if(element2 < 0)
 		element2 = 0;
+//cout<<"element1:"<<element1<<endl;
 
 	return dbf_i_k + min(element1, element2);
 }
@@ -79,7 +80,7 @@ ulong gedf_non_preempt_xi(Task& tk, ProcessorSet& processors, ResourceSet& resou
 	uint r_num = resources.get_resourceset_size();
 	ulong N_k = gedf_non_preempt_N(tk, processors, resources, interval);
 
-	ulong element1 = ((4*p_num + 3*r_num)*e_k)/(2*p_num);
+	ulong element1 = (double(4*p_num + 3*r_num)*e_k)/(2*p_num);
 	ulong element2 = interval + double(p_k)/3 - (double((4*p_num + 3*r_num)*e_k)/(2*p_num)) - N_k*p_k;
 
 	return N_k*double((4*p_num + 3*r_num)*e_k)/(2*p_num) + min(element1, element2);
@@ -112,14 +113,13 @@ ulong gedf_non_preempt_response_time(Task& ti, TaskSet& tasks, ProcessorSet& pro
 //cout<<"e:"<<e<<endl;
 //cout<<"c*:"<<e_i<<endl;
 //cout<<"c:"<<e_c_i<<endl;
-	ulong test_start = ((4*p_num + 3*r_num)*e_i)/(2*p_num);
+	ulong test_start = (double(4*p_num + 3*r_num)*e_i)/(2*p_num);
 	double test_end = double(p_i)/3;
 	ulong response_time = test_start;
 
-
 	while(response_time < test_end)
 	{
-		test_start = ((4*p_num + 3*r_num)*e_i)/(2*p_num);
+		test_start = (double(4*p_num + 3*r_num)*e_i)/(2*p_num);
 
 //cout<<"test_start:"<<test_start<<endl;
 //cout<<"e:"<<e<<endl;
