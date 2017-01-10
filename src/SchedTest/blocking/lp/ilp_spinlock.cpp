@@ -250,7 +250,7 @@ void ILP_SpinLock_add_constraints(TaskSet& tasks, ProcessorSet& processors, Reso
 //cout<<"Set C2"<<endl;
 	ILP_SpinLock_constraint_2(tasks, processors, resources, lp, vars);
 //cout<<"Set C2-1"<<endl;
-//	ILP_SpinLock_constraint_2_1(tasks, processors, resources, lp, vars);
+	ILP_SpinLock_constraint_2_1(tasks, processors, resources, lp, vars);
 //cout<<"Set C3"<<endl;
 	ILP_SpinLock_constraint_3(tasks, processors, resources, lp, vars);
 //cout<<"Set C4"<<endl;

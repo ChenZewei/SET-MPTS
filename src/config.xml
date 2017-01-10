@@ -17,12 +17,13 @@
 		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
 		<data TEST_TYPE="0" REMARK="">ILP-SPINLOCK</data>
 		<data TEST_TYPE="0" REMARK="SPIN">GEDF-NON-PREEMPT</data>
-<!-->		
+<!-->	
 		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
 		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
-		<data TEST_TYPE="0" REMARK="PCP">RO-PFP</data>
+		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
+		<data TEST_TYPE="0" REMARK="">ILP-SPINLOCK</data>
 	</schedulability_test>
-	<experiment_times>500</experiment_times>
+	<experiment_times>10</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -31,14 +32,14 @@
 		<data>JSON</data>
 	</output>
 	<lambda>
-		<data>10</data>
+		<data>3</data>
 	</lambda>
 	<step>
-		<data>0.1</data>
+		<data>0.4</data>
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>0</min>
+			<min>3</min>
 			<max>4</max>
 		</data>
 	</init_utilization_range>
@@ -61,7 +62,7 @@
 		<data>8</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>0</data>
+		<data>1</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.25</data>
