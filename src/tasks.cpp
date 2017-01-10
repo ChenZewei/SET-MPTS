@@ -99,10 +99,14 @@ Task::Task(	uint id,
 				uint num = Random_Gen::uniform_integral_gen(1, min(param.rrn, int(param.mcsn - critical_section_num)));
 				uint max_len = Random_Gen::uniform_integral_gen(param.rrr.min, min(double(wcet), param.rrr.max));
 				ulong length = num * max_len;
+				if(length >= wcet_non_critical_sections)
+					continue;
+
 				wcet_non_critical_sections -= length;
 				wcet_critical_sections += length;
 
 				add_request(i, num, max_len, param.tlf*max_len, resourceset.get_resources()[i].get_locality());
+				
 				resourceset.add_task(i, this);
 				critical_section_num += num;
 			}
