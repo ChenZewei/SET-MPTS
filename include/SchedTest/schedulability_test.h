@@ -10,6 +10,7 @@
 #include "lp_gfp.h"
 #include "ro_pfp.h"
 #include "ilp_spinlock.h"
+#include "gedf_non_preempt.h"
 
 bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
 {
@@ -51,6 +52,9 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 			break;
 		case ILP_SPINLOCK:
 			schedulable = is_ILP_SpinLock_schedulable(taskset, processorset, resourceset);
+			break;
+		case GEDF_NON_PREEMPT:
+			schedulable = is_gedf_non_preempt_schedulable(taskset, processorset, resourceset);
 			break;
 		default:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);

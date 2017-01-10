@@ -11,7 +11,16 @@
 
 ulong ro_workload(Task& ti, ulong interval)
 {
-	ulong e = ti.get_wcet_critical_sections();
+/*
+cout<<"workload C:"<<endl;
+foreach(ti.get_requests(), request)
+{
+	uint q = request->get_resource_id();
+	cout<<"request for resource "<<q<<":"<<"N"<<request->get_num_requests()<<" L:"<<request->get_max_length()<<endl;
+}
+cout<<ti.get_wcet()<<" "<<ti.get_wcet_critical_sections()<<" "<<ti.get_wcet_non_critical_sections()<<endl;
+*/
+	ulong e = ti.get_wcet_non_critical_sections();
 	ulong p = ti.get_period();
 	ulong r = ti.get_response_time();
 	return ceiling((interval + r - e), p) * e;
@@ -144,7 +153,7 @@ ulong ro_get_interference(Task& ti, TaskSet& tasks, ProcessorSet& processors, Re
 ulong rta_ro(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
 	ulong test_bound = ti.get_deadline();
-	ulong test_start = ti.get_wcet_critical_sections() + ro_get_bloking(ti, tasks, resources);
+	ulong test_start = ti.get_wcet() + ro_get_bloking(ti, tasks, resources);
 	ulong response_time = test_start;
 //cout<<"response time1:"<<response_time<<endl;
 //cout<<"deadline1:"<<test_bound<<endl;
@@ -154,7 +163,7 @@ ulong rta_ro(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& re
 		ulong interf_R = ro_get_interference_R(ti, tasks, processors, resources, response_time);
 /*
 cout<<"Deadline:"<<test_bound<<endl;
-cout<<"WCET:"<<ti.get_wcet_critical_sections()<<endl;
+cout<<"WCET:"<<ti.get_wcet_non_critical_sections()<<endl;
 cout<<"interf_C:"<<interf_C<<endl;
 cout<<"interf_R:"<<interf_R<<endl;
 */
@@ -162,7 +171,7 @@ cout<<"interf_R:"<<interf_R<<endl;
 
 		assert(temp >= response_time);
 
-		if(temp > response_time)
+		if(temp != response_time)
 			response_time = temp;
 		else if(temp == response_time)
 			return response_time;

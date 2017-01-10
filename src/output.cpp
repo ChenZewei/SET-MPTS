@@ -114,6 +114,12 @@ string Output::get_method_name(Test_Attribute ta)
 		case 9:
 			name = "RO-PFP";
 			break;
+		case 10:
+			name = "ILP-SPINLOCK";
+			break;
+		case 11:
+			name = "GEDF-NON-PREEMPT";
+			break;
 	}
 	if(0 == strcmp(ta.remark.data(), ""))
 		return name;

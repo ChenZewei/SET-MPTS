@@ -58,20 +58,20 @@ void Resource::add_task(void* taskptr)
 	switch(((Task*)taskptr)->task_model())
 	{
 		case TPS_TASK_MODEL:
-			Request& request = ((Task*)taskptr)->get_request_by_id(resource_id);
-			u = request.get_num_requests() * request.get_max_length();
+			Request& request_tps = ((Task*)taskptr)->get_request_by_id(resource_id);
+			u = request_tps.get_num_requests() * request_tps.get_max_length();
 			u /= ((Task*)taskptr)->get_period();
 			utilization += u;
 			break;
 		case DAG_TASK_MODEL:
-			Request& request = ((DAG_Task*)taskptr)->get_request_by_id(resource_id);
-			u = request.get_num_requests() * request.get_max_length();
+			Request& request_dag = ((DAG_Task*)taskptr)->get_request_by_id(resource_id);
+			u = request_dag.get_num_requests() * request_dag.get_max_length();
 			u /= ((DAG_Task*)taskptr)->get_period();
 			utilization += u;
 			break;
 		default:
-			Request& request = ((Task*)taskptr)->get_request_by_id(resource_id);
-			u = request.get_num_requests() * request.get_max_length();
+			Request& request_def = ((Task*)taskptr)->get_request_by_id(resource_id);
+			u = request_def.get_num_requests() * request_def.get_max_length();
 			u /= ((Task*)taskptr)->get_period();
 			utilization += u;
 	}

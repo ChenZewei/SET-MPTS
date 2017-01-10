@@ -103,6 +103,7 @@ int main(int argc,char** argv)
 	parameters.tlf = tlfs[0];
 	parameters.rrr = rrrs[0];
 
+
 	parameters.job_num_range = job_num_ranges[0];	
 	parameters.arc_num_range = arc_num_ranges[0];	
 	if(0 == is_cyclics[0])
@@ -123,6 +124,30 @@ int main(int argc,char** argv)
 
 	double utilization = u_ranges[0].min;
 
+/////
+
+			TaskSet testt = TaskSet();
+			ProcessorSet testp = ProcessorSet(parameters);
+			ResourceSet testr = ResourceSet();
+			resource_gen(&testr, parameters);
+			tast_gen(testt, testr, parameters, 1);
+
+	testt.RM_Order();
+
+	foreach(testt.get_tasks(), ti)
+	{
+		uint i = ti->get_id();
+cout<<"Task "<<i<<":"<<endl;
+cout<<ti->get_wcet()<<" "<<ti->get_wcet_critical_sections()<<" "<<ti->get_wcet_non_critical_sections()<<endl;
+		foreach(ti->get_requests(), request)
+		{
+			uint q = request->get_resource_id();
+			cout<<"request for resource "<<q<<":"<<"N"<<request->get_num_requests()<<" L:"<<request->get_max_length()<<endl;
+		}
+	}
+
+
+/////
 	time_t start, end;
 	
 	start = time(NULL);
@@ -172,8 +197,8 @@ for(uint k = 0; k < processorset.get_processor_num(); k++)
 */
 //cout<<"j:"<<j<<endl;
 //cout<<"test method:"<<parameters.get_test_method(i)<<endl;
-				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j) + 9, parameters.get_test_type(j), 0))
-				if(is_schedulable(taskset, processorset, resourceset, 10, 0, 1))
+				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
+				//if(is_schedulable(taskset, processorset, resourceset, 10, 0, 1))
 				{
 					success[j]++;
 				}

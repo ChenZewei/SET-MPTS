@@ -75,6 +75,14 @@ cout<<content<<endl;
 		{
 			transform = 9;
 		}
+		else if(0 == strcmp(content,"ILP-SPINLOCK"))
+		{
+			transform = 10;
+		}
+		else if(0 == strcmp(content,"GEDF-NON-PREEMPT"))
+		{
+			transform = 11;
+		}
 		else
 		{
 			transform = 0;
