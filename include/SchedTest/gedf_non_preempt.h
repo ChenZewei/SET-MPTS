@@ -34,14 +34,18 @@ ulong gedf_non_preempt_dbf(Task& ti, Task& tk, ProcessorSet& processors, Resourc
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
 /*
+if(floor(double(p_i)/(3*p_k) - (1.0/3)) > -1)
+{
+cout<<"test:"<<floor(double(p_i)/(3*p_k) - (1.0/3))<<endl;
+cout<<"dbf_i_k:"<<(floor(double(p_i)/(3*p_k) - (1.0/3)) + 1)*(double(4*p_num + 3*r_num)*e_k)/(2*p_num)<<endl;
 cout<<"p_num:"<<p_num<<endl;
 cout<<"r_num:"<<r_num<<endl;
 cout<<"p_i:"<<p_i<<endl;
 cout<<"p_k:"<<p_k<<endl;
 cout<<"e_k:"<<e_k<<endl;
-cout<<"dbf_i_k:"<<((p_i - p_k)/(3*p_k) + 1)*(double(4*p_num + 3*r_num)*e_k)/(2*p_num)<<endl;
+}
 */
-	return ((p_i - p_k)/(3*p_k) + 1)*(double(4*p_num + 3*r_num)*e_k)/(2*p_num);
+	return (floor(double(p_i)/(3*p_k) - (1.0/3)) + 1)*(double(4*p_num + 3*r_num)*e_k)/(2*p_num);
 }
 
 ulong gedf_non_preempt_psi(Task& ti, Task& tk, ProcessorSet& processors, ResourceSet& resources, ulong interval)
@@ -97,7 +101,7 @@ ulong gedf_non_preempt_interference(Task& ti, Task& tk, ProcessorSet& processors
 	
 //cout<<"xi_k:"<<xi_k<<endl;
 //cout<<"psi_i_k:"<<psi_i_k<<endl;
-	ulong element = min(psi_i_k, interval - ((4*p_num + 3*r_num)*e_i)/(2*p_num) + 1);
+	ulong element = min(double(psi_i_k), interval - double((4*p_num + 3*r_num)*e_i)/(2*p_num) + 1);
 	
 	return min(xi_k, element);
 }
@@ -113,13 +117,13 @@ ulong gedf_non_preempt_response_time(Task& ti, TaskSet& tasks, ProcessorSet& pro
 //cout<<"e:"<<e<<endl;
 //cout<<"c*:"<<e_i<<endl;
 //cout<<"c:"<<e_c_i<<endl;
-	ulong test_start = (double(4*p_num + 3*r_num)*e_i)/(2*p_num);
+	ulong test_start = double((4*p_num + 3*r_num)*e_i)/(2*p_num);
 	double test_end = double(p_i)/3;
 	ulong response_time = test_start;
 
 	while(response_time < test_end)
 	{
-		test_start = (double(4*p_num + 3*r_num)*e_i)/(2*p_num);
+		test_start = double((4*p_num + 3*r_num)*e_i)/(2*p_num);
 
 //cout<<"test_start:"<<test_start<<endl;
 //cout<<"e:"<<e<<endl;
@@ -134,16 +138,16 @@ ulong gedf_non_preempt_response_time(Task& ti, TaskSet& tasks, ProcessorSet& pro
 
 //		if(test_start < response_time)
 //			cout<<"test:"<<test_start<<" response_time:"<<response_time<<endl;
-		//assert(test_start >= response_time);
+		assert(test_start >= response_time);
 
-		if(test_start != response_time)
+		if(test_start > response_time)
 			response_time = test_start;
 		else if(test_start == response_time)
 			return response_time;
 		
 	}
 
-	return test_end + 100;
+	return response_time;
 }
 
 bool is_gedf_non_preempt_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
@@ -158,7 +162,7 @@ bool is_gedf_non_preempt_schedulable(TaskSet& tasks, ProcessorSet& processors, R
 		ulong response_time = gedf_non_preempt_response_time(*ti, tasks, processors, resources);
 		if(response_time > double(ti->get_period())/3)
 		{
-			//cout<<"1"<<endl;
+//			cout<<"1 ";
 			return false;
 		}
 	}
@@ -194,14 +198,14 @@ bool is_gedf_non_preempt_schedulable(TaskSet& tasks, ProcessorSet& processors, R
 				
 				if(L < test_start)
 				{
-					//cout<<"2-b"<<endl;
+//					cout<<"2-b ";
 					return false;
 				}
 			}
 		}
 		if(sum > double(4*p_num + 3*r_num)/(3*p_num))
 		{
-			//cout<<"2-a"<<endl;
+//			cout<<"2-a ";
 			return false;
 		}
 	}

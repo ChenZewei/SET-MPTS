@@ -58,10 +58,10 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>4</data>
+		<data>8</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>100</data>
+		<data>0</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.25</data>
