@@ -39,7 +39,7 @@
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>3</min>
+			<min>0</min>
 			<max>4</max>
 		</data>
 	</init_utilization_range>
