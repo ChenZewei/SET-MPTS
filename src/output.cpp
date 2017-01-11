@@ -56,11 +56,13 @@ uint Output::get_sets_num() const
 	return result_sets.size();
 }
 
-void Output::add_result(uint index, double x, double y)
+void Output::add_result(uint index, double x, double y, uint e_num, uint s_num)
 {
 	Result result;
 	result.x = x;
 	result.y = y;
+	result.exp_num = e_num;
+	result.success_num = s_num;
 	result_sets[index].push_back(result);
 }
 
@@ -145,7 +147,6 @@ void Output::export_csv()
 	}
 	output_file<<"\n";
 
-	double utilization = param.u_range.min;
 
 	for(uint i = 0; i < result_sets[0].size(); i++)
 	{
@@ -157,18 +158,56 @@ void Output::export_csv()
 		output_file<<"\n";
 	}
 
-/*
-	output_file<<utilization<<",";
-	do
-	{
-		output_file<<","<<utilization;
-		
-	}
-	while(utilization < param.u_range.max || fabs(param.u_range.max - utilization) < _EPS);
-	output_file<<utilization<<"\n";
-*/
 	output_file.flush();
-	utilization += param.step;
+	output_file.close();
+}
+
+void Output::export_table_head()
+{
+	string file_name = path + "result-test.csv";
+	ofstream output_file(file_name);
+
+	output_file<<"Lambda:"<<param.lambda<<",";					
+	output_file<<"processor number:"<<param.p_num<<",";
+	output_file<<"step:"<<param.step<<",";
+	output_file<<"utilization range:["<<param.u_range.min<<"-"<<param.u_range.max<<"],";
+	output_file<<setprecision(0)<<"period range:["<<param.p_range.min<<"-"<<param.p_range.max<<"]\n"<<setprecision(3);
+	output_file<<"Scheduling test method:,";
+	for(uint i = 0; i < param.test_attributes.size(); i++)
+	{
+		output_file<<get_method_name(param.test_attributes[i])<<"ratio,"<<",,";
+	}
+	output_file<<"\n";
+	output_file<<"Utilization,";
+	for(uint i = 0; i < param.test_attributes.size(); i++)
+	{
+		output_file<<"experiment times,success times,success ratio,";
+	}
+	output_file<<"\n";
+	output_file.flush();
+	output_file.close();
+}
+
+void Output::export_result_append()
+{
+	string file_name = path + "result-test.csv";
+	if(0 != access(file_name.data(), 0))
+	{
+		export_table_head();
+	}
+	ofstream output_file(file_name);
+	uint last_index = result_sets[0].size() - 1;
+	output_file<<result_sets[0][last_index].x<<",";
+	for(uint i = 0; i < param.test_attributes.size(); i++)
+	{
+		Result result = result_sets[i][last_index];
+		output_file<<result.exp_num<<",";
+		output_file<<result.success_num<<",";
+		output_file<<result.y<<",";
+	}
+	output_file<<"\n";
+	output_file.flush();
+	output_file.close();
 }
 
 //export to graph

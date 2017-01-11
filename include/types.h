@@ -94,6 +94,8 @@ typedef struct
 {
 	double x;
 	double y;
+	uint exp_num;
+	uint success_num;
 }Result;
 
 typedef struct

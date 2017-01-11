@@ -120,6 +120,8 @@ int main(int argc,char** argv)
 	
 	Output output(parameters);
 
+	//output.export_table_head();
+
 	Random_Gen::uniform_integral_gen(0,10);
 
 	double utilization = u_ranges[0].min;
@@ -159,8 +161,10 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 		Result result;
 cout<<"Utilization:"<<utilization<<endl;
 		vector<int> success;
+		vector<int> exp;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
+			exp.push_back(0);
 			success.push_back(0);
 		}
 		for(int i = 0; i < exp_times; i++)
@@ -168,17 +172,8 @@ cout<<"Utilization:"<<utilization<<endl;
 cout<<".";
 cout<<flush;
 
-//cout<<"exp:"<<i<<endl;
 	    	TaskSet taskset = TaskSet();
 			ProcessorSet processorset = ProcessorSet(parameters);
-/*
-cout<<"------------------"<<endl;
-for(uint k = 0; k < processorset.get_processor_num(); k++)
-			{
-				Processor& p_temp = processorset.get_processors()[k];
-				cout<<"utilization of processor "<<p_temp.get_processor_id()<<":"<<p_temp.get_utilization().get_d()<<endl;
-			}
-*/
 			ResourceSet resourceset = ResourceSet();
 			resource_gen(&resourceset, parameters);
 			tast_gen(taskset, resourceset, parameters, utilization);
@@ -188,33 +183,28 @@ for(uint k = 0; k < processorset.get_processor_num(); k++)
 				taskset.init();
 				processorset.init();	
 				resourceset.init();
-	/*		
-cout<<"11111"<<endl;
-for(uint k = 0; k < processorset.get_processor_num(); k++)
-			{
-				Processor& p_temp_1 = processorset.get_processors()[k];
-				cout<<"utilization of processor "<<p_temp_1.get_processor_id()<<":"<<p_temp_1.get_utilization().get_d()<<endl;
-			}
-*/
-//cout<<"j:"<<j<<endl;
-//cout<<"test method:"<<parameters.get_test_method(i)<<endl;
+				exp[j]++;
 				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
 				//if(is_schedulable(taskset, processorset, resourceset, 10, 0, 1))
 				{
 					success[j]++;
 				}
 			}
-			result.x = taskset.get_utilization_sum().get_d();
+			//result.x = taskset.get_utilization_sum().get_d();
+			result.x = utilization;
 		}
 cout<<endl;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
-			fraction_t ratio(success[i], exp_times);
+			fraction_t ratio(success[i], exp[i]);
 			result.y = ratio.get_d();
+			result.exp_num = exp[i];
+			result.success_num = success[i];
 //cout<<"ratio:"<<ratio.get_d()<<endl;
-			output.add_result(i, result.x, result.y);
-cout<<"Method "<<i<<": exp_times("<<exp_times<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
+			output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
+cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
 		}
+		output.export_result_append();
 
 		utilization += steps[0];
 
