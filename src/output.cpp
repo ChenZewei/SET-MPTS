@@ -164,7 +164,7 @@ void Output::export_csv()
 
 void Output::export_table_head()
 {
-	string file_name = path + "result-test.csv";
+	string file_name = path + "result-step-by-step.csv";
 	ofstream output_file(file_name);
 
 	output_file<<"Lambda:"<<param.lambda<<",";					
@@ -175,7 +175,7 @@ void Output::export_table_head()
 	output_file<<"Scheduling test method:,";
 	for(uint i = 0; i < param.test_attributes.size(); i++)
 	{
-		output_file<<get_method_name(param.test_attributes[i])<<"ratio,"<<",,";
+		output_file<<get_method_name(param.test_attributes[i])<<","<<",,";
 	}
 	output_file<<"\n";
 	output_file<<"Utilization,";
@@ -190,12 +190,12 @@ void Output::export_table_head()
 
 void Output::export_result_append()
 {
-	string file_name = path + "result-test.csv";
+	string file_name = path + "result-step-by-step.csv";
 	if(0 != access(file_name.data(), 0))
 	{
 		export_table_head();
 	}
-	ofstream output_file(file_name);
+	ofstream output_file(file_name, ofstream::app);
 	uint last_index = result_sets[0].size() - 1;
 	output_file<<result_sets[0][last_index].x<<",";
 	for(uint i = 0; i < param.test_attributes.size(); i++)
