@@ -11,6 +11,7 @@
 #include "ro_pfp.h"
 #include "ilp_spinlock.h"
 #include "gedf_non_preempt.h"
+#include "sched_test_base.h"
 
 bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
 {

@@ -34,5 +34,29 @@ int arcs_increase(ANode a1, ANode a2)
 		return a1.head < a2.head;
 }
 
+template <typename Model>
+int task_utilization_increase(Model m1, Model m2)
+{
+	return m1.get_utilization() < m2.get_utilization();
+}
+
+template <typename Model>
+int task_utilization_decrease(Model m1, Model m2)
+{
+	return m1.get_utilization() > m2.get_utilization();
+}
+
+template <typename Model>
+int resource_utilization_increase(Model m1, Model m2)
+{
+	return m1.get_utilization() < m2.get_utilization();
+}
+
+template <typename Model>
+int resource_utilization_decrease(Model m1, Model m2)
+{
+	return m1.get_resource_utilization() > m2.get_resource_utilization();
+}
+
 
 #endif

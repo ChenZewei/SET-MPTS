@@ -53,6 +53,8 @@ class ProcessorSet
 		uint get_processor_num() const;
 		Processors& get_processors();
 		void init();
+		void sort_by_task_utilization(uint dir);
+		void sort_by_resource_utilization(uint dir);
 		
 };
 #endif

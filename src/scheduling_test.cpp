@@ -14,6 +14,7 @@
 #include "param.h"
 #include "output.h"
 #include "random_gen.h"
+#include "test_model.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
@@ -178,6 +179,15 @@ cout<<flush;
 			resource_gen(&resourceset, parameters);
 			tast_gen(taskset, resourceset, parameters, utilization);
 
+cout<<"Testing:"<<endl;
+		SchedTestBase *testing;
+		TestModel tt = TestModel();
+		testing = &tt;
+		if(testing->is_schedulable(taskset, processorset, resourceset))
+			cout<<"true!"<<endl;
+		else
+			cout<<"false!"<<endl;
+
 			for(uint j = 0; j < parameters.get_method_num(); j++)
 			{
 				taskset.init();
@@ -207,6 +217,8 @@ cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[
 		output.export_result_append();
 
 		utilization += steps[0];
+		
+
 
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < _EPS);
