@@ -27,6 +27,65 @@ set<ulong> delta(Task& ti, TaskSet& tasks)
 	return delta_set;
 }
 
+set<ulong> delta_2(TaskSet& tasks)
+{
+	ulong p_max = tasks.get_tasks()[tasks.get_taskset_size() - 1].get_period();
+	set<ulong> delta_set;
+	foreach(tasks.get_tasks(), tx)
+	{
+		ulong p_x = tx->get_period();
+		uint i = 0;
+		ulong sum = p_x/3;
+		while(sum < (p_max + 1))
+		{
+			delta_set.insert(sum);
+			i++;
+			sum = i*p_x + p_x/3;
+		}
+	}
+	return delta_set;
+}
+
+ulong B(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint resource_id, ulong interval)
+{
+	uint p_num = processors.get_processor_num();
+	uint r_num = resources.get_resourceset_size();
+	ulong result = 0;
+	foreach(tasks.get_tasks(), tl)
+	{
+		ulong p_l = tl->get_period();
+		if(tl->is_request_exist(resource_id))
+		{
+			if(p_l > (3*interval))
+			{
+				ulong A = tl->get_wcet_critical_sections();//only one cirtical section
+				ulong temp = double(3*p_num*A)/(4*p_num + 3* r_num);
+				if(result < temp)
+					result = temp;
+			}
+		}
+	}
+	return result;
+}
+
+ulong H(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint resource_id, ulong interval)
+{
+	uint p_num = processors.get_processor_num();
+	uint r_num = resources.get_resourceset_size();
+	ulong result = 0;
+	foreach(tasks.get_tasks(), ti)
+	{
+		if(ti->is_request_exist(resource_id))
+		{
+			ulong p_i = ti->get_period();
+			ulong A = ti->get_wcet_critical_sections();//only one cirtical section
+			ulong temp = max(0, int((interval - double(p_i)/3)/p_i + 1));
+			result += temp*(double(3*p_num*A)/(4*p_num + 3* r_num));
+		}
+	}
+	return result;
+}
+
 ulong gedf_non_preempt_dbf(Task& ti, Task& tk, ProcessorSet& processors, ResourceSet& resources)
 {
 	ulong p_i = ti.get_period(), p_k = tk.get_period();
@@ -184,7 +243,7 @@ bool is_gedf_non_preempt_schedulable(TaskSet& tasks, ProcessorSet& processors, R
 			foreach(delta_set, delta)
 			{
 				ulong L = *delta;
-
+/*
 				double test_start = double(4*p_num + 3*r_num)*ai_q/(3*p_num);
 
 				foreach_higher_priority_task(tasks.get_tasks(), (*((Task*)(*ti_q))), tj_q)
@@ -195,8 +254,11 @@ bool is_gedf_non_preempt_schedulable(TaskSet& tasks, ProcessorSet& processors, R
 					ulong aj_q = tj_q->get_wcet_critical_sections();
 					test_start += ((L - 1)/pj_q)*(double(4*p_num + 3*r_num)*aj_q/(3*p_num));
 				}
+*/
+
+				ulong sum = B(tasks, processors, resources, q, L) + H(tasks, processors, resources, q, L);
 				
-				if(L < test_start)
+				if(L < sum)
 				{
 //					cout<<"2-b ";
 					return false;
