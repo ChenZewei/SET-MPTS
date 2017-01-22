@@ -21,7 +21,7 @@ void PartitionedSched::BinPacking_WF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 		case UNTEST:
 			break;
 		case TEST:
-			if(!is_schedulable(tasks, processors, resourcese))
+			if(!is_schedulable(tasks, processors, resources))
 			{
 				ti.set_partition(MAX_INT);
 				processor.remove_task(&ti);
@@ -39,6 +39,7 @@ void PartitionedSched::BinPacking_BF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 {
 	uint p_num = processors.get_processor_num();
 	processors.sort_by_task_utilization(DECREASE);
+	uint p_id;
 
 	for(uint assign = 0; assign < p_num; assign++)
 	{
@@ -47,6 +48,7 @@ void PartitionedSched::BinPacking_BF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 		{
 			ti.set_partition(assign);
 			processor.add_task(&ti);
+			p_id = assign;
 			break;
 		}
 		else
@@ -54,13 +56,13 @@ void PartitionedSched::BinPacking_BF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 				return false;
 	}
 
-
+	Processor& processor = processors.get_processors()[p_id];
 	switch(MODE)
 	{
 		case UNTEST:
 			break;
 		case TEST:
-			if(!is_schedulable(tasks, processors, resourcese))
+			if(!is_schedulable(tasks, processors, resources))
 			{
 				ti.set_partition(MAX_INT);
 				processor.remove_task(&ti);
