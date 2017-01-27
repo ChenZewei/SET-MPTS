@@ -131,6 +131,7 @@ void Task::init()
 	jitter = 0;
 	response_time = wcet;
 	cluster = MAX_INT;
+	priority = MAX_INT;
 	independent = true;
 	//wcet_non_critical_sections = this->wcet;
 	//wcet_critical_sections = 0;
@@ -503,9 +504,25 @@ void TaskSet::sort_by_utilization()
 		tasks[i].set_id(i);
 }
 
+void TaskSet::sort_by_density()
+{
+	sort(tasks.begin(), tasks.end(), density_decrease<Task>);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_id(i);
+}
+
 void TaskSet::RM_Order()
 {
 	sort_by_period();
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+}
+
+void TaskSet::DM_Order()
+{
+	sort_by_density();
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		tasks[i].set_priority(i);

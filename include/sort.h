@@ -25,6 +25,12 @@ int utilization_decrease(TaskModel t1, TaskModel t2)
 	return t1.get_utilization() > t2.get_utilization();
 }
 
+template <typename TaskModel>
+int density_decrease(TaskModel t1, TaskModel t2)
+{
+	return t1.get_density() > t2.get_density();
+}
+
 template <typename ANode>
 int arcs_increase(ANode a1, ANode a2)
 {

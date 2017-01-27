@@ -73,7 +73,7 @@ class Task
 			ulong wcet, 
 			ulong period,
 			ulong deadline = 0,
-			uint priority = 0);
+			uint priority = MAX_INT);
 
 		Task(	uint id,
 			ResourceSet& resourceset,
@@ -81,7 +81,7 @@ class Task
 			ulong wcet, 
 			ulong period,
 			ulong deadline = 0,
-			uint priority = 0);
+			uint priority = MAX_INT);
 
 		~Task();
 		
@@ -191,7 +191,9 @@ class TaskSet
 
 		void sort_by_period();//increase
 		void sort_by_utilization();//decrease
+		void sort_by_density();//decrease
 		void RM_Order();
+		void DM_Order();
 		ulong DBF(ulong time);
 
 		void display();
