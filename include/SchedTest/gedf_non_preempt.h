@@ -34,13 +34,11 @@ set<ulong> delta_2(TaskSet& tasks)
 	foreach(tasks.get_tasks(), tx)
 	{
 		ulong p_x = tx->get_period();
-		uint i = 0;
 		ulong sum = p_x/3;
 		while(sum < (p_max + 1))
 		{
 			delta_set.insert(sum);
-			i++;
-			sum = i*p_x + p_x/3;
+			sum += p_x;
 		}
 	}
 	return delta_set;
@@ -59,7 +57,7 @@ ulong B(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint r
 			if(p_l > (3*interval))
 			{
 				ulong A = tl->get_wcet_critical_sections();//only one cirtical section
-				ulong temp = double(3*p_num*A)/(4*p_num + 3* r_num);
+				ulong temp = double(3*p_num*A)/(4*p_num + 3*r_num);
 				if(result < temp)
 					result = temp;
 			}
@@ -80,7 +78,7 @@ ulong H(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint r
 			ulong p_i = ti->get_period();
 			ulong A = ti->get_wcet_critical_sections();//only one cirtical section
 			ulong temp = max(0, int((interval - double(p_i)/3)/p_i + 1));
-			result += temp*(double(3*p_num*A)/(4*p_num + 3* r_num));
+			result += temp*(double(3*p_num*A)/(4*p_num + 3*r_num));
 		}
 	}
 	return result;

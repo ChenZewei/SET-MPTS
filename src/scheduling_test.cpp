@@ -179,6 +179,7 @@ cout<<flush;
 			resource_gen(&resourceset, parameters);
 			tast_gen(taskset, resourceset, parameters, utilization);
 
+/*
 cout<<"Testing:"<<endl;
 		SchedTestBase *testing;
 		TestModel tt = TestModel();
@@ -187,7 +188,7 @@ cout<<"Testing:"<<endl;
 			cout<<"true!"<<endl;
 		else
 			cout<<"false!"<<endl;
-
+*/
 			for(uint j = 0; j < parameters.get_method_num(); j++)
 			{
 				taskset.init();

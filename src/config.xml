@@ -13,17 +13,16 @@
 		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
 		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
 		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
+		<data TEST_TYPE="1" REMARK="FMLP">LP-GFP</data>
 		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
 		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
 		<data TEST_TYPE="0" REMARK="">ILP-SPINLOCK</data>
 		<data TEST_TYPE="0" REMARK="SPIN">GEDF-NON-PREEMPT</data>
+		<data TEST_TYPE="0" REMARK="">PFP-GS</data>
 <!-->	
-		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
-		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
-		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
-		<data TEST_TYPE="0" REMARK="">ILP-SPINLOCK</data>
+		<data TEST_TYPE="0" REMARK="">PFP-GS</data>
 	</schedulability_test>
-	<experiment_times>10</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -32,10 +31,10 @@
 		<data>JSON</data>
 	</output>
 	<lambda>
-		<data>3</data>
+		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.4</data>
+		<data>0.1</data>
 	</step>
 	<init_utilization_range>
 		<data>
@@ -59,13 +58,13 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>8</data>
+		<data>4</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>1</data>
+		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.25</data>
+		<data>0.5</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>

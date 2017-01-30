@@ -51,6 +51,7 @@
 #define RO_PFP 9
 #define ILP_SPINLOCK 10
 #define GEDF_NON_PREEMPT 11
+#define PFP_GS 12
 
 
 #define TPS_TASK_MODEL 0 //Three Parameters Sporadic Task Model
