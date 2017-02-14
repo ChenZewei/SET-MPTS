@@ -22,7 +22,7 @@ ulong pfp_gs_response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors, R
 
 bool is_pfp_gs_tryAssign_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
 
-ulong pfp_gs_tryAssign(Task& ti, uint p_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+long pfp_gs_tryAssign(Task& ti, uint p_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
 
 bool is_pfp_gs_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
 

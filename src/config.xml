@@ -20,6 +20,12 @@
 		<data TEST_TYPE="0" REMARK="SPIN">GEDF-NON-PREEMPT</data>
 		<data TEST_TYPE="0" REMARK="">PFP-GS</data>
 <!-->	
+		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
+		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
+		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
+		<data TEST_TYPE="1" REMARK="FMLP">LP-GFP</data>
+		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
+		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
 		<data TEST_TYPE="0" REMARK="">PFP-GS</data>
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
@@ -64,7 +70,7 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.5</data>
+		<data>0.25</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>

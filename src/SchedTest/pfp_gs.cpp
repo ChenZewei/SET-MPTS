@@ -8,20 +8,26 @@ ulong pfp_gs_local_blocking(Task& ti, TaskSet& tasks, ProcessorSet& processors, 
 {
 	ulong blocking = 0;
 	uint p_id = ti.get_partition();
-	
+//cout<<"111"<<endl;
 	foreach(resources.get_resources(), resource)
 	{
+//cout<<"222"<<endl;
 		uint q = resource->get_resource_id();
+		if(resource->is_global_resource())
+			continue;
+//cout<<"333"<<endl;
 		foreach(tasks.get_tasks(), tj)
 		{
-			if((tj->is_request_exist(q)) && (resource->get_ceiling() < ti.get_id()) && (ti.get_id() < tj->get_id()) && (p_id == resource->get_locality()))
+			if((tj->is_request_exist(q)) && (resource->get_ceiling() < ti.get_priority()) && (ti.get_priority() < tj->get_priority()) && (p_id == tj->get_partition()))
 			{
 				ulong length = tj->get_request_by_id(q).get_max_length();
 				if(blocking < length)
 					blocking = length;
 			}
 		}
+//cout<<"444"<<endl;
 	}
+//cout<<"555"<<endl;
 	return blocking;
 }
 
@@ -82,7 +88,7 @@ ulong pfp_gs_NP_blocking(Task& ti, TaskSet& tasks, ProcessorSet& processors, Res
 			{
 				if((tx->is_request_exist(q)) && (ti.get_partition() == tx->get_partition()) && (ti.get_id() < tx->get_id()))
 				{
-					ulong length = pfp_gs_spin_time(ti, q, tasks, processors, resources) + tx->get_request_by_id(q).get_max_length();
+					ulong length = pfp_gs_spin_time((*tx), q, tasks, processors, resources) + tx->get_request_by_id(q).get_max_length();
 					if(blocking < length)
 						blocking = length;
 				}
@@ -163,10 +169,11 @@ bool is_pfp_gs_tryAssign_schedulable(TaskSet& tasks, ProcessorSet& processors, R
 	return true;
 }
 
-ulong pfp_gs_tryAssign(Task& ti, uint p_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
+long pfp_gs_tryAssign(Task& ti, uint p_id, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
-	ulong s = MAX_LONG;
+	long s = MAX_LONG;
 	Processor& processor = processors.get_processors()[p_id];
+//cout<<"<================= try assign task:"<<ti.get_id()<<" to processor:"<<p_id<<" =================>"<<endl;
 //cout<<"111"<<endl;
 	//temporarily assign ti to processor[p_id]
 	processor.add_task(&ti);
@@ -189,7 +196,7 @@ ulong pfp_gs_tryAssign(Task& ti, uint p_id, TaskSet& tasks, ProcessorSet& proces
 //cout<<pi<<endl;
 //cout<<queue_size-1<<endl;
 //cout<<"333"<<endl;
-		
+//cout<<"---------------priority: "<<pi<<" ---------------"<<endl;
 		TaskQueue C = U;
 		TaskQueue C2;
 
@@ -203,28 +210,35 @@ ulong pfp_gs_tryAssign(Task& ti, uint p_id, TaskSet& tasks, ProcessorSet& proces
 //cout<<"test!!!!!!!!!!!!!!"<<endl;
 				continue;
 			}
-
+//cout<<"task:"<<tx->get_id()<<endl;
+//cout<<"original priority:"<<tx->get_priority()<<endl;
 //cout<<"2"<<endl;	
 			if((MAX_INT == tx->get_priority()) || (pi == tx->get_priority()))
 			//if(MAX_INT == tx->get_priority())
 			{
 				tx->set_priority(pi);
+//cout<<"set priority:"<<tx->get_priority()<<endl;
 				if(is_pfp_gs_tryAssign_schedulable(tasks, processors, resources))
 				{
 					tx->set_priority(MAX_INT);
+//cout<<"reset priority-1:"<<tx->get_priority()<<endl;
 					//C.remove(*task);
 					//continue;
 					C2.push_back(*task);
 				}
 				
 				tx->set_priority(MAX_INT);
+//cout<<"reset priority-2:"<<tx->get_priority()<<endl;
+
 			}
 //cout<<"3"<<endl;	
 		}
+//cout<<"<--------------------------->"<<endl;
 //cout<<"444"<<endl;
+//cout<<"C2 size:"<<C2.size()<<endl;
 		if(0 == C2.size())
 		{
-			//temporarily remove ti from processor[p_id]
+			//remove ti from processor[p_id]
 			processor.remove_task(&ti);
 			ti.set_partition(MAX_INT);
 			return -1;
@@ -242,17 +256,32 @@ ulong pfp_gs_tryAssign(Task& ti, uint p_id, TaskSet& tasks, ProcessorSet& proces
 				}
 			}
 			((Task*)(*it))->set_priority(pi);
-			foreach(U, ti)
+//cout<<"set priority:"<<pi<<" to task:"<<((Task*)(*it))->get_id()<<endl;
+
+
+			foreach(U, it_2)
 			{
-				if(ti == it)
-					U.remove(*it);
+				if(((Task*)(*it_2))->get_id() == ((Task*)(*it))->get_id())
+				{
+					U.remove(*it_2);
+//cout<<"remove task:"<<((Task*)(*it_2))->get_id()<<endl;
+					break;
+				}
 			}
+/*
+cout<<"tasks in U"<<endl;
+foreach(U, it_2)
+{
+cout<<"task:"<<((Task*)(*it_2))->get_id()<<endl;
+}
+*/
 		}
 //cout<<"555"<<endl;
 	}
+//cout<<"########################"<<endl;
 //cout<<"666"<<endl;
 
-	foreach(U, ti)
+	foreach(taskqueue, ti)
 	{
 		ulong period_i = ((Task*)(*ti))->get_period();
 		ulong response_time_i = ((Task*)(*ti))->get_response_time();
@@ -260,28 +289,35 @@ ulong pfp_gs_tryAssign(Task& ti, uint p_id, TaskSet& tasks, ProcessorSet& proces
 		if(s > (period_i - response_time_i))
 		{
 			s = period_i - response_time_i;	
+/*
+cout<<"period_i:"<<period_i<<endl;
+cout<<"response_time_i:"<<response_time_i<<endl;
+cout<<"s:"<<s<<endl;
+*/
 		}
 	}
 //cout<<"777"<<endl;
 
-//temporarily remove ti from processor[p_id]
+//remove ti from processor[p_id]
 	processor.remove_task(&ti);
 	ti.set_partition(MAX_INT);
-
+/*
 	foreach(taskqueue, task)
 	{
 		Task *tx = ((Task*)(*task));
 		cout<<"task:"<<(tx->get_id())<<endl;
 		cout<<"priority:"<<(tx->get_priority())<<endl;
 	}
+*/
 
+//cout<<"final s:"<<s<<endl;
 	return s;
 }
 
 typedef struct
 {
-	ulong p_id;
-	ulong s;
+	uint p_id;
+	long s;
 }gs_tryAssign;
 
 bool is_pfp_gs_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)//Greedy Slacker heuristic partitioning
@@ -294,10 +330,10 @@ bool is_pfp_gs_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet
 	foreach(tasks.get_tasks(), tx)
 	{
 		vector<gs_tryAssign> C;
-
+//cout<<"!!!!!!!!!!!! try assign task:"<<tx->get_id()<<endl;
 		for(uint p_id = 0; p_id < p_num; p_id++)
 		{
-			ulong s = pfp_gs_tryAssign((*tx), p_id, tasks, processors, resources);
+			long s = pfp_gs_tryAssign((*tx), p_id, tasks, processors, resources);
 			if(0 <= s)
 			{
 				gs_tryAssign temp;
@@ -310,7 +346,7 @@ bool is_pfp_gs_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet
 			return false;
 		else
 		{
-			ulong max_s = 0;
+			long max_s = 0;
 			uint assignment;
 			foreach(C, c)
 			{
@@ -333,6 +369,20 @@ bool is_pfp_gs_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet
 		cout<<"task:"<<task->get_id()<<endl;
 		cout<<"partition:"<<task->get_partition()<<endl;
 		cout<<"priority:"<<task->get_priority()<<endl;
+	}
+
+	for(uint p_id = 0; p_id < p_num; p_id++)
+	{
+		Processor& processor = processors.get_processors()[p_id];
+		cout<<"Processor "<<p_id<<endl;
+		TaskQueue tqueue = processor.get_taskqueue();
+		foreach(tqueue, task)
+		{
+			cout<<"Task:"<<((Task*)(*task))->get_id()<<endl;
+			cout<<"Partition:"<<((Task*)(*task))->get_partition()<<endl;
+			cout<<"Priority:"<<((Task*)(*task))->get_priority()<<endl;
+		}
+		
 	}
 */
 	return true;
