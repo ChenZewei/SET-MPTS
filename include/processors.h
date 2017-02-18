@@ -49,6 +49,7 @@ class ProcessorSet
 	private:
 		Processors processors;
 	public:
+		ProcessorSet();
 		ProcessorSet(Param param);//for identical multiprocessor platform
 		uint get_processor_num() const;
 		Processors& get_processors();

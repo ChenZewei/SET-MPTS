@@ -1,6 +1,12 @@
 #ifndef P_SCHED_H
 #define P_SCHED_H
 
+/*
+**
+**
+**
+*/
+
 #include "types.h"
 #include "sched_test_base.h"
 
@@ -21,7 +27,7 @@ class PartitionedSched: public SchedTestBase
 			TEST
 		};
 
-		PartitionedSched();
+		PartitionedSched(bool LinearProgramming, uint TestMethod, uint SchedMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 
 		//Bin packing
 		void BinPacking_WF(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint MODE);

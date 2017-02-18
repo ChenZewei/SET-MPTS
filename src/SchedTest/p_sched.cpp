@@ -3,6 +3,11 @@
 #include "processors.h"
 #include "resources.h"
 
+PartitionedSched::PartitionedSched(bool LinearProgramming, uint TestMethod, uint SchedMethod, uint PriorityAssignment, uint LockingProtocol, string name, string remark): SchedTestBase(LinearProgramming, TestMethod, SchedMethod, PriorityAssignment, LockingProtocol, name, remark)
+{
+	
+}
+
 void PartitionedSched::BinPacking_WF(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint MODE)
 {
 	processors.sort_by_task_utilization(INCREASE);

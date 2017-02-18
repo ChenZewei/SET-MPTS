@@ -15,6 +15,7 @@
 #include "output.h"
 #include "random_gen.h"
 #include "test_model.h"
+#include "rta_native.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
@@ -195,8 +196,10 @@ cout<<"Testing:"<<endl;
 				processorset.init();	
 				resourceset.init();
 				exp[j]++;
-				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
-				//if(is_schedulable(taskset, processorset, resourceset, 10, 0, 1))
+				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
+				RTA_native rta_native = RTA_native(taskset, processorset, resourceset);
+				SchedTestBase *schedTest = &rta_native;
+				if(schedTest->is_schedulable())
 				{
 					success[j]++;
 				}

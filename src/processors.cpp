@@ -123,6 +123,8 @@ void Processor::init()
 }
 ///////////////////////////ProcessorSet/////////////////////////////
 
+ProcessorSet::ProcessorSet() {}
+
 ProcessorSet::ProcessorSet(Param param)//for identical multiprocessor platform
 {
 	for(uint i = 0; i < param.p_num; i++)

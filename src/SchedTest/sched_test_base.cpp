@@ -1,4 +1,7 @@
 #include "sched_test_base.h"
+#include "tasks.h"
+#include "processors.h"
+#include "resources.h"
 
 SchedTestBase::SchedTestBase(bool LinearProgramming, uint TestMethod, uint SchedMethod, uint PriorityAssignment, uint LockingProtocol, string name, string remark)
 {
