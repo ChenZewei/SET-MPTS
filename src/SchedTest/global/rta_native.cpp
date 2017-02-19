@@ -25,10 +25,11 @@ ulong RTA_native::response_time(Task& ti, TaskSet& tasks, ProcessorSet& processo
 	while(response < test_end)
 	{
 		ulong sum = 0;
-		for(uint x = 0; x < ti.get_id(); x++)
+		//for(uint x = 0; x < ti.get_id(); x++)
+		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 		{
-			Task& tx = tasks.get_task_by_id(x);
-			sum += workload(tx, response);
+			//Task& tx = tasks.get_task_by_id(x);
+			sum += workload((*th), response);
 		}
 		demand = sum/p_num + wcet;
 		if(response == demand)
@@ -43,16 +44,19 @@ bool RTA_native::is_schedulable()
 {
 	ulong response_bound;
 
-	for (uint i = 0; i < tasks.get_taskset_size(); i ++)
+	tasks.RM_Order();
+
+	//for (uint i = 0; i < tasks.get_taskset_size(); i ++)
+	foreach(tasks.get_tasks(), ti)
 	{
-		Task& ti = tasks.get_task_by_id(i);
-		ulong original_bound = ti.get_response_time();
-		response_bound = response_time(ti, tasks, processors);
-		if (response_bound > ti.get_deadline())
+		//Task& ti = tasks.get_task_by_id(i);
+		ulong original_bound = ti->get_response_time();
+		response_bound = response_time((*ti), tasks, processors);
+		if (response_bound > ti->get_deadline())
 			return false;
 		if(response_bound > original_bound)
 		{
-			ti.set_response_time(response_bound);
+			ti->set_response_time(response_bound);
 		}
 	}
 	return true;
@@ -62,16 +66,16 @@ bool RTA_native::is_schedulable(TaskSet& tasks, ProcessorSet& processors, Resour
 {
 	ulong response_bound;
 
-	for (uint i = 0; i < tasks.get_taskset_size(); i ++)
+	foreach(tasks.get_tasks(), ti)
 	{
-		Task& ti = tasks.get_task_by_id(i);
-		ulong original_bound = ti.get_response_time();
-		response_bound = response_time(ti, tasks, processors);
-		if (response_bound > ti.get_deadline())
+		//Task& ti = tasks.get_task_by_id(i);
+		ulong original_bound = ti->get_response_time();
+		response_bound = response_time((*ti), tasks, processors);
+		if (response_bound > ti->get_deadline())
 			return false;
 		if(response_bound > original_bound)
 		{
-			ti.set_response_time(response_bound);
+			ti->set_response_time(response_bound);
 		}
 	}
 	return true;
@@ -81,16 +85,16 @@ bool RTA_native::is_schedulable(TaskSet& tasks, ProcessorSet& processors, Resour
 {
 	ulong response_bound;
 
-	for (uint i = 0; i < tasks.get_taskset_size(); i ++)
+	foreach(tasks.get_tasks(), ti)
 	{
-		Task& ti = tasks.get_task_by_id(i);
-		ulong original_bound = ti.get_response_time();
-		response_bound = response_time(ti, tasks, processors);
-		if (response_bound > ti.get_deadline())
+		//Task& ti = tasks.get_task_by_id(i);
+		ulong original_bound = ti->get_response_time();
+		response_bound = response_time((*ti), tasks, processors);
+		if (response_bound > ti->get_deadline())
 			return false;
 		if(response_bound > original_bound)
 		{
-			ti.set_response_time(response_bound);
+			ti->set_response_time(response_bound);
 		}
 	}
 	return true;

@@ -197,10 +197,17 @@ cout<<"Testing:"<<endl;
 				processorset.init();	
 				resourceset.init();
 				exp[j]++;
-				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
+/*
+				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
+				{
+					success[j]++;
+				}
+*/
 //cout<<test_attributes[j].test_name<<endl;
 				
 				//RTA_native rta_native = RTA_native(taskset, processorset, resourceset);
+
+
 				SchedTestBase *schedTest = STFactory.createSchedTest(test_attributes[j].test_name, taskset, processorset, resourceset);
 
 				if(NULL == schedTest)
@@ -214,6 +221,7 @@ cout<<"Testing:"<<endl;
 					success[j]++;
 				}
 				delete(schedTest);
+
 			}
 			//result.x = taskset.get_utilization_sum().get_d();
 			result.x = utilization;
