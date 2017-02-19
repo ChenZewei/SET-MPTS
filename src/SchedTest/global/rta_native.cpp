@@ -94,3 +94,5 @@ bool RTA_native::is_schedulable(TaskSet& tasks, ProcessorSet& processors, Resour
 	return true;
 }
 
+RTA_native* Factory_RTA_native::creativeSchedTest() { return new RTA_native; }
+

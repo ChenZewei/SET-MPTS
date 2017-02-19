@@ -8,6 +8,7 @@
 */
 
 #include "g_sched.h"
+#include "factory_base.h"
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
@@ -35,6 +36,12 @@ class RTA_native: public GlobalSched
 		bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
 		bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint TEST_TYPE = 0, uint ITER_BLOCKING = 0);
 	
+};
+
+class Factory_RTA_native: public FactoryBase
+{
+	public:
+		RTA_native* creativeSchedTest();
 };
 
 #endif

@@ -4,11 +4,11 @@
 #include "resources.h"
 
 
-RTA_BC::RTA_BC(TaskSet& tasks, ProcessorSet& processors, ResoruceSet& resoruces)
+RTA_BC::RTA_BC(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "BC")
 {
 	this->tasks = tasks;
 	this->processors = processors;
-	this->resources = resoruces;
+	this->resources = resources;
 }
 
 ulong RTA_BC::workload(Task& task, ulong interval)
@@ -47,7 +47,7 @@ ulong RTA_BC::response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors)
 	return test_end + 100;
 }
 
-bool RTA_BC::is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResoruceSet& resoruces)
+bool RTA_BC::is_schedulable()
 {
 	ulong response_bound;
 
@@ -65,3 +65,43 @@ bool RTA_BC::is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResoruceSe
 	}
 	return true;
 }
+
+bool RTA_BC::is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
+{
+	ulong response_bound;
+
+	for (uint i = 0; i < tasks.get_taskset_size(); i ++)
+	{
+		Task& ti = tasks.get_task_by_id(i);
+		ulong original_bound = ti.get_response_time();
+		response_bound = response_time(ti, tasks, processors);
+		if (response_bound > ti.get_deadline())
+			return false;
+		if(response_bound > original_bound)
+		{
+			ti.set_response_time(response_bound);
+		}
+	}
+	return true;
+}
+
+bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
+{
+	ulong response_bound;
+
+	for (uint i = 0; i < tasks.get_taskset_size(); i ++)
+	{
+		Task& ti = tasks.get_task_by_id(i);
+		ulong original_bound = ti.get_response_time();
+		response_bound = response_time(ti, tasks, processors);
+		if (response_bound > ti.get_deadline())
+			return false;
+		if(response_bound > original_bound)
+		{
+			ti.set_response_time(response_bound);
+		}
+	}
+	return true;
+}
+
+RTA_BC* Factory_RTA_BC::creativeSchedTest() { return new RTA_BC; }
