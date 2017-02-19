@@ -25,6 +25,12 @@ int utilization_decrease(TaskModel t1, TaskModel t2)
 	return t1.get_utilization() > t2.get_utilization();
 }
 
+template <typename TaskModel>
+int density_decrease(TaskModel t1, TaskModel t2)
+{
+	return t1.get_density() > t2.get_density();
+}
+
 template <typename ANode>
 int arcs_increase(ANode a1, ANode a2)
 {
@@ -32,6 +38,30 @@ int arcs_increase(ANode a1, ANode a2)
 		return a1.tail < a2.tail;
 	else
 		return a1.head < a2.head;
+}
+
+template <typename Model>
+int task_utilization_increase(Model m1, Model m2)
+{
+	return m1.get_utilization() < m2.get_utilization();
+}
+
+template <typename Model>
+int task_utilization_decrease(Model m1, Model m2)
+{
+	return m1.get_utilization() > m2.get_utilization();
+}
+
+template <typename Model>
+int resource_utilization_increase(Model m1, Model m2)
+{
+	return m1.get_utilization() < m2.get_utilization();
+}
+
+template <typename Model>
+int resource_utilization_decrease(Model m1, Model m2)
+{
+	return m1.get_resource_utilization() > m2.get_resource_utilization();
 }
 
 

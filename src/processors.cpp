@@ -2,6 +2,7 @@
 #include "tasks.h"
 #include "resources.h"
 #include "param.h"
+#include "sort.h"
 
 ///////////////////////////Processor/////////////////////////////
 
@@ -122,6 +123,8 @@ void Processor::init()
 }
 ///////////////////////////ProcessorSet/////////////////////////////
 
+ProcessorSet::ProcessorSet() {}
+
 ProcessorSet::ProcessorSet(Param param)//for identical multiprocessor platform
 {
 	for(uint i = 0; i < param.p_num; i++)
@@ -143,3 +146,43 @@ void ProcessorSet::init()
 	for(uint i = 0; i < processors.size(); i++)
 		processors[i].init();
 }
+
+void ProcessorSet::sort_by_task_utilization(uint dir)
+{
+	switch(dir)
+	{
+		case INCREASE://For worst fit
+			sort(processors.begin(), processors.end(), task_utilization_increase<Processor>);
+			break;
+		case DECREASE://For best fit
+			sort(processors.begin(), processors.end(), task_utilization_decrease<Processor>);
+			break;
+		default:
+			sort(processors.begin(), processors.end(), task_utilization_increase<Processor>);
+			break;
+	}
+}
+
+void ProcessorSet::sort_by_resource_utilization(uint dir)
+{
+	switch(dir)
+	{
+		case INCREASE://For worst fit
+			sort(processors.begin(), processors.end(), resource_utilization_increase<Processor>);
+			break;
+		case DECREASE://For best fit
+			sort(processors.begin(), processors.end(), resource_utilization_decrease<Processor>);
+			break;
+		default:
+			sort(processors.begin(), processors.end(), resource_utilization_increase<Processor>);
+			break;
+	}
+}
+
+
+
+
+
+
+
+

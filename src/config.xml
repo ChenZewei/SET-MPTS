@@ -13,16 +13,18 @@
 		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
 		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
 		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
+		<data TEST_TYPE="1" REMARK="FMLP">LP-GFP</data>
 		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
 		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
 		<data TEST_TYPE="0" REMARK="">ILP-SPINLOCK</data>
 		<data TEST_TYPE="0" REMARK="SPIN">GEDF-NON-PREEMPT</data>
+		<data TEST_TYPE="0" REMARK="">PFP-GS</data>
+
+
 <!-->	
-		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
-		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
-		<data TEST_TYPE="0" REMARK="">RO-PFP</data>
+		<data TEST_TYPE="0" REMARK="native">RTA-GFP</data>
 	</schedulability_test>
-	<experiment_times>500</experiment_times>
+	<experiment_times>100</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -39,11 +41,11 @@
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>4</max>
+			<max>8</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>4</data>	
+		<data>8</data>	
 	</processor_num>
 	<period_range>
 		<data>
@@ -58,7 +60,7 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>8</data>
+		<data>4</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
 		<data>100</data>

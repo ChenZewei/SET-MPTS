@@ -83,6 +83,10 @@ cout<<content<<endl;
 		{
 			transform = 11;
 		}
+		else if(0 == strcmp(content,"PFP-GS"))
+		{
+			transform = 12;
+		}
 		else
 		{
 			transform = 0;

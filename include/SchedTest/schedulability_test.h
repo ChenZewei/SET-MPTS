@@ -11,6 +11,9 @@
 #include "ro_pfp.h"
 #include "ilp_spinlock.h"
 #include "gedf_non_preempt.h"
+#include "sched_test_base.h"
+#include "pfp_gs.h"
+#include "rta_native.h"
 
 bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
 {
@@ -56,6 +59,10 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 		case GEDF_NON_PREEMPT:
 			taskset.RM_Order();
 			schedulable = is_gedf_non_preempt_schedulable(taskset, processorset, resourceset);
+			break;
+		case PFP_GS:
+			taskset.DM_Order();
+			schedulable = is_pfp_gs_schedulable(taskset, processorset, resourceset);
 			break;
 		default:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);

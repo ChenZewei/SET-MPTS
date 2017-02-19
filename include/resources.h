@@ -32,7 +32,7 @@ class Resource
 		void set_locality(uint locality);
 		uint get_locality() const;
 		fraction_t get_utilization() const;
-		bool is_global_resource() const;
+		bool is_global_resource();
 		bool is_processor_local_resource() const;
 		//Request_Tasks get_tasks() const;
 		TaskQueue& get_taskqueue();

@@ -2,26 +2,29 @@
 #define SCHED_TEST_BASE_H
 
 #include "types.h"
+#include <fstream>
+#include <sstream>
+#include <string>
 
 //Test Method
 #define UTI_BOUND	0
 #define RTA 		1
 
-//Priority Assignment
-#define RM	0
-#define DM	1
-#define EDF	2
-
 //Scheduling Method
 #define GLOBAL		0
 #define	PARTITIONED	1
 
+//Priority Assignment
+#define FIX_PRIORITY	0
+#define EDF				1
+
 //Locking Protocols
-#define SPIN	0
-#define PIP		1
-#define	DPCP	2
-#define	MPCP	3
-#define	FMLP	4
+#define NONE	0
+#define SPIN	1
+#define PIP		2
+#define	DPCP	3
+#define	MPCP	4
+#define	FMLP	5
 
 class Task;
 class TaskSet;
@@ -41,11 +44,35 @@ class SchedTestBase
 		uint SchedMethod;
 		uint PriorityAssignment;
 		uint LockingProtocol;
+		string name;
+		string remark;
 	public:
-		SchedTestBase(bool LP, uint TM, uint SM, uint PA, uint LoP);
+		SchedTestBase(bool LinearProgramming, uint TestMethod, uint SchedMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 		string get_test_name();
-		virtual bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resourcese, uint TEST_TYPE, uint ITER_BLOCKING);
-		
+		virtual bool is_schedulable() = 0;
+		virtual bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint TEST_TYPE = 0, uint ITER_BLOCKING = 0) = 0;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif

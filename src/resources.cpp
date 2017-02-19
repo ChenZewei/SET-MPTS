@@ -39,7 +39,28 @@ void Resource::set_locality(uint locality) { this->locality = locality; }
 uint Resource::get_locality() const { return locality; }
 fraction_t Resource::get_utilization() const { return utilization; }
 
-bool Resource::is_global_resource() const { return global_resource; }
+bool Resource::is_global_resource()
+{
+	global_resource = false;
+	uint partition;
+//cout<<"111"<<endl;
+	list<void*>::iterator it = queue.begin();
+//cout<<"222"<<endl;
+	if(queue.end() == it)
+		return false;
+	partition = ((Task*)(*it))->get_partition();
+//cout<<"333"<<endl;
+	for(uint i = 0; it != queue.end(); it++, i++)
+	{
+		if(partition != ((Task*)(*it))->get_partition())
+		{
+			global_resource = true;
+			break;
+		}
+//cout<<"444"<<endl;
+	}
+	return global_resource; 
+}
 
 bool Resource::is_processor_local_resource() const { return processor_local_resource; }
 //Request_Tasks Resource::get_tasks() const { return tasks; }
