@@ -72,6 +72,7 @@
 #define ILP_SOLUTION_VAR_CHECK 0
 
 
+
 using namespace std;
 
 typedef mpz_class int_t;		//multiple precision integer
@@ -101,8 +102,13 @@ typedef struct
 
 typedef struct
 {
-	int test_method;
-	int test_type;
+	bool LP;
+	uint test_type;
+	uint test_method;
+	string sched_method;
+	string priority_assignment;
+	string locking_protocol;
+	string test_name;
 	string remark;
 }Test_Attribute;
 

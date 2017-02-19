@@ -1,5 +1,7 @@
 #include "rta_native.h"
 
+RTA_native::RTA_native(): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "native") {}
+
 RTA_native::RTA_native(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "native")
 {
 	this->tasks = tasks;
@@ -93,6 +95,4 @@ bool RTA_native::is_schedulable(TaskSet& tasks, ProcessorSet& processors, Resour
 	}
 	return true;
 }
-
-RTA_native* Factory_RTA_native::creativeSchedTest() { return new RTA_native; }
 

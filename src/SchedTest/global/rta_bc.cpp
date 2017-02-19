@@ -3,6 +3,7 @@
 #include "processors.h"
 #include "resources.h"
 
+RTA_BC::RTA_BC(): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "BC") {}
 
 RTA_BC::RTA_BC(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "BC")
 {
@@ -17,7 +18,7 @@ ulong RTA_BC::workload(Task& task, ulong interval)
 	return task.get_wcet() * floor((interval + task.get_response_time() - task.get_wcet())/task.get_period()) + a;
 }
 
-ulong interference(Task& tk, Task& ti, ulong interval)
+ulong RTA_BC::interference(Task& tk, Task& ti, ulong interval)
 {
 	return min(interval - tk.get_wcet() + 1, max((ulong)0, workload(ti, interval)));
 }
@@ -33,7 +34,7 @@ ulong RTA_BC::response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors)
 	while(response < test_end)
 	{
 		ulong sum = 0;
-		for(uint x = 0; i < ti.get_id(); x++)
+		for(uint x = 0; x < ti.get_id(); x++)
 		{
 			Task& tx = tasks.get_task_by_id(x);
 			sum += interference(ti, tx, response);
@@ -85,7 +86,7 @@ bool RTA_BC::is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSe
 	return true;
 }
 
-bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
+bool RTA_BC::is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint TEST_TYPE, uint ITER_BLOCKING)
 {
 	ulong response_bound;
 
@@ -104,4 +105,3 @@ bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resou
 	return true;
 }
 
-RTA_BC* Factory_RTA_BC::creativeSchedTest() { return new RTA_BC; }

@@ -7,8 +7,7 @@
 ** RTSS 2009 Nan Guan [New Response Time Bounds for Fixed priority Multiprocessor Scheudling]
 */
 
-#include "g_shced.h"
-#include "factory_base.h"
+#include "g_sched.h"
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
@@ -21,20 +20,15 @@ class RTA_BC: public GlobalSched
 		ResourceSet resources;
 
 		ulong workload(Task& task, ulong interval);
-		ulong response_time(TaskSet& tasks, ProcessorSet& processors, uint t_id);
+		ulong response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors);
 		ulong interference(Task& tk, Task& ti, ulong interval);
 	public:
-		RTA_BC(TaskSet& tasks, ProcessorSet& processors, ResoruceSet& resoruces);
+		RTA_BC();
+		RTA_BC(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
 		bool is_schedulable();
-		bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResoruceSet& resoruces);
+		bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
 		bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint TEST_TYPE = 0, uint ITER_BLOCKING = 0);
 
-};
-
-class Factory_RTA_BC: public FactoryBase
-{
-	public:
-		RTA_BC* creativeSchedTest();
 };
 
 #endif

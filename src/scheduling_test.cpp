@@ -16,6 +16,7 @@
 #include "random_gen.h"
 #include "test_model.h"
 #include "rta_native.h"
+#include "sched_test_factory.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
@@ -33,6 +34,7 @@ int main(int argc,char** argv)
 	Result_Set results[MAX_METHOD];
 	Chart chart;
 	Param parameters;
+	SchedTestFactory STFactory;
 
 	XML::LoadFile("config.xml");
 
@@ -125,7 +127,6 @@ int main(int argc,char** argv)
 	//output.export_table_head();
 
 	Random_Gen::uniform_integral_gen(0,10);
-
 	double utilization = u_ranges[0].min;
 
 /////
@@ -197,12 +198,22 @@ cout<<"Testing:"<<endl;
 				resourceset.init();
 				exp[j]++;
 				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
-				RTA_native rta_native = RTA_native(taskset, processorset, resourceset);
-				SchedTestBase *schedTest = &rta_native;
+//cout<<test_attributes[j].test_name<<endl;
+				
+				//RTA_native rta_native = RTA_native(taskset, processorset, resourceset);
+				SchedTestBase *schedTest = STFactory.createSchedTest(test_attributes[j].test_name, taskset, processorset, resourceset);
+
+				if(NULL == schedTest)
+				{
+					cout<<"Incorrect test name."<<endl;
+					return -1;
+				}
+
 				if(schedTest->is_schedulable())
 				{
 					success[j]++;
 				}
+				delete(schedTest);
 			}
 			//result.x = taskset.get_utilization_sum().get_d();
 			result.x = utilization;

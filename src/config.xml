@@ -19,10 +19,13 @@
 		<data TEST_TYPE="0" REMARK="">ILP-SPINLOCK</data>
 		<data TEST_TYPE="0" REMARK="SPIN">GEDF-NON-PREEMPT</data>
 		<data TEST_TYPE="0" REMARK="">PFP-GS</data>
+		<data LP="false" TEST_METHOD="rta"  TEST_TYPE="0" REMARK="native">RTA-GFP</data>
+		<data TEST_TYPE="0" REMARK="GFP">RTA-native</data>
 
 
 <!-->	
-		<data TEST_TYPE="0" REMARK="native">RTA-GFP</data>
+		<data TEST_TYPE="0" REMARK="GFP">RTA-native</data>
+		<data TEST_TYPE="0" REMARK="GFP">RTA-BC</data>
 	</schedulability_test>
 	<experiment_times>100</experiment_times>
 	<output>
@@ -41,11 +44,11 @@
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>8</max>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>8</data>	
+		<data>4</data>	
 	</processor_num>
 	<period_range>
 		<data>
