@@ -15,7 +15,6 @@
 #include "output.h"
 #include "random_gen.h"
 #include "test_model.h"
-#include "rta_native.h"
 #include "sched_test_factory.h"
 
 #define MAX_LEN 100
@@ -210,7 +209,6 @@ cout<<"Testing:"<<endl;
 
 
 				SchedTestBase *schedTest = STFactory.createSchedTest(test_attributes[j].test_name, taskset, processorset, resourceset);
-
 				if(NULL == schedTest)
 				{
 					cout<<"Incorrect test name."<<endl;

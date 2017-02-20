@@ -21,15 +21,14 @@
 		<data TEST_TYPE="0" REMARK="">PFP-GS</data>
 		<data LP="false" TEST_METHOD="rta"  TEST_TYPE="0" REMARK="native">RTA-GFP</data>
 		<data TEST_TYPE="0" REMARK="GFP">RTA-native</data>
-		
-		<data TEST_TYPE="0" REMARK="GFP">RTA-native</data>
-		<data TEST_TYPE="0" REMARK="GFP">RTA-BC</data>
 
 <!-->	
-		<data TEST_TYPE="0" REMARK="GFP">RTA-native</data>
-		<data TEST_TYPE="0" REMARK="GFP">RTA-BC</data>
+		<data REMARK="">RTA-GFP-native</data>
+		<data REMARK="">RTA-GFP-BC</data>
+		<data REMARK="">RTA-GFP-NG</data>
+		<data REMARK="">RTA-PFP-WF</data>
 	</schedulability_test>
-	<experiment_times>200</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>

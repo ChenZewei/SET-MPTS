@@ -50,7 +50,6 @@ class SchedTestBase
 		SchedTestBase(bool LinearProgramming, uint TestMethod, uint SchedMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 		string get_test_name();
 		virtual bool is_schedulable() = 0;
-		virtual bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint TEST_TYPE = 0, uint ITER_BLOCKING = 0) = 0;
 };
 
 
