@@ -197,8 +197,8 @@ cout<<"Testing:"<<endl;
 				resourceset.init();
 				exp[j]++;
 				//if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
-				RTA_native rta_native = RTA_native(taskset, processorset, resourceset);
-				SchedTestBase *schedTest = &rta_native;
+				//RTA_native rta_native = ;
+				SchedTestBase *schedTest = &RTA_native(taskset, processorset, resourceset);
 				if(schedTest->is_schedulable())
 				{
 					success[j]++;
