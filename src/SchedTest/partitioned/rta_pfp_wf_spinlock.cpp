@@ -1,8 +1,8 @@
-#include "rta_pfp_wf.h"
+#include "rta_pfp_wf_spinlock.h"
 
-RTA_PFP_WF::RTA_PFP_WF():PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF") {}
+RTA_PFP_WF_spinlock::RTA_PFP_WF_spinlock():PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF") {}
 
-RTA_PFP_WF::RTA_PFP_WF(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources):PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF")
+RTA_PFP_WF_spinlock::RTA_PFP_WF_spinlock(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources):PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF")
 {
 	this->tasks = tasks;
 	this->processors = processors;
@@ -12,16 +12,15 @@ RTA_PFP_WF::RTA_PFP_WF(TaskSet& tasks, ProcessorSet& processors, ResourceSet& re
 	this->processors.init();
 }
 
-ulong RTA_PFP_WF::interference(Task& task, ulong interval)
+ulong RTA_PFP_WF_spinlock::interference(Task& task, ulong interval)
 {
-	return task.get_wcet() * ceiling((interval + task.get_jitter()), task.get_period());
+	return (task.get_wcet() + task.get_spin()) * ceiling((interval + task.get_jitter()), task.get_period());
 }
 
-ulong RTA_PFP_WF::response_time(Task& ti)
+ulong RTA_PFP_WF_spinlock::response_time(Task& ti)
 {
-	//uint t_id = ti.get_id();
 	ulong test_end = ti.get_deadline();
-	ulong test_start = ti.get_total_blocking() + ti.get_wcet();
+	ulong test_start = ti.get_spin() + ti.get_local_blocking() + ti.get_wcet();
 	ulong response = test_start;
 	ulong demand = 0;
 	while (response <= test_end)
@@ -29,10 +28,9 @@ ulong RTA_PFP_WF::response_time(Task& ti)
 		demand = test_start;
 
 		ulong total_interference = 0;
-
 		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 		{
-			if (th->get_partition() == ti.get_partition())
+			if (ti.get_partition() == th->get_partition())
 			{
 				total_interference += interference((*th), response);
 			}
@@ -48,13 +46,16 @@ ulong RTA_PFP_WF::response_time(Task& ti)
 	return test_end + 100;
 }
 
-bool RTA_PFP_WF::alloc_schedulable()
+bool RTA_PFP_WF_spinlock::alloc_schedulable()
 {
 	ulong response_bound;
 
 	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
 	foreach(tasks.get_tasks(), ti)
 	{
+
+		tasks.calculate_spin(resources, processors);
+		tasks.calculate_local_blocking(resources);
 
 		if (ti->get_partition() == 0XFFFFFFFF)
 			continue;
@@ -69,7 +70,7 @@ bool RTA_PFP_WF::alloc_schedulable()
 	return true;
 }
 
-bool RTA_PFP_WF::is_schedulable()
+bool RTA_PFP_WF_spinlock::is_schedulable()
 {
 	foreach(tasks.get_tasks(), ti)
 	{
@@ -78,3 +79,4 @@ bool RTA_PFP_WF::is_schedulable()
 	}
 	return true;
 }
+

@@ -9,9 +9,6 @@
 		<data TEST_TYPE="0" REMARK="normal">WF-DM</data>
 		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
 		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
-		<data TEST_TYPE="0" REMARK="normal">WF-DM</data>
-		<data TEST_TYPE="1" REMARK="spin">WF-DM</data>
-		<data TEST_TYPE="2" REMARK="semaphore">WF-DM</data>
 		<data TEST_TYPE="0" REMARK="PIP">LP-GFP</data>
 		<data TEST_TYPE="1" REMARK="FMLP">LP-GFP</data>
 		<data TEST_TYPE="0" REMARK="DPCP">LP-PFP</data>
@@ -27,8 +24,10 @@
 		<data REMARK="">RTA-GFP-BC</data>
 		<data REMARK="">RTA-GFP-NG</data>
 		<data REMARK="">RTA-PFP-WF</data>
+		<data REMARK="">RTA-PFP-WF-spinlock</data>
+		<data REMARK="">RTA-PFP-WF-semaphore</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>100</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>

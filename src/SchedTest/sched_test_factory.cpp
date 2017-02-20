@@ -3,6 +3,8 @@
 #include "rta_gfp_bc.h"
 #include "rta_gfp_ng.h"
 #include "rta_pfp_wf.h"
+#include "rta_pfp_wf_spinlock.h"
+#include "rta_pfp_wf_semaphore.h"
 
 SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
@@ -21,6 +23,14 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-WF"))
 	{
 		return new RTA_PFP_WF(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-WF-spinlock"))
+	{
+		return new RTA_PFP_WF_spinlock(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-WF-semaphore"))
+	{
+		return new RTA_PFP_WF_semaphore(tasks, processors, resources);
 	}
 	else
 		return NULL;
