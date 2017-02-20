@@ -30,6 +30,7 @@ class RTA_native: public GlobalSched
 		ulong workload(Task& task, ulong interval);
 		ulong response_time(Task& ti, TaskSet& tasks, ProcessorSet& processors);
 	public:
+		RTA_native();
 		RTA_native(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
 		bool is_schedulable();
 		bool is_schedulable(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);

@@ -5,6 +5,7 @@
 #include <iostream>
 #include "tinyxml2.h"
 #include "types.h"
+#include "string.h"
 
 using namespace tinyxml2;
 using namespace std;

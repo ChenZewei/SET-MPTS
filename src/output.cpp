@@ -34,7 +34,7 @@ Output::Output(Param param)
 	chart.SetGraphSize(1280,640);
 	chart.SetGraphQual(3);
 	
-	
+	cout<<param.get_method_num()<<endl;
 	for(uint i = 0; i < param.get_method_num(); i++)
 		add_set();
 	
@@ -81,6 +81,8 @@ string Output::output_filename()
 string Output::get_method_name(Test_Attribute ta)
 {
 	string name;
+	name = ta.test_name;
+/*
 	switch(ta.test_method)
 	{
 		default:
@@ -126,6 +128,7 @@ string Output::get_method_name(Test_Attribute ta)
 			name = "PFP-GS";
 			break;
 	}
+*/
 	if(0 == strcmp(ta.remark.data(), ""))
 		return name;
 	else

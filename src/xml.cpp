@@ -93,6 +93,7 @@ cout<<content<<endl;
 		}
 		ta.test_method = transform;
 		ta.test_type = test_type;
+		ta.test_name = content;
 		ta.remark = remark;
 		t_set->push_back(ta);
 //		i_set->push_back(transform);
