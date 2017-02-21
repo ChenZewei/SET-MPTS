@@ -1,8 +1,8 @@
 #include "rta_pfp_wf_semaphore.h"
 
-RTA_PFP_WF_semaphore::RTA_PFP_WF_semaphore():PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF") {}
+RTA_PFP_WF_semaphore::RTA_PFP_WF_semaphore():PartitionedSched(RTA, FIX_PRIORITY, MPCP, "", "semaphore") {}
 
-RTA_PFP_WF_semaphore::RTA_PFP_WF_semaphore(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources):PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF")
+RTA_PFP_WF_semaphore::RTA_PFP_WF_semaphore(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources):PartitionedSched(RTA, FIX_PRIORITY, MPCP, "", "semaphore")
 {
 	this->tasks = tasks;
 	this->processors = processors;

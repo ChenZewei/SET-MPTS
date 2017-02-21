@@ -1,8 +1,8 @@
 #include "rta_pfp_wf_spinlock.h"
 
-RTA_PFP_WF_spinlock::RTA_PFP_WF_spinlock():PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF") {}
+RTA_PFP_WF_spinlock::RTA_PFP_WF_spinlock():PartitionedSched(RTA, FIX_PRIORITY, SPIN, "", "spinlock") {}
 
-RTA_PFP_WF_spinlock::RTA_PFP_WF_spinlock(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources):PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF")
+RTA_PFP_WF_spinlock::RTA_PFP_WF_spinlock(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources):PartitionedSched(RTA, FIX_PRIORITY, SPIN, "", "spinlock")
 {
 	this->tasks = tasks;
 	this->processors = processors;

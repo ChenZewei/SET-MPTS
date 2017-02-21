@@ -3,7 +3,7 @@
 #include "processors.h"
 #include "resources.h"
 
-PartitionedSched::PartitionedSched(bool LinearProgramming, uint TestMethod, uint PriorityAssignment, uint LockingProtocol, string name, string remark): SchedTestBase(LinearProgramming, TestMethod, PARTITIONED, PriorityAssignment, LockingProtocol, name, remark)
+PartitionedSched::PartitionedSched(uint TestMethod, uint PriorityAssignment, uint LockingProtocol, string name, string remark): SchedTestBase(false, TestMethod, PARTITIONED, PriorityAssignment, LockingProtocol, name, remark)
 {
 	
 }

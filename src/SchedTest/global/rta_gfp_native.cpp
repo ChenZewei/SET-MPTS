@@ -1,8 +1,8 @@
 #include "rta_gfp_native.h"
 
-RTA_GFP_native::RTA_GFP_native(): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "native") {}
+RTA_GFP_native::RTA_GFP_native(): GlobalSched(RTA, FIX_PRIORITY, NONE, "", "native") {}
 
-RTA_GFP_native::RTA_GFP_native(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "native")
+RTA_GFP_native::RTA_GFP_native(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(RTA, FIX_PRIORITY, NONE, "", "native")
 {
 	this->tasks = tasks;
 	this->processors = processors;

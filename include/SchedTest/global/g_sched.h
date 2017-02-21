@@ -12,16 +12,15 @@ class ResourceSet;
 
 class GlobalSched: public SchedTestBase
 {
-	private:
-		
 	public:
+/*
 		enum
 		{
 			UNTEST,
 			TEST
 		};
-
-		GlobalSched(bool LinearProgramming, uint TestMethod, uint SchedMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
+*/
+		GlobalSched(uint TestMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 
 		
 };

@@ -3,9 +3,9 @@
 #include "processors.h"
 #include "resources.h"
 
-RTA_GFP_BC::RTA_GFP_BC(): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "BC") {}
+RTA_GFP_BC::RTA_GFP_BC(): GlobalSched(RTA, FIX_PRIORITY, NONE, "", "BC") {}
 
-RTA_GFP_BC::RTA_GFP_BC(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "BC")
+RTA_GFP_BC::RTA_GFP_BC(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(RTA, FIX_PRIORITY, NONE, "", "BC")
 {
 	this->tasks = tasks;
 	this->processors = processors;

@@ -1,8 +1,8 @@
 #include "rta_pfp_wf.h"
 
-RTA_PFP_WF::RTA_PFP_WF():PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF") {}
+RTA_PFP_WF::RTA_PFP_WF():PartitionedSched(RTA, FIX_PRIORITY, NONE, "", "NONE") {}
 
-RTA_PFP_WF::RTA_PFP_WF(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources):PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "WF")
+RTA_PFP_WF::RTA_PFP_WF(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources):PartitionedSched(RTA, FIX_PRIORITY, NONE, "", "NONE")
 {
 	this->tasks = tasks;
 	this->processors = processors;

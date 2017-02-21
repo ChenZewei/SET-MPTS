@@ -19,15 +19,21 @@
 		<data LP="false" TEST_METHOD="rta"  TEST_TYPE="0" REMARK="native">RTA-GFP</data>
 		<data TEST_TYPE="0" REMARK="GFP">RTA-native</data>
 
-<!-->	
+		
 		<data REMARK="">RTA-GFP-native</data>
 		<data REMARK="">RTA-GFP-BC</data>
 		<data REMARK="">RTA-GFP-NG</data>
 		<data REMARK="">RTA-PFP-WF</data>
 		<data REMARK="">RTA-PFP-WF-spinlock</data>
 		<data REMARK="">RTA-PFP-WF-semaphore</data>
+		<data REMARK="">LP-RTA-GFP-PIP</data>
+		<data REMARK="">LP-RTA-GFP-FMLP</data>
+<!-->	
+		<data REMARK="">LP-RTA-GFP-PIP</data>
+		<data REMARK="">LP-RTA-GFP-FMLP</data>
+		<data REMARK="">LP-RTA-GFP-DPCP</data>
 	</schedulability_test>
-	<experiment_times>100</experiment_times>
+	<experiment_times>10</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -69,7 +75,7 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.25</data>
+		<data>0.5</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>

@@ -1,8 +1,8 @@
 #include "rta_gfp_ng.h"
 
-RTA_GFP_NG::RTA_GFP_NG(): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "NG") {}
+RTA_GFP_NG::RTA_GFP_NG(): GlobalSched(RTA, FIX_PRIORITY, NONE, "", "NG") {}
 
-RTA_GFP_NG::RTA_GFP_NG(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(false, RTA, GLOBAL, FIX_PRIORITY, NONE, "", "NG")
+RTA_GFP_NG::RTA_GFP_NG(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(RTA, FIX_PRIORITY, NONE, "", "NG")
 {
 	this->tasks = tasks;
 	this->processors = processors;

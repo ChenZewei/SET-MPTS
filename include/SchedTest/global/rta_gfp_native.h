@@ -4,7 +4,7 @@
 /*
 ** native RTA for global scheduling with constraint deadline task system
 ** 
-** RTSS 2009 Nan Guan [New Response Time Bounds for Fixed priority Multiprocessor Scheudling]
+** RTSS 2009 Nan Guan et al. [New Response Time Bounds for Fixed priority Multiprocessor Scheudling]
 */
 
 #include "g_sched.h"
