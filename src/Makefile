@@ -4,7 +4,7 @@ CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES) -fpermissive
 CXXFLAGS      = -pipe -O2 -Wall -W -g -D_REENTRANT -fPIE $(DEFINES) -std=c++11 -std=gnu++11 -fext-numeric-literals -fpermissive
-INCPATH       = -I. -I../include -I../include/SchedTest -I../include/SchedTest/global -I../include/SchedTest/partitioned -I../include/SchedTest/lp -I../include/QCustomPlot -I../include/mathGL -I../include/LP -I../include/SchedTest/blocking/lp
+INCPATH       = -I. -I../include -I../include/SchedTest -I../include/SchedTest/global -I../include/SchedTest/global/lp -I../include/SchedTest/partitioned -I../include/SchedTest/partitioned/lp -I../include/SchedTest/lp -I../include/QCustomPlot -I../include/mathGL -I../include/LP -I../include/SchedTest/blocking/lp
 LINK          = g++
 LFLAGS        = -Wl,-O1
 LIBS          = -lgmp -lgmpxx -lmgl -lpthread -lglpk
@@ -17,8 +17,8 @@ MOVE          = mv -f
 MKDIR         = mkdir -p
 TARGET	      = SchedulingAnalysis
 
-SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o ilp_spinlock.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o lp_sched.o pfp_gs.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_gfp_dpcp.o  
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o ilp_spinlock.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o lp_sched.o pfp_gs.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_gfp_dpcp.o  $(LFLAGS) $(LIBS)
+SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o ilp_spinlock.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o pfp_gs.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o  
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o lp.o solution.o varmapper.o ilp_spinlock.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o pfp_gs.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o  $(LFLAGS) $(LIBS)
 	
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
@@ -74,9 +74,6 @@ p_sched.o:SchedTest/partitioned/p_sched.cpp
 g_sched.o:SchedTest/global/g_sched.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/global/g_sched.cpp $(LIBS)
 
-lp_sched.o:SchedTest/lp/lp_sched.cpp
-	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/lp/lp_sched.cpp $(LIBS)
-
 pfp_gs.o:SchedTest/pfp_gs.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/pfp_gs.cpp $(LIBS)
 
@@ -98,14 +95,14 @@ rta_pfp_wf_spinlock.o:SchedTest/partitioned/rta_pfp_wf_spinlock.cpp
 rta_pfp_wf_semaphore.o:SchedTest/partitioned/rta_pfp_wf_semaphore.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/rta_pfp_wf_semaphore.cpp $(LIBS)
 
-lp_rta_gfp_pip.o:SchedTest/lp/lp_rta_gfp_pip.cpp
-	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/lp/lp_rta_gfp_pip.cpp $(LIBS)
+lp_rta_gfp_pip.o:SchedTest/global/lp/lp_rta_gfp_pip.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/global/lp/lp_rta_gfp_pip.cpp $(LIBS)
 
-lp_rta_gfp_fmlp.o:SchedTest/lp/lp_rta_gfp_fmlp.cpp
-	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/lp/lp_rta_gfp_fmlp.cpp $(LIBS)
+lp_rta_gfp_fmlp.o:SchedTest/global/lp/lp_rta_gfp_fmlp.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/global/lp/lp_rta_gfp_fmlp.cpp $(LIBS)
 
-lp_rta_gfp_dpcp.o:SchedTest/lp/lp_rta_gfp_dpcp.cpp
-	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/lp/lp_rta_gfp_dpcp.cpp $(LIBS)
+lp_rta_pfp_dpcp.o:SchedTest/partitioned/lp/lp_rta_pfp_dpcp.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/lp/lp_rta_pfp_dpcp.cpp $(LIBS)
 
 clean:
 	rm -f *.o ${ALL}	

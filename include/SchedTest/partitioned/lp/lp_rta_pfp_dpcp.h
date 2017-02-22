@@ -1,13 +1,13 @@
-#ifndef LP_RTA_GFP_DPCP_H
-#define LP_RTA_GFP_DPCP_H
+#ifndef LP_RTA_PFP_DPCP_H
+#define LP_RTA_PFP_DPCP_H
 
 /*
-** LinearProgramming approach for global fix-priority scheduling under DPCP locking protocol
+** LinearProgramming approach for partitioned fix-priority scheduling under DPCP locking protocol
 ** 
 ** RTSS 2015 Maolin Yang et al. [Global Real-Time Semaphore Protocols: A Survey, Unified Analysis, and Comparison]
 */
 
-#include "lp_sched.h"
+#include "p_sched.h"
 #include "varmapper.h"
 #include "tasks.h"
 #include "processors.h"
@@ -52,7 +52,7 @@ class DPCPMapper: public VarMapperBase
 													
 };
 
-class LP_RTA_GFP_DPCP: public LPSched
+class LP_RTA_PFP_DPCP: public PartitionedSched
 {
 	private:
 		TaskSet tasks;
@@ -64,6 +64,7 @@ class LP_RTA_GFP_DPCP: public LPSched
 		ulong total_blocking(Task& task_i);
 		ulong interference(Task& task, ulong interval);
 		ulong response_time(Task& task_i);
+		bool alloc_schedulable();
 		ulong get_max_wait_time(Task& ti, Request& rq);
 		void lp_dpcp_objective(Task& ti, LinearProgram& lp, DPCPMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj);
 //		void lp_dpcp_local_objective(Task& ti, LinearProgram& lp, DPCPMapper& vars);
@@ -83,9 +84,9 @@ class LP_RTA_GFP_DPCP: public LPSched
 		void lp_dpcp_constraint_6(Task& ti, LinearProgram& lp, DPCPMapper& vars);
 
 	public:
-		LP_RTA_GFP_DPCP();
-		LP_RTA_GFP_DPCP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
-		~LP_RTA_GFP_DPCP();
+		LP_RTA_PFP_DPCP();
+		LP_RTA_PFP_DPCP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		~LP_RTA_PFP_DPCP();
 		bool is_schedulable();
 };
 

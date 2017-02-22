@@ -7,7 +7,7 @@
 #include "rta_pfp_wf_semaphore.h"
 #include "lp_rta_gfp_pip.h"
 #include "lp_rta_gfp_fmlp.h"
-#include "lp_rta_gfp_dpcp.h"
+#include "lp_rta_pfp_dpcp.h"
 
 SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
@@ -43,9 +43,9 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	{
 		return new LP_RTA_GFP_FMLP(tasks, processors, resources);
 	}
-	else if(0 == strcmp(test_name.data(), "LP-RTA-GFP-DPCP"))
+	else if(0 == strcmp(test_name.data(), "LP-RTA-PFP-DPCP"))
 	{
-		return new LP_RTA_GFP_DPCP(tasks, processors, resources);
+		return new LP_RTA_PFP_DPCP(tasks, processors, resources);
 	}
 	else
 		return NULL;

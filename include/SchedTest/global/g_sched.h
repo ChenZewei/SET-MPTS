@@ -20,7 +20,7 @@ class GlobalSched: public SchedTestBase
 			TEST
 		};
 */
-		GlobalSched(uint TestMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
+		GlobalSched(bool LinearProgramming, uint TestMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 
 		
 };

@@ -1,12 +1,15 @@
-#include "lp_rta_gfp_pip.h"
+#include "lp_rta_gfp_fmlp.h"
+#include <tasks.h>
+#include <resources.h>
+#include <processors.h>
 #include <lp.h>
 #include <solution.h>
 #include <sstream>
 #include <iostream>
 #include <assert.h>
 
-////////////////////PIPMapper////////////////////
-uint64_t PIPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type)
+////////////////////FMLPMapper////////////////////
+uint64_t FMLPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type)
 {
 	uint64_t one = 1;
 	uint64_t key = 0;
@@ -22,63 +25,63 @@ uint64_t PIPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t r
 	return key;
 }
 
-uint64_t PIPMapper::get_type(uint64_t var)
+uint64_t FMLPMapper::get_type(uint64_t var)
 {
 	return (var >> 30) & (uint64_t) 0x7; //3 bits
 }
 
-uint64_t PIPMapper::get_task(uint64_t var)
+uint64_t FMLPMapper::get_task(uint64_t var)
 {
 	return (var >> 20) & (uint64_t) 0x3ff; //10 bits
 }
 
-uint64_t PIPMapper::get_res_id(uint64_t var)
+uint64_t FMLPMapper::get_res_id(uint64_t var)
 {
 	return (var >> 10) & (uint64_t) 0x3ff; //10 bits
 }
 
-uint64_t PIPMapper::get_req_id(uint64_t var)
+uint64_t FMLPMapper::get_req_id(uint64_t var)
 {
 	return var & (uint64_t) 0x3ff; //10 bits
 }
 
-PIPMapper::PIPMapper(uint start_var): VarMapperBase(start_var) {}
+FMLPMapper::FMLPMapper(uint start_var): VarMapperBase(start_var) {}
 
-uint PIPMapper::lookup(uint task_id, uint res_id, uint req_id, var_type type)
+uint FMLPMapper::lookup(uint task_id, uint res_id, uint req_id, var_type type)
 {
 	uint64_t key = encode_request(task_id, res_id, req_id, type);
 	uint var = var_for_key(key);
 	return var;
 }
 
-string PIPMapper::key2str(uint64_t key, uint var) const
+string FMLPMapper::key2str(uint64_t key, uint var) const
 {
 	ostringstream buf;
 
 	switch (get_type(key))
 	{
-		case PIPMapper::BLOCKING_DIRECT:
+		case FMLPMapper::BLOCKING_DIRECT:
 			buf << "Xd[";
 			break;
-		case PIPMapper::BLOCKING_INDIRECT:
+		case FMLPMapper::BLOCKING_INDIRECT:
 			buf << "Xi[";
 			break;
-		case PIPMapper::BLOCKING_PREEMPT:
+		case FMLPMapper::BLOCKING_PREEMPT:
 			buf << "Xp[";
 			break;
-		case PIPMapper::BLOCKING_OTHER:
+		case FMLPMapper::BLOCKING_OTHER:
 			buf << "Xo[";
 			break;
-		case PIPMapper::INTERF_REGULAR:
+		case FMLPMapper::INTERF_REGULAR:
 			buf << "Ir[";
 			break;
-		case PIPMapper::INTERF_CO_BOOSTING:
+		case FMLPMapper::INTERF_CO_BOOSTING:
 			buf << "Ic[";
 			break;
-		case PIPMapper::INTERF_STALLING:
+		case FMLPMapper::INTERF_STALLING:
 			buf << "Is[";
 			break;
-		case PIPMapper::INTERF_OTHER:
+		case FMLPMapper::INTERF_OTHER:
 			buf << "Io[";
 			break;
 		default:
@@ -92,11 +95,11 @@ string PIPMapper::key2str(uint64_t key, uint var) const
 	return buf.str();
 }
 
-////////////////////LP_RTA_GFP_PIP////////////////////
+////////////////////LP_RTA_GFP_FMLP////////////////////
 
-LP_RTA_GFP_PIP::LP_RTA_GFP_PIP(): LPSched(RTA, GLOBAL, FIX_PRIORITY, PIP, "", "PIP") {}
+LP_RTA_GFP_FMLP::LP_RTA_GFP_FMLP(): GlobalSched(true, RTA, FIX_PRIORITY, FMLP, "", "FMLP") {}
 
-LP_RTA_GFP_PIP::LP_RTA_GFP_PIP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): LPSched(RTA, GLOBAL, FIX_PRIORITY, PIP, "", "PIP")
+LP_RTA_GFP_FMLP::LP_RTA_GFP_FMLP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(true, RTA, FIX_PRIORITY, FMLP, "", "FMLP")
 {
 	this->tasks = tasks;
 	this->processors = processors;
@@ -107,12 +110,11 @@ LP_RTA_GFP_PIP::LP_RTA_GFP_PIP(TaskSet& tasks, ProcessorSet& processors, Resourc
 
 }
 
-LP_RTA_GFP_PIP::~LP_RTA_GFP_PIP()
+LP_RTA_GFP_FMLP::~LP_RTA_GFP_FMLP()
 {
 	
 }
-
-bool LP_RTA_GFP_PIP::is_schedulable()
+bool LP_RTA_GFP_FMLP::is_schedulable()
 {
 	bool update;
 	do
@@ -121,19 +123,24 @@ bool LP_RTA_GFP_PIP::is_schedulable()
 		foreach(tasks.get_tasks(), ti)
 		{
 			
-			ulong response_t = ti->get_response_time();
-			ulong temp = response_time(*ti);
+			ulong response_time = ti->get_response_time();
+//cout<<"original response time:"<<response_time<<endl;
+			ulong temp = fmlp_get_response_time(*ti);
+
+
+//cout<<"current response time:"<<temp<<endl;
 
 			//assert(temp >= response_time);
-			if(temp > response_t)
+			if(temp > response_time)
 			{
-				response_t = temp;
+//cout<<"last response time:"<<response_time<<" current response time:"<<temp<<endl;
+				response_time = temp;
 				update = true;
 			}
 
-			if(response_t < ti->get_deadline())
+			if(response_time < ti->get_deadline())
 			{
-				ti->set_response_time(response_t);
+				ti->set_response_time(response_time);
 			}
 			else
 				return false;
@@ -143,19 +150,19 @@ bool LP_RTA_GFP_PIP::is_schedulable()
 	return true;
 }
 
-ulong LP_RTA_GFP_PIP::response_time(Task& ti)
+ulong LP_RTA_GFP_FMLP::fmlp_get_response_time(Task& ti)
 {
-	ulong response_t = 0;
+	ulong response_time = 0;
 
-	PIPMapper vars;
+	FMLPMapper vars;
 	LinearProgram response_bound;
 	LinearExpression *obj = new LinearExpression();
 
-	lp_pip_objective(ti, response_bound, vars, obj);
+	lp_fmlp_objective(ti, response_bound, vars, obj);
 
 	response_bound.set_objective(obj);
 
-	lp_pip_add_constraints(ti, response_bound, vars);
+	lp_fmlp_add_constraints(ti, response_bound, vars);
 
 	//vars.seal();
 
@@ -165,22 +172,27 @@ ulong LP_RTA_GFP_PIP::response_time(Task& ti)
 
 	if(rb_solution->is_solved())
 	{
+//cout<<"solved."<<endl;
 		assert(ti.get_response_time() >= ti.get_wcet());
 		ulong gap = ti.get_response_time() - ti.get_wcet();
 		double result = rb_solution->evaluate(*(response_bound.get_objective()));
+//cout<<"original gap:"<<gap<<endl;
+//cout<<"lp result:"<<result<<endl;
 
 		if((result < gap) && (gap - result < _EPS))
 		{
-			response_t = ti.get_response_time();
+			response_time = ti.get_response_time();
+//cout<<"bingo!!!"<<endl;
 		}
 		else
 		{
-			response_t = result + ti.get_wcet();
-			assert(response_t < MAX_LONG);
+			response_time = result + ti.get_wcet();
+			assert(response_time < MAX_LONG);
 		}
 	}
 	else
 	{
+cout<<"unsolved."<<endl;
 		delete rb_solution;
 		return MAX_LONG;
 	}
@@ -192,10 +204,10 @@ ulong LP_RTA_GFP_PIP::response_time(Task& ti)
 #endif
 
 	delete rb_solution;
-	return response_t;
+	return response_time;
 }
 
-ulong LP_RTA_GFP_PIP::workload_bound(Task& tx, ulong Ri)
+ulong LP_RTA_GFP_FMLP::fmlp_workload_bound(Task& tx, ulong Ri)
 {
 	ulong e = tx.get_wcet();
 	ulong d = tx.get_deadline();
@@ -207,8 +219,8 @@ ulong LP_RTA_GFP_PIP::workload_bound(Task& tx, ulong Ri)
 
 	return N*e + min(e, Ri + r - e - N*p);
 }
-
-ulong LP_RTA_GFP_PIP::holding_bound(Task& ti, Task& tx, uint resource_id)
+/*
+ulong LP_RTA_GFP_FMLP::fmlp_holding_bound(Task& ti, Task& tx, uint resource_id)
 {
 
 	uint x = tx.get_id(), q = resource_id;
@@ -228,7 +240,7 @@ ulong LP_RTA_GFP_PIP::holding_bound(Task& ti, Task& tx, uint resource_id)
 
 			foreach_higher_priority_task_then(tasks.get_tasks(), y, th)
 			{
-				temp += workload_bound(*th, holding_time);
+				temp += fmlp_workload_bound(*th, holding_time);
 			}
 
 			foreach_lower_priority_task_then(tasks.get_tasks(), y, tl)
@@ -267,7 +279,7 @@ ulong LP_RTA_GFP_PIP::holding_bound(Task& ti, Task& tx, uint resource_id)
 	return holding_time;
 }
 
-ulong LP_RTA_GFP_PIP::wait_time_bound(Task& ti, uint resource_id)
+ulong LP_RTA_GFP_FMLP::fmlp_wait_time_bound(Task& ti, uint resource_id)
 {
 	ulong wait_time = 0;
 	ulong holding_time_l = 0;
@@ -278,7 +290,7 @@ ulong LP_RTA_GFP_PIP::wait_time_bound(Task& ti, uint resource_id)
 		ulong temp = 0;
 
 		if(tl->is_request_exist(resource_id))
-			temp = holding_bound(ti, *tl, resource_id);
+			temp = fmlp_holding_bound(ti, *tl, resource_id);
 
 		if(temp > holding_time_l)
 			holding_time_l = temp;
@@ -301,7 +313,7 @@ ulong LP_RTA_GFP_PIP::wait_time_bound(Task& ti, uint resource_id)
 			if(th->is_request_exist(resource_id))
 			{
 				uint N_h_q = th->get_request_by_id(resource_id).get_num_requests();
-				ulong H_h_q = holding_bound(ti, *th, resource_id);
+				ulong H_h_q = fmlp_holding_bound(ti, *th, resource_id);
 				temp += th->get_max_job_num(wait_time)*N_h_q *H_h_q;
 			}
 		}
@@ -326,9 +338,9 @@ ulong LP_RTA_GFP_PIP::wait_time_bound(Task& ti, uint resource_id)
 
 	return wait_time;
 }
-
+*/
 ////////////////////Expressions////////////////////
-void LP_RTA_GFP_PIP::lp_pip_directed_blocking(Task& ti, Task& tx, PIPMapper& vars, LinearExpression *exp, double coef)
+void LP_RTA_GFP_FMLP::lp_fmlp_directed_blocking(Task& ti, Task& tx, FMLPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
 	uint x = tx.get_id();
@@ -341,13 +353,13 @@ void LP_RTA_GFP_PIP::lp_pip_directed_blocking(Task& ti, Task& tx, PIPMapper& var
 		{
 			uint var_id;
 
-			var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_DIRECT);
+			var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_DIRECT);
 			exp->add_term(var_id, coef*length);
 		}
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_indirected_blocking(Task& ti, Task& tx, PIPMapper& vars, LinearExpression *exp, double coef)
+void LP_RTA_GFP_FMLP::lp_fmlp_indirected_blocking(Task& ti, Task& tx, FMLPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
 	uint x = tx.get_id();
@@ -359,13 +371,13 @@ void LP_RTA_GFP_PIP::lp_pip_indirected_blocking(Task& ti, Task& tx, PIPMapper& v
 		{
 			uint var_id;
 
-			var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_INDIRECT);
+			var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_INDIRECT);
 			exp->add_term(var_id, coef*length);
 		}
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_preemption_blocking(Task& ti, Task& tx, PIPMapper& vars, LinearExpression *exp, double coef)
+void LP_RTA_GFP_FMLP::lp_fmlp_preemption_blocking(Task& ti, Task& tx, FMLPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
 	uint x = tx.get_id();
@@ -377,14 +389,14 @@ void LP_RTA_GFP_PIP::lp_pip_preemption_blocking(Task& ti, Task& tx, PIPMapper& v
 		{
 			uint var_id;
 
-			var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_PREEMPT);
+			var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_PREEMPT);
 			exp->add_term(var_id, coef*length);
 		}
 	}
 }
 
 
-void LP_RTA_GFP_PIP::lp_pip_OD(Task& ti, PIPMapper& vars, LinearExpression *exp, double coef)
+void LP_RTA_GFP_FMLP::lp_fmlp_OD(Task& ti, FMLPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
 	uint p_num = processors.get_processor_num();
@@ -394,7 +406,7 @@ void LP_RTA_GFP_PIP::lp_pip_OD(Task& ti, PIPMapper& vars, LinearExpression *exp,
 	{
 		uint h = th->get_id();
 		
-		var_id = vars.lookup(h, 0, 0, PIPMapper::INTERF_REGULAR);
+		var_id = vars.lookup(h, 0, 0, FMLPMapper::INTERF_REGULAR);
 		exp->add_term(var_id, coef*(1.0/p_num));
 	}
 
@@ -402,37 +414,37 @@ void LP_RTA_GFP_PIP::lp_pip_OD(Task& ti, PIPMapper& vars, LinearExpression *exp,
 	{
 		uint l = tl->get_id();
 		
-		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+		var_id = vars.lookup(l, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 		exp->add_term(var_id, coef*(1.0/p_num));
 		
-		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_STALLING);
+		var_id = vars.lookup(l, 0, 0, FMLPMapper::INTERF_STALLING);
 		exp->add_term(var_id, coef*(1.0/p_num));
 
-		lp_pip_indirected_blocking(ti, *tl, vars, exp, coef*(1.0/p_num));
+		lp_fmlp_indirected_blocking(ti, *tl, vars, exp, coef*(1.0/p_num));
 
-		lp_pip_preemption_blocking(ti, *tl, vars, exp, coef*(1.0/p_num));
+		lp_fmlp_preemption_blocking(ti, *tl, vars, exp, coef*(1.0/p_num));
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_declare_variable_bounds(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_declare_variable_bounds(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
 		uint x = tx->get_id();
 		uint var_id;
 	
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_REGULAR);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 		
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_STALLING);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_objective(Task& ti, LinearProgram& lp, PIPMapper& vars, LinearExpression *obj)
+void LP_RTA_GFP_FMLP::lp_fmlp_objective(Task& ti, LinearProgram& lp, FMLPMapper& vars, LinearExpression *obj)
 {
 	uint p_num = processors.get_processor_num();
 	uint var_id;
@@ -441,7 +453,7 @@ void LP_RTA_GFP_PIP::lp_pip_objective(Task& ti, LinearProgram& lp, PIPMapper& va
 	{
 		uint h = th->get_id();
 //cout<<"task:"<<h<<endl;
-		var_id = vars.lookup(h, 0, 0, PIPMapper::INTERF_REGULAR);
+		var_id = vars.lookup(h, 0, 0, FMLPMapper::INTERF_REGULAR);
 		obj->add_term(var_id, 1.0/p_num);
 	}
 //cout<<"foreach lower priority task then:"<<ti.get_id()<<endl;
@@ -449,43 +461,42 @@ void LP_RTA_GFP_PIP::lp_pip_objective(Task& ti, LinearProgram& lp, PIPMapper& va
 	{
 		uint l = tl->get_id();
 //cout<<"task:"<<l<<endl;	
-		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+		var_id = vars.lookup(l, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 		obj->add_term(var_id, 1.0/p_num);
 		
-		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_STALLING);
+		var_id = vars.lookup(l, 0, 0, FMLPMapper::INTERF_STALLING);
 		obj->add_term(var_id, 1.0/p_num);
 
-		lp_pip_indirected_blocking(ti, *tl, vars, obj, 1.0/p_num);
+		lp_fmlp_indirected_blocking(ti, *tl, vars, obj, 1.0/p_num);
 
-		lp_pip_preemption_blocking(ti, *tl, vars, obj, 1.0/p_num);
+		lp_fmlp_preemption_blocking(ti, *tl, vars, obj, 1.0/p_num);
 	}
 
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		lp_pip_directed_blocking(ti, *tx, vars, obj, 1.0);
+		lp_fmlp_directed_blocking(ti, *tx, vars, obj, 1.0);
 	}
 
 //	vars.seal();
 }
 
-void LP_RTA_GFP_PIP::lp_pip_add_constraints(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_add_constraints(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
-	lp_pip_constraint_1(ti, lp, vars);
-	lp_pip_constraint_2(ti, lp, vars);
-	lp_pip_constraint_3(ti, lp, vars);
-	lp_pip_constraint_4(ti, lp, vars);
-	lp_pip_constraint_5(ti, lp, vars);
+	lp_fmlp_constraint_1(ti, lp, vars);
+	lp_fmlp_constraint_2(ti, lp, vars);
+	lp_fmlp_constraint_3(ti, lp, vars);
+	lp_fmlp_constraint_4(ti, lp, vars);
+	lp_fmlp_constraint_5(ti, lp, vars);
 	vars.seal();
-	lp_pip_declare_variable_bounds(ti, lp, vars);
-	lp_pip_constraint_6(ti, lp, vars);
-	lp_pip_constraint_7(ti, lp, vars);
-	lp_pip_constraint_8(ti, lp, vars);
-	lp_pip_constraint_9(ti, lp, vars);
-	lp_pip_constraint_10(ti, lp, vars);
-	lp_pip_constraint_11(ti, lp, vars);
+	lp_fmlp_declare_variable_bounds(ti, lp, vars);
+	lp_fmlp_constraint_6(ti, lp, vars);
+	lp_fmlp_constraint_7(ti, lp, vars);
+	lp_fmlp_constraint_8(ti, lp, vars);
+	lp_fmlp_constraint_9(ti, lp, vars);
+	lp_fmlp_constraint_10(ti, lp, vars);
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_1(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_1(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
@@ -494,26 +505,26 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_1(Task& ti, LinearProgram& lp, PIPMapper&
 		uint var_id;
 		uint x = tx->get_id();
 				
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_REGULAR);
 		exp->add_var(var_id);
 
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 		exp->add_var(var_id);
 
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_STALLING);
 		exp->add_var(var_id);
 		
-		lp_pip_directed_blocking(ti, *tx, vars, exp);
+		lp_fmlp_directed_blocking(ti, *tx, vars, exp);
 
-		lp_pip_indirected_blocking(ti, *tx, vars, exp);
+		lp_fmlp_indirected_blocking(ti, *tx, vars, exp);
 
-		lp_pip_preemption_blocking(ti, *tx, vars, exp);
+		lp_fmlp_preemption_blocking(ti, *tx, vars, exp);
 
-		lp.add_inequality(exp, workload_bound(*tx, ti.get_response_time()));
+		lp.add_inequality(exp, fmlp_workload_bound(*tx, ti.get_response_time()));
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_2(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_2(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {	
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
@@ -521,26 +532,26 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_2(Task& ti, LinearProgram& lp, PIPMapper&
 		uint var_id;
 		uint x = tx->get_id();
 
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_REGULAR);
 		exp->add_var(var_id);
 
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 		exp->add_var(var_id);
 
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_STALLING);
 		exp->add_var(var_id);
 
-		lp_pip_indirected_blocking(ti, *tx, vars, exp);
+		lp_fmlp_indirected_blocking(ti, *tx, vars, exp);
 
-		lp_pip_preemption_blocking(ti, *tx, vars, exp);
+		lp_fmlp_preemption_blocking(ti, *tx, vars, exp);
 
-		lp_pip_OD(ti, vars, exp, -1);
+		lp_fmlp_OD(ti, vars, exp, -1);
 
 		lp.add_inequality(exp, 0);
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_3(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_3(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
@@ -553,13 +564,13 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_3(Task& ti, LinearProgram& lp, PIPMapper&
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
 				
-				var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_DIRECT);
+				var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_DIRECT);
 				exp->add_var(var_id);
 
-				var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_INDIRECT);
+				var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_INDIRECT);
 				exp->add_var(var_id);
 
-				var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_PREEMPT);
+				var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_PREEMPT);
 				exp->add_var(var_id);
 
 				lp.add_inequality(exp, 1);
@@ -568,7 +579,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_3(Task& ti, LinearProgram& lp, PIPMapper&
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_4(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_4(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
 	if(0 == ti.get_requests().size())
 	{
@@ -578,7 +589,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_4(Task& ti, LinearProgram& lp, PIPMapper&
 			uint x = tx->get_id();
 			uint var_id;
 		
-			var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
+			var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_STALLING);
 			exp->add_var(var_id);
 
 			lp.add_equality(exp, 0);
@@ -586,7 +597,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_4(Task& ti, LinearProgram& lp, PIPMapper&
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_5(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_5(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
 	LinearExpression *exp = new LinearExpression();
 	
@@ -602,7 +613,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_5(Task& ti, LinearProgram& lp, PIPMapper&
 				{
 					uint var_id;
 				
-					var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_DIRECT);
+					var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_DIRECT);
 					exp->add_var(var_id);
 				}
 			}
@@ -612,7 +623,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_5(Task& ti, LinearProgram& lp, PIPMapper&
 	lp.add_equality(exp, 0);
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_6(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_6(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
 	LinearExpression *exp = new LinearExpression();
 
@@ -621,14 +632,14 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_6(Task& ti, LinearProgram& lp, PIPMapper&
 		uint var_id;
 		uint x = tx->get_id();
 
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 		exp->add_var(var_id);
 	}
 	
 	lp.add_equality(exp, 0);
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_7(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_7(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
 	uint p_num = processors.get_processor_num();
 
@@ -641,27 +652,27 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_7(Task& ti, LinearProgram& lp, PIPMapper&
 			uint var_id;
 			uint x = tx->get_id();
 				
-			var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
+			var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_REGULAR);
 			exp->add_var(var_id);
 
-			var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
+			var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 			exp->add_var(var_id);
 
-			var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
+			var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_STALLING);
 			exp->add_var(var_id);
 		
-			lp_pip_indirected_blocking(ti, *tx, vars, exp);
+			lp_fmlp_indirected_blocking(ti, *tx, vars, exp);
 
-			lp_pip_preemption_blocking(ti, *tx, vars, exp);
+			lp_fmlp_preemption_blocking(ti, *tx, vars, exp);
 
 			lp.add_equality(exp, 0);
 		}
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_8(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_8(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
-	foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
+	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
 		uint x = tx->get_id();
 		foreach(tx->get_requests(), request)
@@ -678,7 +689,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_8(Task& ti, LinearProgram& lp, PIPMapper&
 			{
 				uint var_id;
 				
-				var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_DIRECT);
+				var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_DIRECT);
 				exp->add_var(var_id);
 			}
 
@@ -687,62 +698,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_8(Task& ti, LinearProgram& lp, PIPMapper&
 	}
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_9(Task& ti, LinearProgram& lp, PIPMapper& vars)
-{
-
-	foreach_higher_priority_task(tasks.get_tasks(), ti, tx)
-	{
-		uint x = tx->get_id();
-		foreach(resources.get_resources(), resource)
-		{
-			
-			uint q = resource->get_resource_id();
-			uint N_i_q;
-			ulong W_i_q;
-			
-			if(ti.is_request_exist(q))
-			{
-
-				N_i_q = ti.get_request_by_id(q).get_num_requests();
-
-				W_i_q = wait_time_bound(ti, q);
-				if(MAX_LONG == W_i_q)
-				{
-					continue;
-				}
-
-			}
-			else
-			{
-				N_i_q = 0;
-				W_i_q = 0;
-			}
-			
-			if(tx->is_request_exist(q))
-			{
-				LinearExpression *exp = new LinearExpression();
-
-				uint N_x_q = tx->get_request_by_id(q).get_num_requests();
-
-				ulong bound = N_i_q*(tx->get_max_job_num(W_i_q))*N_x_q;
-
-				foreach_request_instance(ti, *tx, q, v)
-				{
-					uint var_id;
-
-					var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_DIRECT);
-					exp->add_var(var_id);
-				}
-				
-				lp.add_inequality(exp, bound);
-			}
-			
-		}
-	}
-
-}
-
-void LP_RTA_GFP_PIP::lp_pip_constraint_10(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_9(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
 	LinearExpression *exp = new LinearExpression();
 
@@ -751,63 +707,57 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_10(Task& ti, LinearProgram& lp, PIPMapper
 		uint x = tx->get_id();
 		uint var_id;
 
-		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
+		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_STALLING);
 		exp->add_var(var_id);
 	}
 	lp.add_equality(exp, 0);
 }
 
-void LP_RTA_GFP_PIP::lp_pip_constraint_11(Task& ti, LinearProgram& lp, PIPMapper& vars)
+void LP_RTA_GFP_FMLP::lp_fmlp_constraint_10(Task& ti, LinearProgram& lp, FMLPMapper& vars)
 {
-	ulong bound = 0;
 	ulong R_i = ti.get_response_time();
 
 	foreach(resources.get_resources(), resource)
 	{
-		LinearExpression *exp = new LinearExpression();
 		uint q = resource->get_resource_id();
 
 		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 		{
 			uint x = tx->get_id();
+			
 			if(tx->is_request_exist(q))
 			{
 				uint x = tx->get_id();
-				
+				LinearExpression *exp = new LinearExpression();
+
 				foreach_request_instance(ti, *tx, q, v)
 				{
 					uint var_id;
 
-					var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_INDIRECT);
+					var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_INDIRECT);
 					exp->add_var(var_id);
 
-					var_id = vars.lookup(x, q, v, PIPMapper::BLOCKING_PREEMPT);
+					var_id = vars.lookup(x, q, v, FMLPMapper::BLOCKING_PREEMPT);
 					exp->add_var(var_id);
 				}
+
+				if(!exp->has_terms())
+				{
+					delete exp;
+					continue;
+				}
+
+				ulong bound = 0;
+				foreach_higher_priority_task(tasks.get_tasks(), ti, th)
+				{
+					bound += th->get_max_request_num(q, R_i);
+				}
+				lp.add_inequality(exp, bound);
 			}
-			else
-			{
-				//delete exp;
-				continue;
-			}
 		}
-		
-		if(!exp->has_terms())
-		{
-			delete exp;
-			continue;
-		}
-
-		ulong bound = 0;
-
-		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
-		{
-			bound += th->get_max_request_num(q, R_i);
-		}
-
-		lp.add_inequality(exp, bound);
 	}
 }
+
 
 
 

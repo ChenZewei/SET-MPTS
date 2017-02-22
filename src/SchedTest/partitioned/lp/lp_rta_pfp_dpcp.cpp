@@ -1,4 +1,4 @@
-#include "lp_rta_gfp_dpcp.h"
+#include "lp_rta_pfp_dpcp.h"
 #include "solution.h"
 #include <lp.h>
 #include <sstream>
@@ -80,9 +80,9 @@ string DPCPMapper::key2str(uint64_t key, uint var) const
 	return buf.str();
 }
 
-////////////////////LP_RTA_GFP_DPCP////////////////////
-LP_RTA_GFP_DPCP::LP_RTA_GFP_DPCP(): LPSched(RTA, GLOBAL, FIX_PRIORITY, DPCP, "", "DPCP") {}
-LP_RTA_GFP_DPCP::LP_RTA_GFP_DPCP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): LPSched(RTA, GLOBAL, FIX_PRIORITY, DPCP, "", "DPCP")
+////////////////////LP_RTA_PFP_DPCP////////////////////
+LP_RTA_PFP_DPCP::LP_RTA_PFP_DPCP(): PartitionedSched(true, RTA, FIX_PRIORITY, DPCP, "", "DPCP") {}
+LP_RTA_PFP_DPCP::LP_RTA_PFP_DPCP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): PartitionedSched(true, RTA, FIX_PRIORITY, DPCP, "", "DPCP")
 {
 	this->tasks = tasks;
 	this->processors = processors;
@@ -92,32 +92,21 @@ LP_RTA_GFP_DPCP::LP_RTA_GFP_DPCP(TaskSet& tasks, ProcessorSet& processors, Resou
 	this->processors.init();
 }
 
-LP_RTA_GFP_DPCP::~LP_RTA_GFP_DPCP() {}
+LP_RTA_PFP_DPCP::~LP_RTA_PFP_DPCP() {}
 
-bool LP_RTA_GFP_DPCP::is_schedulable()
+bool LP_RTA_PFP_DPCP::is_schedulable()
 {
-	
-	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+	foreach(tasks.get_tasks(), ti)
 	{
-		Task& task = tasks.get_task_by_id(t_id);
-		ulong response_bound = task.get_response_time();
-		if(task.get_partition() == MAX_LONG)
-			continue;
-
-		ulong temp = response_time(task);
-
-		assert(temp >= response_bound);
-		response_bound = temp;
-
-		if(response_bound <= task.get_deadline())
-			task.set_response_time(response_bound);
-		else
+		if(!BinPacking_WF((*ti), tasks, processors, resources, UNTEST))
 			return false;
 	}
+	if(!alloc_schedulable())
+		return false;
 	return true;
 }
 
-ulong LP_RTA_GFP_DPCP::local_blocking(Task& task_i)
+ulong LP_RTA_PFP_DPCP::local_blocking(Task& task_i)
 {
 	ulong local_blocking = 0;
 	Resources& r = resources.get_resources();	
@@ -153,7 +142,7 @@ ulong LP_RTA_GFP_DPCP::local_blocking(Task& task_i)
 	return local_blocking;
 }
 
-ulong LP_RTA_GFP_DPCP::remote_blocking(Task& task_i)
+ulong LP_RTA_PFP_DPCP::remote_blocking(Task& task_i)
 {
 	ulong remote_blocking = 0;
 	Resources& r = resources.get_resources();	
@@ -187,7 +176,7 @@ ulong LP_RTA_GFP_DPCP::remote_blocking(Task& task_i)
 	return remote_blocking;
 }
 
-ulong LP_RTA_GFP_DPCP::total_blocking(Task& task_i)
+ulong LP_RTA_PFP_DPCP::total_blocking(Task& task_i)
 {	
 	ulong total_blocking;
 //cout<<"111"<<endl;
@@ -200,13 +189,12 @@ ulong LP_RTA_GFP_DPCP::total_blocking(Task& task_i)
 	return total_blocking;
 }
 
-ulong LP_RTA_GFP_DPCP::interference(Task& task, ulong interval)
+ulong LP_RTA_PFP_DPCP::interference(Task& task, ulong interval)
 {
 	return task.get_wcet() * ceiling((interval + task.get_response_time()), task.get_period());
 }
 
-
-ulong LP_RTA_GFP_DPCP::response_time(Task& task_i)
+ulong LP_RTA_PFP_DPCP::response_time(Task& task_i)
 {
 	ulong test_end = task_i.get_deadline();
 	ulong test_start = task_i.get_total_blocking() + task_i.get_wcet();
@@ -237,7 +225,29 @@ ulong LP_RTA_GFP_DPCP::response_time(Task& task_i)
 	return test_end + 100;
 }
 
-ulong LP_RTA_GFP_DPCP::get_max_wait_time(Task& ti, Request& rq)
+bool LP_RTA_PFP_DPCP::alloc_schedulable()
+{
+	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+	{
+		Task& task = tasks.get_task_by_id(t_id);
+		ulong response_bound = task.get_response_time();
+		if(task.get_partition() == MAX_LONG)
+			continue;
+
+		ulong temp = response_time(task);
+
+		assert(temp >= response_bound);
+		response_bound = temp;
+
+		if(response_bound <= task.get_deadline())
+			task.set_response_time(response_bound);
+		else
+			return false;
+	}
+	return true;
+}
+
+ulong LP_RTA_PFP_DPCP::get_max_wait_time(Task& ti, Request& rq)
 {
 	uint priority = ti.get_priority();
 	uint p_id = rq.get_locality();
@@ -296,7 +306,7 @@ ulong LP_RTA_GFP_DPCP::get_max_wait_time(Task& ti, Request& rq)
 	return max_wait_time;
 }
 
-void LP_RTA_GFP_DPCP::lp_dpcp_objective(Task& ti, LinearProgram& lp, DPCPMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj)
+void LP_RTA_PFP_DPCP::lp_dpcp_objective(Task& ti, LinearProgram& lp, DPCPMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj)
 {
 	//LinearExpression *obj = new LinearExpression();
 	
@@ -339,7 +349,7 @@ void LP_RTA_GFP_DPCP::lp_dpcp_objective(Task& ti, LinearProgram& lp, DPCPMapper&
 	vars.seal();
 }
 /*
-void LP_RTA_GFP_DPCP::lp_dpcp_local_objective(Task& ti, LinearProgram& lp, DPCPMapper& vars)
+void LP_RTA_PFP_DPCP::lp_dpcp_local_objective(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {
 	LinearExpression *obj = new LinearExpression();
 	
@@ -370,7 +380,7 @@ void LP_RTA_GFP_DPCP::lp_dpcp_local_objective(Task& ti, LinearProgram& lp, DPCPM
 	vars.seal();
 }
 
-void LP_RTA_GFP_DPCP::lp_dpcp_remote_objective(Task& ti, LinearProgram& lp, DPCPMapper& vars)
+void LP_RTA_PFP_DPCP::lp_dpcp_remote_objective(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {
 	LinearExpression *obj = new LinearExpression();
 	
@@ -404,7 +414,7 @@ void LP_RTA_GFP_DPCP::lp_dpcp_remote_objective(Task& ti, LinearProgram& lp, DPCP
 	vars.seal();
 }
 */
-void LP_RTA_GFP_DPCP::lp_dpcp_add_constraints(Task& ti, LinearProgram& lp, DPCPMapper& vars)
+void LP_RTA_PFP_DPCP::lp_dpcp_add_constraints(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {
 	lp_dpcp_constraint_1(ti, lp, vars);
 	lp_dpcp_constraint_2(ti, lp, vars);
@@ -414,7 +424,7 @@ void LP_RTA_GFP_DPCP::lp_dpcp_add_constraints(Task& ti, LinearProgram& lp, DPCPM
 	lp_dpcp_constraint_6(ti, lp, vars);
 }
 
-void LP_RTA_GFP_DPCP::lp_dpcp_constraint_1(Task& ti, LinearProgram& lp, DPCPMapper& vars)
+void LP_RTA_PFP_DPCP::lp_dpcp_constraint_1(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {
 //cout<<"Constraint 1"<<endl;
 	foreach_task_except(tasks.get_tasks(), ti, tx)
@@ -444,7 +454,7 @@ void LP_RTA_GFP_DPCP::lp_dpcp_constraint_1(Task& ti, LinearProgram& lp, DPCPMapp
 	}
 }
 
-void LP_RTA_GFP_DPCP::lp_dpcp_constraint_2(Task& ti, LinearProgram& lp, DPCPMapper& vars)
+void LP_RTA_PFP_DPCP::lp_dpcp_constraint_2(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {
 	LinearExpression *exp = new LinearExpression();
 
@@ -465,7 +475,7 @@ void LP_RTA_GFP_DPCP::lp_dpcp_constraint_2(Task& ti, LinearProgram& lp, DPCPMapp
 	lp.add_equality(exp, 0);
 }
 
-void LP_RTA_GFP_DPCP::lp_dpcp_constraint_3(Task& ti, LinearProgram& lp, DPCPMapper& vars)
+void LP_RTA_PFP_DPCP::lp_dpcp_constraint_3(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {
 	uint t_id = ti.get_id();	
 	uint max_arrival = 1;
@@ -493,7 +503,7 @@ void LP_RTA_GFP_DPCP::lp_dpcp_constraint_3(Task& ti, LinearProgram& lp, DPCPMapp
 	}
 }
 
-void LP_RTA_GFP_DPCP::lp_dpcp_constraint_4(Task& ti, LinearProgram& lp, DPCPMapper& vars)
+void LP_RTA_PFP_DPCP::lp_dpcp_constraint_4(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {
 	LinearExpression *exp = new LinearExpression();
 	uint priority = ti.get_priority();
@@ -523,7 +533,7 @@ void LP_RTA_GFP_DPCP::lp_dpcp_constraint_4(Task& ti, LinearProgram& lp, DPCPMapp
 	lp.add_equality(exp, 0);
 }
 
-void LP_RTA_GFP_DPCP::lp_dpcp_constraint_5(Task& ti, LinearProgram& lp, DPCPMapper& vars)
+void LP_RTA_PFP_DPCP::lp_dpcp_constraint_5(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {	
 	uint priority = ti.get_priority();
 
@@ -568,7 +578,7 @@ void LP_RTA_GFP_DPCP::lp_dpcp_constraint_5(Task& ti, LinearProgram& lp, DPCPMapp
 	}
 }
 
-void LP_RTA_GFP_DPCP::lp_dpcp_constraint_6(Task& ti, LinearProgram& lp, DPCPMapper& vars)
+void LP_RTA_PFP_DPCP::lp_dpcp_constraint_6(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {
 	ulong max_wait_time_l = 0;
 	ulong max_wait_time_h = 0;
@@ -608,8 +618,6 @@ void LP_RTA_GFP_DPCP::lp_dpcp_constraint_6(Task& ti, LinearProgram& lp, DPCPMapp
 		}
 	}
 }
-
-
 
 
 

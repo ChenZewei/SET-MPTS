@@ -7,7 +7,7 @@
 ** RTSS 2015 Maolin Yang et al. [Global Real-Time Semaphore Protocols: A Survey, Unified Analysis, and Comparison]
 */
 
-#include "lp_sched.h"
+#include "g_sched.h"
 #include "varmapper.h"
 #include "tasks.h"
 #include "processors.h"
@@ -56,7 +56,7 @@ class PIPMapper: public VarMapperBase
 };
 
 
-class LP_RTA_GFP_PIP: public LPSched
+class LP_RTA_GFP_PIP: public GlobalSched
 {
 	private:
 		TaskSet tasks;

@@ -27,7 +27,7 @@ class PartitionedSched: public SchedTestBase
 			TEST
 		};
 
-		PartitionedSched(uint TestMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
+		PartitionedSched(bool LinearProgramming, uint TestMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 
 		virtual bool alloc_schedulable() = 0;
 
