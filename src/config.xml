@@ -31,7 +31,9 @@
 		<data REMARK="">LP-RTA-PFP-DPCP</data>
 		<data REMARK="">RTA-PFP-RO</data>
 		<data REMARK="">ILP-RTA-PFP-spinlock</data>
+		<data REMARK="">RTA-PFP-GS</data>
 <!-->	
+		<data REMARK="">RTA-PFP-GS</data>
 	</schedulability_test>
 	<experiment_times>500</experiment_times>
 	<output>

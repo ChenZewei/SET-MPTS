@@ -10,6 +10,7 @@
 #include "lp_rta_pfp_dpcp.h"
 #include "rta_pfp_ro.h"
 #include "ilp_rta_pfp_spinlock.h"
+#include "rta_pfp_gs.h"
 
 SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
@@ -56,6 +57,10 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	else if(0 == strcmp(test_name.data(), "ILP-RTA-PFP-spinlock"))
 	{
 		return new ILP_RTA_PFP_spinlock(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-GS"))
+	{
+		return new RTA_PFP_GS(tasks, processors, resources);
 	}
 	else
 		return NULL;
