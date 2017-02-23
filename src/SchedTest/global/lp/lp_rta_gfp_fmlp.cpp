@@ -99,7 +99,7 @@ string FMLPMapper::key2str(uint64_t key, uint var) const
 
 LP_RTA_GFP_FMLP::LP_RTA_GFP_FMLP(): GlobalSched(true, RTA, FIX_PRIORITY, FMLP, "", "FMLP") {}
 
-LP_RTA_GFP_FMLP::LP_RTA_GFP_FMLP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(true, RTA, FIX_PRIORITY, FMLP, "", "FMLP")
+LP_RTA_GFP_FMLP::LP_RTA_GFP_FMLP(TaskSet tasks, ProcessorSet processors, ResourceSet resources): GlobalSched(true, RTA, FIX_PRIORITY, FMLP, "", "FMLP")
 {
 	this->tasks = tasks;
 	this->processors = processors;

@@ -33,7 +33,7 @@ class RTA_PFP_WF_spinlock: public PartitionedSched
 
 	public:
 		RTA_PFP_WF_spinlock();
-		RTA_PFP_WF_spinlock(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		RTA_PFP_WF_spinlock(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
 		bool is_schedulable();
 	
 };

@@ -2,7 +2,7 @@
 
 RTA_GFP_native::RTA_GFP_native(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "native") {}
 
-RTA_GFP_native::RTA_GFP_native(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "native")
+RTA_GFP_native::RTA_GFP_native(TaskSet tasks, ProcessorSet processors, ResourceSet resources): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "native")
 {
 	this->tasks = tasks;
 	this->processors = processors;

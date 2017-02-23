@@ -33,7 +33,7 @@ class RTA_PFP_WF: public PartitionedSched
 
 	public:
 		RTA_PFP_WF();
-		RTA_PFP_WF(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		RTA_PFP_WF(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
 		bool is_schedulable();
 	
 };

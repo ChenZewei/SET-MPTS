@@ -24,7 +24,7 @@ class RTA_GFP_BC: public GlobalSched
 		ulong interference(Task& tk, Task& ti, ulong interval);
 	public:
 		RTA_GFP_BC();
-		RTA_GFP_BC(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		RTA_GFP_BC(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
 		bool is_schedulable();
 
 };

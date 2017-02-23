@@ -32,9 +32,7 @@
 <!-->	
 		<data REMARK="">RTA-PFP-WF-spinlock</data>
 		<data REMARK="">RTA-PFP-WF-semaphore</data>
-		<data REMARK="">LP-RTA-GFP-PIP</data>
-		<data REMARK="">LP-RTA-GFP-FMLP</data>
-		<data REMARK="">LP-RTA-PFP-DPCP</data>
+		<data REMARK="">RTA-PFP-RO</data>
 	</schedulability_test>
 	<experiment_times>500</experiment_times>
 	<output>

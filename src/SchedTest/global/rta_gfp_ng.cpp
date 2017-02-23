@@ -2,7 +2,7 @@
 
 RTA_GFP_NG::RTA_GFP_NG(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "NG") {}
 
-RTA_GFP_NG::RTA_GFP_NG(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "NG")
+RTA_GFP_NG::RTA_GFP_NG(TaskSet tasks, ProcessorSet processors, ResourceSet resources): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "NG")
 {
 	this->tasks = tasks;
 	this->processors = processors;

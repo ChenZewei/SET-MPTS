@@ -98,7 +98,7 @@ class LP_RTA_GFP_PIP: public GlobalSched
 		void lp_pip_constraint_11(Task& ti, LinearProgram& lp, PIPMapper& vars);
 	public:
 		LP_RTA_GFP_PIP();
-		LP_RTA_GFP_PIP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		LP_RTA_GFP_PIP(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
 		~LP_RTA_GFP_PIP();
 		bool is_schedulable();
 	

@@ -82,7 +82,7 @@ string DPCPMapper::key2str(uint64_t key, uint var) const
 
 ////////////////////LP_RTA_PFP_DPCP////////////////////
 LP_RTA_PFP_DPCP::LP_RTA_PFP_DPCP(): PartitionedSched(true, RTA, FIX_PRIORITY, DPCP, "", "DPCP") {}
-LP_RTA_PFP_DPCP::LP_RTA_PFP_DPCP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): PartitionedSched(true, RTA, FIX_PRIORITY, DPCP, "", "DPCP")
+LP_RTA_PFP_DPCP::LP_RTA_PFP_DPCP(TaskSet tasks, ProcessorSet processors, ResourceSet resources): PartitionedSched(true, RTA, FIX_PRIORITY, DPCP, "", "DPCP")
 {
 	this->tasks = tasks;
 	this->processors = processors;

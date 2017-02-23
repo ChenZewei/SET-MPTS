@@ -39,7 +39,7 @@ class RTA_PFP_WF_semaphore: public PartitionedSched
 
 	public:
 		RTA_PFP_WF_semaphore();
-		RTA_PFP_WF_semaphore(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		RTA_PFP_WF_semaphore(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
 		bool is_schedulable();
 	
 };

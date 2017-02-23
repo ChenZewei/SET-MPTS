@@ -96,7 +96,7 @@ string PIPMapper::key2str(uint64_t key, uint var) const
 
 LP_RTA_GFP_PIP::LP_RTA_GFP_PIP(): GlobalSched(true, RTA, FIX_PRIORITY, PIP, "", "PIP") {}
 
-LP_RTA_GFP_PIP::LP_RTA_GFP_PIP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources): GlobalSched(true, RTA, FIX_PRIORITY, PIP, "", "PIP")
+LP_RTA_GFP_PIP::LP_RTA_GFP_PIP(TaskSet tasks, ProcessorSet processors, ResourceSet resources): GlobalSched(true, RTA, FIX_PRIORITY, PIP, "", "PIP")
 {
 	this->tasks = tasks;
 	this->processors = processors;

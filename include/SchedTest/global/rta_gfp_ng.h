@@ -43,7 +43,7 @@ class RTA_GFP_NG: public GlobalSched
 
 	public:
 		RTA_GFP_NG();
-		RTA_GFP_NG(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		RTA_GFP_NG(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
 		bool is_schedulable();
 	
 };

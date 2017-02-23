@@ -85,7 +85,7 @@ class LP_RTA_PFP_DPCP: public PartitionedSched
 
 	public:
 		LP_RTA_PFP_DPCP();
-		LP_RTA_PFP_DPCP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		LP_RTA_PFP_DPCP(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
 		~LP_RTA_PFP_DPCP();
 		bool is_schedulable();
 };

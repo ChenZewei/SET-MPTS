@@ -31,7 +31,7 @@ class RTA_GFP_native: public GlobalSched
 		ulong response_time(Task& ti);
 	public:
 		RTA_GFP_native();
-		RTA_GFP_native(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		RTA_GFP_native(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
 		bool is_schedulable();
 	
 };

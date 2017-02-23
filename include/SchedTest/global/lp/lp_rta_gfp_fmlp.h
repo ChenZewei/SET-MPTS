@@ -96,7 +96,7 @@ class LP_RTA_GFP_FMLP: public GlobalSched
 		void lp_fmlp_constraint_10(Task& ti, LinearProgram& lp, FMLPMapper& vars);
 	public:
 		LP_RTA_GFP_FMLP();
-		LP_RTA_GFP_FMLP(TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+		LP_RTA_GFP_FMLP(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
 		~LP_RTA_GFP_FMLP();
 		bool is_schedulable();
 };
