@@ -287,6 +287,33 @@ uint LP_RTA_PFP_MPCP::DD(Task& ti, Task& tx, uint r_id)
 		return tx.get_max_request_num(r_id, ti.get_response_time());
 }
 
+
+uint LP_RTA_PFP_MPCP::PO(Task& ti, Task& tx)
+{
+	uint sum = 0;
+	uint x = tx.get_id();
+	uint i = ti.get_id();
+
+	uint p_id = tx.get_partition();
+
+	foreach(tasks.get_tasks(), ty)
+	{
+		uint y = ty->get_id();
+		if((p_id != ty->get_partition()) || (y == x) || (y == i))
+			continue;
+		
+		foreach(ty->get_request, request)
+		{
+			uint v = request->get_resource_id();
+
+			if(priority_ceiling(v, p_id) <= priority_ceiling(tx))
+				continue;
+			sum += (ti, tx, v);
+		}
+	}
+	return sum;
+}
+
 void LP_RTA_PFP_MPCP::set_objective(Task& ti, LinearProgram& lp, MPCPMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj)
 {
 	//LinearExpression *obj = new LinearExpression();
@@ -303,21 +330,21 @@ void LP_RTA_PFP_MPCP::set_objective(Task& ti, LinearProgram& lp, MPCPMapper& var
 			{
 				uint var_id;
 
-				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_DIRECT);
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_DIRECT);
 				//obj->add_term(var_id, length);
 				if (is_local && (local_obj != NULL))
 					local_obj->add_term(var_id, length);
 				else if (!is_local && (remote_obj != NULL))
 					remote_obj->add_term(var_id, length);
 
-				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_INDIRECT);
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_INDIRECT);
 				//obj->add_term(var_id, length);
 				if (is_local && (local_obj != NULL))
 					local_obj->add_term(var_id, length);
 				else if (!is_local && (remote_obj != NULL))
 					remote_obj->add_term(var_id, length);
 
-				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_PREEMPT);
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_PREEMPT);
 				//obj->add_term(var_id, length);
 				if (is_local && (local_obj != NULL))
 					local_obj->add_term(var_id, length);
@@ -355,7 +382,7 @@ void LP_RTA_PFP_MPCP::constraint_1(Task& ti, LinearProgram& lp, MPCPMapper& vars
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
 
-				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_DIRECT);
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_DIRECT);
 				exp->add_var(var_id);
 
 				lp.add_inequality(exp, N_i_q);
@@ -381,7 +408,7 @@ void LP_RTA_PFP_MPCP::constraint_2(Task& ti, LinearProgram& lp, MPCPMapper& vars
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
 
-				var_id = vars.lookup(x, q, v, DPCPMapper::BLOCKING_DIRECT);
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_DIRECT);
 				exp->add_var(var_id);
 
 				lp.add_equality(exp, 0);
@@ -391,7 +418,28 @@ void LP_RTA_PFP_MPCP::constraint_2(Task& ti, LinearProgram& lp, MPCPMapper& vars
 }
 
 //Constraint 17 [BrandenBurg 2013 RTAS Appendix-C]	
-void LP_RTA_PFP_MPCP::constraint_3(Task& ti, LinearProgram& lp, MPCPMapper& vars);	
+void LP_RTA_PFP_MPCP::constraint_3(Task& ti, LinearProgram& lp, MPCPMapper& vars)
+{
+	foreach_task_except(tasks.get_tasks(), ti, tx)
+	{
+		foreach(resources.get_resources(), resource)
+		{
+			uint q = resource->get_resource_id();
+
+			foreach_request_instance(ti, *tx, q, v)
+			{
+				LinearExpression *exp = new LinearExpression();
+				uint var_id;
+
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_INDIRECT);
+				exp->add_var(var_id);
+
+				lp.add_inequality(exp, PO(ti, *tx)));
+			}
+		}
+	}
+}
+
 //Constraint 18 [BrandenBurg 2013 RTAS Appendix-C]	
 void LP_RTA_PFP_MPCP::constraint_4(Task& ti, LinearProgram& lp, MPCPMapper& vars);
 //Constraint 19 [BrandenBurg 2013 RTAS Appendix-C]		

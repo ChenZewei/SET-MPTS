@@ -70,6 +70,7 @@ class LP_RTA_PFP_MPCP: public PartitionedSched
 		uint priority_ceiling(uint r_id, uint p_id);
 		uint priority_ceiling(Task& ti);
 		uint DD(Task& ti, Task& tx, uint r_id);
+		uint PO(Task& ti, Task& tx);
 
 		void set_objective(Task& ti, LinearProgram& lp, MPCPMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj);
 
