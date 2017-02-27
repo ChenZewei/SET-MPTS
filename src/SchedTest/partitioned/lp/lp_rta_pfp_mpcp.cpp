@@ -94,6 +94,18 @@ LP_RTA_PFP_MPCP::LP_RTA_PFP_MPCP(TaskSet tasks, ProcessorSet processors, Resourc
 
 LP_RTA_PFP_MPCP::~LP_RTA_PFP_MPCP() {}
 
+bool LP_RTA_PFP_MPCP::is_schedulable()
+{
+	foreach(tasks.get_tasks(), ti)
+	{
+		if(!BinPacking_WF((*ti), tasks, processors, resources, UNTEST))
+			return false;
+	}
+	if(!alloc_schedulable())
+		return false;
+	return true;
+}
+
 ulong LP_RTA_PFP_MPCP::local_blocking(Task& task_i)
 {
 	ulong local_blocking = 0;
@@ -232,9 +244,6 @@ bool LP_RTA_PFP_MPCP::alloc_schedulable()
 	return true;
 }
 
-ulong LP_RTA_PFP_MPCP::get_max_wait_time(Task& ti, Request& rq);
-
-
 uint LP_RTA_PFP_MPCP::priority_ceiling(uint r_id, uint p_id)
 {
 	uint min = MAX_INT;
@@ -265,7 +274,7 @@ uint LP_RTA_PFP_MPCP::priority_ceiling(Task& ti)
 	{
 		uint q = resource->get_resource_id();
 
-		if(!tj->is_request_exist(q))
+		if(!ti.is_request_exist(q))
 			continue;
 
 		uint temp = priority_ceiling(q, p_id);
@@ -302,7 +311,7 @@ uint LP_RTA_PFP_MPCP::PO(Task& ti, Task& tx)
 		if((p_id != ty->get_partition()) || (y == x) || (y == i))
 			continue;
 		
-		foreach(ty->get_request, request)
+		foreach(ty->get_requests(), request)
 		{
 			uint v = request->get_resource_id();
 
@@ -312,6 +321,102 @@ uint LP_RTA_PFP_MPCP::PO(Task& ti, Task& tx)
 		}
 	}
 	return sum;
+}
+
+uint LP_RTA_PFP_MPCP::PO(Task& ti, Task& tx, uint r_id)
+{
+	uint sum = 0;
+	uint x = tx.get_id();
+	uint i = ti.get_id();
+
+	uint p_id = tx.get_partition();
+
+	foreach(tasks.get_tasks(), ty)
+	{
+		uint y = ty->get_id();
+		if((p_id != ty->get_partition()) || (y == x) || (y == i))
+			continue;
+		
+		foreach(ty->get_requests(), request)
+		{
+			uint v = request->get_resource_id();
+
+			if(priority_ceiling(v, p_id) <= priority_ceiling(r_id, p_id))
+				continue;
+			sum += (ti, tx, v);
+		}
+	}
+	return sum;
+}
+
+
+ulong LP_RTA_PFP_MPCP::holding_time(Task& tx, uint r_id)
+{
+	ulong h_time = 0;
+	uint p_id = tx.get_partition();
+	if(tx.is_request_exist(r_id))
+		h_time += tx.get_request_by_id(r_id).get_max_length();
+
+	foreach_task_except(tasks.get_tasks(), tx, ty)
+	{
+		if(p_id != ty->get_partition())
+			continue;
+		
+		ulong max = 0;
+		
+		foreach(ty->get_requests(), request)
+		{
+			uint v = request->get_resource_id();
+			if(priority_ceiling(v, p_id) > priority_ceiling(v, r_id))
+				continue;
+			else if(max < request->get_max_length())
+				max = request->get_max_length();
+		}
+
+		h_time += max;
+	}
+	return h_time;
+}
+
+ulong LP_RTA_PFP_MPCP::wait_time(Task& ti, uint r_id)
+{
+	ulong max_h = 0;
+
+	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
+	{
+		if(!tl->is_request_exist(r_id))
+			continue;
+		ulong H_l_q = holding_time(*tl, r_id);
+		if(max_h < H_l_q)
+			max_h = H_l_q;
+	}
+
+	ulong demand = max_h;
+	ulong w_time = max_h;
+
+	while(true)
+	{
+		demand = max_h;	
+
+		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
+		{
+			if(!th->is_request_exist(r_id))
+				continue;
+			ulong H_h_q = holding_time(*th, r_id);
+			uint N_h_q = th->get_request_by_id(r_id).get_num_requests();
+			
+			demand += ceiling(th->get_response_time() + w_time, th->get_period())*N_h_q*H_h_q;
+			
+		}
+
+		assert(demand >= w_time);
+
+		if(demand > w_time)
+			w_time = demand;
+		else
+			break;
+	}
+	return w_time;
 }
 
 void LP_RTA_PFP_MPCP::set_objective(Task& ti, LinearProgram& lp, MPCPMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj)
@@ -359,7 +464,12 @@ void LP_RTA_PFP_MPCP::set_objective(Task& ti, LinearProgram& lp, MPCPMapper& var
 
 void LP_RTA_PFP_MPCP::add_constraints(Task& ti, LinearProgram& lp, MPCPMapper& vars)
 {
-
+	constraint_1(ti, lp, vars);
+	constraint_2(ti, lp, vars);
+	constraint_3(ti, lp, vars);
+	constraint_4(ti, lp, vars);
+	constraint_5(ti, lp, vars);
+	constraint_6(ti, lp, vars);
 }
 
 //Constraint 15 [BrandenBurg 2013 RTAS Appendix-C]
@@ -367,53 +477,57 @@ void LP_RTA_PFP_MPCP::constraint_1(Task& ti, LinearProgram& lp, MPCPMapper& vars
 {
 	foreach(resources.get_resources(), resource)
 	{
-		uint q = resource->get_resoruce_id();
+		uint q = resource->get_resource_id();
+		LinearExpression *exp = new LinearExpression();
+		uint N_i_q = 0;
+		if(ti.is_request_exist(q))
+		{
+			N_i_q = ti.get_request_by_id(q).get_num_requests();
+		}
+		
 		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 		{
 			uint x = tx->get_id();
-			uint N_i_q = 0;
-			if(ti.is_request_exist(q))
-			{
-				N_i_q = ti.get_request_by_id(q).get_num_requests();
-			}
-			
 			foreach_request_instance(ti, *tx, q, v)
 			{
-				LinearExpression *exp = new LinearExpression();
+				
 				uint var_id;
 
 				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_DIRECT);
 				exp->add_var(var_id);
 
-				lp.add_inequality(exp, N_i_q);
+				
 			}
 		}
+		lp.add_inequality(exp, N_i_q);
 	}
 }
 
 //Constraint 16 [BrandenBurg 2013 RTAS Appendix-C]	
 void LP_RTA_PFP_MPCP::constraint_2(Task& ti, LinearProgram& lp, MPCPMapper& vars)
 {
-	foreach(resoruces.get_resources(), resource)
+	foreach(resources.get_resources(), resource)
 	{
-		uint q = resource.get_resrouce_id();
+		uint q = resource->get_resource_id();
 
 		if(ti.is_request_exist(q))
 			continue;		
-		
+		LinearExpression *exp = new LinearExpression();
 		foreach_task_except(tasks.get_tasks(), ti, tx)
 		{
+			uint x = tx->get_id();
 			foreach_request_instance(ti, *tx, q, v)
 			{
-				LinearExpression *exp = new LinearExpression();
+				
 				uint var_id;
 
 				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_DIRECT);
 				exp->add_var(var_id);
 
-				lp.add_equality(exp, 0);
+				
 			}
 		}
+		lp.add_equality(exp, 0);
 	}
 }
 
@@ -422,30 +536,126 @@ void LP_RTA_PFP_MPCP::constraint_3(Task& ti, LinearProgram& lp, MPCPMapper& vars
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
+		uint x = tx->get_id();
+		LinearExpression *exp = new LinearExpression();
 		foreach(resources.get_resources(), resource)
 		{
 			uint q = resource->get_resource_id();
 
 			foreach_request_instance(ti, *tx, q, v)
 			{
-				LinearExpression *exp = new LinearExpression();
+				
 				uint var_id;
 
 				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_INDIRECT);
 				exp->add_var(var_id);
 
-				lp.add_inequality(exp, PO(ti, *tx)));
+				
 			}
 		}
+		lp.add_inequality(exp, PO(ti, *tx));
 	}
 }
 
 //Constraint 18 [BrandenBurg 2013 RTAS Appendix-C]	
-void LP_RTA_PFP_MPCP::constraint_4(Task& ti, LinearProgram& lp, MPCPMapper& vars);
+void LP_RTA_PFP_MPCP::constraint_4(Task& ti, LinearProgram& lp, MPCPMapper& vars)
+{
+	foreach_task_except(tasks.get_tasks(), ti, tx)
+	{
+		uint x = tx->get_id();
+		foreach(resources.get_resources(), resource)
+		{
+			uint q = resource->get_resource_id();
+			LinearExpression *exp = new LinearExpression();
+			foreach_request_instance(ti, *tx, q, v)
+			{
+				
+				uint var_id;
+
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_INDIRECT);
+				exp->add_var(var_id);
+				
+			}
+			lp.add_inequality(exp, PO(ti, *tx, q));
+		}
+	}
+}
+
 //Constraint 19 [BrandenBurg 2013 RTAS Appendix-C]		
-void LP_RTA_PFP_MPCP::constraint_5(Task& ti, LinearProgram& lp, MPCPMapper& vars);	
+void LP_RTA_PFP_MPCP::constraint_5(Task& ti, LinearProgram& lp, MPCPMapper& vars)
+{
+	foreach_higher_priority_task(tasks.get_tasks(), ti, tx)
+	{
+		uint x = tx->get_id();
+		foreach(ti.get_requests(), request)
+		{
+			uint q = request->get_resource_id();
+			LinearExpression *exp = new LinearExpression();
+
+			uint N_x_q = 0, N_i_q = request->get_num_requests();
+
+			if(tx->is_request_exist(q))
+				N_x_q = tx->get_request_by_id(q).get_num_requests();
+			
+			ulong delay_bound = ceiling(tx->get_response_time() + wait_time(ti, q), tx->get_period())*N_x_q*N_i_q;
+
+			foreach_request_instance(ti, *tx, q, v)
+			{
+				uint var_id;
+
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_DIRECT);
+				exp->add_var(var_id);
+			}
+			lp.add_inequality(exp, delay_bound);
+		}
+	}
+}
+
 //Constraint 20 [BrandenBurg 2013 RTAS Appendix-C]	
-void LP_RTA_PFP_MPCP::constraint_6(Task& ti, LinearProgram& lp, MPCPMapper& vars);
+void LP_RTA_PFP_MPCP::constraint_6(Task& ti, LinearProgram& lp, MPCPMapper& vars)
+{
+	uint p_id = ti.get_partition();
+	LinearExpression *exp = new LinearExpression();
+
+	ulong total_wait_time = 0;
+
+	foreach(resources.get_resources(), resource)
+	{
+		uint q = resource->get_resource_id();
+		uint N_i_q = 0;
+		if(ti.is_request_exist(q))
+			N_i_q = ti.get_request_by_id(q).get_num_requests();
+		total_wait_time += wait_time(ti, q);
+	}
+	
+	foreach(tasks.get_tasks(), tx)
+	{
+		uint x = tx->get_id();
+		if(p_id == tx->get_partition())
+			continue;
+		foreach(resources.get_resources(), resource)
+		{
+			uint q = resource->get_resource_id();
+			ulong L_x_q = 0;
+			if(tx->is_request_exist(q))
+				L_x_q = tx->get_request_by_id(q).get_max_length();
+			else
+				continue;
+			foreach_request_instance(ti, *tx, q, v)
+			{
+				uint var_id;
+
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_DIRECT);
+				exp->add_term(var_id, L_x_q);
+
+				var_id = vars.lookup(x, q, v, MPCPMapper::BLOCKING_INDIRECT);
+				exp->add_term(var_id, L_x_q);
+			}
+		}
+	}
+
+	lp.add_inequality(exp, total_wait_time);
+}
 
 
 

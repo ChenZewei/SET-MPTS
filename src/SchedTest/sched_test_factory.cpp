@@ -8,6 +8,7 @@
 #include "lp_rta_gfp_pip.h"
 #include "lp_rta_gfp_fmlp.h"
 #include "lp_rta_pfp_dpcp.h"
+#include "lp_rta_pfp_mpcp.h"
 #include "rta_pfp_ro.h"
 #include "ilp_rta_pfp_spinlock.h"
 #include "rta_pfp_gs.h"
@@ -49,6 +50,10 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	else if(0 == strcmp(test_name.data(), "LP-RTA-PFP-DPCP"))
 	{
 		return new LP_RTA_PFP_DPCP(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "LP-RTA-PFP-MPCP"))
+	{
+		return new LP_RTA_PFP_MPCP(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO"))
 	{
