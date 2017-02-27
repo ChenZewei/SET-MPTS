@@ -67,8 +67,27 @@ class LP_RTA_PFP_MPCP: public PartitionedSched
 		ulong response_time(Task& task_i);
 		bool alloc_schedulable();
 		ulong get_max_wait_time(Task& ti, Request& rq);
+		uint priority_ceiling(uint r_id, uint p_id);
+		uint priority_ceiling(Task& ti);
+		uint DD(Task& ti, Task& tx, uint r_id);
 
+		void set_objective(Task& ti, LinearProgram& lp, MPCPMapper& vars, LinearExpression *local_obj, LinearExpression *remote_obj);
 
+		void add_constraints(Task& ti, LinearProgram& lp, MPCPMapper& vars);
+		
+		//Constraint 15 [BrandenBurg 2013 RTAS Appendix-C]
+		void constraint_1(Task& ti, LinearProgram& lp, MPCPMapper& vars);	
+		//Constraint 16 [BrandenBurg 2013 RTAS Appendix-C]	
+		void constraint_2(Task& ti, LinearProgram& lp, MPCPMapper& vars);	
+		//Constraint 17 [BrandenBurg 2013 RTAS Appendix-C]	
+		void constraint_3(Task& ti, LinearProgram& lp, MPCPMapper& vars);	
+		//Constraint 18 [BrandenBurg 2013 RTAS Appendix-C]	
+		void constraint_4(Task& ti, LinearProgram& lp, MPCPMapper& vars);
+		//Constraint 19 [BrandenBurg 2013 RTAS Appendix-C]		
+		void constraint_5(Task& ti, LinearProgram& lp, MPCPMapper& vars);	
+		//Constraint 20 [BrandenBurg 2013 RTAS Appendix-C]	
+		void constraint_6(Task& ti, LinearProgram& lp, MPCPMapper& vars);
+	
 	public:
 		LP_RTA_PFP_MPCP();
 		LP_RTA_PFP_MPCP(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
