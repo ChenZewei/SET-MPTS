@@ -129,30 +129,6 @@ int main(int argc,char** argv)
 	Random_Gen::uniform_integral_gen(0,10);
 	double utilization = u_ranges[0].min;
 
-/////
-/*
-			TaskSet testt = TaskSet();
-			ProcessorSet testp = ProcessorSet(parameters);
-			ResourceSet testr = ResourceSet();
-			resource_gen(&testr, parameters);
-			tast_gen(testt, testr, parameters, 1);
-
-	testt.RM_Order();
-
-	foreach(testt.get_tasks(), ti)
-	{
-		uint i = ti->get_id();
-cout<<"Task "<<i<<":"<<endl;
-cout<<ti->get_wcet()<<" "<<ti->get_wcet_critical_sections()<<" "<<ti->get_wcet_non_critical_sections()<<endl;
-		foreach(ti->get_requests(), request)
-		{
-			uint q = request->get_resource_id();
-			cout<<"request for resource "<<q<<":"<<"N"<<request->get_num_requests()<<" L:"<<request->get_max_length()<<endl;
-		}
-	}
-*/
-
-/////
 	time_t start, end;
 	
 	start = time(NULL);
@@ -181,33 +157,12 @@ cout<<flush;
 			resource_gen(&resourceset, parameters);
 			tast_gen(taskset, resourceset, parameters, utilization);
 
-/*
-cout<<"Testing:"<<endl;
-		SchedTestBase *testing;
-		TestModel tt = TestModel();
-		testing = &tt;
-		if(testing->is_schedulable(taskset, processorset, resourceset))
-			cout<<"true!"<<endl;
-		else
-			cout<<"false!"<<endl;
-*/
 			for(uint j = 0; j < parameters.get_method_num(); j++)
 			{
 				taskset.init();
 				processorset.init();	
 				resourceset.init();
 				exp[j]++;
-
-/*
-				if(is_schedulable(taskset, processorset, resourceset, parameters.get_test_method(j), parameters.get_test_type(j), 0))
-				{
-					success[j]++;
-				}
-*/
-//cout<<test_attributes[j].test_name<<endl;
-				
-				//RTA_native rta_native = RTA_native(taskset, processorset, resourceset);
-
 
 				SchedTestBase *schedTest = STFactory.createSchedTest(test_attributes[j].test_name, taskset, processorset, resourceset);
 				if(NULL == schedTest)
@@ -220,6 +175,7 @@ cout<<"Testing:"<<endl;
 				{
 					success[j]++;
 				}
+				
 				delete(schedTest);
 
 			}
@@ -233,7 +189,7 @@ cout<<endl;
 			result.y = ratio.get_d();
 			result.exp_num = exp[i];
 			result.success_num = success[i];
-//cout<<"ratio:"<<ratio.get_d()<<endl;
+
 			output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
 cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
 		}

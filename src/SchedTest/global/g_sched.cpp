@@ -4,3 +4,5 @@ GlobalSched::GlobalSched(bool LinearProgramming, uint TestMethod, uint PriorityA
 {
 	
 }
+
+GlobalSched::~GlobalSched() {}

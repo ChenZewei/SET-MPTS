@@ -29,6 +29,8 @@ class PartitionedSched: public SchedTestBase
 
 		PartitionedSched(bool LinearProgramming, uint TestMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 
+		virtual ~PartitionedSched();
+
 		virtual bool alloc_schedulable() = 0;
 
 		//Bin packing

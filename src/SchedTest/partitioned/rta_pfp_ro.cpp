@@ -139,12 +139,10 @@ ulong RTA_PFP_RO::ro_get_interference(Task& ti, ulong interval)
 	Processor& processor = processors.get_processors()[p_i];
 	if(0 == processor.get_resourcequeue().size())//Application Core
 	{
-//cout<<"AC"<<endl;
 		return ro_get_interference_AC(ti, interval);
 	}
 	else//Universal Core
 	{
-//cout<<"UC"<<endl;
 		return ro_get_interference_UC(ti, interval);
 	}
 }
@@ -154,22 +152,12 @@ ulong RTA_PFP_RO::response_time(Task& ti)
 	ulong test_bound = ti.get_deadline();
 	ulong test_start = ti.get_wcet() + ro_get_bloking(ti);
 	ulong response_time = test_start;
-//cout<<"response time1:"<<response_time<<endl;
-//cout<<"deadline1:"<<test_bound<<endl;
+
 	while(response_time <= test_bound)
 	{
 		ulong interf_C = ro_get_interference(ti, response_time);
 		ulong interf_R = ro_get_interference_R(ti, response_time);
-/*
-cout<<"Deadline:"<<test_bound<<endl;
-cout<<"WCET:"<<ti.get_wcet()<<endl;
-cout<<"interf_C:"<<interf_C<<endl;
-cout<<"interf_R:"<<interf_R<<endl;
-*/
 		ulong temp = test_start + interf_C + interf_R;
-
-		//if(temp < response_time)
-//			cout<<temp<<" "<<response_time<<endl;
 
 		assert(temp >= response_time);
 
@@ -178,9 +166,6 @@ cout<<"interf_R:"<<interf_R<<endl;
 		else if(temp == response_time)
 			return response_time;
 	}
-//cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
-//cout<<"response time2:"<<response_time<<endl;
-//cout<<"deadline2:"<<test_bound<<endl;
 	return test_bound + 100;
 }
 
@@ -199,9 +184,7 @@ bool RTA_PFP_RO::alloc_schedulable()
 			task.set_response_time(response_bound);
 		}
 		else
-		{
-//cout<<"response time3:"<<response_bound<<endl;
-//cout<<"deadline3:"<<task.get_deadline()<<endl;	
+		{	
 			return false;
 		}
 	}
@@ -232,7 +215,7 @@ bool RTA_PFP_RO::worst_fit_for_resources(uint active_processor_num)
 		}
 		else
 		{
-//cout<<"false"<<endl;
+
 			return false;
 		}
 	}
@@ -245,23 +228,19 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 	bool schedulable;
 	uint p_num = processors.get_processor_num();
 	tasks.RM_Order();
-//cout<<"First-fit. Start from processor "<<start_processor<<endl;
 	foreach(tasks.get_tasks(), ti)
 	{
-		//Processor& processor = processors.get_processors()[0];
 		uint assignment;
 		schedulable = false;
-//cout<<"task "<<ti->get_id()<<endl;
+
 		for(uint i = start_processor; i < start_processor + p_num; i++)
 		{
 			assignment = i%p_num;
-//cout<<"Assignment:"<<assignment<<endl;
 			Processor& processor = processors.get_processors()[assignment];
-//cout<<"Processor id:"<<processor.get_processor_id()<<endl;
+
 			if(processor.add_task(&(*ti)))
 			{
 				ti->set_partition(assignment);
-//cout<<"get_partition:"<<ti->get_partition()<<endl;
 				if(alloc_schedulable())
 				{
 					schedulable = true;
@@ -269,25 +248,9 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 				}
 				else
 				{
-//cout<<"remove task "<<ti->get_id()<<endl;
 					ti->init();
-/*
-		cout<<"task(before remove): ";
-	foreach(processor.get_taskqueue(), tx)
-	{
-		cout<<((Task*)(*tx))->get_id()<<" ";
-	}
-		cout<<endl;
-*/
 					processor.remove_task(&(*ti));
-/*
-	cout<<"task(after remocve): ";
-	foreach(processor.get_taskqueue(), tx)
-	{
-		cout<<((Task*)(*tx))->get_id()<<" ";
-	}
-		cout<<endl;
-*/
+
 				}
 			}
 			else
@@ -300,16 +263,7 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 
 		if(!schedulable)
 		{
-/*
-cout<<"ffffffffffffffffffffffffffffffffff."<<endl;
 
-			for(uint i = 0; i < p_num; i++)
-			{
-cout<<"i:"<<i<<endl;
-				Processor& p_temp_f = processors.get_processors()[i];
-				cout<<"utilization of processor "<<p_temp_f.get_processor_id()<<":"<<p_temp_f.get_utilization().get_d()<<endl;
-			}
-*/
 			return schedulable;
 		}
 	}
@@ -333,14 +287,7 @@ bool RTA_PFP_RO::is_schedulable()
 		
 		if(!worst_fit_for_resources(i))
 			continue;
-/*
-cout<<"22222"<<endl;
-for(uint k = 0; k < processors.get_processor_num(); k++)
-			{
-				Processor& p_temp_2 = processors.get_processors()[k];
-				cout<<"utilization of processor "<<p_temp_2.get_processor_id()<<":"<<p_temp_2.get_utilization().get_d()<<endl;
-			}
-*/
+
 		schedulable = is_first_fit_for_tasks_schedulable(i%p_num);
 		if(schedulable)
 			return schedulable;

@@ -8,6 +8,8 @@ PartitionedSched::PartitionedSched(bool LinearProgramming, uint TestMethod, uint
 	
 }
 
+PartitionedSched::~PartitionedSched() {}
+
 bool PartitionedSched::BinPacking_WF(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint MODE)
 {
 	processors.sort_by_task_utilization(INCREASE);

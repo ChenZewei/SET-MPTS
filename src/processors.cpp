@@ -18,7 +18,8 @@ Processor::Processor(uint id, fraction_t speedfactor)
 
 Processor::~Processor()
 {
-	
+	tQueue.clear();
+	rQueue.clear();
 }
 
 uint Processor::get_processor_id() const

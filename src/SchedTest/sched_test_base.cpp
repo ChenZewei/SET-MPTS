@@ -14,6 +14,8 @@ SchedTestBase::SchedTestBase(bool LinearProgramming, uint TestMethod, uint Sched
 	this->remark = remark;
 }
 
+SchedTestBase::~SchedTestBase() {}
+
 string SchedTestBase::get_test_name()
 {
 	stringstream test_name;

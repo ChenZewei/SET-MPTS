@@ -22,7 +22,7 @@ class GlobalSched: public SchedTestBase
 */
 		GlobalSched(bool LinearProgramming, uint TestMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 
-		
+		virtual ~GlobalSched();
 };
 
 #endif
