@@ -33,8 +33,7 @@ Output::Output(Param param)
 	}
 	chart.SetGraphSize(1280,640);
 	chart.SetGraphQual(3);
-	
-	cout<<param.get_method_num()<<endl;
+
 	for(uint i = 0; i < param.get_method_num(); i++)
 		add_set();
 	

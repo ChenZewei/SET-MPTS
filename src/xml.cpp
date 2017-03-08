@@ -26,7 +26,6 @@ void XML::get_method(Test_Attribute_Set *t_set)
 	while(subtitle)
 	{
 		content = subtitle->GetText();
-cout<<content<<endl;
 		Test_Attribute ta;
 		int test_type = subtitle->IntAttribute("TEST_TYPE");
 		string remark;

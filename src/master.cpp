@@ -24,6 +24,12 @@
 
 using namespace std;
 
+typedef struct
+{
+	string test_name;
+	double utilization;
+}key;
+
 int main(int argc,char** argv)
 {	
 	Int_Set lambdas, p_num, methods;
@@ -213,11 +219,11 @@ cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[
 	cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
 
 	XML::SaveConfig((output.get_path() + "config.xml").data());
-
+/*
 	output.export_csv();
 
 	output.Export(PNG|EPS|SVG|TGA|JSON);
-
+*/
 	return 0;
 }
 

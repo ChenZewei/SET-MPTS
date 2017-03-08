@@ -127,80 +127,53 @@ int main(int argc,char** argv)
 	//output.export_table_head();
 
 	Random_Gen::uniform_integral_gen(0,10);
-	double utilization = u_ranges[0].min;
 
 	time_t start, end;
 	
 	start = time(NULL);
 
-cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
+	double utilization;
+	string test_name;
 
-	do
-	{	
-		Result result;
-cout<<"Utilization:"<<utilization<<endl;
-		vector<int> success;
-		vector<int> exp;
-		for(uint i = 0; i < test_attributes.size(); i++)
-		{
-			exp.push_back(0);
-			success.push_back(0);
-		}
-		for(int i = 0; i < exp_times; i++)
-		{
-cout<<".";
-cout<<flush;
+	cin>>utilization>>test_name;
 
-	    	TaskSet taskset = TaskSet();
-			ProcessorSet processorset = ProcessorSet(parameters);
-			ResourceSet resourceset = ResourceSet();
-			resource_gen(&resourceset, parameters);
-			tast_gen(taskset, resourceset, parameters, utilization);
+	TaskSet taskset = TaskSet();
+	ProcessorSet processorset = ProcessorSet(parameters);
+	ResourceSet resourceset = ResourceSet();
+	resource_gen(&resourceset, parameters);
+	tast_gen(taskset, resourceset, parameters, utilization);
 
-			for(uint j = 0; j < parameters.get_method_num(); j++)
-			{
-				taskset.init();
-				processorset.init();	
-				resourceset.init();
-				exp[j]++;
+	taskset.init();
+	processorset.init();	
+	resourceset.init();
 
-				SchedTestBase *schedTest = STFactory.createSchedTest(test_attributes[j].test_name, taskset, processorset, resourceset);
-				if(NULL == schedTest)
-				{
-					cout<<"Incorrect test name."<<endl;
-					return -1;
-				}
-
-				if(schedTest->is_schedulable())
-				{
-					success[j]++;
-				}
-				
-				delete(schedTest);
-
-			}
-			//result.x = taskset.get_utilization_sum().get_d();
-			result.x = utilization;
-		}
-cout<<endl;
-		for(uint i = 0; i < test_attributes.size(); i++)
-		{
-			fraction_t ratio(success[i], exp[i]);
-			result.y = ratio.get_d();
-			result.exp_num = exp[i];
-			result.success_num = success[i];
-
-			output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
-cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
-		}
-		output.export_result_append();
-
-		utilization += steps[0];
-		
-
-
+	SchedTestBase *schedTest = STFactory.createSchedTest(test_name, taskset, processorset, resourceset);
+	if(NULL == schedTest)
+	{
+		cout<<"Incorrect test name."<<endl;
+		return -1;
 	}
-	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < _EPS);
+
+	if(schedTest->is_schedulable())
+	{
+		cout<<test_name<<'\t'<<1<<endl;
+	}
+	else
+		cout<<test_name<<'\t'<<0<<endl;
+/*
+	for(uint i = 0; i < test_attributes.size(); i++)
+	{
+		fraction_t ratio(success[i], exp[i]);
+		result.y = ratio.get_d();
+		result.exp_num = exp[i];
+		result.success_num = success[i];
+
+		output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
+cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
+	}
+	//output.export_result_append();
+
+	//utilization += steps[0];
 
 	time(&end);
 	cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
@@ -217,7 +190,7 @@ cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[
 	output.export_csv();
 
 	output.Export(PNG|EPS|SVG|TGA|JSON);
-
+*/
 	return 0;
 }
 
