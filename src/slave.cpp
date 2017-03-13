@@ -37,7 +37,7 @@ int main(int argc,char** argv)
 	SchedTestFactory STFactory;
 
 	XML::LoadFile("config.xml");
-
+/*
 	if(0 == access(string("results").data(), 0))
 		printf("results folder exsists.\n");
 	else
@@ -48,7 +48,7 @@ int main(int argc,char** argv)
 		else
 			return 0;
 	}
-
+*/
 	//scheduling parameter
 	XML::get_method(&test_attributes);
 	exp_times = XML::get_experiment_times();
@@ -122,7 +122,7 @@ int main(int argc,char** argv)
 	parameters.max_para_job = max_para_jobs[0];
 	parameters.max_cond_branch = max_cond_branches[0];
 	
-	Output output(parameters);
+//	Output output(parameters);
 
 	//output.export_table_head();
 
@@ -135,31 +135,36 @@ int main(int argc,char** argv)
 	double utilization;
 	string test_name;
 
-	cin>>utilization>>test_name;
+	
 
-	TaskSet taskset = TaskSet();
-	ProcessorSet processorset = ProcessorSet(parameters);
-	ResourceSet resourceset = ResourceSet();
-	resource_gen(&resourceset, parameters);
-	tast_gen(taskset, resourceset, parameters, utilization);
-
-	taskset.init();
-	processorset.init();	
-	resourceset.init();
-
-	SchedTestBase *schedTest = STFactory.createSchedTest(test_name, taskset, processorset, resourceset);
-	if(NULL == schedTest)
+	while(cin>>test_name>>utilization)
 	{
-		cout<<"Incorrect test name."<<endl;
-		return -1;
+		TaskSet taskset = TaskSet();
+		ProcessorSet processorset = ProcessorSet(parameters);
+		ResourceSet resourceset = ResourceSet();
+		resource_gen(&resourceset, parameters);
+		tast_gen(taskset, resourceset, parameters, utilization);
+
+		taskset.init();
+		processorset.init();	
+		resourceset.init();
+
+		SchedTestBase *schedTest = STFactory.createSchedTest(test_name, taskset, processorset, resourceset);
+		if(NULL == schedTest)
+		{
+			cout<<"Incorrect test name."<<endl;
+			return -1;
+		}
+
+		if(schedTest->is_schedulable())
+		{
+			cout<<test_name<<'\t'<<utilization<<'\t'<<1<<endl;
+		}
+		else
+			cout<<test_name<<'\t'<<utilization<<'\t'<<0<<endl;
 	}
 
-	if(schedTest->is_schedulable())
-	{
-		cout<<test_name<<'\t'<<1<<endl;
-	}
-	else
-		cout<<test_name<<'\t'<<0<<endl;
+	
 /*
 	for(uint i = 0; i < test_attributes.size(); i++)
 	{

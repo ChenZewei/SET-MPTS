@@ -34,12 +34,11 @@
 		<data REMARK="">ILP-RTA-PFP-spinlock</data>
 		<data REMARK="">RTA-PFP-GS</data>
 <!-->	
-		<data REMARK="">LP-RTA-GFP-PIP</data>
-		<data REMARK="">LP-RTA-GFP-FMLP</data>
-		<data REMARK="">LP-RTA-PFP-DPCP</data>
-		<data REMARK="">LP-RTA-PFP-MPCP</data>
+		<data REMARK="">RTA-GFP-native</data>
+		<data REMARK="">RTA-GFP-BC</data>
+		<data REMARK="">RTA-GFP-NG</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>1</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>

@@ -43,7 +43,7 @@ int main(int argc,char** argv)
 	SchedTestFactory STFactory;
 
 	XML::LoadFile("config.xml");
-
+/*
 	if(0 == access(string("results").data(), 0))
 		printf("results folder exsists.\n");
 	else
@@ -54,7 +54,7 @@ int main(int argc,char** argv)
 		else
 			return 0;
 	}
-
+*/
 	//scheduling parameter
 	XML::get_method(&test_attributes);
 	exp_times = XML::get_experiment_times();
@@ -128,7 +128,7 @@ int main(int argc,char** argv)
 	parameters.max_para_job = max_para_jobs[0];
 	parameters.max_cond_branch = max_cond_branches[0];
 	
-	Output output(parameters);
+//	Output output(parameters);
 
 	//output.export_table_head();
 
@@ -139,12 +139,12 @@ int main(int argc,char** argv)
 	
 	start = time(NULL);
 
-cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
+//cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
 	do
 	{	
 		Result result;
-cout<<"Utilization:"<<utilization<<endl;
+//cout<<"Utilization:"<<utilization<<endl;
 		vector<int> success;
 		vector<int> exp;
 		for(uint i = 0; i < test_attributes.size(); i++)
@@ -154,41 +154,18 @@ cout<<"Utilization:"<<utilization<<endl;
 		}
 		for(int i = 0; i < exp_times; i++)
 		{
-cout<<".";
-cout<<flush;
+//cout<<".";
+//cout<<flush;
 
-	    	TaskSet taskset = TaskSet();
-			ProcessorSet processorset = ProcessorSet(parameters);
-			ResourceSet resourceset = ResourceSet();
-			resource_gen(&resourceset, parameters);
-			tast_gen(taskset, resourceset, parameters, utilization);
 
 			for(uint j = 0; j < parameters.get_method_num(); j++)
 			{
-				taskset.init();
-				processorset.init();	
-				resourceset.init();
-				exp[j]++;
-
-				SchedTestBase *schedTest = STFactory.createSchedTest(test_attributes[j].test_name, taskset, processorset, resourceset);
-				if(NULL == schedTest)
-				{
-					cout<<"Incorrect test name."<<endl;
-					return -1;
-				}
-
-				if(schedTest->is_schedulable())
-				{
-					success[j]++;
-				}
-				
-				delete(schedTest);
-
+				cout<<test_attributes[j].test_name<<"\t"<<utilization<<endl;
 			}
-			//result.x = taskset.get_utilization_sum().get_d();
-			result.x = utilization;
+
 		}
-cout<<endl;
+//cout<<endl;
+/*
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp[i]);
@@ -196,11 +173,11 @@ cout<<endl;
 			result.exp_num = exp[i];
 			result.success_num = success[i];
 
-			output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
-cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
+			//output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
+//cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
 		}
 		output.export_result_append();
-
+*/
 		utilization += steps[0];
 		
 
@@ -209,16 +186,16 @@ cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < _EPS);
 
 	time(&end);
-	cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
+//	cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
 
 	ulong gap = difftime(end, start);
 	uint hour = gap/3600;
 	uint min = (gap%3600)/60;
 	uint sec = (gap%3600)%60;
 
-	cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
+//	cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
 
-	XML::SaveConfig((output.get_path() + "config.xml").data());
+//	XML::SaveConfig((output.get_path() + "config.xml").data());
 /*
 	output.export_csv();
 
