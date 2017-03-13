@@ -9,6 +9,7 @@
 //Test Method
 #define UTI_BOUND	0
 #define RTA 		1
+#define NC			2	//Necessary Condition
 
 //Scheduling Method
 #define GLOBAL		0
