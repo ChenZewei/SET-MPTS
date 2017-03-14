@@ -34,10 +34,7 @@
 		<data REMARK="">ILP-RTA-PFP-spinlock</data>
 		<data REMARK="">RTA-PFP-GS</data>
 <!-->	
-		<data REMARK="">LP-RTA-GFP-PIP</data>
-		<data REMARK="">LP-RTA-GFP-FMLP</data>
-		<data REMARK="">LP-RTA-PFP-DPCP</data>
-		<data REMARK="">LP-RTA-PFP-MPCP</data>
+		<data REMARK="">NC-GEDF-VPR</data>
 	</schedulability_test>
 	<experiment_times>1000</experiment_times>
 	<output>
@@ -78,10 +75,10 @@
 		<data>4</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>100</data>
+		<data>1</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.5</data>
+		<data>0.25</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>
