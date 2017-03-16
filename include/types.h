@@ -110,6 +110,7 @@ typedef struct
 	string locking_protocol;
 	string test_name;
 	string remark;
+	string rename;
 }Test_Attribute;
 
 typedef vector<int> Int_Set;

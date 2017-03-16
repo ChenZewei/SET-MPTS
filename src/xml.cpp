@@ -26,14 +26,19 @@ void XML::get_method(Test_Attribute_Set *t_set)
 	while(subtitle)
 	{
 		content = subtitle->GetText();
-cout<<content<<endl;
+//cout<<content<<endl;
 		Test_Attribute ta;
 		int test_type = subtitle->IntAttribute("TEST_TYPE");
 		string remark;
+		string rename;
 		if(NULL == subtitle->Attribute("REMARK"))
 			remark = "";
 		else
 			remark = subtitle->Attribute("REMARK");
+		if(NULL == subtitle->Attribute("RENAME"))
+			rename = "";
+		else
+			rename = subtitle->Attribute("RENAME");
 		int transform = 0;
 		if(0 == strcmp(content,"P-EDF"))
 		{
@@ -95,6 +100,7 @@ cout<<content<<endl;
 		ta.test_type = test_type;
 		ta.test_name = content;
 		ta.remark = remark;
+		ta.rename = rename;
 		t_set->push_back(ta);
 //		i_set->push_back(transform);
 		subtitle = subtitle->NextSiblingElement();
