@@ -1,4 +1,8 @@
-#include "../include/processors.h"
+#include "processors.h"
+#include "tasks.h"
+#include "resources.h"
+#include "param.h"
+#include "sort.h"
 
 ///////////////////////////Processor/////////////////////////////
 
@@ -7,8 +11,15 @@ Processor::Processor(uint id, fraction_t speedfactor)
 	processor_id = id;
 	speedfactor = speedfactor;
 	utilization = 0;
+	resource_utilization = 0;
 	density = 0;
 	tryed_assign = false;
+}
+
+Processor::~Processor()
+{
+	tQueue.clear();
+	rQueue.clear();
 }
 
 uint Processor::get_processor_id() const
@@ -31,6 +42,12 @@ fraction_t Processor::get_density() const
 	return density;
 }
 
+
+fraction_t Processor::get_resource_utilization() const
+{
+	return resource_utilization;
+}
+
 bool Processor::get_tryed_assign() const
 {
 	return tryed_assign;
@@ -38,29 +55,58 @@ bool Processor::get_tryed_assign() const
 
 TaskQueue& Processor::get_taskqueue()
 {
-	return queue;
+	return tQueue;
 }
 
-bool Processor::add_task(Task* task)
+bool Processor::add_task(void* taskptr)
 {
-	if(1 < utilization + task->get_utilization())
+	if(1 < utilization + ((Task*)taskptr)->get_utilization())
 		return false;
-	queue.push_back(task);
-	utilization += task->get_utilization();
-	density += task->get_density();
+	tQueue.push_back(taskptr);
+	utilization += ((Task*)taskptr)->get_utilization();
+	density += ((Task*)taskptr)->get_density();
 	return true;	
 }
 
-bool Processor::remove_task(Task* task)
+bool Processor::remove_task(void* taskptr)
 {
-	list<Task*>::iterator it = queue.begin();
-	for(uint i = 0; it != queue.end(); it++, i++)
+	TaskQueue::iterator it = tQueue.begin();
+	for(uint i = 0; it != tQueue.end(); it++, i++)
 	{
-		if(task == *it)
+		if(taskptr == *it)
 		{
-			queue.remove(*it);
-			utilization -= task->get_utilization();
-			density -= task->get_density();
+			tQueue.remove(*it);
+			utilization -= ((Task*)taskptr)->get_utilization();
+			density -= ((Task*)taskptr)->get_density();
+			return true;
+		}
+	}
+	return false;
+}
+
+
+ResourceQueue& Processor::get_resourcequeue()
+{
+	return rQueue;
+}
+
+bool Processor::add_resource(void* resourceptr)
+{
+	if(1 < resource_utilization + ((Resource*)resourceptr)->get_utilization())
+			return false;
+		rQueue.push_back(resourceptr);
+		resource_utilization += ((Resource*)resourceptr)->get_utilization();
+		return true;
+}
+bool Processor::remove_resource(void* resourceptr)
+{
+	ResourceQueue::iterator it = rQueue.begin();
+	for(uint i = 0; it != tQueue.end(); it++, i++)
+	{
+		if(resourceptr == *it)
+		{
+			rQueue.remove(*it);
+			resource_utilization -= ((Resource*)resourceptr)->get_utilization();
 			return true;
 		}
 	}
@@ -69,12 +115,16 @@ bool Processor::remove_task(Task* task)
 
 void Processor::init()
 {
-	queue.clear();
 	utilization = 0;
+	resource_utilization = 0;
 	density = 0;
 	tryed_assign = false;
+	tQueue.clear();
+	rQueue.clear();
 }
 ///////////////////////////ProcessorSet/////////////////////////////
+
+ProcessorSet::ProcessorSet() {}
 
 ProcessorSet::ProcessorSet(Param param)//for identical multiprocessor platform
 {
@@ -97,3 +147,43 @@ void ProcessorSet::init()
 	for(uint i = 0; i < processors.size(); i++)
 		processors[i].init();
 }
+
+void ProcessorSet::sort_by_task_utilization(uint dir)
+{
+	switch(dir)
+	{
+		case INCREASE://For worst fit
+			sort(processors.begin(), processors.end(), task_utilization_increase<Processor>);
+			break;
+		case DECREASE://For best fit
+			sort(processors.begin(), processors.end(), task_utilization_decrease<Processor>);
+			break;
+		default:
+			sort(processors.begin(), processors.end(), task_utilization_increase<Processor>);
+			break;
+	}
+}
+
+void ProcessorSet::sort_by_resource_utilization(uint dir)
+{
+	switch(dir)
+	{
+		case INCREASE://For worst fit
+			sort(processors.begin(), processors.end(), resource_utilization_increase<Processor>);
+			break;
+		case DECREASE://For best fit
+			sort(processors.begin(), processors.end(), resource_utilization_decrease<Processor>);
+			break;
+		default:
+			sort(processors.begin(), processors.end(), resource_utilization_increase<Processor>);
+			break;
+	}
+}
+
+
+
+
+
+
+
+

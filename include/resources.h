@@ -1,32 +1,42 @@
 #ifndef RESOURCES_H
 #define RESOURCES_H
-#include <vector>
-#include <list>
+
 #include "types.h"
-#include "processors.h"
-#include "param.h"
 
 using namespace std;
 
-//typedef vector<uint> Request_Tasks;
+class Task;
+class TaskSet;
+class DAG_Task;
+class DAG_TaskSet;
+class Processor;
+class ProcessorSet;
+class Param;
+class Random_Gen;
+
 class Resource
 {
 	private:
 		uint resource_id;
 		uint locality;
+		fraction_t utilization;
 		bool global_resource;
 		bool processor_local_resource;
 		//Request_Tasks tasks;
 		TaskQueue queue;
 	public:
-		Resource(uint id, uint locality = 0, bool global_resource = false, bool processor_local_resource = false);
+		Resource(uint id, uint locality = MAX_INT, bool global_resource = false, bool processor_local_resource = false);
+		~Resource();
+		void init();
 		uint get_resource_id() const;
+		void set_locality(uint locality);
 		uint get_locality() const;
-		bool is_global_resource() const;
+		fraction_t get_utilization() const;
+		bool is_global_resource();
 		bool is_processor_local_resource() const;
 		//Request_Tasks get_tasks() const;
 		TaskQueue& get_taskqueue();
-		void add_task(Task* task);
+		void add_task(void* taskptr);
 		uint get_ceiling();
 };
 
@@ -35,17 +45,26 @@ typedef vector<Resource> Resources;
 class ResourceSet
 {
 	private:
-		Resources resources;
+		vector<Resource> resources;
 	public:
 		ResourceSet();
+		void init();
 		void add_resource();
 		uint size() const;
 		Resources& get_resources();
-		const uint& get_resourceset_size() const;
-		void add_task(uint resource_id, Task* task);
+		uint get_resourceset_size() const;
+		void add_task(uint resource_id, void* taskptr);
+		void sort_by_utilization();
 };
 
 void resource_gen(ResourceSet *resourceset, Param param);
+
+/*
+ * Using next fit allocation
+ */
+void resource_alloc(ResourceSet& resources, uint p_num);
+
+
 
 #endif
 

@@ -22,10 +22,22 @@ class Param
 		uint exp_times;
 		//resource parameters
 		int resource_num;
+		int mcsn;
 		int rrn;
 		double rrp;
 		double tlf;
 		Range rrr;
+		//graph task model parameters
+		Range job_num_range;
+		Range arc_num_range;
+		bool is_cyclic;
+		int max_indegree;
+		int max_outdegree;
+		double para_prob;
+		double cond_prob;
+		double arc_density;
+		int max_para_job;
+		int max_cond_branch;
 	
 	public:
 		void set_lambda(int lambda);
@@ -55,6 +67,17 @@ class Param
 		double get_total_length_factor() const;
 		void set_request_range(Range rrr);
 		Range get_request_range() const;
+
+		void set_job_num_range(Range job_num_range);
+		Range get_job_num_range() const;
+		void set_arc_num_range(Range arc_num_range);
+		Range get_arc_num_range() const;
+		void set_is_cyclic(bool is_cyclic);
+		bool get_is_cyclic() const;
+		void set_max_indegree(int max_indegree);
+		int get_max_indegree() const;
+		void set_max_outdegree(int max_outdegree);
+		int get_ax_outdegree() const;
 		
 		uint get_method_num();
 		int get_test_method(uint index);

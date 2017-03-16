@@ -5,6 +5,7 @@
 #include <iostream>
 #include "tinyxml2.h"
 #include "types.h"
+#include "string.h"
 
 using namespace tinyxml2;
 using namespace std;
@@ -19,6 +20,8 @@ class XML
 		XML();
 		
 		static void LoadFile(const char* path);		
+
+		static void SaveConfig(const char* path);
 		
 		static void get_method(Test_Attribute_Set *t_set);
 
@@ -49,6 +52,10 @@ class XML
 		static void get_resource_request_range(Range_Set *r_set);
 
 		static void get_total_len_factor(Double_Set *d_set);
+
+		//output
+
+		static void get_output(Int_Set *i_set);
 
 		//defalut
 

@@ -120,10 +120,10 @@ ulong transitive_preemption(TaskSet& taskset, ProcessorSet& processorset, Resour
 	Resource& resource = resourceset.get_resources()[r_id];
 	uint ceiling_k = resource.get_ceiling();
 	ulong sum = 0;
-	list<Task*>::iterator it = tq.begin();
+	list<void*>::iterator it = tq.begin();
 	for(uint j = 0; it != tq.end(); it++, j++)
 	{
-		Task* task_j = *it;
+		Task* task_j = (Task*)*it;
 		if(t_id == task_j->get_id())
 			continue;
 		Resource_Requests& rr =  task_j->get_requests();
@@ -156,11 +156,11 @@ ulong DLB(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset
 
 	ulong max_length = 0;
 
-	list<Task*>::iterator it = tq.begin();
+	list<void*>::iterator it = tq.begin();
 
 	for(uint j = 0; it != tq.end(); it++, j++)
 	{
-		Task* task_j = *it;
+		Task* task_j = (Task*)*it;
 		if(t_id >= task_j->get_id())
 			continue;
 		

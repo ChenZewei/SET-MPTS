@@ -6,9 +6,17 @@
 #include "types.h"
 #include "pfp_algorithms.h"
 #include "rta_gfp.h"
+#include "dag_gedf.h"
+#include "lp_gfp.h"
+#include "ro_pfp.h"
+#include "ilp_spinlock.h"
+#include "gedf_non_preempt.h"
+#include "sched_test_base.h"
+#include "pfp_gs.h"
 
 bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& resourceset, uint TEST_METHOD, uint TEST_TYPE, uint ITER_BLOCKING)
 {
+//cout<<"TEST METHOD:"<<TEST_METHOD<<endl;
 	bool schedulable;
 	switch(TEST_METHOD)
 	{
@@ -22,16 +30,38 @@ bool is_schedulable(TaskSet& taskset, ProcessorSet& processorset, ResourceSet& r
 			schedulable = is_bcl_edf_schedulable(taskset, processorset);
 			break;
 		case WF_DM:
-			schedulable = is_worst_fit_dm_schedulable(taskset, processorset, resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
+			schedulable = is_worst_fit_dm_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
 			break;
 		case WF_EDF:
-			schedulable = is_worst_fit_edf_schedulable(taskset, processorset, resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
+			schedulable = is_worst_fit_edf_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
 			break;
 		case RTA_GFP:
 			schedulable = is_gfp_rta_schedulable(taskset, processorset, TEST_TYPE);
 			break;
 		case FF_DM:
-			schedulable = is_first_fit_dm_schedulable(taskset, processorset, resourceset, processorset.get_processor_num(), TEST_TYPE, ITER_BLOCKING);
+			schedulable = is_first_fit_dm_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
+			break;
+		case LP_PFP://7
+			taskset.RM_Order();
+			schedulable = is_worst_fit_pfp_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
+			break;
+		case LP_GFP://8
+			taskset.RM_Order();
+			schedulable = is_lp_gfp_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
+			break;
+		case RO_PFP:
+			schedulable = is_ro_pfp_schedulable(taskset, processorset, resourceset, TEST_TYPE, ITER_BLOCKING);
+			break;
+		case ILP_SPINLOCK:
+			schedulable = is_ILP_SpinLock_schedulable(taskset, processorset, resourceset);
+			break;
+		case GEDF_NON_PREEMPT:
+			taskset.RM_Order();
+			schedulable = is_gedf_non_preempt_schedulable(taskset, processorset, resourceset);
+			break;
+		case PFP_GS:
+			taskset.DM_Order();
+			schedulable = is_pfp_gs_schedulable(taskset, processorset, resourceset);
 			break;
 		default:
 			schedulable = is_bcl_ftp_schedulable(taskset, processorset);

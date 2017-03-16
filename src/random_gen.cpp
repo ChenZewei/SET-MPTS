@@ -15,6 +15,12 @@ int Random_Gen::uniform_integral_gen(int min, int max)
 	return distribution(generator);
 }
 
+ulong Random_Gen::uniform_ulong_gen(ulong min, ulong max)
+{
+	uniform_int_distribution<ulong> distribution(min, max);
+	return distribution(generator);
+}
+
 double Random_Gen::uniform_real_gen(double min, double max)
 {
 	uniform_real_distribution<double> distribution(min, max);

@@ -12,6 +12,11 @@ void XML::LoadFile(const char* path)
 	config.LoadFile(path);
 }
 
+void XML::SaveConfig(const char* path)
+{
+	config.SaveFile(path);
+}
+
 void XML::get_method(Test_Attribute_Set *t_set)
 {
 	const char* content;
@@ -21,13 +26,19 @@ void XML::get_method(Test_Attribute_Set *t_set)
 	while(subtitle)
 	{
 		content = subtitle->GetText();
+//cout<<content<<endl;
 		Test_Attribute ta;
 		int test_type = subtitle->IntAttribute("TEST_TYPE");
 		string remark;
+		string rename;
 		if(NULL == subtitle->Attribute("REMARK"))
 			remark = "";
 		else
 			remark = subtitle->Attribute("REMARK");
+		if(NULL == subtitle->Attribute("RENAME"))
+			rename = "";
+		else
+			rename = subtitle->Attribute("RENAME");
 		int transform = 0;
 		if(0 == strcmp(content,"P-EDF"))
 		{
@@ -57,13 +68,39 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		{
 			transform = 6;
 		}
+		else if(0 == strcmp(content,"LP-PFP"))
+		{
+			transform = 7;
+		}
+		else if(0 == strcmp(content,"LP-GFP"))
+		{
+			transform = 8;
+		}
+		else if(0 == strcmp(content,"RO-PFP"))
+		{
+			transform = 9;
+		}
+		else if(0 == strcmp(content,"ILP-SPINLOCK"))
+		{
+			transform = 10;
+		}
+		else if(0 == strcmp(content,"GEDF-NON-PREEMPT"))
+		{
+			transform = 11;
+		}
+		else if(0 == strcmp(content,"PFP-GS"))
+		{
+			transform = 12;
+		}
 		else
 		{
 			transform = 0;
 		}
 		ta.test_method = transform;
 		ta.test_type = test_type;
+		ta.test_name = content;
 		ta.remark = remark;
+		ta.rename = rename;
 		t_set->push_back(ta);
 //		i_set->push_back(transform);
 		subtitle = subtitle->NextSiblingElement();
