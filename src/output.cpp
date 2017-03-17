@@ -216,6 +216,18 @@ void Output::export_result_append()
 	output_file.close();
 }
 
+
+void Output::append2file(string flie_name, string buffer)
+{
+	string file_name = path + flie_name;
+
+	ofstream output_file(file_name, ofstream::app);
+
+	output_file<<buffer<<"\n";
+	output_file.flush();
+	output_file.close();
+}
+
 //export to graph
 void Output::SetGraphSize(int width, int height)
 {

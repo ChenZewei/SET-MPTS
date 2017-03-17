@@ -3,11 +3,13 @@
 
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <unistd.h>
 #include "types.h"
 #include "mgl_chart.h"
 #include "param.h"
+
+class Param;
+class Chart;
 
 class Output
 {
@@ -33,6 +35,7 @@ class Output
 		void export_csv();
 		void export_table_head();
 		void export_result_append();
+		void append2file(string flie_name, string buffer);
 
 		//export to graph
 		void SetGraphSize(int width, int height);

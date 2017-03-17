@@ -189,6 +189,17 @@ cout<<endl;
 			result.y = ratio.get_d();
 			result.exp_num = exp[i];
 			result.success_num = success[i];
+			
+			stringstream buf;
+
+			if(0 == strcmp(test_attributes[i].rename.data(),""))
+				buf<<test_attributes[i].test_name;
+			else
+				buf<<test_attributes[i].rename;
+
+			buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
+
+			output.append2file("result-logs.csv", buf.str());
 
 			output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
 cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
