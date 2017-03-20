@@ -4,6 +4,8 @@
 #include "param.h"
 #include "random_gen.h"
 #include "sort.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 /////////////////////////////Resource///////////////////////////////
 Resource::Resource(uint id, uint locality, bool global_resource, bool processor_local_resource)

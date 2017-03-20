@@ -1,4 +1,6 @@
 #include "nc_gedf_vpr.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 NC_GEDF_VPR::NC_GEDF_VPR(): GlobalSched(false, NC, EDF, NONE, "", "vpr") {}
 

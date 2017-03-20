@@ -1,4 +1,6 @@
 #include "rta_gfp_native.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_GFP_native::RTA_GFP_native(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "native") {}
 

@@ -1,6 +1,7 @@
 #include "rta_pfp_ro.h"
-#include "types.h"
 #include <assert.h>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_PFP_RO::RTA_PFP_RO():PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented") {}
 

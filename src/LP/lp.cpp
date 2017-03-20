@@ -1,4 +1,6 @@
 #include "lp.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ////////////////////LinearExpression////////////////////
 Terms& LinearExpression::get_terms()

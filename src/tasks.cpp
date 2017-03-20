@@ -4,6 +4,8 @@
 #include "sort.h"
 #include "random_gen.h"
 #include "param.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ////////////////////////////Request//////////////////////////////
 

@@ -1,4 +1,6 @@
 #include "rta_gfp_ng.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_GFP_NG::RTA_GFP_NG(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "NG") {}
 

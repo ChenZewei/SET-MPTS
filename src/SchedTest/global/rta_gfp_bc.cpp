@@ -2,6 +2,8 @@
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_GFP_BC::RTA_GFP_BC(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "BC") {}
 

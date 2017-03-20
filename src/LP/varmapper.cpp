@@ -2,6 +2,8 @@
 #include <sstream>
 #include <limits.h>
 #include <iostream>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 using namespace std;
 

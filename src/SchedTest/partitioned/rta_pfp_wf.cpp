@@ -1,4 +1,6 @@
 #include "rta_pfp_wf.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_PFP_WF::RTA_PFP_WF():PartitionedSched(false, RTA, FIX_PRIORITY, NONE, "", "NONE") {}
 

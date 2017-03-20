@@ -1,4 +1,6 @@
 #include "rta_pfp_wf_spinlock.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_PFP_WF_spinlock::RTA_PFP_WF_spinlock():PartitionedSched(false, RTA, FIX_PRIORITY, SPIN, "", "spinlock") {}
 

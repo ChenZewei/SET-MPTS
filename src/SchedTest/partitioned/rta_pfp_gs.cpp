@@ -3,6 +3,8 @@
 #include "processors.h"
 #include "resources.h"
 #include "assert.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_PFP_GS::RTA_PFP_GS(): PartitionedSched(false, RTA, FIX_PRIORITY, SPIN, "", "spinlock") {}
 

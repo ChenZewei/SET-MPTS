@@ -3,6 +3,8 @@
 #include "resources.h"
 #include "param.h"
 #include "sort.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ///////////////////////////Processor/////////////////////////////
 

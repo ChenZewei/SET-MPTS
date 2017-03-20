@@ -2,6 +2,8 @@
 #include "solution.h"
 #include <lp.h>
 #include <sstream>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ////////////////////MPCPMapper////////////////////
 uint64_t MPCPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type)

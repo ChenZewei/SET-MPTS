@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iostream>
 #include <assert.h>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ////////////////////PIPMapper////////////////////
 uint64_t PIPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type)
