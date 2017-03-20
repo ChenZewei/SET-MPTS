@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <unistd.h>
 #include <ctime>
+//#include <gtkmm.h>
 //#include "schedulability_test.h"
 #include "tasks.h"
 #include "processors.h"
@@ -17,15 +18,22 @@
 #include "random_gen.h"
 #include "test_model.h"
 #include "sched_test_factory.h"
+//#include "GTKMM_window.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
-
 
 using namespace std;
 
 int main(int argc,char** argv)
 {	
+
+//	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
+
+//	GTKMMWindow window;
+
+//	app->run(window);
+
 	Int_Set lambdas, p_num, methods;
 	Double_Set steps;
 	Range_Set p_ranges, u_ranges, d_ranges;

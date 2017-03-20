@@ -4,6 +4,7 @@ CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES) -fpermissive
 CXXFLAGS      = -pipe -O2 -Wall -W -g -D_REENTRANT -fPIE $(DEFINES) -std=c++11 -std=gnu++11 -fext-numeric-literals -fpermissive
+GTKFLAGS	  =	`pkg-config gtkmm-3.0 --cflags --libs`
 INCPATH       = -I. -I../include -I../include/SchedTest -I../include/SchedTest/global -I../include/SchedTest/global/lp -I../include/SchedTest/partitioned -I../include/SchedTest/partitioned/lp -I../include/SchedTest/lp -I../include/QCustomPlot -I../include/mathGL -I../include/LP -I../include/SchedTest/blocking/lp
 LINK          = g++
 LFLAGS        = -Wl,-O1
@@ -49,6 +50,9 @@ param.o:param.cpp
 
 output.o:output.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c output.cpp $(LIBS)
+
+GTKMM_window.o:GTKMM_window.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c GTKMM_window.cpp $(LIBS) $(GTKFLAGS)
 
 lp.o:LP/lp.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c LP/lp.cpp $(LIBS)
