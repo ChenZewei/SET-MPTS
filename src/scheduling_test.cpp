@@ -18,7 +18,7 @@
 #include "random_gen.h"
 #include "test_model.h"
 #include "sched_test_factory.h"
-//#include "GTKMM_window.h"
+#include "GTKMM_window.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
@@ -28,11 +28,11 @@ using namespace std;
 int main(int argc,char** argv)
 {	
 
-//	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
+	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
 
-//	GTKMMWindow window;
+	GTKMMWindow window;
 
-//	app->run(window);
+	app->run(window);
 
 	Int_Set lambdas, p_num, methods;
 	Double_Set steps;
