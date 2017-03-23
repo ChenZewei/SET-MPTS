@@ -11,7 +11,7 @@
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
-#include "mgl_chart.h"
+//#include "mgl_chart.h"
 #include "xml.h"
 #include "param.h"
 #include "output.h"
@@ -22,6 +22,8 @@
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
+
+#define typeof(x) __typeof(x)
 
 using namespace std;
 
@@ -34,13 +36,16 @@ int main(int argc,char** argv)
 
 	app->run(window);
 
+	int test_int;
+
+	typeof (test_int) test_int2 = 1;
+
 	Int_Set lambdas, p_num, methods;
 	Double_Set steps;
 	Range_Set p_ranges, u_ranges, d_ranges;
 	Test_Attribute_Set test_attributes;
 	uint exp_times;
 	Result_Set results[MAX_METHOD];
-	Chart chart;
 	Param parameters;
 	SchedTestFactory STFactory;
 
