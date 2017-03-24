@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <unistd.h>
 #include <ctime>
+#include <pthread.h>
 //#include <gtkmm.h>
 //#include "schedulability_test.h"
 #include "tasks.h"
@@ -27,18 +28,24 @@
 
 using namespace std;
 
-int main(int argc,char** argv)
-{	
+void result_window(void *ptr)
+{
+	char** argv = ptr;
+	int argc = 1;
 
 	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
 
 	GTKMMWindow window;
 
 	app->run(window);
+}
 
-	int test_int;
 
-	typeof (test_int) test_int2 = 1;
+int main(int argc,char** argv)
+{	
+	pthread_t id;
+
+	int ret = pthread_create(&id, NULL, (void *)result_window, argv);
 
 	Int_Set lambdas, p_num, methods;
 	Double_Set steps;
