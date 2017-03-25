@@ -1,4 +1,6 @@
 #include "mgl_chart.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 Chart::Chart()
 {
@@ -68,7 +70,7 @@ void Chart::AddData(string name, Result_Set r_set)
 }
 */
 
-void AddData(SchedResultSet srs)
+void Chart::AddData(SchedResultSet srs)
 {
 	this->srs = srs;
 }
@@ -108,14 +110,14 @@ void Chart::ExportLineChart(string path, const char* title, double min, double m
 			{
 
 				Result r = results->get_result_by_utilization(i);
-				if(r.exp_time == 0)
+				if(r.exp_num == 0)
 				{
 					c_data.data.a[j] = NAN;
 				}
 				else
 				{
-					double ratio = r.success_time;
-					ratio /= r.exp_time;
+					double ratio = r.success_num;
+					ratio /= r.exp_num;
 					c_data.data.a[j] = ratio;
 				}
 

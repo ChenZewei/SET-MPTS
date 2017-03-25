@@ -1,4 +1,6 @@
 #include "output.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 Output::Output(const char* path)
 {
@@ -40,10 +42,10 @@ string Output::get_path()
 	return path;
 }
 
-void Output::add_result(string test_name, double utilization, uint e_num, s_num)
+void Output::add_result(string test_name, double utilization, uint e_num, uint s_num)
 {
 	SchedResult& sr = srs.get_sched_result(test_name);
-	sr.insert-result(utilization, e_num, s_num);
+	sr.insert_result(utilization, e_num, s_num);
 }
 
 string Output::output_filename()
@@ -93,7 +95,7 @@ void Output::export_csv()
 	}
 */
 	
-	for(double i = param.u_range.min;  i - max < _EPS; i += param.step)
+	for(double i = param.u_range.min;  i - param.u_range.max < _EPS; i += param.step)
 	{
 		output_file<<i<<",";
 		foreach(srs.get_sched_result_set(), sched_result)
@@ -140,7 +142,7 @@ void Output::export_table_head()
 	output_file.close();
 }
 
-void Output::export_result_append(double utilization);
+void Output::export_result_append(double utilization)
 {
 	string file_name = path + "result-step-by-step.csv";
 	if(0 != access(file_name.data(), 0))
@@ -211,11 +213,12 @@ void Output::SetGraphQual(int quality)
 void Output::Export(int format)
 {
 	string temp, file_name = path + "result";
+/*
 	for(uint i = 0; i < get_sets_num(); i++)
 	{
 		chart.AddData(get_method_name(param.test_attributes[i]), result_sets[i]);
 	}
-
+*/
 	chart.AddData(srs);
 
 	if(0x0f & format)

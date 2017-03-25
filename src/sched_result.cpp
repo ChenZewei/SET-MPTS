@@ -1,4 +1,6 @@
 #include "sched_result.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 template <typename TaskModel>
 int increase_order(TaskModel t1, TaskModel t2)
@@ -26,8 +28,8 @@ void SchedResult::insert_result(double utilization, uint e_time, uint s_time)
 		if(abs(result->utilization - utilization) <= _EPS)
 		{
 			exist = true;
-			result->exp_time += e_time;
-			result->success_time += s_time;
+			result->exp_num += e_time;
+			result->success_num += s_time;
 			break;
 		}
 	}
@@ -36,8 +38,8 @@ void SchedResult::insert_result(double utilization, uint e_time, uint s_time)
 	{
 		Result temp;
 		temp.utilization = utilization;
-		temp.exp_time = e_time;
-		temp.success_time = s_time;
+		temp.exp_num = e_time;
+		temp.success_num = s_time;
 
 		results.push_back(temp);
 
@@ -54,8 +56,8 @@ Result SchedResult::get_result_by_utilization(double utilization)
 {
 	Result empty;
 	empty.utilization = 0;
-	empty.exp_time = 0;
-	empty.success_time = 0;
+	empty.exp_num = 0;
+	empty.success_num = 0;
 
 	foreach(results, result)
 	{

@@ -33,15 +33,15 @@ typedef struct
 	int argc;
 	char** argv;
 	GTKMMWindow window;
-}window_args;
+}Window_args;
 
 void result_window(void *ptr)
 {
-	Window_args win_args = *ptr;
+	Window_args *win_args = ptr;
 
-	auto app = Gtk::Application::create(win_args.argc, win_args.argv, "org.gtkmm.example");
+	auto app = Gtk::Application::create(win_args->argc, win_args->argv, "org.gtkmm.example");
 
-	app->run(win_args.window);
+	app->run(win_args->window);
 }
 
 
@@ -50,6 +50,7 @@ int main(int argc,char** argv)
 	Window_args win_args;
 	win_args.argc = argc;
 	win_args.argv = argv;
+	//win_args.window = GTKMMWindow();
 	pthread_t id;
 
 
@@ -216,9 +217,9 @@ cout<<endl;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp[i]);
-			result.ratio = ratio.get_d();
-			result.exp_num = exp[i];
-			result.success_num = success[i];
+			//result.ratio = ratio.get_d();
+			//result.exp_num = exp[i];
+			//result.success_num = success[i];
 
 			output.add_result(test_attributes[i].test_name, utilization, exp[i], success[i]);
 
@@ -235,7 +236,7 @@ cout<<endl;
 
 			output.append2file("result-logs.csv", buf.str());
 
-cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
+cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
 		}
 		output.export_result_append(utilization);
 
