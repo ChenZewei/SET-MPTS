@@ -19,8 +19,8 @@ MOVE          = mv -f
 MKDIR         = mkdir -p
 TARGET	      = SchedulingAnalysis
 
-SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o GTKMM_window.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_gedf_vpr.o  
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o output.o GTKMM_window.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_gedf_vpr.o  $(LFLAGS) $(LIBS) $(GTKMMFLAGS) $(GLIBMMGLAGS) -std=gnu++11
+SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o GTKMM_window.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_gedf_vpr.o  
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o GTKMM_window.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_gedf_vpr.o  $(LFLAGS) $(LIBS) $(GTKMMFLAGS) $(GLIBMMGLAGS) -std=gnu++11
 	
 scheduling_test.o:scheduling_test.cpp
 	$(CXX) $(GTKMMFLAGS) $(GLIBMMGLAGS) $(CXXFLAGS) $(INCPATH) -c scheduling_test.cpp $(LIBS)
@@ -48,6 +48,9 @@ xml.o:xml.cpp
 
 param.o:param.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c param.cpp $(LIBS)
+
+sched_result.o:sched_result.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c sched_result.cpp $(LIBS)
 
 output.o:output.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c output.cpp $(LIBS)

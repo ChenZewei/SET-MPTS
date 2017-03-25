@@ -28,24 +28,30 @@
 
 using namespace std;
 
+typedef struct
+{
+	int argc;
+	char** argv;
+	GTKMMWindow window;
+}window_args;
+
 void result_window(void *ptr)
 {
-	char** argv = ptr;
-	int argc = 1;
+	Window_args win_args = *ptr;
 
-	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
+	auto app = Gtk::Application::create(win_args.argc, win_args.argv, "org.gtkmm.example");
 
-	GTKMMWindow window;
-
-	app->run(window);
+	app->run(win_args.window);
 }
 
 
 int main(int argc,char** argv)
 {	
+	Window_args win_args;
+	win_args.argc = argc;
+	win_args.argv = argv;
 	pthread_t id;
 
-	int ret = pthread_create(&id, NULL, (void *)result_window, argv);
 
 	Int_Set lambdas, p_num, methods;
 	Double_Set steps;
@@ -144,6 +150,10 @@ int main(int argc,char** argv)
 	
 	Output output(parameters);
 
+	win_args.window.set_path(output.get_path());
+
+	int ret = pthread_create(&id, NULL, (void *)result_window, &win_args);
+
 	//output.export_table_head();
 
 	Random_Gen::uniform_integral_gen(0,10);
@@ -200,16 +210,20 @@ cout<<flush;
 
 			}
 			//result.x = taskset.get_utilization_sum().get_d();
-			result.x = utilization;
+			result.utilization = utilization;
 		}
 cout<<endl;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp[i]);
-			result.y = ratio.get_d();
+			result.ratio = ratio.get_d();
 			result.exp_num = exp[i];
 			result.success_num = success[i];
-			
+
+			output.add_result(test_attributes[i].test_name, utilization, exp[i], success[i]);
+
+			//output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
+
 			stringstream buf;
 
 			if(0 == strcmp(test_attributes[i].rename.data(),""))
@@ -221,10 +235,9 @@ cout<<endl;
 
 			output.append2file("result-logs.csv", buf.str());
 
-			output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
 cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
 		}
-		output.export_result_append();
+		output.export_result_append(utilization);
 
 		utilization += steps[0];
 		

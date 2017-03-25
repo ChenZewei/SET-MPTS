@@ -2,7 +2,7 @@
 
 GTKMMWindow::GTKMMWindow()
 {
-	path = "";
+	path = ".";
 	//refresh().connect(sigc::mem_fun((*this), &GTKMMWindow::reload));
 
 	/* Set some window properties */
