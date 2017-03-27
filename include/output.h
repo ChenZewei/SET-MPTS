@@ -35,6 +35,7 @@ class Output
 		string get_method_name(Test_Attribute ta);
 
 		//output to console
+		void proceeding();
 		void proceeding(string test_name, double utilization, uint e_num, uint s_num);
 		void finish();
 

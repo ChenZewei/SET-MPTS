@@ -13,18 +13,19 @@ class GTKMMWindow : public Gtk::Window
 	private:
 		string path;
 
+		//typedef sigc::signal<void> Signals;
+		
+		//void reload();
+
 	public:
 		GTKMMWindow();
 		virtual ~GTKMMWindow();
-
-		typedef sigc::signal<void, bool, int> Signals;
-		Signals refresh();
-
-		void reload();
+		//Signals refresh();
+		
 		void set_path(string path);
 
 	protected:
-		Signals refresh_signal;
+		//Signals refresh_signal;
 		//Child widgets:
 		Gtk::Frame m_Frame;
 		Gtk::Image m_Image;

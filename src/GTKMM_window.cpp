@@ -1,7 +1,9 @@
+#include <iostream>
 #include "GTKMM_window.h"
 
 GTKMMWindow::GTKMMWindow()
 {
+std::cout<<"Init window."<<endl;
 	path = ".";
 	//refresh().connect(sigc::mem_fun((*this), &GTKMMWindow::reload));
 

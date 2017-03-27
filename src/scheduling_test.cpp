@@ -19,7 +19,7 @@
 #include "random_gen.h"
 #include "test_model.h"
 #include "sched_test_factory.h"
-#include "GTKMM_window.h"
+//#include "GTKMM_window.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
@@ -27,12 +27,13 @@
 #define typeof(x) __typeof(x)
 
 using namespace std;
-
+/*
 typedef struct
 {
 	int argc;
 	char** argv;
-	GTKMMWindow window;
+	string path;
+//	GTKMMWindow window;
 }Window_args;
 
 void result_window(void *ptr)
@@ -40,19 +41,13 @@ void result_window(void *ptr)
 	Window_args *win_args = ptr;
 
 	auto app = Gtk::Application::create(win_args->argc, win_args->argv, "org.gtkmm.example");
-
-	app->run(win_args->window);
+	GTKMMWindow window;
+	app->run(window);
 }
-
+*/
 
 int main(int argc,char** argv)
 {	
-	Window_args win_args;
-	win_args.argc = argc;
-	win_args.argv = argv;
-	//win_args.window = GTKMMWindow();
-	pthread_t id;
-
 
 	Int_Set lambdas, p_num, methods;
 	Double_Set steps;
@@ -151,9 +146,6 @@ int main(int argc,char** argv)
 	
 	Output output(parameters);
 
-	win_args.window.set_path(output.get_path());
-
-	int ret = pthread_create(&id, NULL, (void *)result_window, &win_args);
 
 	//output.export_table_head();
 
@@ -169,7 +161,7 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 	do
 	{	
 		Result result;
-cout<<"Utilization:"<<utilization<<endl;
+//cout<<"Utilization:"<<utilization<<endl;
 		vector<int> success;
 		vector<int> exp;
 		for(uint i = 0; i < test_attributes.size(); i++)
@@ -179,8 +171,8 @@ cout<<"Utilization:"<<utilization<<endl;
 		}
 		for(int i = 0; i < exp_times; i++)
 		{
-cout<<".";
-cout<<flush;
+//cout<<".";
+//cout<<flush;
 
 	    	TaskSet taskset = TaskSet();
 			ProcessorSet processorset = ProcessorSet(parameters);
@@ -212,8 +204,9 @@ cout<<flush;
 			}
 			//result.x = taskset.get_utilization_sum().get_d();
 			result.utilization = utilization;
+			output.proceeding();
 		}
-cout<<endl;
+//cout<<endl;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp[i]);
@@ -236,10 +229,10 @@ cout<<endl;
 
 			output.append2file("result-logs.csv", buf.str());
 
-cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
+//cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
 		}
 		output.export_result_append(utilization);
-
+		output.Export(PNG);
 		utilization += steps[0];
 		
 
