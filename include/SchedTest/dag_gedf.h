@@ -14,7 +14,7 @@ typedef struct Work
 {
 	ulong time;
 	ulong workload;
-	bool operator <(const Work &a)const //排序并且去重复  
+	bool operator <(const Work &a)const //排序并且去重复
     {  
         if(time == a.time)  
         {  

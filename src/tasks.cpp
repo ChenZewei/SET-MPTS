@@ -578,6 +578,7 @@ DAG_Task::DAG_Task(	uint task_id,
 											deadline,
 											priority)
 {
+	this->task_id = task_id;
 	this->len = 0;
 	this->vol = vol;
 	if(0 == deadline)
@@ -1108,6 +1109,7 @@ DAG_TaskSet::DAG_TaskSet()
 
 void DAG_TaskSet::add_task(ResourceSet& resourceset, Param param, long wcet, long period, long deadline)
 {
+cout<<"task set size:"<<dag_tasks.size()<<endl;
 	uint task_id = dag_tasks.size();
 	dag_tasks.push_back(DAG_Task(	task_id,
 									resourceset,
