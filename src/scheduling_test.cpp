@@ -7,19 +7,15 @@
 #include <unistd.h>
 #include <ctime>
 #include <pthread.h>
-//#include <gtkmm.h>
-//#include "schedulability_test.h"
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
-//#include "mgl_chart.h"
 #include "xml.h"
 #include "param.h"
 #include "output.h"
 #include "random_gen.h"
 #include "test_model.h"
 #include "sched_test_factory.h"
-//#include "GTKMM_window.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
@@ -27,24 +23,7 @@
 #define typeof(x) __typeof(x)
 
 using namespace std;
-/*
-typedef struct
-{
-	int argc;
-	char** argv;
-	string path;
-//	GTKMMWindow window;
-}Window_args;
 
-void result_window(void *ptr)
-{
-	Window_args *win_args = ptr;
-
-	auto app = Gtk::Application::create(win_args->argc, win_args->argv, "org.gtkmm.example");
-	GTKMMWindow window;
-	app->run(window);
-}
-*/
 
 int main(int argc,char** argv)
 {	
@@ -146,9 +125,6 @@ int main(int argc,char** argv)
 	
 	Output output(parameters);
 
-
-	//output.export_table_head();
-
 	Random_Gen::uniform_integral_gen(0,10);
 	double utilization = u_ranges[0].min;
 
@@ -161,7 +137,7 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 	do
 	{	
 		Result result;
-//cout<<"Utilization:"<<utilization<<endl;
+cout<<"Utilization:"<<utilization<<endl;
 		vector<int> success;
 		vector<int> exp;
 		for(uint i = 0; i < test_attributes.size(); i++)
@@ -171,8 +147,8 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 		}
 		for(int i = 0; i < exp_times; i++)
 		{
-//cout<<".";
-//cout<<flush;
+cout<<".";
+cout<<flush;
 
 	    	TaskSet taskset = TaskSet();
 			ProcessorSet processorset = ProcessorSet(parameters);
@@ -202,21 +178,13 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 				delete(schedTest);
 
 			}
-			//result.x = taskset.get_utilization_sum().get_d();
 			result.utilization = utilization;
-			output.proceeding();
 		}
-//cout<<endl;
+cout<<endl;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp[i]);
-			//result.ratio = ratio.get_d();
-			//result.exp_num = exp[i];
-			//result.success_num = success[i];
-
 			output.add_result(test_attributes[i].test_name, utilization, exp[i], success[i]);
-
-			//output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
 
 			stringstream buf;
 
@@ -229,7 +197,7 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
 			output.append2file("result-logs.csv", buf.str());
 
-//cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
+cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
 		}
 		output.export_result_append(utilization);
 		output.Export(PNG);

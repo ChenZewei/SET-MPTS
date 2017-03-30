@@ -70,53 +70,6 @@ string Output::get_method_name(Test_Attribute ta)
 void Output::proceeding()
 {
 
-	stringstream buf;
-cout<<"\033[H";
-	
-	buf<<"Lambda:"<<param.lambda<<"\t";					
-	buf<<"processor number:"<<param.p_num<<"\t";
-	buf<<"step:"<<param.step<<"\t";
-	buf<<"utilization range:["<<param.u_range.min<<"-"<<param.u_range.max<<"]\t";
-	buf<<setprecision(0)<<"period range:["<<param.p_range.min<<"-"<<param.p_range.max<<"]\n"<<setprecision(3);
-	buf<<"Scheduling test method:\n";
-	for(uint i = 0; i < param.test_attributes.size(); i++)
-	{
-		buf<<get_method_name(param.test_attributes[i])<<"\t"<<"\t\t";
-	}
-	buf<<"\n";
-/*	
-	buf<<"Utilization\t";
-	for(uint i = 0; i < param.test_attributes.size(); i++)
-	{
-		buf<<"experiment times\tsuccess times\tsuccess ratio\t";
-	}
-	buf<<"\n";
-*/
-	{
-		double utilization = param.u_range.min;
-		for(; utilization - param.u_range.max < _EPS; utilization += param.step)
-		{
-			buf<<utilization<<"\t";
-			foreach(srs.get_sched_result_set(), sched_result)
-			{
-				uint e_num = sched_result->get_result_by_utilization(utilization).exp_num;
-				uint s_num = sched_result->get_result_by_utilization(utilization).success_num;
-				if(0 == e_num)
-					buf<<"\t\t\t";
-				else
-				{
-					double ratio = s_num;
-					ratio /= e_num;
-					buf<<e_num<<"\t";
-					buf<<s_num<<"\t";
-					buf<<ratio<<"\t";
-				}
-			}
-			buf<<"\n";
-		}
-	}
-	cout<<buf.str()<<endl;
-	//cout<<"\033[u";
 }
 
 void Output::proceeding(string test_name, double utilization, uint e_num, uint s_num)
