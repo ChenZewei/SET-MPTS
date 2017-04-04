@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <unistd.h>
 #include <ctime>
+#include "dag_gedf.h"
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
@@ -25,7 +26,13 @@ using namespace std;
 void config(Param &parameters);
 
 int main(int argc,char** argv)
-{	
+{
+	floating_t u = 0;
+
+	if(1 < argc)
+		u = floating_t(argv[1]);
+
+
 	Param parameters;
 	config(parameters);
 	Output output(parameters);
@@ -35,8 +42,9 @@ int main(int argc,char** argv)
 	ProcessorSet processorset = ProcessorSet(parameters);
 	ResourceSet resourceset = ResourceSet();
 	resource_gen(&resourceset, parameters);
-	dag_task_gen(tasks, resourceset, parameters, 0.2);
+	dag_task_gen(tasks, resourceset, parameters, u.get_d());
 
+/*
 	foreach(tasks.get_tasks(), task)
 	{
 		cout<<"/////////// task "<<task->get_id()<<" ///////////"<<endl;
@@ -48,6 +56,11 @@ int main(int argc,char** argv)
 		cout<<"utilization:"<<task->get_utilization()<<endl;
 		cout<<"density:"<<task->get_density()<<endl;
 	}
+*/
+	if(dag_schedulability_test(tasks, 4, 0.1))
+		cout<<"Schedulable!"<<endl;
+	else
+		cout<<"Unschedulable!"<<endl;
 	
 	return 0;
 }

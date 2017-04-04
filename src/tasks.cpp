@@ -1109,7 +1109,7 @@ DAG_TaskSet::DAG_TaskSet()
 
 void DAG_TaskSet::add_task(ResourceSet& resourceset, Param param, long wcet, long period, long deadline)
 {
-cout<<"task set size:"<<dag_tasks.size()<<endl;
+//cout<<"task set size:"<<dag_tasks.size()<<endl;
 	uint task_id = dag_tasks.size();
 	dag_tasks.push_back(DAG_Task(	task_id,
 									resourceset,
@@ -1123,7 +1123,7 @@ cout<<"task set size:"<<dag_tasks.size()<<endl;
 		utilization_max = get_task_by_id(task_id).get_utilization();
 	if(density_max < get_task_by_id(task_id).get_density())
 		density_max = get_task_by_id(task_id).get_density();
-	
+/*
 cout<<"<------------------->"<<endl;
 for(uint i = 0; i <= task_id; i++)
 {
@@ -1136,6 +1136,7 @@ cout<<"task"<<i<<":"<<endl;
 	}
 }
 cout<<"<------------------->"<<endl;
+*/
 }
 
 void DAG_TaskSet::add_task(DAG_Task dag_task)
@@ -1226,7 +1227,7 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double ut
 
 void dag_task_gen(DAG_TaskSet& dag_taskset, ResourceSet& resourceset, Param param, double utilization)
 {
-cout<<"DAG_Task generation, utilization:"<<utilization<<endl;
+//cout<<"DAG_Task generation, utilization:"<<utilization<<endl;
 	while(dag_taskset.get_utilization_sum() < utilization)//generate tasks
 	{
 		ulong period = Random_Gen::uniform_integral_gen(int(param.p_range.min),int(param.p_range.max));
@@ -1245,7 +1246,7 @@ cout<<"DAG_Task generation, utilization:"<<utilization<<endl;
 			if(deadline < wcet)
 				deadline = wcet;
 		}
-		cout<<"wcet:"<<wcet<<" deadline:"<<deadline<<" period:"<<period<<endl;
+//		cout<<"wcet:"<<wcet<<" deadline:"<<deadline<<" period:"<<period<<endl;
 		fraction_t temp(wcet, period);
 		if(dag_taskset.get_utilization_sum() + temp > utilization)
 		{
