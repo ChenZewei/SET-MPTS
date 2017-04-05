@@ -541,6 +541,34 @@ void TaskSet::display()
 
 ////////////////////////////DAG Tasks//////////////////////////////
 
+DAG_Task::DAG_Task(const DAG_Task &dt):Task(dt.get_id(), 0, dt.get_period(), dt.get_deadline(), dt.get_priority())
+{
+	task_id = dt.task_id;
+	vnodes = dt.vnodes;
+	arcnodes = dt.arcnodes;
+	vol = dt.vol;//total wcet of the jobs in graph
+	len = dt.len;
+	deadline = dt.deadline;
+	period = dt.period;
+	utilization = dt.utilization;
+	density = dt.density;
+	vexnum = dt.vexnum;
+	arcnum = dt.arcnum;
+	spin = dt.spin;
+	self_suspension = dt.self_suspension;
+	local_blocking = dt.local_blocking;
+	remote_blocking = dt.remote_blocking;
+	total_blocking = dt.total_blocking;
+	jitter = dt.jitter;
+	response_time = dt.response_time;//initialization as WCET
+	priority = dt.priority;
+	partition = dt.partition;//0XFFFFFFFF
+	ratio = dt.ratio;//for heterogeneous platform
+	requests = dt.requests;
+
+	refresh_relationship();
+}
+
 DAG_Task::DAG_Task(uint task_id, ulong period, ulong deadline, uint priority):Task(task_id, 0, period, deadline, priority)
 {
 	len = 0;
@@ -561,7 +589,7 @@ DAG_Task::DAG_Task(uint task_id, ulong period, ulong deadline, uint priority):Ta
 	partition = 0XFFFFFFFF;
 	utilization = 0;
 	density = 0;
-
+	refresh_relationship();
 }
 
 DAG_Task::DAG_Task(	uint task_id,
@@ -928,7 +956,11 @@ void DAG_Task::delete_arc(uint tail, uint head)
 
 void DAG_Task::refresh_relationship()
 {
+//	cout<<"dag_task "<<task_id<<":"<<endl;
+//	display_arcs();
+//	cout<<"sort..."<<endl;
 	sort(arcnodes.begin(), arcnodes.end(), arcs_increase<ArcNode>);
+//	display_arcs();
 	for(uint i = 0; i < vnodes.size(); i++)
 	{
 		vnodes[i].precedences.clear();
@@ -936,6 +968,7 @@ void DAG_Task::refresh_relationship()
 	}
 	for(uint i = 0; i < arcnodes.size(); i++)
 	{
+//		cout<<"refresh arcs "<<i<<"\taddress:"<<&arcnodes[i]<<endl;
 		vnodes[arcnodes[i].tail].follow_ups.push_back(&arcnodes[i]);
 		vnodes[arcnodes[i].head].precedences.push_back(&arcnodes[i]);
 	}
@@ -1066,7 +1099,7 @@ void DAG_Task::display_arcs()
 	cout<<"display main arcs:"<<endl;
 	for(uint i = 0; i < arcnodes.size(); i++)
 	{
-		cout<<arcnodes[i].tail<<"--->"<<arcnodes[i].head<<endl;
+		cout<<arcnodes[i].tail<<"--->"<<arcnodes[i].head<<"\taddress:"<<&arcnodes[i]<<endl;
 	}
 }
 
@@ -1084,14 +1117,14 @@ void DAG_Task::display_follow_ups(uint job_id)
 {
 	for(uint i = 0; i < vnodes[job_id].follow_ups.size(); i++)
 	{
-		cout<<"follow up of node "<<job_id<<":"<<vnodes[job_id].follow_ups[i]->head<<endl;
+		cout<<"follow up of node "<<job_id<<":"<<vnodes[job_id].follow_ups[i]->head<<"\taddress:"<<vnodes[job_id].follow_ups[i]<<endl;
 	}
 }
 
 void DAG_Task::display_precedences(uint job_id)
 {
 	for(uint i = 0; i < vnodes[job_id].precedences.size(); i++)
-		cout<<"precedences of node "<<job_id<<":"<<vnodes[job_id].precedences[i]->tail<<endl;
+		cout<<"precedences of node "<<job_id<<":"<<vnodes[job_id].precedences[i]->tail<<"\taddress:"<<vnodes[job_id].precedences[i]<<endl;
 }
 
 uint DAG_Task::get_indegrees(uint job_id) const {return vnodes[job_id].precedences.size();}
@@ -1259,6 +1292,12 @@ void dag_task_gen(DAG_TaskSet& dag_taskset, ResourceSet& resourceset, Param para
 		}
 		dag_taskset.add_task(resourceset, param, wcet, period, deadline);
 	}
+
+	foreach(dag_taskset.get_tasks(), task)
+	{
+		task->refresh_relationship();
+	}
+	
 	//dag_taskset.sort_by_period();
 /*
 	double sum = 0;

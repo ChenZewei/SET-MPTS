@@ -204,6 +204,8 @@ typedef struct ArcNode
 {
 	uint tail;//i
 	uint head;//j
+//	ArcPtr headlink;
+//	ArcPtr taillink;
 }ArcNode,*ArcPtr;
 
 typedef struct VNode
@@ -251,6 +253,7 @@ class DAG_Task:public Task
 		Ratio ratio;//for heterogeneous platform
 		Resource_Requests requests;
 	public:
+		DAG_Task(const DAG_Task &dt);
 		DAG_Task(uint task_id, ulong period, ulong deadline = 0, uint priority = 0);
 		DAG_Task(	uint task_id,
 					ResourceSet& resourceset,

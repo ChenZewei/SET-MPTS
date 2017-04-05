@@ -51,17 +51,23 @@ int main(int argc,char** argv)
 		cout<<"wcet:"<<task->get_wcet()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
 		task->display_vertices();
 		task->display_arcs();
+		for(uint j = 0; j < task->get_vnode_num(); j++)
+		{
+			task->display_follow_ups(j);
+			task->display_precedences(j);
+		}
 		cout<<"vol:"<<task->get_vol()<<endl;
 		cout<<"len:"<<task->get_len()<<endl;
 		cout<<"utilization:"<<task->get_utilization()<<endl;
 		cout<<"density:"<<task->get_density()<<endl;
 	}
 */
+
 	if(dag_schedulability_test(tasks, 4, 0.1))
 		cout<<"Schedulable!"<<endl;
 	else
 		cout<<"Unschedulable!"<<endl;
-	
+
 	return 0;
 }
 
