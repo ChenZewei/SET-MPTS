@@ -202,9 +202,6 @@ cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") s
 		output.export_result_append(utilization);
 		output.Export(PNG);
 		utilization += steps[0];
-		
-
-
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < _EPS);
 

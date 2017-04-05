@@ -341,7 +341,7 @@ double approximation(DAG_TaskSet &dag_taskset, double e)
 		if(s > max_slope)
 			max_slope = s;
 	}
-cout<<"max_slope:"<<max_slope<<endl;
+//cout<<"max_slope:"<<max_slope<<endl;
 	if(last_slope > max_slope)
 		max_slope = last_slope;
 	

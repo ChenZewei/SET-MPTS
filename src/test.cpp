@@ -27,10 +27,10 @@ void config(Param &parameters);
 
 int main(int argc,char** argv)
 {
-	floating_t u = 0;
+	floating_t e = 0.1;
 
 	if(1 < argc)
-		u = floating_t(argv[1]);
+		e = floating_t(argv[1]);
 
 
 	Param parameters;
@@ -38,11 +38,7 @@ int main(int argc,char** argv)
 	Output output(parameters);
 	Random_Gen::uniform_integral_gen(0,10);
 
-	DAG_TaskSet tasks = DAG_TaskSet();
-	ProcessorSet processorset = ProcessorSet(parameters);
-	ResourceSet resourceset = ResourceSet();
-	resource_gen(&resourceset, parameters);
-	dag_task_gen(tasks, resourceset, parameters, u.get_d());
+	
 
 /*
 	foreach(tasks.get_tasks(), task)
@@ -63,10 +59,30 @@ int main(int argc,char** argv)
 	}
 */
 
-	if(dag_schedulability_test(tasks, 4, 0.1))
-		cout<<"Schedulable!"<<endl;
-	else
-		cout<<"Unschedulable!"<<endl;
+	double utilization = parameters.u_range.min;
+
+	do
+	{
+		uint exp_times = parameters.exp_times;
+		uint success_times = 0;
+		for(int i = 0; i < exp_times; i++)
+		{
+			DAG_TaskSet tasks = DAG_TaskSet();
+			ProcessorSet processors = ProcessorSet(parameters);
+			ResourceSet resources = ResourceSet();
+			resource_gen(&resources, parameters);
+			dag_task_gen(tasks, resources, parameters, utilization);
+
+			if(dag_schedulability_test(tasks, processors.get_processor_num(), e.get_d()))
+				success_times++;
+		}
+		
+		cout<<"DAG-GEDF"<<"\t"<<utilization<<"\t"<<exp_times<<"\t"<<success_times<<endl;
+		utilization += parameters.step;
+	}
+	while(utilization < parameters.u_range.max || fabs(parameters.u_range.max - utilization) < _EPS);
+
+	
 
 	return 0;
 }
