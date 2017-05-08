@@ -192,8 +192,10 @@ class TaskSet
 		void sort_by_period();//increase
 		void sort_by_utilization();//decrease
 		void sort_by_density();//decrease
+		void sort_by_DC();
 		void RM_Order();
 		void DM_Order();
+		void DC_Order();
 		ulong DBF(ulong time);
 
 		void display();

@@ -513,6 +513,13 @@ void TaskSet::sort_by_density()
 		tasks[i].set_id(i);
 }
 
+void TaskSet::sort_by_DC()
+{
+	sort(tasks.begin(), tasks.end(), task_DC_increase<Task>);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_id(i);
+}
+
 void TaskSet::RM_Order()
 {
 	sort_by_period();
@@ -525,6 +532,15 @@ void TaskSet::RM_Order()
 void TaskSet::DM_Order()
 {
 	sort_by_density();
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+}
+
+void TaskSet::DC_Order()
+{
+	sort_by_DC();
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		tasks[i].set_priority(i);

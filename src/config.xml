@@ -20,24 +20,23 @@
 		<data TEST_TYPE="0" REMARK="GFP">RTA-native</data>
 
 		
-		<data REMARK="">RTA-GFP-native</data>
-		<data REMARK="">RTA-GFP-BC</data>
-		<data REMARK="">RTA-GFP-NG</data>
-		<data REMARK="">RTA-PFP-WF</data>
-		<data REMARK="">RTA-PFP-WF-spinlock</data>
-		<data REMARK="">RTA-PFP-WF-semaphore</data>
-		<data REMARK="">LP-RTA-GFP-PIP</data>
-		<data REMARK="">LP-RTA-GFP-FMLP</data>
-		<data REMARK="">LP-RTA-PFP-DPCP</data>
-		<data REMARK="">LP-RTA-PFP-MPCP</data>
-		<data REMARK="">RTA-PFP-RO</data>
-		<data REMARK="">ILP-RTA-PFP-spinlock</data>
-		<data REMARK="">RTA-PFP-GS</data>
-		<data REMARK="">NC-GEDF-VPR</data>
+		<data RENAME="" REMARK="">RTA-GFP-native</data>
+		<data RENAME="" REMARK="">RTA-GFP-BC</data>
+		<data RENAME="" REMARK="">RTA-GFP-NG</data>
+		<data RENAME="" REMARK="">RTA-PFP-WF</data>
+		<data RENAME="" REMARK="">RTA-PFP-WF-spinlock</data>
+		<data RENAME="" REMARK="">RTA-PFP-WF-semaphore</data>
+		<data RENAME="" REMARK="">LP-RTA-GFP-PIP</data>
+		<data RENAME="" REMARK="">LP-RTA-GFP-FMLP</data>
+		<data RENAME="" REMARK="">LP-RTA-PFP-DPCP</data>
+		<data RENAME="" REMARK="">LP-RTA-PFP-MPCP</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO</data>
+		<data RENAME="" REMARK="">ILP-RTA-PFP-spinlock</data>
+		<data RENAME="" REMARK="">RTA-PFP-GS</data>
+		<data RENAME="" REMARK="">NC-GEDF-VPR</data>
 <!-->	
-		<data RENAME="RO" REMARK="">RTA-PFP-RO</data>
-		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
-		<data RENAME="NCGEDF" REMARK="">NC-GEDF-VPR</data>
+		<data REMARK="">RTA-GFP-NG</data>
+		<data REMARK="">RTA-GDC</data>
 	</schedulability_test>
 	<experiment_times>500</experiment_times>
 	<output>

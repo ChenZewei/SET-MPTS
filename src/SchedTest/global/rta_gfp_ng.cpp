@@ -10,7 +10,7 @@ RTA_GFP_NG::RTA_GFP_NG(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->processors = processors;
 	this->resources = resources;
 	
-	this->tasks.RM_Order();
+	//this->tasks.RM_Order();
 }
 
 int RTA_GFP_NG::interference_gap_decrease(Carry_in t1, Carry_in t2)

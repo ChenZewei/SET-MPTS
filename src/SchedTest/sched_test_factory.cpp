@@ -26,6 +26,7 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-GFP-NG"))
 	{
+		tasks.RM_Order();
 		return new RTA_GFP_NG(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-WF"))
@@ -71,6 +72,11 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	else if(0 == strcmp(test_name.data(), "NC-GEDF-VPR"))
 	{
 		return new NC_GEDF_VPR(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-GDC"))
+	{
+		tasks.DC_Order();
+		return new RTA_GFP_NG(tasks, processors, resources);
 	}
 	else
 		return NULL;
