@@ -42,9 +42,8 @@
 <!-->
 		<data RENAME="" REMARK="">RTA-GFP-native</data>
 		<data RENAME="" REMARK="">RTA-GDC-native</data>
-		<data RENAME="" REMARK="">RTA-GDCC-native</data>
 	</schedulability_test>
-	<experiment_times>500</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -53,7 +52,7 @@
 		<data>JSON</data>
 	</output>
 	<lambda>
-		<data>2</data>
+		<data>10</data>
 	</lambda>
 	<step>
 		<data>0.1</data>
@@ -61,16 +60,16 @@
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>4</max>
+			<max>8</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>4</data>	
+		<data>10</data>	
 	</processor_num>
 	<period_range>
 		<data>
-			<min>10000</min>
-			<max>100000</max>
+			<min>10</min>
+			<max>20</max>
 		</data>
 	</period_range>
 	<deadline_propotion>

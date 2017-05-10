@@ -527,10 +527,23 @@ void TaskSet::sort_by_DC()
 		tasks[i].set_id(i);
 }
 
-
 void TaskSet::sort_by_DCC()
 {
 	sort(tasks.begin(), tasks.end(), task_DCC_increase<Task>);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_id(i);
+}
+
+void TaskSet::sort_by_DDC()
+{
+	sort(tasks.begin(), tasks.end(), task_DDC_increase<Task>);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_id(i);
+}
+
+void TaskSet::sort_by_UDC()
+{
+	sort(tasks.begin(), tasks.end(), task_UDC_increase<Task>);
 	for(int i = 0; i < tasks.size(); i++)
 		tasks[i].set_id(i);
 }
@@ -565,6 +578,93 @@ void TaskSet::DC_Order()
 void TaskSet::DCC_Order()
 {
 	sort_by_DCC();
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+}
+
+void TaskSet::DDC_Order()
+{
+	sort_by_DDC();
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+}
+
+void TaskSet::UDC_Order()
+{
+	sort_by_UDC();
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+}
+
+
+void TaskSet::SM_PLUS_Order()
+{
+	cout<<"before sm_plus:"<<endl;
+	cout<<"-----------------------"<<endl;
+
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+
+	sort_by_DC();
+	cout<<"after sm:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+
+	cout<<"reverse order:"<<endl;
+	cout<<"-----------------------"<<endl;
+
+	for(vector<Task>::iterator it = tasks.end(); it >= tasks.begin(); it--)
+	{
+		cout<<"Task "<<it->get_id()<<":"<<endl;
+		cout<<"WCET:"<<it->get_wcet()<<" Deadline:"<<it->get_deadline()<<" Period:"<<it->get_period()<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+
+
+	for(vector<Task>::iterator it = (tasks.end() - 1); it > tasks.begin(); it--)
+	{
+		cout<<"for1: task: "<<it->get_id()<<endl;
+		ulong dl = (it)->get_deadline();
+		cout<<dl<<endl;
+		for(vector<Task>::iterator it2 = (it - 1); it2 >= tasks.begin(); it2--)
+		{
+			cout<<"for2: task: "<<it2->get_id()<<endl;
+			ulong c = (it2)->get_wcet();
+			if(c >= dl)
+			{
+				cout<<"t1 "<<dl<<endl;
+				cout<<"t2 "<<c<<endl;
+				tasks.insert(it2, (*it));
+				it = tasks.erase(it);
+				break;
+			}
+		}
+	}
+
+	cout<<"after plus:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		tasks[i].set_priority(i);

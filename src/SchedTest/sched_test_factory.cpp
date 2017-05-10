@@ -112,6 +112,16 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 		tasks.DCC_Order();
 		return new RTA_GDC_native(tasks, processors, resources);
 	}
+	else if(0 == strcmp(test_name.data(), "RTA-GDDC-native"))
+	{
+		tasks.DDC_Order();
+		return new RTA_GDC_native(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-GUDC-native"))
+	{
+		tasks.UDC_Order();
+		return new RTA_GDC_native(tasks, processors, resources);
+	}
 	else if(0 == strcmp(test_name.data(), "RTA-GDC-BC"))
 	{
 		tasks.DC_Order();

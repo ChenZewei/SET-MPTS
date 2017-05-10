@@ -195,10 +195,15 @@ class TaskSet
 		void sort_by_density();//decrease
 		void sort_by_DC();
 		void sort_by_DCC();
+		void sort_by_DDC();
+		void sort_by_UDC();
 		void RM_Order();
 		void DM_Order();
 		void DC_Order();
 		void DCC_Order();
+		void DDC_Order();
+		void UDC_Order();
+		void SM_PLUS_Order();
 		ulong DBF(ulong time);
 
 		void display();

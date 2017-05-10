@@ -71,6 +71,19 @@ int task_DCC_increase(Model m1, Model m2)
 }
 
 template <typename Model>
+int task_DDC_increase(Model m1, Model m2)
+{
+	return (m1.get_deadline() - m1.get_wcet())*m1.get_deadline() < (m2.get_deadline() - m2.get_wcet())*m2.get_deadline();
+}
+
+template <typename Model>
+int task_UDC_increase(Model m1, Model m2)
+{
+	return (m1.get_deadline() - m1.get_wcet())*m1.get_utilization() < (m2.get_deadline() - m2.get_wcet())*m2.get_utilization();
+}
+
+
+template <typename Model>
 int resource_utilization_increase(Model m1, Model m2)
 {
 	return m1.get_utilization() < m2.get_utilization();

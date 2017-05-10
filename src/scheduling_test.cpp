@@ -155,7 +155,7 @@ cout<<flush;
 			ResourceSet resourceset = ResourceSet();
 			resource_gen(&resourceset, parameters);
 			tast_gen(taskset, resourceset, parameters, utilization);
-
+			//taskset.SM_PLUS_Order();
 			for(uint j = 0; j < parameters.get_method_num(); j++)
 			{
 				taskset.init();
