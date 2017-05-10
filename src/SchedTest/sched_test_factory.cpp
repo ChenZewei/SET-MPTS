@@ -13,15 +13,18 @@
 #include "ilp_rta_pfp_spinlock.h"
 #include "rta_pfp_gs.h"
 #include "nc_gedf_vpr.h"
+#include "rta_gdc_native.h"
 
 SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
 	if(0 == strcmp(test_name.data(), "RTA-GFP-native"))
 	{
+		tasks.RM_Order();
 		return new RTA_GFP_native(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-GFP-BC"))
 	{
+		tasks.RM_Order();
 		return new RTA_GFP_BC(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-GFP-NG"))
@@ -74,7 +77,6 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	{
 		return new NC_GEDF_VPR(tasks, processors, resources);
 	}
-	
 	else if(0 == strcmp(test_name.data(), "RTA-GRM"))
 	{
 		tasks.RM_Order();
@@ -99,6 +101,21 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	{
 		tasks.DC_Order();
 		return new RTA_PFP_WF(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-GDC-native"))
+	{
+		tasks.DC_Order();
+		return new RTA_GDC_native(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-GDCC-native"))
+	{
+		tasks.DCC_Order();
+		return new RTA_GDC_native(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-GDC-BC"))
+	{
+		tasks.DC_Order();
+		return new RTA_GFP_BC(tasks, processors, resources);
 	}
 	else
 		return NULL;

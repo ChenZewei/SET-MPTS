@@ -12,8 +12,8 @@ RTA_GFP_BC::RTA_GFP_BC(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
-	this->tasks.RM_Order();
 
+	this->processors.init();
 }
 
 ulong RTA_GFP_BC::workload(Task& task, ulong interval)

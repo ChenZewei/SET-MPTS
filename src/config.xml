@@ -35,12 +35,14 @@
 		<data RENAME="" REMARK="">RTA-PFP-GS</data>
 		<data RENAME="" REMARK="">NC-GEDF-VPR</data>
 
+		
+		<data RENAME="" REMARK="">RTA-GDC-native</data>
 
-<!-->	
-		<data REMARK="">RTA-GRM</data>
-		<data REMARK="">RTA-GDM</data>
-		<data REMARK="">RTA-GDC</data>
-		<data RENAME="" REMARK="">RTA-PDC-WF</data>
+
+<!-->
+		<data RENAME="" REMARK="">RTA-GFP-native</data>
+		<data RENAME="" REMARK="">RTA-GDC-native</data>
+		<data RENAME="" REMARK="">RTA-GDCC-native</data>
 	</schedulability_test>
 	<experiment_times>500</experiment_times>
 	<output>
@@ -51,7 +53,7 @@
 		<data>JSON</data>
 	</output>
 	<lambda>
-		<data>10</data>
+		<data>2</data>
 	</lambda>
 	<step>
 		<data>0.1</data>

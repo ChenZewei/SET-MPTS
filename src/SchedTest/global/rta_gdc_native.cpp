@@ -1,10 +1,10 @@
-#include "rta_gfp_native.h"
+#include "rta_gdc_native.h"
 #include "iteration-helper.h"
 #include "math-helper.h"
 
-RTA_GFP_native::RTA_GFP_native(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "native") {}
+RTA_GDC_native::RTA_GDC_native(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "DC-native") {}
 
-RTA_GFP_native::RTA_GFP_native(TaskSet tasks, ProcessorSet processors, ResourceSet resources): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "native")
+RTA_GDC_native::RTA_GDC_native(TaskSet tasks, ProcessorSet processors, ResourceSet resources): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "DC-native")
 {
 	this->tasks = tasks;
 	this->processors = processors;
@@ -13,12 +13,12 @@ RTA_GFP_native::RTA_GFP_native(TaskSet tasks, ProcessorSet processors, ResourceS
 	this->processors.init();
 }
 
-ulong RTA_GFP_native::workload(Task& task, ulong interval)
+ulong RTA_GDC_native::workload(Task& task, ulong interval)
 {
-	return task.get_wcet() * ceiling(interval, task.get_period()) + task.get_wcet();
+	return min(interval, task.get_wcet() * ceiling(interval, task.get_period()) + task.get_wcet());
 }
 
-ulong RTA_GFP_native::response_time(Task& ti)
+ulong RTA_GDC_native::response_time(Task& ti)
 {
 	ulong wcet = ti.get_wcet();
 	ulong test_end = ti.get_deadline();
@@ -44,7 +44,7 @@ ulong RTA_GFP_native::response_time(Task& ti)
 	return test_end + 100;
 }
 
-bool RTA_GFP_native::is_schedulable()
+bool RTA_GDC_native::is_schedulable()
 {
 	ulong response_bound;
 
