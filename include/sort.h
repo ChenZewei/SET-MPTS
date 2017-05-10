@@ -20,6 +20,12 @@ int period_increase(TaskModel t1, TaskModel t2)
 }
 
 template <typename TaskModel>
+int deadline_increase(TaskModel t1, TaskModel t2)
+{
+	return t1.get_deadline() < t2.get_deadline();
+}
+
+template <typename TaskModel>
 int utilization_decrease(TaskModel t1, TaskModel t2)
 {
 	return t1.get_utilization() > t2.get_utilization();
@@ -56,6 +62,12 @@ template <typename Model>
 int task_DC_increase(Model m1, Model m2)
 {
 	return (m1.get_deadline() - m1.get_wcet()) < (m2.get_deadline() - m2.get_wcet());
+}
+
+template <typename Model>
+int task_DCC_increase(Model m1, Model m2)
+{
+	return (m1.get_deadline() - m1.get_wcet())*m1.get_wcet() < (m2.get_deadline() - m2.get_wcet())*m2.get_wcet();
 }
 
 template <typename Model>

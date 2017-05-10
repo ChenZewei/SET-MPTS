@@ -34,9 +34,13 @@
 		<data RENAME="" REMARK="">ILP-RTA-PFP-spinlock</data>
 		<data RENAME="" REMARK="">RTA-PFP-GS</data>
 		<data RENAME="" REMARK="">NC-GEDF-VPR</data>
+
+
 <!-->	
-		<data REMARK="">RTA-GFP-NG</data>
+		<data REMARK="">RTA-GRM</data>
+		<data REMARK="">RTA-GDM</data>
 		<data REMARK="">RTA-GDC</data>
+		<data RENAME="" REMARK="">RTA-PDC-WF</data>
 	</schedulability_test>
 	<experiment_times>500</experiment_times>
 	<output>

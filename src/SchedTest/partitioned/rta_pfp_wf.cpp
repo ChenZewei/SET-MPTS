@@ -10,7 +10,7 @@ RTA_PFP_WF::RTA_PFP_WF(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->processors = processors;
 	this->resources = resources;
 	
-	this->tasks.RM_Order();
+	//this->tasks.RM_Order();
 	this->processors.init();
 }
 

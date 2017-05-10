@@ -190,12 +190,15 @@ class TaskSet
 		void get_density_max(fraction_t &density_max) const;
 
 		void sort_by_period();//increase
+		void sort_by_deadline();//increase
 		void sort_by_utilization();//decrease
 		void sort_by_density();//decrease
 		void sort_by_DC();
+		void sort_by_DCC();
 		void RM_Order();
 		void DM_Order();
 		void DC_Order();
+		void DCC_Order();
 		ulong DBF(ulong time);
 
 		void display();

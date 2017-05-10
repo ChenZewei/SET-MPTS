@@ -499,6 +499,13 @@ void TaskSet::sort_by_period()
 		tasks[i].set_id(i);
 }
 
+void TaskSet::sort_by_deadline()
+{
+	sort(tasks.begin(), tasks.end(), deadline_increase<Task>);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_id(i);
+}
+
 void TaskSet::sort_by_utilization()
 {
 	sort(tasks.begin(), tasks.end(), utilization_decrease<Task>);
@@ -520,6 +527,14 @@ void TaskSet::sort_by_DC()
 		tasks[i].set_id(i);
 }
 
+
+void TaskSet::sort_by_DCC()
+{
+	sort(tasks.begin(), tasks.end(), task_DCC_increase<Task>);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_id(i);
+}
+
 void TaskSet::RM_Order()
 {
 	sort_by_period();
@@ -531,7 +546,7 @@ void TaskSet::RM_Order()
 
 void TaskSet::DM_Order()
 {
-	sort_by_density();
+	sort_by_deadline();
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		tasks[i].set_priority(i);
@@ -541,6 +556,15 @@ void TaskSet::DM_Order()
 void TaskSet::DC_Order()
 {
 	sort_by_DC();
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+}
+
+void TaskSet::DCC_Order()
+{
+	sort_by_DCC();
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		tasks[i].set_priority(i);

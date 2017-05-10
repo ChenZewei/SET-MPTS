@@ -31,6 +31,7 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-WF"))
 	{
+		tasks.RM_Order();
 		return new RTA_PFP_WF(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-WF-spinlock"))
@@ -73,10 +74,31 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	{
 		return new NC_GEDF_VPR(tasks, processors, resources);
 	}
+	
+	else if(0 == strcmp(test_name.data(), "RTA-GRM"))
+	{
+		tasks.RM_Order();
+		return new RTA_GFP_NG(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-GDM"))
+	{
+		tasks.DM_Order();
+		return new RTA_GFP_NG(tasks, processors, resources);
+	}
 	else if(0 == strcmp(test_name.data(), "RTA-GDC"))
 	{
 		tasks.DC_Order();
 		return new RTA_GFP_NG(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-GDCC"))
+	{
+		tasks.DCC_Order();
+		return new RTA_GFP_NG(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PDC-WF"))
+	{
+		tasks.DC_Order();
+		return new RTA_PFP_WF(tasks, processors, resources);
 	}
 	else
 		return NULL;
