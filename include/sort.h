@@ -14,6 +14,12 @@
 //typedef struct ArcNode;
 
 template <typename TaskModel>
+int id_increase(TaskModel t1, TaskModel t2)
+{
+	return t1.get_id() < t2.get_id();
+}
+
+template <typename TaskModel>
 int period_increase(TaskModel t1, TaskModel t2)
 {
 	return t1.get_period() < t2.get_period();

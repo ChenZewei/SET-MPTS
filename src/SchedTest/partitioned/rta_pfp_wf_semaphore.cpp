@@ -10,7 +10,7 @@ RTA_PFP_WF_semaphore::RTA_PFP_WF_semaphore(TaskSet tasks, ProcessorSet processor
 	this->processors = processors;
 	this->resources = resources;
 	
-	this->tasks.RM_Order();
+	//this->tasks.RM_Order();
 	this->processors.init();
 }
 

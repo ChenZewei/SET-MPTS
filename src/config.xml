@@ -37,13 +37,21 @@
 
 		
 		<data RENAME="" REMARK="">RTA-GDC-native</data>
+		<data RENAME="" REMARK="">RTA-GFP-native</data>
+		<data RENAME="" REMARK="">RTA-GDC-native</data>
+		<data RENAME="" REMARK="">RTA-GSMP-native</data>
+		<data RENAME="" REMARK="">RTA-GFP-BC</data>
+		<data RENAME="" REMARK="">RTA-GDC-BC</data>
+		<data RENAME="" REMARK="">RTA-GSMP-BC</data>
+		<data RENAME="" REMARK="">RTA-GSMP2-BC</data>
+		<data RENAME="" REMARK="">RTA-GLO-NG</data>
 
 
 <!-->
-		<data RENAME="" REMARK="">RTA-GFP-native</data>
-		<data RENAME="" REMARK="">RTA-GDC-native</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO</data>
+		<data RENAME="" REMARK="">RTA-PDC-RO</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>2000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -55,16 +63,16 @@
 		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.02</data>
+		<data>0.1</data>
 	</step>
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>1</max>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>1</data>	
+		<data>4</data>	
 	</processor_num>
 	<period_range>
 		<data>
@@ -74,15 +82,15 @@
 	</period_range>
 	<deadline_propotion>
 		<data>
-			<min>1</min>
+			<min>0.6</min>
 			<max>1</max>
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>4</data>
+		<data>10</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>1</data>
+		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.25</data>

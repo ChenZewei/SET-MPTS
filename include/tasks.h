@@ -189,6 +189,7 @@ class TaskSet
 		void get_density_sum(fraction_t &density_sum) const;
 		void get_density_max(fraction_t &density_max) const;
 
+		void sort_by_id();
 		void sort_by_period();//increase
 		void sort_by_deadline();//increase
 		void sort_by_utilization();//decrease
@@ -204,7 +205,12 @@ class TaskSet
 		void DDC_Order();
 		void UDC_Order();
 		void SM_PLUS_Order();
+		void SM_PLUS_2_Order();
+		void SM_PLUS_3_Order();
+		void Leisure_Order();
 		ulong DBF(ulong time);
+
+		long leisure(uint index);
 
 		void display();
 

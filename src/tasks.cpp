@@ -492,6 +492,11 @@ ulong TaskSet::get_task_period(uint index) const
 	return tasks[index].get_period();
 }
 
+void TaskSet::sort_by_id()
+{
+	sort(tasks.begin(), tasks.end(), id_increase<Task>);
+}
+
 void TaskSet::sort_by_period()
 {
 	sort(tasks.begin(), tasks.end(), period_increase<Task>);
@@ -555,6 +560,17 @@ void TaskSet::RM_Order()
 	{
 		tasks[i].set_priority(i);
 	}
+
+#if SORT_DEBUG
+	cout<<"RM Order:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<leisure(task->get_id())<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+#endif
 }
 
 void TaskSet::DM_Order()
@@ -573,6 +589,17 @@ void TaskSet::DC_Order()
 	{
 		tasks[i].set_priority(i);
 	}
+
+#if SORT_DEBUG
+	cout<<"DC Order:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<leisure(task->get_id())<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+#endif
 }
 
 void TaskSet::DCC_Order()
@@ -602,73 +629,306 @@ void TaskSet::UDC_Order()
 	}
 }
 
-
 void TaskSet::SM_PLUS_Order()
 {
+//	cout<<"///////////////////////////////////////////////////"<<endl;
+/*
 	cout<<"before sm_plus:"<<endl;
 	cout<<"-----------------------"<<endl;
 
 	foreach(tasks, task)
 	{
 		cout<<"Task "<<task->get_id()<<":"<<endl;
-		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<endl;
 		cout<<"-----------------------"<<endl;
 	}
-
+*/
 	sort_by_DC();
-	cout<<"after sm:"<<endl;
-	cout<<"-----------------------"<<endl;
-	foreach(tasks, task)
+	
+
+	if(1 < tasks.size())
 	{
-		cout<<"Task "<<task->get_id()<<":"<<endl;
-		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<endl;
-		cout<<"-----------------------"<<endl;
-	}
-
-	cout<<"reverse order:"<<endl;
-	cout<<"-----------------------"<<endl;
-
-	for(vector<Task>::iterator it = tasks.end(); it >= tasks.begin(); it--)
-	{
-		cout<<"Task "<<it->get_id()<<":"<<endl;
-		cout<<"WCET:"<<it->get_wcet()<<" Deadline:"<<it->get_deadline()<<" Period:"<<it->get_period()<<endl;
-		cout<<"-----------------------"<<endl;
-	}
-
-
-	for(vector<Task>::iterator it = (tasks.end() - 1); it > tasks.begin(); it--)
-	{
-		cout<<"for1: task: "<<it->get_id()<<endl;
-		ulong dl = (it)->get_deadline();
-		cout<<dl<<endl;
-		for(vector<Task>::iterator it2 = (it - 1); it2 >= tasks.begin(); it2--)
+		vector<ulong> accum;
+		for(uint i = 0; i < tasks.size(); i++)
 		{
-			cout<<"for2: task: "<<it2->get_id()<<endl;
-			ulong c = (it2)->get_wcet();
-			if(c >= dl)
+			accum.push_back(0);
+		}
+		for(int index = 0; index < tasks.size() - 1; index++)
+		{
+//			cout<<"index: "<<index<<endl;
+			vector<Task>::iterator it = (tasks.begin() + index);
+			ulong c = (it)->get_wcet();
+			ulong gap = (it)->get_deadline() - (it)->get_wcet();
+			ulong d = (it)->get_deadline();
+
+			for(int index2 = index + 1; index2 < tasks.size(); index2++)
 			{
-				cout<<"t1 "<<dl<<endl;
-				cout<<"t2 "<<c<<endl;
-				tasks.insert(it2, (*it));
-				it = tasks.erase(it);
-				break;
+				vector<Task>::iterator it2 = (tasks.begin() + index2);
+				ulong c2 = (it2)->get_wcet();
+				ulong gap2 = (it2)->get_deadline() - (it2)->get_wcet();
+				ulong d2 = (it2)->get_deadline();
+
+				if(c > gap2 && d > d2)
+				{
+					accum[(it->get_id())] += c2;
+/*
+					cout<<"<==========plus==========>"<<endl;
+
+					cout<<"before plus:"<<endl;
+					cout<<"-----------------------"<<endl;
+					foreach(tasks, task)
+					{
+						cout<<"Task "<<task->get_id()<<":"<<endl;
+						cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<endl;
+						cout<<"-----------------------"<<endl;
+					}
+
+					cout<<"t"<<it->get_id()<<endl;
+					cout<<"t"<<it2->get_id()<<endl;
+*/
+					Task temp = (*it2);
+					tasks.erase((it2));
+					tasks.insert(it, temp);
+
+/*
+					cout<<"switch plus:"<<endl;
+					foreach(tasks, task)
+					{
+						cout<<"Task "<<task->get_id()<<endl;
+						cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<endl;
+						cout<<"-----------------------"<<endl;
+					}
+*/
+					index = 0;
+					break;
+				}
+				//cout<<"for2 end"<<endl;
 			}
 		}
+
+		for(int i = 0; i < tasks.size(); i++)
+			tasks[i].set_id(i);
+/*
+		cout<<"after plus:"<<endl;
+		cout<<"-----------------------"<<endl;
+		foreach(tasks, task)
+		{
+			cout<<"Task "<<task->get_id()<<":"<<endl;
+			cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<endl;
+			cout<<"-----------------------"<<endl;
+		}
+*/
 	}
 
-	cout<<"after plus:"<<endl;
-	cout<<"-----------------------"<<endl;
-	foreach(tasks, task)
+
+	
+
+	for(uint i = 0; i < tasks.size(); i++)
 	{
-		cout<<"Task "<<task->get_id()<<":"<<endl;
-		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<endl;
-		cout<<"-----------------------"<<endl;
+		tasks[i].set_priority(i);
+	}
+}
+
+void TaskSet::SM_PLUS_2_Order()
+{
+	sort_by_DC();
+	
+
+	if(1 < tasks.size())
+	{
+		vector<ulong> accum;
+		for(uint i = 0; i < tasks.size(); i++)
+		{
+			accum.push_back(0);
+		}
+		for(int index = 0; index < tasks.size() - 1; index++)
+		{
+			vector<Task>::iterator it = (tasks.begin() + index);
+			ulong c = (it)->get_wcet();
+			ulong gap = (it)->get_deadline() - (it)->get_wcet();
+			ulong d = (it)->get_deadline();
+
+			for(int index2 = index + 1; index2 < tasks.size(); index2++)
+			{
+				vector<Task>::iterator it2 = (tasks.begin() + index2);
+				ulong c2 = (it2)->get_wcet();
+				ulong gap2 = (it2)->get_deadline() - (it2)->get_wcet();
+				ulong d2 = (it2)->get_deadline();
+
+				if(c > gap2 && d > d2 && (accum[(it->get_id())] + c2) <= gap)
+				{
+					accum[(it->get_id())] += c2;
+
+					Task temp = (*it2);
+					tasks.erase((it2));
+					tasks.insert(it, temp);
+
+					index = 0;
+					break;
+				}
+				//cout<<"for2 end"<<endl;
+			}
+		}
+
+		for(int i = 0; i < tasks.size(); i++)
+			tasks[i].set_id(i);
 	}
 
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		tasks[i].set_priority(i);
 	}
+
+#if SORT_DEBUG
+	cout<<"SMP2:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<leisure(task->get_id())<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+#endif
+}
+
+void TaskSet::SM_PLUS_3_Order()
+{
+	sort_by_period();
+	
+	if(1 < tasks.size())
+	{
+		vector<ulong> accum;
+		for(uint i = 0; i < tasks.size(); i++)
+		{
+			accum.push_back(0);
+		}
+		for(int index = 0; index < tasks.size() - 1; index++)
+		{
+			vector<Task>::iterator it = (tasks.begin() + index);
+			ulong c = (it)->get_wcet();
+			ulong gap = (it)->get_deadline() - (it)->get_wcet();
+			ulong d = (it)->get_deadline();
+			ulong p = (it)->get_period();
+
+			for(int index2 = index + 1; index2 < tasks.size(); index2++)
+			{
+				vector<Task>::iterator it2 = (tasks.begin() + index2);
+				ulong c2 = (it2)->get_wcet();
+				ulong gap2 = (it2)->get_deadline() - (it2)->get_wcet();
+				ulong d2 = (it2)->get_deadline();
+				ulong p2 = (it2)->get_period();
+				uint N = ceiling(p, p2);
+				if(gap > gap2 && (accum[(it->get_id())] + N*c2) <= gap)
+				{
+					accum[(it->get_id())] += N*c2;
+
+					Task temp = (*it2);
+					tasks.erase((it2));
+					tasks.insert(it, temp);
+
+					index = 0;
+					break;
+				}
+				//cout<<"for2 end"<<endl;
+			}
+		}
+
+		for(int i = 0; i < tasks.size(); i++)
+			tasks[i].set_id(i);
+	}
+
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+
+#if SORT_DEBUG
+	cout<<"SMP3:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<leisure(task->get_id())<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+#endif
+}
+
+void TaskSet::Leisure_Order()
+{
+	Tasks NewSet;
+	sort_by_id();
+/*
+	cout<<"Before Leisure Order:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<leisure(task->get_id())<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+*/
+	for(int i = tasks.size() - 1; i >= 0; i--)
+	{
+//		cout<<"For 1: "<<i<<endl;
+		long l_max = 0xffffffffffffffff;
+		uint index = i;
+		for(int j = i; j >= 0; j--)
+		{
+			vector<Task>::iterator it = (tasks.begin() + j);
+//			cout<<"For 2: task "<<(it)->get_id();
+			Task temp = (*it);
+			tasks.erase((it));
+			tasks.push_back(temp);
+			long l = leisure(i);
+//			cout<<" leisure:"<<l<<endl;
+			if(l > l_max)
+			{
+				l_max = l;
+				index = j;
+			}
+		}
+		sort_by_id();
+		vector<Task>::iterator it2 = (tasks.begin() + index);
+//		cout<<"max leisure: task "<<(it2)->get_id()<<endl;
+		Task temp2 = (*it2);
+		tasks.erase(it2);
+		NewSet.insert(NewSet.begin(), temp2);
+	}
+
+	tasks.clear();
+	tasks = NewSet;
+
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_id(i);
+		tasks[i].set_priority(i);
+	}
+
+#if SORT_DEBUG
+	cout<<"Leisure Order:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<leisure(task->get_id())<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+#endif
+}
+
+long TaskSet::leisure(uint index)
+{
+	Task& task = get_task_by_id(index);
+	ulong gap = task.get_deadline() - task.get_wcet();
+	ulong period = task.get_period();
+	long remain = gap;
+	for(uint i = 0; i < index; i++)
+	{
+		Task& temp = get_task_by_id(i);
+		remain -= temp.get_wcet()*ceiling(period, temp.get_period());
+	}
+	return remain;
 }
 
 void TaskSet::display()
