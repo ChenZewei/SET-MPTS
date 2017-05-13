@@ -51,7 +51,8 @@ Task::Task(uint id,
 		density /= this->deadline;
 	else
 		density /= this->period;
-	partition = 0XFFFFFFFF;
+	partition = MAX_INT;
+	other_attr = 0;
 }
 
 Task::Task(	uint id,
@@ -89,6 +90,7 @@ Task::Task(	uint id,
 	wcet_non_critical_sections = this->wcet;
 	wcet_critical_sections = 0;
 	carry_in = false;
+	other_attr = 0;
 
 	uint critical_section_num = 0;
 
@@ -203,6 +205,7 @@ void Task::set_id(uint id) { this->id = id; };
 ulong Task::get_wcet() const	{ return wcet; }
 ulong Task::get_deadline() const { return deadline; }
 ulong Task::get_period() const { return period; }
+ulong Task::get_slack() const { return deadline - wcet; }
 bool Task::is_feasible() const { return deadline >= wcet && period >= wcet && wcet > 0; }	
 
 Resource_Requests& Task::get_requests() {	return requests; }
@@ -257,6 +260,8 @@ void Task::set_dependent() { independent = false; }
 bool Task::is_carry_in() const { return carry_in; }
 void Task::set_carry_in() { carry_in = true; }
 void Task::clear_carry_in() { carry_in = false; }
+ulong Task::get_other_attr() const { return other_attr; }
+void Task::set_other_attr(ulong attr) { other_attr = attr; }
 
 /////////////////////////////TaskSet///////////////////////////////
 
@@ -449,7 +454,12 @@ Tasks& TaskSet::get_tasks()
 
 Task& TaskSet::get_task_by_id(uint id)
 {
-	return tasks[id];
+	foreach(tasks, task)
+	{
+		if(id == task->get_id())
+			return (*task);
+	}
+	return *(Task*)0;
 }
 
 bool TaskSet::is_implicit_deadline()
@@ -907,6 +917,127 @@ void TaskSet::Leisure_Order()
 
 #if SORT_DEBUG
 	cout<<"Leisure Order:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<leisure(task->get_id())<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+#endif
+}
+
+
+void TaskSet::SM_PLUS_4_Order(uint p_num)
+{
+	sort_by_period();
+	
+
+	if(1 < tasks.size())
+	{
+		uint min_id;
+		ulong min_slack = MAX_LONG;
+		vector<uint> id_stack;
+
+		foreach(tasks, task)
+		{
+			task->set_other_attr(0);//accumulative adjustment
+		}
+
+		for(int index = 0; index < task.size(); index++)
+		{
+			bool is_continue = false;
+			foreach(tasks, task)
+			{
+				uint temp_id = task->get_id();
+				foreach(id_stask, element)
+				{
+					if(temp_id == (*element))
+						is_continue = true;
+				}
+				if(is_continue)
+					continue;
+				ulong temp_slack = task->get_slack();
+				if(min_slack > task->get_slack())
+				{
+					min_id = temp_id;
+					min_slack = temp_slack;
+				}
+			}
+			id_stack.push_back(min_id);
+			
+			is_continue = false;
+
+			//Task& ms_task = get_task_by_id(min_id);
+			
+			for(int index2 = 0; index2 < tasks.size(); index2++)
+			{
+				if(min_id == tasks[index2].get_id())
+				{
+					vector<Task>::iterator task1 = (tasks.begin() + index2);
+					for(int index3 = index2 - 1; index3 >= 0; index3--)
+					{
+						vector<Task>::iterator task2 = (tasks.begin() + index3);
+						if((p_num - 1) <= task2->get_other_attr())
+						{
+							is_continue = true;
+							break;
+						}
+
+						if(task1->get_slack() <task2->get_slack())
+						{
+							Task temp = (*task2);
+							tasks.erase((task2));
+							tasks.insert(task1, temp);
+							task1->set_other_attr(task1->get_other_attr() + 1);
+						}
+					}
+
+					break;
+				}
+			}
+		}
+
+		for(int index = 0; index < tasks.size() - 1; index++)
+		{
+			vector<Task>::iterator it = (tasks.begin() + index);
+			ulong c = (it)->get_wcet();
+			ulong gap = (it)->get_deadline() - (it)->get_wcet();
+			ulong d = (it)->get_deadline();
+
+			for(int index2 = index + 1; index2 < tasks.size(); index2++)
+			{
+				vector<Task>::iterator it2 = (tasks.begin() + index2);
+				ulong c2 = (it2)->get_wcet();
+				ulong gap2 = (it2)->get_deadline() - (it2)->get_wcet();
+				ulong d2 = (it2)->get_deadline();
+
+				if(c > gap2 && d > d2 && (accum[(it->get_id())]) < (p_num - 1))
+				{
+					accum[(it->get_id())]++;
+
+					Task temp = (*it2);
+					tasks.erase((it2));
+					tasks.insert(it, temp);
+
+					index = 0;
+					break;
+				}
+				//cout<<"for2 end"<<endl;
+			}
+		}
+
+		for(int i = 0; i < tasks.size(); i++)
+			tasks[i].set_id(i);
+	}
+
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+
+#if SORT_DEBUG
+	cout<<"SMP4:"<<endl;
 	cout<<"-----------------------"<<endl;
 	foreach(tasks, task)
 	{

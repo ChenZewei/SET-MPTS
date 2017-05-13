@@ -68,6 +68,7 @@ class Task
 		fraction_t density;
 		Ratio ratio;//for heterogeneous platform
 		Resource_Requests requests;
+		ulong other_attr;
 	public:
 		Task(	uint id,
 			ulong wcet, 
@@ -94,6 +95,7 @@ class Task
 		ulong get_wcet() const;
 		ulong get_deadline() const;
 		ulong get_period() const;
+		ulong get_slack() const;
 		bool is_feasible() const;
 
 		Resource_Requests& get_requests();
@@ -131,6 +133,8 @@ class Task
 		bool is_carry_in() const;
 		void set_carry_in();
 		void clear_carry_in();
+		ulong get_other_attr() const;
+		void set_other_attr(ulong attr);
 
 		void add_request(uint res_id, uint num, ulong max_len, ulong total_len, uint locality = MAX_INT);
 		
@@ -208,6 +212,7 @@ class TaskSet
 		void SM_PLUS_2_Order();
 		void SM_PLUS_3_Order();
 		void Leisure_Order();
+		void SM_PLUS_4_Order(uint p_num);
 		ulong DBF(ulong time);
 
 		long leisure(uint index);
