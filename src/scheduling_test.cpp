@@ -159,7 +159,7 @@ cout<<flush;
 			ResourceSet resourceset = ResourceSet();
 			resource_gen(&resourceset, parameters);
 			tast_gen(taskset, resourceset, parameters, utilization);
-			//taskset.Leisure_Order();
+//			taskset.SM_PLUS_4_Order(parameters.p_num);
 			for(uint j = 0; j < parameters.get_method_num(); j++)
 			{
 				taskset.init();
@@ -173,13 +173,13 @@ cout<<flush;
 					cout<<"Incorrect test name."<<endl;
 					return -1;
 				}
-
+//cout<<test_attributes[j].test_name<<":";
 				if(schedTest->is_schedulable())
 				{
 					success[j]++;
-#if SORT_DEBUG
 					s_n++;
 					s_i = j;
+#if SORT_DEBUG
 					cout<<test_attributes[j].test_name<<" success!"<<endl;
 #endif
 				}
@@ -188,10 +188,11 @@ cout<<flush;
 
 			}
 
-#if SORT_DEBUG
+
 			if(1 == s_n)
 			{
 				exc[s_i]++;
+#if SORT_DEBUG
 				cout<<"Exclusive Success TaskSet:"<<endl;
 				cout<<"/////////////////"<<test_attributes[s_i].test_name<<"////////////////"<<endl;
 				foreach(taskset.get_tasks(), task)
@@ -200,11 +201,42 @@ cout<<flush;
 					cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
 					cout<<"-----------------------"<<endl;
 				}
-				sleep(1);
-			}
 #endif
+				//sleep(1);
+			}
+/*
+			else if(0 == s_n)
+			{
+				cout<<"None Success TaskSet:"<<endl;
+				cout<<"////////////////RM/////////////////"<<endl;
+				taskset.RM_Order();
+				foreach(taskset.get_tasks(), task)
+				{
+					cout<<"Task "<<task->get_id()<<":"<<endl;
+					cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
+					cout<<"-----------------------"<<endl;
+				}
+				cout<<"////////////////DC/////////////////"<<endl;
+				taskset.DC_Order();
+				foreach(taskset.get_tasks(), task)
+				{
+					cout<<"Task "<<task->get_id()<<":"<<endl;
+					cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
+					cout<<"-----------------------"<<endl;
+				}
+				cout<<"////////////////SMP4/////////////////"<<endl;
+				taskset.SM_PLUS_4_Order(parameters.p_num);
+				foreach(taskset.get_tasks(), task)
+				{
+					cout<<"Task "<<task->get_id()<<":"<<endl;
+					cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
+					cout<<"-----------------------"<<endl;
+				}
+			}
+*/
 
 			result.utilization = utilization;
+//cout<<endl;
 		}
 cout<<endl;
 		for(uint i = 0; i < test_attributes.size(); i++)

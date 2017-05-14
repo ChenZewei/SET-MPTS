@@ -120,6 +120,11 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 		tasks.SM_PLUS_3_Order();
 		return new RTA_GFP_NG(tasks, processors, resources);
 	}
+	else if(0 == strcmp(test_name.data(), "RTA-GSMP4-NG"))
+	{
+		tasks.SM_PLUS_4_Order(processors.get_processor_num());
+		return new RTA_GFP_NG(tasks, processors, resources);
+	}
 	else if(0 == strcmp(test_name.data(), "RTA-GLO-NG"))
 	{
 		tasks.Leisure_Order();

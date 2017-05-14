@@ -454,6 +454,11 @@ Tasks& TaskSet::get_tasks()
 
 Task& TaskSet::get_task_by_id(uint id)
 {
+	return tasks[id];
+}
+/*
+Task& TaskSet::get_task_by_id(uint id)
+{
 	foreach(tasks, task)
 	{
 		if(id == task->get_id())
@@ -461,7 +466,7 @@ Task& TaskSet::get_task_by_id(uint id)
 	}
 	return *(Task*)0;
 }
-
+*/
 bool TaskSet::is_implicit_deadline()
 {
 	foreach_condition(tasks,tasks[i].get_deadline() != tasks[i].get_period());
@@ -915,7 +920,6 @@ void TaskSet::Leisure_Order()
 		tasks[i].set_priority(i);
 	}
 
-#if SORT_DEBUG
 	cout<<"Leisure Order:"<<endl;
 	cout<<"-----------------------"<<endl;
 	foreach(tasks, task)
@@ -924,19 +928,28 @@ void TaskSet::Leisure_Order()
 		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<leisure(task->get_id())<<endl;
 		cout<<"-----------------------"<<endl;
 	}
-#endif
 }
 
 
 void TaskSet::SM_PLUS_4_Order(uint p_num)
 {
 	sort_by_period();
-	
+#if SORT_DEBUG
+cout<<"////////////////////////////////////////////"<<endl;
+	cout<<"RM:"<<endl;
+	cout<<"-----------------------"<<endl;
+	foreach(tasks, task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<leisure(task->get_id())<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+#endif
 
 	if(1 < tasks.size())
 	{
 		uint min_id;
-		ulong min_slack = MAX_LONG;
+		ulong min_slack;
 		vector<uint> id_stack;
 
 		foreach(tasks, task)
@@ -944,20 +957,25 @@ void TaskSet::SM_PLUS_4_Order(uint p_num)
 			task->set_other_attr(0);//accumulative adjustment
 		}
 
-		for(int index = 0; index < task.size(); index++)
+		for(int index = 0; index < tasks.size(); index++)
 		{
 			bool is_continue = false;
-			foreach(tasks, task)
+			min_id = 0;
+			min_slack = MAX_LONG;
+			foreach(tasks, task)//find next minimum slack
 			{
+				is_continue = false;
 				uint temp_id = task->get_id();
-				foreach(id_stask, element)
+				foreach(id_stack, element)
 				{
+//					cout<<"element:"<<(*element)<<endl;
 					if(temp_id == (*element))
 						is_continue = true;
 				}
 				if(is_continue)
 					continue;
 				ulong temp_slack = task->get_slack();
+//				cout<<"pre min slack:"<<min_slack<<" current slack:"<<temp_slack<<endl;
 				if(min_slack > task->get_slack())
 				{
 					min_id = temp_id;
@@ -965,12 +983,12 @@ void TaskSet::SM_PLUS_4_Order(uint p_num)
 				}
 			}
 			id_stack.push_back(min_id);
-			
+//			cout<<"min slack id:"<<min_id<<endl;
 			is_continue = false;
 
 			//Task& ms_task = get_task_by_id(min_id);
 			
-			for(int index2 = 0; index2 < tasks.size(); index2++)
+			for(int index2 = 0; index2 < tasks.size(); index2++)//locate minimum slack
 			{
 				if(min_id == tasks[index2].get_id())
 				{
@@ -984,12 +1002,13 @@ void TaskSet::SM_PLUS_4_Order(uint p_num)
 							break;
 						}
 
-						if(task1->get_slack() <task2->get_slack())
+						if(task1->get_slack() < task2->get_slack())
 						{
-							Task temp = (*task2);
-							tasks.erase((task2));
-							tasks.insert(task1, temp);
-							task1->set_other_attr(task1->get_other_attr() + 1);
+							Task temp = (*task1);
+							tasks.erase((task1));
+							tasks.insert(task2, temp);
+							task2->set_other_attr(task2->get_other_attr() + 1);
+							task1 = (tasks.begin() + index3);
 						}
 					}
 
@@ -998,37 +1017,9 @@ void TaskSet::SM_PLUS_4_Order(uint p_num)
 			}
 		}
 
-		for(int index = 0; index < tasks.size() - 1; index++)
-		{
-			vector<Task>::iterator it = (tasks.begin() + index);
-			ulong c = (it)->get_wcet();
-			ulong gap = (it)->get_deadline() - (it)->get_wcet();
-			ulong d = (it)->get_deadline();
-
-			for(int index2 = index + 1; index2 < tasks.size(); index2++)
-			{
-				vector<Task>::iterator it2 = (tasks.begin() + index2);
-				ulong c2 = (it2)->get_wcet();
-				ulong gap2 = (it2)->get_deadline() - (it2)->get_wcet();
-				ulong d2 = (it2)->get_deadline();
-
-				if(c > gap2 && d > d2 && (accum[(it->get_id())]) < (p_num - 1))
-				{
-					accum[(it->get_id())]++;
-
-					Task temp = (*it2);
-					tasks.erase((it2));
-					tasks.insert(it, temp);
-
-					index = 0;
-					break;
-				}
-				//cout<<"for2 end"<<endl;
-			}
-		}
-
 		for(int i = 0; i < tasks.size(); i++)
 			tasks[i].set_id(i);
+
 	}
 
 	for(uint i = 0; i < tasks.size(); i++)
