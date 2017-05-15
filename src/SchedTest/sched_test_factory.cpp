@@ -15,6 +15,7 @@
 #include "nc_gedf_vpr.h"
 #include "rta_gdc_native.h"
 #include "rta_pdc_ro.h"
+#include "rta_gfp_czw.h"
 
 SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
@@ -190,9 +191,24 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 		tasks.SM_PLUS_3_Order();
 		return new RTA_GFP_BC(tasks, processors, resources);
 	}
+	else if(0 == strcmp(test_name.data(), "RTA-GSMP4-BC"))
+	{
+		tasks.SM_PLUS_4_Order(processors.get_processor_num());
+		return new RTA_GFP_BC(tasks, processors, resources);
+	}
 	else if(0 == strcmp(test_name.data(), "RTA-PDC-RO"))
 	{
 		return new RTA_PDC_RO(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-GFP-CZW"))
+	{
+		tasks.RM_Order();
+		return new RTA_GFP_CZW(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-GSMP4-CZW"))
+	{
+		tasks.SM_PLUS_4_Order(processors.get_processor_num());
+		return new RTA_GFP_CZW(tasks, processors, resources);
 	}
 	else
 		return NULL;

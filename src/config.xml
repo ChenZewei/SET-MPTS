@@ -47,14 +47,14 @@
 		<data RENAME="" REMARK="">RTA-GLO-NG</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO</data>
 		<data RENAME="" REMARK="">RTA-PDC-RO</data>
+		<data RENAME="" REMARK="">RTA-GSMP4-NG</data>
 
 
 <!-->
-		<data RENAME="" REMARK="">RTA-GFP-NG</data>
-		<data RENAME="" REMARK="">RTA-GDC-NG</data>
-		<data RENAME="" REMARK="">RTA-GSMP4-NG</data>
+		<data RENAME="" REMARK="">RTA-GFP-BC</data>
+		<data RENAME="" REMARK="">RTA-GFP-CZW</data>
 	</schedulability_test>
-	<experiment_times>500</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -63,7 +63,7 @@
 		<data>JSON</data>
 	</output>
 	<lambda>
-		<data>1</data>
+		<data>10</data>
 	</lambda>
 	<step>
 		<data>0.1</data>
@@ -71,11 +71,11 @@
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>10</max>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>10</data>	
+		<data>4</data>	
 	</processor_num>
 	<period_range>
 		<data>
