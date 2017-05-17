@@ -10,7 +10,7 @@ RTA_PFP_WF_spinlock::RTA_PFP_WF_spinlock(TaskSet tasks, ProcessorSet processors,
 	this->processors = processors;
 	this->resources = resources;
 	
-	this->tasks.RM_Order();
+	//this->tasks.RM_Order();
 	this->processors.init();
 }
 
