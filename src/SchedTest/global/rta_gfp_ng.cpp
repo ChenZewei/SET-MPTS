@@ -10,7 +10,7 @@ RTA_GFP_NG::RTA_GFP_NG(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->processors = processors;
 	this->resources = resources;
 	
-	this->tasks.RM_Order();
+	//this->tasks.RM_Order();
 }
 
 int RTA_GFP_NG::interference_gap_decrease(Carry_in t1, Carry_in t2)
@@ -116,17 +116,53 @@ ulong RTA_GFP_NG::response_time(Task& ti)
 	uint p_num = processors.get_processor_num();
 //cout<<"id:"<<t_id<<endl;
 //tasks.display();
-	while(response < test_end)
+	bool test = (wcet == test_end);
+/*
+if(test)
+{
+
+	foreach(tasks.get_tasks(), task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+}
+*/
+	while(response <= test_end)
 	{
 		omega = total_interference(ti, response);
+
+/*
+	if(test)
+	{
+		cout<<"task:"<<t_id<<"total interference:"<<omega<<endl;
+	}
+*/
 //cout<<"omega:"<<omega<<endl; 
 		demand = floor(omega/p_num) + wcet;
 //cout<<response<<" "<<demand<<endl;
+	
+	
 		if(response == demand)
+		{
+/*
+if(test)
+{
+	cout<<"task:"<<t_id<<"response:"<<response<<endl;
+}
+*/
 			return 	response;
+		}
 		else
 			response = demand;
 	}
+/*
+if(test)
+{
+	cout<<"task:"<<t_id<<"response:"<<response<<endl;
+}
+*/
 	return test_end + 100;
 }
 
@@ -141,7 +177,10 @@ bool RTA_GFP_NG::is_schedulable()
 		ulong original_bound = ti->get_response_time();
 		response_bound = response_time((*ti));
 		if (response_bound > ti->get_deadline())
+		{
+//			cout<<"RTA failed on task:"<<ti->get_id()<<endl;
 			return false;
+		}
 		if(response_bound > original_bound)
 		{
 			ti->set_response_time(response_bound);

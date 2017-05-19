@@ -43,6 +43,10 @@
 	foreach(collection, tx)						\
 		if(tx->get_id() != ti.get_id())
 
+#define foreach_resource_except(collection, ru, rv) \
+	foreach(collection, rv)						\
+		if(ru->get_resource_id() != rv.get_resource_id())
+
 #define foreach_higher_priority_task(tasks, ti, tx) \
 	foreach(tasks, tx)				       \
 	if (tx->get_priority() < ti.get_priority())

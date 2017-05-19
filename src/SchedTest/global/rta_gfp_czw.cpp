@@ -1,13 +1,13 @@
-#include "rta_gfp_bc.h"
+#include "rta_gfp_czw.h"
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
 #include "iteration-helper.h"
 #include "math-helper.h"
 
-RTA_GFP_BC::RTA_GFP_BC(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "BC") {}
+RTA_GFP_CZW::RTA_GFP_CZW(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "CZW") {}
 
-RTA_GFP_BC::RTA_GFP_BC(TaskSet tasks, ProcessorSet processors, ResourceSet resources): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "BC")
+RTA_GFP_CZW::RTA_GFP_CZW(TaskSet tasks, ProcessorSet processors, ResourceSet resources): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "CZW")
 {
 	this->tasks = tasks;
 	this->processors = processors;
@@ -16,18 +16,18 @@ RTA_GFP_BC::RTA_GFP_BC(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->processors.init();
 }
 
-ulong RTA_GFP_BC::workload(Task& task, ulong interval)
+ulong RTA_GFP_CZW::workload(Task& task, ulong interval)
 {
 	ulong a = min(task.get_wcet(), (interval + task.get_response_time() - task.get_wcet()%task.get_period()));
 	return task.get_wcet() * floor((interval + task.get_response_time() - task.get_wcet())/task.get_period()) + a;
 }
 
-ulong RTA_GFP_BC::interference(Task& tk, Task& ti, ulong interval)
+ulong RTA_GFP_CZW::interference(Task& tk, Task& ti, ulong interval)
 {
 	return min(interval - tk.get_wcet() + 1, max((ulong)0, workload(ti, interval)));
 }
 
-ulong RTA_GFP_BC::response_time(Task& ti)
+ulong RTA_GFP_CZW::response_time(Task& ti)
 {
 	ulong wcet = ti.get_wcet();
 	ulong test_end = ti.get_deadline();
@@ -38,16 +38,10 @@ ulong RTA_GFP_BC::response_time(Task& ti)
 	while(response <= test_end)
 	{
 		ulong sum = 0;
-/*
 		for(uint x = 0; x < ti.get_id(); x++)
 		{
 			Task& tx = tasks.get_task_by_id(x);
 			sum += interference(ti, tx, response);
-		}
-*/
-		foreach_higher_priority_task(tasks.get_tasks(), ti, tx)
-		{
-			sum += interference(ti, (*tx), response);
 		}
 		demand = floor(sum/p_num) + wcet;
 		if(response == demand)
@@ -58,7 +52,7 @@ ulong RTA_GFP_BC::response_time(Task& ti)
 	return test_end + 100;
 }
 
-bool RTA_GFP_BC::is_schedulable()
+bool RTA_GFP_CZW::is_schedulable()
 {
 	ulong response_bound;
 
