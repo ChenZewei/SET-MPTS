@@ -380,9 +380,47 @@ void ILP_RTA_PFP_DPCP::constraint_4(LinearProgram& lp, ILPDPCPMapper& vars)
 	}
 }
 //C5
-void ILP_RTA_PFP_DPCP::constraint_5(LinearProgram& lp, ILPDPCPMapper& vars);
+void ILP_RTA_PFP_DPCP::constraint_5(LinearProgram& lp, ILPDPCPMapper& vars)
+{
+	uint p_num = processors.get_processor_num();
+
+	foreach(tasks.get_tasks(), ti)
+	{
+		uint i = ti->get_id();
+		foreach(resources.get_resources(), ru)
+		{
+			uint u = ru->get_resource_id();
+			for(uint k = 1; k <= p_num; k++)
+			{
+				LinearExpression *exp = new LinearExpression();
+				uint var_id;
+
+				var_id = vars.lookup(ILPDPCPMapper::LOCALITY_ASSIGNMENT, i, k);
+				exp->add_term(var_id, 1);
+
+				var_id = vars.lookup(ILPDPCPMapper::RESOURCE_ASSIGNMENT, u, k);
+				exp->add_term(var_id, 1);
+
+				var_id = vars.lookup(ILPDPCPMapper::SAME_TR_LOCALITY, i, u);
+				exp->sub_term(var_id, 1);
+				lp.declare_variable_binary(var_id);
+
+				lp.add_inequality(exp, 1);
+			}
+		}	
+	}
+}
 //C6
-void ILP_RTA_PFP_DPCP::constraint_6(LinearProgram& lp, ILPDPCPMapper& vars);
+void ILP_RTA_PFP_DPCP::constraint_6(LinearProgram& lp, ILPDPCPMapper& vars)
+{
+	foreach(tasks.get_tasks(), ti)
+	{
+		uint i = ti->get_id();
+		ulong di = ti->get_deadline();
+
+		
+	}
+}
 //C7
 void ILP_RTA_PFP_DPCP::constraint_7(LinearProgram& lp, ILPDPCPMapper& vars);
 //C8
