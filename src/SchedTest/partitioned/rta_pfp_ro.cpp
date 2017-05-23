@@ -292,7 +292,7 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 
 bool RTA_PFP_RO::is_schedulable()
 {
-	bool schedulable;
+	bool schedulable = false;
 
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
