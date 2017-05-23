@@ -30,15 +30,21 @@ bool RTA_PFP_RO_FEASIBLE::condition_1()
 	if((processors.get_processor_num() - tasks.get_utilization_sum()) >= _EPS)
 		return true;
 	else
+	{
+		//cout<<"Condition 1 false."<<endl;
 		return false;
+	}
 }
 
 bool RTA_PFP_RO_FEASIBLE::condition_2()
 {
 	foreach(tasks.get_tasks(), task)
 	{
-		if(task->get_utilization() > 1)
+		if(task->get_utilization() > 1)	
+		{
+			//cout<<"Condition 2 false."<<endl;
 			return false;
+		}
 	}
 	return true;
 }
@@ -73,8 +79,12 @@ bool RTA_PFP_RO_FEASIBLE::condition_3()
 				sum += DBF_R(*th, q, deadline);
 			}
 
-			if(abs((double)sum/deadline - 1) > _EPS)
+			if((double)sum/deadline > 1)			
+			{
+				//cout<<"LHS:"<<(double)sum/deadline<<" deadline:"<<deadline<<endl;
+				//cout<<"Condition 3 false."<<endl;
 				return false;
+			}
 		}
 	}
 	return true;
@@ -91,4 +101,6 @@ ulong RTA_PFP_RO_FEASIBLE::DBF_R(Task& ti, uint r_id, ulong interval)
 	ulong DBF = ((interval - deadline)/period + 1) * wccs;
 	return max((ulong)0, DBF);
 }
+
+bool RTA_PFP_RO_FEASIBLE::alloc_schedulable() {}
 

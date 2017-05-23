@@ -53,8 +53,13 @@
 <!-->
 		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO-FEASIBLE</data>
+		<data RENAME="" REMARK="">ILP-RTA-PFP-spinlock</data>
+		<data RENAME="" REMARK="">RTA-PFP-GS</data>
+		<data RENAME="" REMARK="">LP-RTA-PFP-DPCP</data>
+		<data RENAME="" REMARK="">LP-RTA-GFP-PIP</data>
+		<data RENAME="" REMARK="">NC-GEDF-VPR</data>
 	</schedulability_test>
-	<experiment_times>500</experiment_times>
+	<experiment_times>10</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -79,8 +84,8 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>10000</min>
-			<max>1000000</max>
+			<min>1000</min>
+			<max>10000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>
@@ -96,7 +101,7 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.5</data>
+		<data>0.2</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>
@@ -104,7 +109,7 @@
 	<rrr>//resource_request_range
 		<data>
 			<min>10</min>
-			<max>100</max>
+			<max>20</max>
 		</data>
 	</rrr>
 	<total_len_factor>
