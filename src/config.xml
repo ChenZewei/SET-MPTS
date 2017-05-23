@@ -51,9 +51,8 @@
 
 
 <!-->
-		<data RENAME="" REMARK="">RTA-PFP-GS</data>
-		<data RENAME="" REMARK="">LP-RTA-GFP-PIP</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
 	</schedulability_test>
 	<experiment_times>500</experiment_times>
 	<output>
@@ -80,13 +79,13 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>1000</min>
-			<max>10000</max>
+			<min>10000</min>
+			<max>1000000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>
 		<data>
-			<min>1</min>
+			<min>0.6</min>
 			<max>1</max>
 		</data>
 	</deadline_propotion>
@@ -97,15 +96,15 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.2</data>
+		<data>0.5</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
-			<min>1</min>
-			<max>10</max>
+			<min>10</min>
+			<max>100</max>
 		</data>
 	</rrr>
 	<total_len_factor>
