@@ -51,25 +51,21 @@
 
 
 <!-->
-		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
-		<data RENAME="" REMARK="">RTA-PFP-RO-FEASIBLE</data>
 		<data RENAME="" REMARK="">RTA-PFP-GS</data>
-		<data RENAME="" REMARK="">LP-RTA-PFP-DPCP</data>
-		<data RENAME="" REMARK="">LP-RTA-GFP-PIP</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>500</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="SVG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="TGA" BLACK_ONLY="true" >LineChart</data>
-		<data>JSON</data>
+		<data>JSON</data>]
 	</output>
 	<lambda>
 		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.1</data>
+		<data>0.2</data>
 	</step>
 	<init_utilization_range>
 		<data>
@@ -82,8 +78,8 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>10000</min>
-			<max>1000000</max>
+			<min>1000</min>
+			<max>10000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>
@@ -93,10 +89,10 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>4</data>
+		<data>0</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>1</data>
+		<data>0</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.2</data>
@@ -106,8 +102,8 @@
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
-			<min>100</min>
-			<max>500</max>
+			<min>50</min>
+			<max>100</max>
 		</data>
 	</rrr>
 	<total_len_factor>

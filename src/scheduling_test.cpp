@@ -167,6 +167,7 @@ cout<<flush;
 				resourceset.init();
 				exp[j]++;
 
+
 				SchedTestBase *schedTest = STFactory.createSchedTest(test_attributes[j].test_name, taskset, processorset, resourceset);
 				if(NULL == schedTest)
 				{
@@ -183,10 +184,9 @@ cout<<flush;
 					cout<<test_attributes[j].test_name<<" success!"<<endl;
 #endif
 				}
-				
+			
 				delete(schedTest);
-
-			}
+				}	
 
 
 			if(1 == s_n)
