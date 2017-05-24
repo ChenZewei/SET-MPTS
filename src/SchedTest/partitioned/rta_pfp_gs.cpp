@@ -142,7 +142,12 @@ ulong RTA_PFP_GS::response_time(Task& ti)
 	ti.set_local_blocking(local_blocking);
 	ti.set_remote_blocking(remote_blocking);
 	ti.set_total_blocking(local_blocking + remote_blocking);
-
+/*
+	foreach(tasks.get_tasks(), tx)
+	{
+		cout<<"Task"<<tx->get_id()<<" partition:"<<tx->get_id()<<" priority:"<<tx->get_priority()<<endl;
+	}
+*/
 	while(response_time + jitter <= test_end)
 	{
 		test_start = wcet + remote_blocking + max(local_blocking, NP_blocking);
@@ -207,7 +212,7 @@ bool RTA_PFP_GS::alloc_schedulable(Task& ti)
 
 long RTA_PFP_GS::pfp_gs_tryAssign(Task& ti, uint p_id)
 {
-	long s = MAX_LONG;
+	long s = 0x7fffffffffffffff;
 	Processor& processor = processors.get_processors()[p_id];
 //cout<<"<================= try assign task:"<<ti.get_id()<<" to processor:"<<p_id<<" =================>"<<endl;
 
@@ -217,10 +222,14 @@ long RTA_PFP_GS::pfp_gs_tryAssign(Task& ti, uint p_id)
 
 	foreach_task_assign_to_other_processor(tasks.get_tasks(), p_id, tx)
 	{
+		if(MAX_INT == tx->get_partition())
+			continue;
+//		cout<<"task"<<tx->get_id();
 		if(!alloc_schedulable(*tx))
 		{
 			processor.remove_task(&ti);
 			ti.set_partition(MAX_INT);
+//			cout<<"X";
 			return -1;
 		}
 	}
@@ -275,7 +284,7 @@ long RTA_PFP_GS::pfp_gs_tryAssign(Task& ti, uint p_id)
 	foreach(taskqueue, ti)
 	{
 		long slack = ((Task*)(*ti))->get_period() - ((Task*)(*ti))->get_response_time();
-
+//cout<<"slack:"<<slack<<endl;
 		if(s > slack)
 		{
 			s = slack;	
@@ -314,6 +323,7 @@ bool RTA_PFP_GS::is_schedulable()//Greedy Slacker heuristic partitioning
 		for(uint p_id = 0; p_id < p_num; p_id++)
 		{
 			long s = pfp_gs_tryAssign((*tx), p_id);
+//			cout<<"TryAssign task_"<<tx->get_id()<<" to proc_"<<p_id<<" slack:"<<s<<endl;
 			if(0 <= s)
 			{
 				gs_tryAssign temp;
@@ -332,6 +342,7 @@ bool RTA_PFP_GS::is_schedulable()//Greedy Slacker heuristic partitioning
 			uint priority;
 			foreach(C, c)
 			{
+//				cout<<" "<<c->s<<" "<<c->p_id<<" "<<c->priority<<endl;
 				if(max_s < c->s)
 				{
 					max_s = c->s;
