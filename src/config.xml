@@ -52,7 +52,7 @@
 
 <!-->
 		<data RENAME="" REMARK="">RTA-PFP-GS</data>
-		<data RENAME="" REMARK="">RTA-PFP-RO</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
 	</schedulability_test>
 	<experiment_times>500</experiment_times>
 	<output>
@@ -90,21 +90,21 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>4</data>
+		<data>8</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.2</data>
+		<data>0.5</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
-			<min>100</min>
-			<max>500</max>
+			<min>50</min>
+			<max>100</max>
 		</data>
 	</rrr>
 	<total_len_factor>

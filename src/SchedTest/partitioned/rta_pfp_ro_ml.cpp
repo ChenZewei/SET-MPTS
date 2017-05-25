@@ -368,7 +368,7 @@ bool RTA_PFP_RO_ML::is_first_fit_for_tasks_schedulable(uint start_processor)
 			if(processor.add_task(&(*ti)))
 			{
 				ti->set_partition(assignment);
-				if(alloc_schedulable())
+				if(alloc_schedulable(*ti))
 				{
 					schedulable = true;
 					break;
@@ -388,16 +388,16 @@ bool RTA_PFP_RO_ML::is_first_fit_for_tasks_schedulable(uint start_processor)
 	return schedulable;
 }
 
-bool RTA_PFP_RO_ML::alloc_schedulable()//
+bool RTA_PFP_RO_ML::alloc_schedulable()
 {
 	ulong response_bound = 0;
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint p_i = ti->get_partition();
-		if(p_i == MAX_INT)
+		uint p_id = ti->get_partition();
+		if(MAX_INT == p_id)
 			continue;
 		
-		Processor& processor = processors.get_processors()[p_i];
+		Processor& processor = processors.get_processors()[p_id];
 		if(0 == processor.get_resourcequeue().size())//Application Processor
 		{
 			response_bound = response_time_AP((*ti));
@@ -416,6 +416,35 @@ bool RTA_PFP_RO_ML::alloc_schedulable()//
 		}
 	}
 	return true;
+}
+
+bool RTA_PFP_RO_ML::alloc_schedulable(Task& ti)
+{
+	uint p_id = ti.get_partition();
+	if(MAX_INT == p_id)
+		return false;
+
+	Processor& processor = processors.get_processors()[p_id];
+	ulong response_bound = 0;
+	if(0 == processor.get_resourcequeue().size())//Application Processor
+	{
+		response_bound = response_time_AP(ti);
+		ti.set_response_time(response_bound);
+	}
+	else//Synchronization Processor
+	{
+		response_bound = response_time_SP(ti);
+		ti.set_response_time(response_bound);
+	}
+
+	if(response_bound <= ti.get_deadline())
+	{
+		return true;
+	}
+	else
+	{	
+		return false;
+	}
 }
 
 bool RTA_PFP_RO_ML::is_schedulable()

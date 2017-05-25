@@ -24,6 +24,7 @@ class RTA_PFP_RO: public PartitionedSched
 		bool worst_fit_for_resources(uint active_processor_num);
 		bool is_first_fit_for_tasks_schedulable(uint start_processor);
 		bool alloc_schedulable();
+		bool alloc_schedulable(Task& ti);
 	public:
 		RTA_PFP_RO();
 		RTA_PFP_RO(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
