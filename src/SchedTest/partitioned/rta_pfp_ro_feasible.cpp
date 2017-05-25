@@ -71,9 +71,9 @@ bool RTA_PFP_RO_FEASIBLE::condition_3()
 
 			sum += max;
 
-			foreach_task_except(tasks.get_tasks(), (*ti), th)
+			foreach(tasks.get_tasks(), th)
 			{
-				if(th->get_deadline() > ti->get_deadline() || !(th->is_request_exist(q)))
+				if(th->get_deadline() >= ti->get_deadline() || !(th->is_request_exist(q)))
 					continue;
 
 				sum += DBF_R(*th, q, deadline);
