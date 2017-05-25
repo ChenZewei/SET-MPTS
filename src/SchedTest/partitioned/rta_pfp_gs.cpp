@@ -129,9 +129,9 @@ ulong RTA_PFP_GS::pfp_gs_NP_blocking(Task& ti)
 
 ulong RTA_PFP_GS::response_time(Task& ti)
 {
-	if(ti.get_partition())
+	if(MAX_INT == ti.get_partition())
 		return ti.get_deadline();
-cout<<"RTA for task:"<<ti.get_id()<<endl;
+//cout<<"RTA for task:"<<ti.get_id()<<endl;
 	ulong wcet = ti.get_wcet();
 	ulong jitter = ti.get_jitter();
 	//ti.set_response_time(wcet);
@@ -154,13 +154,13 @@ cout<<"RTA for task:"<<ti.get_id()<<endl;
 	while(response_time + jitter <= test_end)
 	{
 		test_start = wcet + remote_blocking + max(local_blocking, NP_blocking);
-cout<<"remote blocking:"<<remote_blocking<<" max(local_b, NP_b):"<<max(local_blocking, NP_blocking)<<endl;
+//cout<<"remote blocking:"<<remote_blocking<<" max(local_b, NP_b):"<<max(local_blocking, NP_blocking)<<endl;
 		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 		{
 			if(ti.get_partition() == th->get_partition())
 			{
-cout<<"Task:"<<th->get_id()<<" Partition:"<<th->get_partition()<<" priority:"<<th->get_priority()<<endl;
-cout<<"........................"<<endl;
+//cout<<"Task:"<<th->get_id()<<" Partition:"<<th->get_partition()<<" priority:"<<th->get_priority()<<endl;
+//cout<<"........................"<<endl;
 				ulong wcet_h = th->get_wcet();
 				ulong period_h = th->get_period();
 				ulong jitter_h = th->get_jitter();
@@ -176,6 +176,7 @@ cout<<"........................"<<endl;
 		else
 		{
 			//ti.set_response_time(response_time);
+			//cout<<"rt:"<<response_time<<endl;
 			return response_time;
 		}	
 	}
@@ -205,8 +206,9 @@ bool RTA_PFP_GS::alloc_schedulable(Task& ti)
 {
 	if(MAX_INT == ti.get_partition())
 		return false;
-	
+
 	ulong response_bound = response_time(ti);
+//cout<<"rb of task "<<ti.get_id()<<":"<<response_bound<<endl;
 	ti.set_response_time(response_bound);
 
 	if(response_bound > ti.get_deadline())
@@ -250,7 +252,7 @@ long RTA_PFP_GS::pfp_gs_tryAssign(Task& ti, uint p_id)
 
 	for(int pi = queue_size - 1; pi >= 0; pi--) // pi from |U| -> 0
 	{
-cout<<"try to assign priority "<<pi<<" on processor "<<p_id<<endl;
+//cout<<"try to assign priority "<<pi<<" on processor "<<p_id<<endl;
 		TaskQueue C;
 /*
 		foreach_task_assign_to_processor(tasks.get_tasks(), p_id, tx)
@@ -263,7 +265,7 @@ cout<<"try to assign priority "<<pi<<" on processor "<<p_id<<endl;
 */
 		foreach(U, taskptr)
 		{
-cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
+//cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
 			((Task*)(*taskptr))->set_priority(pi);
 			if(alloc_schedulable(*((Task*)(*taskptr))))
 				C.push_back(*taskptr);
@@ -271,15 +273,19 @@ cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
 		}
 
 		if(0 == C.size())
+		{
+			processor.remove_task(&ti);
+			ti.set_partition(MAX_INT);
 			return -1;
+		}
 
-		//Assign priority to the max period task in U
+		//Assign priority to the max period task in C
 		ulong max_period = 0;
 		TaskQueue::iterator it;
-		foreach(U, taskptr)
+		foreach(C, taskptr)
 		{
 
-			cout<<"period:"<<((Task*)(*taskptr))->get_period()<<endl;
+//			cout<<"task:"<<((Task*)(*taskptr))->get_id()<<" partition:"<<((Task*)(*taskptr))->get_partition()<<" wcet:"<<((Task*)(*taskptr))->get_wcet()<<" period:"<<((Task*)(*taskptr))->get_period()<<" response time:"<<((Task*)(*taskptr))->get_response_time()<<endl;
 			if(max_period < ((Task*)(*taskptr))->get_period())
 			{
 				it = taskptr;
@@ -296,7 +302,8 @@ cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
 	foreach(taskqueue, ti)
 	{
 		long slack = ((Task*)(*ti))->get_period() - ((Task*)(*ti))->get_response_time();
-cout<<"slack:"<<slack<<endl;
+
+//cout<<"slack:"<<slack<<endl;
 		if(s > slack)
 		{
 			s = slack;	
@@ -334,7 +341,7 @@ bool RTA_PFP_GS::is_schedulable()//Greedy Slacker heuristic partitioning
 
 		for(uint p_id = 0; p_id < p_num; p_id++)
 		{
-			cout<<"TryAssign task_"<<tx->get_id()<<" to proc_"<<p_id<<endl;
+//			cout<<"TryAssign task_"<<tx->get_id()<<" to proc_"<<p_id<<endl;
 			long s = pfp_gs_tryAssign((*tx), p_id);
 			if(0 <= s)
 			{
@@ -347,42 +354,45 @@ bool RTA_PFP_GS::is_schedulable()//Greedy Slacker heuristic partitioning
 		}
 		if(0 == C.size())
 		{
+/*
 			foreach(tasks.get_tasks(), task)
 			{
 				cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<endl;
 				cout<<"----------------------------"<<endl;
 			}
-
+*/
 			return false;
 		}
 		else
 		{
-			long max_s = 0;
+			long max_s = -1;
 			uint assignment;
 			uint priority;
 			foreach(C, c)
 			{
-				cout<<" "<<c->s<<" "<<c->p_id<<" "<<c->priority<<endl;
+//				cout<<" "<<c->s<<" "<<c->p_id<<" "<<c->priority<<endl;
 				if(max_s < c->s)
 				{
 					max_s = c->s;
 					assignment = c->p_id;
 					priority = c->priority;
 				}
+				
 			}
+//			cout<<"max: "<<max_s<<" "<<assignment<<" "<<priority<<endl;
 			Processor& processor = processors.get_processors()[assignment];
 			processor.add_task(&(*tx));
 			tx->set_partition(assignment);
 			tx->set_priority(priority);
 		}
 	}
-
+/*
 	foreach(tasks.get_tasks(), task)
 	{
 		cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<endl;
 		cout<<"----------------------------"<<endl;
 	}
-
+*/
 	return true;
 }
 
