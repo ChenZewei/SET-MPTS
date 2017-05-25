@@ -109,7 +109,7 @@
 	<rrr>//resource_request_range
 		<data>
 			<min>10</min>
-			<max>20</max>
+			<max>50</max>
 		</data>
 	</rrr>
 	<total_len_factor>
