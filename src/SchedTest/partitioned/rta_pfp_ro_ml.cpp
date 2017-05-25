@@ -13,6 +13,7 @@ RTA_PFP_RO_ML::RTA_PFP_RO_ML(TaskSet tasks, ProcessorSet processors, ResourceSet
 	
 	this->tasks.RM_Order();
 	this->processors.init();
+
 }
 
 RTA_PFP_RO_ML::~RTA_PFP_RO_ML() {}
@@ -123,7 +124,7 @@ ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id)
 		}
 	}
 
-	return max(lambda, miu);
+	return min(lambda, miu);
 }
 
 ulong RTA_PFP_RO_ML::NCS_workload(Task& ti, ulong interval)
@@ -150,16 +151,33 @@ ulong RTA_PFP_RO_ML::response_time_AP(Task& ti)
 	ulong test_start = ti.get_wcet_non_critical_sections();
 	ulong response_time = test_start;
 
+#if RTA_DEBUG == 1
+	cout<<"AP "<<"Task"<<ti.get_id()<<" priority:"<<ti.get_priority()<<": partition:"<<ti.get_partition()<<endl;
+	cout<<"ncs-wcet:"<<ti.get_wcet_non_critical_sections()<<" cs-wcet:"<<ti.get_wcet_critical_sections()<<" wcet:"<<ti.get_wcet()<<" response time:"<<ti.get_response_time()<<" deadline:"<<ti.get_deadline()<<" period:"<<ti.get_period()<<" utilization:"<<ti.get_utilization().get_d()<<endl;
+	foreach(ti.get_requests(), request)
+	{
+		cout<<"request"<<request->get_resource_id()<<":"<<" resource_u"<<resources.get_resources()[request->get_resource_id()].get_utilization().get_d()<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
+	}
+#endif
 	while(response_time <= test_bound)
 	{
 		ulong temp = test_start;
+		ulong temp2 = temp;
+
 		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 		{
-			if(p_id == th->get_partition())
+#if RTA_DEBUG == 1
+			cout<<"Th:"<<th->get_id()<<" partition:"<<th->get_partition()<<" priority:"<<th->get_priority()<<endl;
+#endif
+			if (th->get_partition() == ti.get_partition())
 			{
 				temp += NCS_workload(*th, response_time);
 			}
 		}
+#if RTA_DEBUG == 1
+		cout<<"NCS workload:"<<temp-test_start<<endl;
+		temp2 = temp;
+#endif
 
 		for(uint k = 0; k < processors.get_processor_num(); k++)
 		{
@@ -169,6 +187,11 @@ ulong RTA_PFP_RO_ML::response_time_AP(Task& ti)
 //			cout<<"AB of processor "<<k<<":"<<agent_bound<<endl;
 			temp += agent_bound;
 		}
+#if RTA_DEBUG == 1
+		cout<<"agent exec bound:"<<temp-temp2<<endl;
+
+		cout<<"response time:"<<temp<<endl;
+#endif
 
 		assert(temp >= response_time);
 
@@ -179,9 +202,17 @@ ulong RTA_PFP_RO_ML::response_time_AP(Task& ti)
 			response_time = temp;
 		}
 		else if(temp == response_time)
+		{
+#if RTA_DEBUG == 1
+			cout<<"=============================="<<endl;
+#endif
 			return response_time;
+		}
 	}
 //	cout<<"AP miss."<<endl;
+#if RTA_DEBUG == 1
+	cout<<"=============================="<<endl;
+#endif
 	return test_bound + 100;
 }
 
@@ -192,9 +223,19 @@ ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
 	ulong test_start = ti.get_wcet_non_critical_sections();
 	ulong response_time = test_start;
 
+#if RTA_DEBUG == 1
+	cout<<"SP "<<"Task"<<ti.get_id()<<": partition:"<<ti.get_partition()<<endl;
+	cout<<"ncs-wcet:"<<ti.get_wcet_non_critical_sections()<<" cs-wcet:"<<ti.get_wcet_critical_sections()<<" wcet:"<<ti.get_wcet()<<" response time:"<<ti.get_response_time()<<" deadline:"<<ti.get_deadline()<<" period:"<<ti.get_period()<<" utilization:"<<ti.get_utilization().get_d()<<endl;
+	foreach(ti.get_requests(), request)
+	{
+		cout<<"request"<<request->get_resource_id()<<":"<<" resource_u"<<resources.get_resources()[request->get_resource_id()].get_utilization().get_d()<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
+	}
+#endif
+
 	while(response_time <= test_bound)
 	{
 		ulong temp = test_start;
+		ulong temp2 = temp;
 
 		foreach(ti.get_requests(), request)//A
 		{
@@ -206,6 +247,11 @@ ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
 			}
 		}
 
+#if RTA_DEBUG == 1	
+		cout<<"A:"<<temp-temp2<<endl;
+		temp2 = temp;
+#endif
+
 		foreach_higher_priority_task(tasks.get_tasks(), ti, th)//W
 		{
 			if(p_id == th->get_partition())
@@ -213,6 +259,11 @@ ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
 				temp += NCS_workload(*th, response_time);
 			}
 		}
+
+#if RTA_DEBUG == 1
+		cout<<"NCS workload:"<<temp-temp2<<endl;
+		temp2 = temp;
+#endif
 
 		foreach_task_except(tasks.get_tasks(), ti, tj)
 		{
@@ -226,14 +277,24 @@ ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
 				}
 			}
 		}
+#if RTA_DEBUG == 1
+		cout<<"CS workload:"<<temp-temp2<<endl;
+		temp2 = temp;
+#endif
 
-		for(uint k = 0; k < processors.get_processor_num(); k++)//Seta
+		for(uint k = 0; k < processors.get_processor_num(); k++)//Theata
 		{
 			if(p_id == k)
 				continue;
 
 			temp += angent_exec_bound(ti, k);
 		}
+#if RTA_DEBUG == 1
+		cout<<"Theata:"<<temp-temp2<<endl;
+		temp2 = temp;
+		
+		cout<<"response time:"<<temp<<endl;
+#endif
 
 		assert(temp >= response_time);
 
@@ -244,9 +305,17 @@ ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
 			response_time = temp;
 		}
 		else if(temp == response_time)
+		{
+#if RTA_DEBUG == 1
+			cout<<"=============================="<<endl;
+#endif
 			return response_time;
+		}
 	}
 //	cout<<"SP miss."<<endl;
+#if RTA_DEBUG == 1
+	cout<<"=============================="<<endl;
+#endif
 	return test_bound + 100;
 }
 
@@ -256,6 +325,8 @@ bool RTA_PFP_RO_ML::worst_fit_for_resources(uint active_processor_num)
 
 	foreach(resources.get_resources(), resource)
 	{
+		if(abs(resource->get_utilization()) <= _EPS)
+			continue;
 		fraction_t r_utilization = 1;
 		uint assignment = 0;
 		for(uint i = 0; i < active_processor_num; i++)
@@ -297,7 +368,7 @@ bool RTA_PFP_RO_ML::is_first_fit_for_tasks_schedulable(uint start_processor)
 			if(processor.add_task(&(*ti)))
 			{
 				ti->set_partition(assignment);
-				if(alloc_schedulable())
+				if(alloc_schedulable(*ti))
 				{
 					schedulable = true;
 					break;
@@ -322,11 +393,11 @@ bool RTA_PFP_RO_ML::alloc_schedulable()
 	ulong response_bound = 0;
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint p_i = ti->get_partition();
-		if(p_i == MAX_INT)
+		uint p_id = ti->get_partition();
+		if(MAX_INT == p_id)
 			continue;
 		
-		Processor& processor = processors.get_processors()[p_i];
+		Processor& processor = processors.get_processors()[p_id];
 		if(0 == processor.get_resourcequeue().size())//Application Processor
 		{
 			response_bound = response_time_AP((*ti));
@@ -345,6 +416,35 @@ bool RTA_PFP_RO_ML::alloc_schedulable()
 		}
 	}
 	return true;
+}
+
+bool RTA_PFP_RO_ML::alloc_schedulable(Task& ti)
+{
+	uint p_id = ti.get_partition();
+	if(MAX_INT == p_id)
+		return false;
+
+	Processor& processor = processors.get_processors()[p_id];
+	ulong response_bound = 0;
+	if(0 == processor.get_resourcequeue().size())//Application Processor
+	{
+		response_bound = response_time_AP(ti);
+		ti.set_response_time(response_bound);
+	}
+	else//Synchronization Processor
+	{
+		response_bound = response_time_SP(ti);
+		ti.set_response_time(response_bound);
+	}
+
+	if(response_bound <= ti.get_deadline())
+	{
+		return true;
+	}
+	else
+	{	
+		return false;
+	}
 }
 
 bool RTA_PFP_RO_ML::is_schedulable()
@@ -366,7 +466,33 @@ bool RTA_PFP_RO_ML::is_schedulable()
 
 		schedulable = is_first_fit_for_tasks_schedulable(i%p_num);
 		if(schedulable)
+		{
+/*
+			foreach(tasks.get_tasks(), task)
+			{
+				cout<<"Task"<<task->get_id()<<": partition:"<<task->get_partition()<<endl;
+				cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
+				foreach(task->get_requests(), request)
+				{
+					cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
+				}
+				cout<<"-------------------------------------------"<<endl;
+			}
+*/
 			return schedulable;
+		}
 	}
+/*
+	foreach(tasks.get_tasks(), task)
+	{
+		cout<<"Task"<<task->get_id()<<": partition:"<<task->get_partition()<<endl;
+		cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
+		foreach(task->get_requests(), request)
+		{
+			cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
+		}
+		cout<<"-------------------------------------------"<<endl;
+	}
+*/
 	return schedulable;
 }

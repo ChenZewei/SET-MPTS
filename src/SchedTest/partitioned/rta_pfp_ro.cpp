@@ -176,24 +176,7 @@ ulong RTA_PFP_RO::response_time(Task& ti)
 bool RTA_PFP_RO::alloc_schedulable()
 {
 	ulong response_bound = 0;
-/*
-	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
-	{
-		Task& task = tasks.get_task_by_id(t_id);
-//cout<<"task id:"<<t_id<<endl;
-		if(task.get_partition() == MAX_INT)
-			continue;
-		response_bound = response_time(task);
-		if(response_bound <= task.get_deadline())
-		{
-			task.set_response_time(response_bound);
-		}
-		else
-		{	
-			return false;
-		}
-	}
-*/
+
 	foreach(tasks.get_tasks(), ti)
 	{
 		if(ti->get_partition() == MAX_INT)
@@ -210,6 +193,20 @@ bool RTA_PFP_RO::alloc_schedulable()
 	}
 
 	return true;
+}
+
+bool RTA_PFP_RO::alloc_schedulable(Task& ti)
+{
+	if(MAX_INT == ti.get_partition())
+		return false;
+
+	ulong response_bound = response_time(ti);
+	ti.set_response_time(response_bound);
+
+	if(response_bound > ti.get_deadline())
+		return false;
+	else
+		return true;
 }
 
 bool RTA_PFP_RO::worst_fit_for_resources(uint active_processor_num)
@@ -261,7 +258,7 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 			if(processor.add_task(&(*ti)))
 			{
 				ti->set_partition(assignment);
-				if(alloc_schedulable())
+				if(alloc_schedulable(*ti))
 				{
 					schedulable = true;
 					break;

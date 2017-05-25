@@ -3,6 +3,8 @@
 #include "processors.h"
 #include "resources.h"
 #include "assert.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ulong pfp_gs_local_blocking(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {

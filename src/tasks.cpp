@@ -84,7 +84,7 @@ Task::Task(	uint id,
 	local_blocking = 0;
 	total_blocking = 0;
 	jitter = 0;
-	response_time = wcet;
+	response_time = deadline;
 	cluster = MAX_INT;
 	independent = true;
 	wcet_non_critical_sections = this->wcet;
@@ -133,9 +133,9 @@ void Task::init()
 	local_blocking = 0;
 	total_blocking = 0;
 	jitter = 0;
-	response_time = wcet;
+	response_time = deadline;
 	cluster = MAX_INT;
-	priority = MAX_INT;
+//	priority = MAX_INT;
 	independent = true;
 	//wcet_non_critical_sections = this->wcet;
 	//wcet_critical_sections = 0;
@@ -1746,7 +1746,7 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double ut
 	{
 		ulong period = Random_Gen::uniform_integral_gen(int(param.p_range.min),int(param.p_range.max));
 		fraction_t u = Random_Gen::exponential_gen(param.lambda);
-		//fraction_t u = Random_Gen::uniform_real_gen(0.05, 0.1);
+		//fraction_t u = Random_Gen::uniform_real_gen(0.25, 0.35);
 		ulong wcet = period*u.get_d();
 		if(0 == wcet)
 			wcet++;

@@ -20,6 +20,7 @@ class RTA_PFP_GS: public PartitionedSched
 		ulong pfp_gs_NP_blocking(Task& ti);
 		ulong response_time(Task& ti);
 		bool alloc_schedulable();
+		bool alloc_schedulable(Task& ti);
 		long pfp_gs_tryAssign(Task& ti, uint p_id);
 	public:
 		RTA_PFP_GS();
