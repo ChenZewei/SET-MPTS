@@ -53,7 +53,7 @@
 <!-->
 		<data RENAME="" REMARK="">RTA-PFP-GS</data>
 	</schedulability_test>
-	<experiment_times>500</experiment_times>
+	<experiment_times>200</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -78,13 +78,13 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>1000</min>
-			<max>10000</max>
+			<min>10000</min>
+			<max>1000000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>
 		<data>
-			<min>0.6</min>
+			<min>1</min>
 			<max>1</max>
 		</data>
 	</deadline_propotion>
