@@ -1,6 +1,7 @@
 #include "rta_pfp_ro.h"
-#include "types.h"
 #include <assert.h>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_PFP_RO::RTA_PFP_RO():PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented") {}
 
@@ -112,11 +113,11 @@ ulong RTA_PFP_RO::ro_get_interference_AC(Task& ti, ulong interval)
 ulong RTA_PFP_RO::ro_get_interference_UC(Task& ti, ulong interval)
 {
 	uint p_i = ti.get_partition();
-	ulong IAC_i = 0;
+	ulong IUC_i = 0;
 	foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 	{
 		if(th->get_partition() == ti.get_partition())
-			IAC_i += ro_workload(*th, interval);
+			IUC_i += ro_workload(*th, interval);
 	}
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
@@ -126,11 +127,11 @@ ulong RTA_PFP_RO::ro_get_interference_UC(Task& ti, ulong interval)
 			Resource& resource = resources.get_resources()[r];
 			if(p_i == resource.get_locality())
 			{
-				IAC_i += ro_agent_workload(*tx, r, interval);
+				IUC_i += ro_agent_workload(*tx, r, interval);
 			}
 		}
 	}
-	return IAC_i;
+	return IUC_i;
 }
 
 ulong RTA_PFP_RO::ro_get_interference(Task& ti, ulong interval)
@@ -155,6 +156,7 @@ ulong RTA_PFP_RO::response_time(Task& ti)
 
 	while(response_time <= test_bound)
 	{
+		//ti.set_response_time(response_time);
 		ulong interf_C = ro_get_interference(ti, response_time);
 		ulong interf_R = ro_get_interference_R(ti, response_time);
 		ulong temp = test_start + interf_C + interf_R;
@@ -162,7 +164,9 @@ ulong RTA_PFP_RO::response_time(Task& ti)
 		assert(temp >= response_time);
 
 		if(temp != response_time)
+		{
 			response_time = temp;
+		}
 		else if(temp == response_time)
 			return response_time;
 	}
@@ -171,24 +175,38 @@ ulong RTA_PFP_RO::response_time(Task& ti)
 
 bool RTA_PFP_RO::alloc_schedulable()
 {
-	ulong response_bound;
-	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+	ulong response_bound = 0;
+
+	foreach(tasks.get_tasks(), ti)
 	{
-		Task& task = tasks.get_task_by_id(t_id);
-//cout<<"task id:"<<t_id<<endl;
-		if(task.get_partition() == MAX_INT)
+		if(ti->get_partition() == MAX_INT)
 			continue;
-		response_bound = response_time(task);
-		if(response_bound <= task.get_deadline())
+		response_bound = response_time((*ti));
+		if(response_bound <= ti->get_deadline())
 		{
-			task.set_response_time(response_bound);
+			ti->set_response_time(response_bound);
 		}
 		else
 		{	
 			return false;
 		}
 	}
+
 	return true;
+}
+
+bool RTA_PFP_RO::alloc_schedulable(Task& ti)
+{
+	if(MAX_INT == ti.get_partition())
+		return false;
+
+	ulong response_bound = response_time(ti);
+	ti.set_response_time(response_bound);
+
+	if(response_bound > ti.get_deadline())
+		return false;
+	else
+		return true;
 }
 
 bool RTA_PFP_RO::worst_fit_for_resources(uint active_processor_num)
@@ -201,10 +219,10 @@ bool RTA_PFP_RO::worst_fit_for_resources(uint active_processor_num)
 		uint assignment = 0;
 		for(uint i = 0; i < active_processor_num; i++)
 		{
-			Processor& processor = processors.get_processors()[i];
-			if(r_utilization > processor.get_resource_utilization())
+			Processor& p_temp = processors.get_processors()[i];
+			if(r_utilization > p_temp.get_resource_utilization())
 			{
-				r_utilization = processor.get_resource_utilization();
+				r_utilization = p_temp.get_resource_utilization();
 				assignment = i;
 			}
 		}
@@ -215,7 +233,6 @@ bool RTA_PFP_RO::worst_fit_for_resources(uint active_processor_num)
 		}
 		else
 		{
-
 			return false;
 		}
 	}
@@ -241,7 +258,7 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 			if(processor.add_task(&(*ti)))
 			{
 				ti->set_partition(assignment);
-				if(alloc_schedulable())
+				if(alloc_schedulable(*ti))
 				{
 					schedulable = true;
 					break;
@@ -263,7 +280,6 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 
 		if(!schedulable)
 		{
-
 			return schedulable;
 		}
 	}
@@ -273,7 +289,7 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 
 bool RTA_PFP_RO::is_schedulable()
 {
-	bool schedulable;
+	bool schedulable = false;
 
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();

@@ -1,4 +1,6 @@
 #include "rta_pfp_wf_semaphore.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_PFP_WF_semaphore::RTA_PFP_WF_semaphore():PartitionedSched(false, RTA, FIX_PRIORITY, MPCP, "", "semaphore") {}
 
@@ -8,7 +10,7 @@ RTA_PFP_WF_semaphore::RTA_PFP_WF_semaphore(TaskSet tasks, ProcessorSet processor
 	this->processors = processors;
 	this->resources = resources;
 	
-	this->tasks.RM_Order();
+	//this->tasks.RM_Order();
 	this->processors.init();
 }
 

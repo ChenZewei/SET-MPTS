@@ -10,8 +10,8 @@
 #include <math.h>
 #include <time.h>
 #include <assert.h>
-#include "iteration-helper.h"
-#include "math-helper.h"
+//#include "iteration-helper.h"
+//#include "math-helper.h"
 
 #define uint unsigned int
 #define ulong unsigned long
@@ -71,6 +71,11 @@
 #define GLPK_TERM_OUT 0
 #define ILP_SOLUTION_VAR_CHECK 0
 
+//CFG
+
+#define SORT_DEBUG 0
+#define RTA_DEBUG 0
+
 
 
 using namespace std;
@@ -94,8 +99,7 @@ typedef struct
 
 typedef struct
 {
-	double x;
-	double y;
+	double utilization;
 	uint exp_num;
 	uint success_num;
 }Result;
@@ -110,6 +114,7 @@ typedef struct
 	string locking_protocol;
 	string test_name;
 	string remark;
+	string rename;
 }Test_Attribute;
 
 typedef vector<int> Int_Set;

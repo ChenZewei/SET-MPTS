@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iostream>
 #include <assert.h>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ////////////////////PIPMapper////////////////////
 uint64_t PIPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type)
@@ -114,32 +116,18 @@ LP_RTA_GFP_PIP::~LP_RTA_GFP_PIP()
 
 bool LP_RTA_GFP_PIP::is_schedulable()
 {
-	bool update;
-	do
+	foreach(tasks.get_tasks(), ti)
 	{
-		update = false;
-		foreach(tasks.get_tasks(), ti)
+		ulong response_t = response_time(*ti);
+
+		if(response_t <= ti->get_deadline())
 		{
-			
-			ulong response_t = ti->get_response_time();
-			ulong temp = response_time(*ti);
-
-			//assert(temp >= response_time);
-			if(temp > response_t)
-			{
-				response_t = temp;
-				update = true;
-			}
-
-			if(response_t < ti->get_deadline())
-			{
-				ti->set_response_time(response_t);
-			}
-			else
-				return false;
+			ti->set_response_time(response_t);
 		}
+		else
+			return false;
 	}
-	while(update);
+
 	return true;
 }
 

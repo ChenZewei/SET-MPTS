@@ -1,4 +1,6 @@
 #include "output.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 Output::Output(const char* path)
 {
@@ -33,10 +35,6 @@ Output::Output(Param param)
 	}
 	chart.SetGraphSize(1280,640);
 	chart.SetGraphQual(3);
-
-	for(uint i = 0; i < param.get_method_num(); i++)
-		add_set();
-	
 }
 
 string Output::get_path()
@@ -44,30 +42,10 @@ string Output::get_path()
 	return path;
 }
 
-void Output::add_set()
+void Output::add_result(string test_name, double utilization, uint e_num, uint s_num)
 {
-	Result_Set results;
-	result_sets.push_back(results);
-}
-
-uint Output::get_sets_num() const
-{
-	return result_sets.size();
-}
-
-void Output::add_result(uint index, double x, double y, uint e_num, uint s_num)
-{
-	Result result;
-	result.x = x;
-	result.y = y;
-	result.exp_num = e_num;
-	result.success_num = s_num;
-	result_sets[index].push_back(result);
-}
-
-uint Output::get_results_num(uint index) const
-{
-	return result_sets[index].size();
+	SchedResult& sr = srs.get_sched_result(test_name);
+	sr.insert_result(utilization, e_num, s_num);
 }
 
 string Output::output_filename()
@@ -81,57 +59,27 @@ string Output::get_method_name(Test_Attribute ta)
 {
 	string name;
 	name = ta.test_name;
-/*
-	switch(ta.test_method)
-	{
-		default:
-			name = "P-EDF";
-			break;
-		case 0:
-			name =  "P-EDF";
-			break;
-		case 1:
-			name =  "BCL-FTP";
-			break;
-		case 2:
-			name =  "BCL-EDF";
-			break;
-		case 3:
-			name = "WF-DM";
-			break;
-		case 4:
-			name = "WF-EDF";
-			break;
-		case 5:
-			name = "RTA-GFP";
-			break;
-		case 6:
-			name = "FF-DM";
-			break;
-		case 7:
-			name = "LP-PFP";
-			break;
-		case 8:
-			name = "LP-GFP";
-			break;
-		case 9:
-			name = "RO-PFP";
-			break;
-		case 10:
-			name = "ILP-SPINLOCK";
-			break;
-		case 11:
-			name = "GEDF-NON-PREEMPT";
-			break;
-		case 12:
-			name = "PFP-GS";
-			break;
-	}
-*/
+
 	if(0 == strcmp(ta.remark.data(), ""))
 		return name;
 	else
 		return name + "-" + ta.remark;
+}
+
+//output to console
+void Output::proceeding()
+{
+
+}
+
+void Output::proceeding(string test_name, double utilization, uint e_num, uint s_num)
+{
+
+}
+
+void Output::finish()
+{
+
 }
 
 //export to csv
@@ -151,14 +99,31 @@ void Output::export_csv()
 		output_file<<get_method_name(param.test_attributes[i])<<" ratio,";
 	}
 	output_file<<"\n";
-
-
+/*
 	for(uint i = 0; i < result_sets[0].size(); i++)
 	{
 		output_file<<result_sets[0][i].x<<",";
 		for(uint j = 0; j < result_sets.size(); j++)
 		{
 			output_file<<result_sets[j][i].y<<",";
+		}
+		output_file<<"\n";
+	}
+*/
+	
+	for(double i = param.u_range.min;  i - param.u_range.max < _EPS; i += param.step)
+	{
+		output_file<<i<<",";
+		foreach(srs.get_sched_result_set(), sched_result)
+		{
+			if(0 == sched_result->get_result_by_utilization(i).exp_num)
+				output_file<<",";
+			else
+			{
+				double ratio = sched_result->get_result_by_utilization(i).success_num;
+				ratio /= sched_result->get_result_by_utilization(i).exp_num;
+				output_file<<ratio<<",";
+			}
 		}
 		output_file<<"\n";
 	}
@@ -193,7 +158,7 @@ void Output::export_table_head()
 	output_file.close();
 }
 
-void Output::export_result_append()
+void Output::export_result_append(double utilization)
 {
 	string file_name = path + "result-step-by-step.csv";
 	if(0 != access(file_name.data(), 0))
@@ -201,6 +166,8 @@ void Output::export_result_append()
 		export_table_head();
 	}
 	ofstream output_file(file_name, ofstream::app);
+
+/*
 	uint last_index = result_sets[0].size() - 1;
 	output_file<<result_sets[0][last_index].x<<",";
 	for(uint i = 0; i < param.test_attributes.size(); i++)
@@ -211,6 +178,39 @@ void Output::export_result_append()
 		output_file<<result.y<<",";
 	}
 	output_file<<"\n";
+*/
+
+	output_file<<utilization<<",";
+	foreach(srs.get_sched_result_set(), sched_result)
+	{
+		uint e_num = sched_result->get_result_by_utilization(utilization).exp_num;
+		uint s_num = sched_result->get_result_by_utilization(utilization).success_num;
+		if(0 == e_num)
+			output_file<<",,,";
+		else
+		{
+			double ratio = s_num;
+			ratio /= e_num;
+			output_file<<e_num<<",";
+			output_file<<s_num<<",";
+			output_file<<ratio<<",";
+		}
+	}
+	output_file<<"\n";
+
+
+	output_file.flush();
+	output_file.close();
+}
+
+
+void Output::append2file(string flie_name, string buffer)
+{
+	string file_name = path + flie_name;
+
+	ofstream output_file(file_name, ofstream::app);
+
+	output_file<<buffer<<"\n";
 	output_file.flush();
 	output_file.close();
 }
@@ -229,14 +229,17 @@ void Output::SetGraphQual(int quality)
 void Output::Export(int format)
 {
 	string temp, file_name = path + "result";
+/*
 	for(uint i = 0; i < get_sets_num(); i++)
 	{
 		chart.AddData(get_method_name(param.test_attributes[i]), result_sets[i]);
 	}
+*/
+	chart.AddData(srs);
 
 	if(0x0f & format)
 	{
-		chart.ExportLineChart(file_name, "", param.u_range.min, param.u_range.max, format);
+		chart.ExportLineChart(file_name, "", param.u_range.min, param.u_range.max, param.step, format);
 	}
 	if(0x10 & format)
 	{

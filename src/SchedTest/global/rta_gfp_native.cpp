@@ -1,4 +1,6 @@
 #include "rta_gfp_native.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_GFP_native::RTA_GFP_native(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "native") {}
 
@@ -8,7 +10,7 @@ RTA_GFP_native::RTA_GFP_native(TaskSet tasks, ProcessorSet processors, ResourceS
 	this->processors = processors;
 	this->resources = resources;
 	
-	this->tasks.RM_Order();
+	this->processors.init();
 }
 
 ulong RTA_GFP_native::workload(Task& task, ulong interval)

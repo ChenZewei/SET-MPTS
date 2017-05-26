@@ -2,6 +2,8 @@
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 RTA_GFP_BC::RTA_GFP_BC(): GlobalSched(false, RTA, FIX_PRIORITY, NONE, "", "BC") {}
 
@@ -10,8 +12,8 @@ RTA_GFP_BC::RTA_GFP_BC(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
-	this->tasks.RM_Order();
 
+	this->processors.init();
 }
 
 ulong RTA_GFP_BC::workload(Task& task, ulong interval)
@@ -33,13 +35,19 @@ ulong RTA_GFP_BC::response_time(Task& ti)
 	ulong response = test_start;
 	ulong demand = 0;
 	uint p_num = processors.get_processor_num();
-	while(response < test_end)
+	while(response <= test_end)
 	{
 		ulong sum = 0;
+/*
 		for(uint x = 0; x < ti.get_id(); x++)
 		{
 			Task& tx = tasks.get_task_by_id(x);
 			sum += interference(ti, tx, response);
+		}
+*/
+		foreach_higher_priority_task(tasks.get_tasks(), ti, tx)
+		{
+			sum += interference(ti, (*tx), response);
 		}
 		demand = floor(sum/p_num) + wcet;
 		if(response == demand)

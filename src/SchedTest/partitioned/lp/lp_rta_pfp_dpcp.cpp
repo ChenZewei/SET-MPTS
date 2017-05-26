@@ -2,6 +2,8 @@
 #include "solution.h"
 #include <lp.h>
 #include <sstream>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ////////////////////DPCPMapper////////////////////
 uint64_t DPCPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type)
@@ -102,7 +104,33 @@ bool LP_RTA_PFP_DPCP::is_schedulable()
 			return false;
 	}
 	if(!alloc_schedulable())
+	{
+/*
+		foreach(tasks.get_tasks(), task)
+		{
+			cout<<"Task"<<task->get_id()<<":"<<endl;
+			cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
+			foreach(task->get_requests(), request)
+			{
+				cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
+			}
+			cout<<"-------------------------------------------"<<endl;
+		}
+*/
 		return false;
+	}
+/*
+	foreach(tasks.get_tasks(), task)
+	{
+		cout<<"Task"<<task->get_id()<<":"<<endl;
+		cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
+		foreach(task->get_requests(), request)
+		{
+			cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
+		}
+		cout<<"-------------------------------------------"<<endl;
+	}
+*/
 	return true;
 }
 
@@ -230,14 +258,14 @@ bool LP_RTA_PFP_DPCP::alloc_schedulable()
 	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
 	{
 		Task& task = tasks.get_task_by_id(t_id);
-		ulong response_bound = task.get_response_time();
+		//ulong response_bound = task.get_response_time();
 		if(task.get_partition() == MAX_LONG)
 			continue;
 
-		ulong temp = response_time(task);
+		ulong response_bound = response_time(task);
 
-		assert(temp >= response_bound);
-		response_bound = temp;
+		//assert(temp >= response_bound);
+		//response_bound = temp;
 
 		if(response_bound <= task.get_deadline())
 			task.set_response_time(response_bound);

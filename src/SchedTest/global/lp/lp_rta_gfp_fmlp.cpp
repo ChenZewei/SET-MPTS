@@ -7,6 +7,8 @@
 #include <sstream>
 #include <iostream>
 #include <assert.h>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ////////////////////FMLPMapper////////////////////
 uint64_t FMLPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type)
@@ -116,37 +118,20 @@ LP_RTA_GFP_FMLP::~LP_RTA_GFP_FMLP()
 }
 bool LP_RTA_GFP_FMLP::is_schedulable()
 {
-	bool update;
-	do
+	foreach(tasks.get_tasks(), ti)
 	{
-		update = false;
-		foreach(tasks.get_tasks(), ti)
-		{
-			
-			ulong response_time = ti->get_response_time();
-//cout<<"original response time:"<<response_time<<endl;
-			ulong temp = fmlp_get_response_time(*ti);
-
+		
+		ulong response_time = fmlp_get_response_time(*ti);
 
 //cout<<"current response time:"<<temp<<endl;
 
-			//assert(temp >= response_time);
-			if(temp > response_time)
-			{
-//cout<<"last response time:"<<response_time<<" current response time:"<<temp<<endl;
-				response_time = temp;
-				update = true;
-			}
-
-			if(response_time < ti->get_deadline())
-			{
-				ti->set_response_time(response_time);
-			}
-			else
-				return false;
+		if(response_time <= ti->get_deadline())
+		{
+			ti->set_response_time(response_time);
 		}
+		else
+			return false;
 	}
-	while(update);
 	return true;
 }
 

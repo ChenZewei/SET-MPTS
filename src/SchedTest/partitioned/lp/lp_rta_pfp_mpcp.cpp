@@ -2,6 +2,8 @@
 #include "solution.h"
 #include <lp.h>
 #include <sstream>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ////////////////////MPCPMapper////////////////////
 uint64_t MPCPMapper::encode_request(uint64_t task_id, uint64_t res_id, uint64_t req_id, uint64_t type)
@@ -227,14 +229,11 @@ bool LP_RTA_PFP_MPCP::alloc_schedulable()
 	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
 	{
 		Task& task = tasks.get_task_by_id(t_id);
-		ulong response_bound = task.get_response_time();
+		//ulong response_bound = task.get_response_time();
 		if(task.get_partition() == MAX_LONG)
 			continue;
 
-		ulong temp = response_time(task);
-
-		assert(temp >= response_bound);
-		response_bound = temp;
+		ulong response_bound = response_time(task);
 
 		if(response_bound <= task.get_deadline())
 			task.set_response_time(response_bound);

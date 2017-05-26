@@ -1,6 +1,8 @@
 #include <solution.h>
 #include <lp.h>
 #include <assert.h>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 GLPKSolution::GLPKSolution(const LinearProgram &lp, 
 							unsigned int max_var_num, 

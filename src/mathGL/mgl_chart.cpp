@@ -1,4 +1,6 @@
 #include "mgl_chart.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 Chart::Chart()
 {
@@ -45,7 +47,7 @@ void Chart::AddColor(string newColor)
 {
 	color.push_back(newColor);
 }
-
+/*
 void Chart::AddData(string name, double* d, int size)
 {
 	Chart_Data temp;
@@ -66,6 +68,12 @@ void Chart::AddData(string name, Result_Set r_set)
 	}
 	data_set.push_back(temp);
 }
+*/
+
+void Chart::AddData(SchedResultSet srs)
+{
+	this->srs = srs;
+}
 
 void Chart::SetGraphSize(int width, int height)
 {
@@ -77,6 +85,91 @@ void Chart::SetGraphQual(int quality)
 	graph.SetQuality(quality);
 }
 
+void Chart::ExportLineChart(string path, const char* title, double min, double max, double step, int format)
+{
+	graph.Clf('w');
+	if(!(0 == strcmp(title, "")))
+		graph.Title(title,"",-2);	
+	graph.SetOrigin(0,0,0);
+	graph.SetRange('x', min, max);
+	graph.SetRange('y', 0, 1);	
+
+	vector<Chart_Data> data_sets;
+
+	vector<SchedResult>& results_set= srs.get_sched_result_set();
+
+	foreach(results_set, results)
+	{
+		uint num = (max - min)/step + 1;
+		Chart_Data c_data;
+		c_data.name = results->get_test_name();
+		c_data.data = mglData(num);
+		{
+			double i = min; int j = 0;
+			for(; i - max < _EPS; i += step, j++)
+			{
+
+				Result r = results->get_result_by_utilization(i);
+				if(r.exp_num == 0)
+				{
+					c_data.data.a[j] = NAN;
+				}
+				else
+				{
+					double ratio = r.success_num;
+					ratio /= r.exp_num;
+					c_data.data.a[j] = ratio;
+				}
+
+			}
+		}
+
+		data_sets.push_back(c_data);
+	}
+
+	for(int i = 0; i < data_sets.size(); i++)
+	{
+		graph.Plot(data_sets[i].data, get_line_style(i).c_str());
+		graph.AddLegend(data_sets[i].name.c_str(), get_line_style(i).c_str());
+	}
+	
+	graph.Box();
+	//graph.Label('x',"x: TaskSet Utilization", 0);
+	//graph.Label('y',"y: Ratio", 0);
+	graph.Legend(0);
+	graph.Axis("xy");
+
+	string temp;
+
+	if(0x01 & format)
+	{
+		temp = path + ".png";
+		graph.WritePNG(temp.data());
+	}
+	if(0x02 & format)
+	{
+		temp = path + ".eps";
+		graph.WriteEPS(temp.data());
+	}
+	if(0x04 & format)
+	{
+		temp = path + ".svg";
+		graph.WriteSVG(temp.data());
+	}
+	if(0x08 & format)
+	{
+		temp = path + ".tga";
+		graph.WriteTGA(temp.data());
+	}
+
+}
+
+void Chart::ExportJSON(string path)
+{
+	graph.WriteJSON(path.data());
+}
+
+/*
 void Chart::ExportLineChart(string path, const char* title, double min, double max, int format)
 {
 	graph.Clf('w');
@@ -122,8 +215,6 @@ void Chart::ExportLineChart(string path, const char* title, double min, double m
 	}
 
 }
+*/
 
-void Chart::ExportJSON(string path)
-{
-	graph.WriteJSON(path.data());
-}
+

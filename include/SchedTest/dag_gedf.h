@@ -6,15 +6,15 @@
 #include <algorithm>
 #include <iostream>
 
-#include "../tasks.h"
-#include "../processors.h"
-#include "../resources.h"
+#include "tasks.h"
+#include "processors.h"
+#include "resources.h"
 
 typedef struct Work
 {
 	ulong time;
 	ulong workload;
-	bool operator <(const Work &a)const //排序并且去重复  
+	bool operator <(const Work &a)const //排序并且去重复
     {  
         if(time == a.time)  
         {  
@@ -52,7 +52,7 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 	ulong current_t = T;
 	vector<ulong> f_times;
 	vector<Exec_Range> jobs;
-	VNode vnode;
+	
 	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
 	{
 		Exec_Range er;
@@ -60,18 +60,18 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 		er.f_t = 0;
 		jobs.push_back(er);
 	}
-	cout<<"dag_task "<<dag_task.get_id()<<":"<<endl;
-	dag_task.display_arcs();
-	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
-		dag_task.display_precedences(i);
+//	cout<<"dag_task-"<<dag_task.get_id()<<":"<<endl;
+//	dag_task.display_arcs();
+//	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
+//		dag_task.display_precedences(i);
 	
 	for(uint i = 0; i < dag_task.get_vnode_num(); i++)
 	{
-		vnode = dag_task.get_vnode_by_id(i);
+		VNode& vnode = dag_task.get_vnode_by_id(i);
 		ulong latest_f_time = 0;
 		for(uint j = 0; j < vnode.precedences.size(); j++)
 		{
-			dag_task.display_precedences(i);
+//			dag_task.display_precedences(i);
 			uint prenode = vnode.precedences[j]->tail;
 			
 			if(latest_f_time < jobs[prenode].f_t)
@@ -101,7 +101,7 @@ set<Work> precise_workload(DAG_Task &dag_task, ulong T)
 	{
 		ulong t = set_member<ulong>(time_set, i);
 		ulong exec_t = t - set_member<ulong>(time_set, i - 1);
-cout<<"t:"<<t<<" exec:"<<exec_t<<endl;
+//cout<<"t:"<<t<<" exec:"<<exec_t<<endl;
 		ulong workload = 0;
 		for(uint j = 0; j < jobs.size(); j++)
 		{
@@ -113,7 +113,7 @@ cout<<"t:"<<t<<" exec:"<<exec_t<<endl;
 		work.time = t;
 		work.workload = workload;
 		//work.workload = workload + set_member(workload_set, workload_set.size() - 1).workload;
-cout<<"workload:"<<work.workload<<endl;
+//cout<<"workload:"<<work.workload<<endl;
 		workload_set.insert(work);
 	}
 
@@ -121,7 +121,7 @@ cout<<"workload:"<<work.workload<<endl;
 	uint l = T%period;
 	ulong release;
 	
-cout<<"num:"<<num<<" l:"<<l<<endl;
+//cout<<"num:"<<num<<" l:"<<l<<endl;
 
 	work.time = 0;
 	work.workload = 0;
@@ -135,7 +135,7 @@ cout<<"num:"<<num<<" l:"<<l<<endl;
 		}
 		else
 			release = period - deadline;
-cout<<"release:"<<release<<endl;
+//cout<<"release:"<<release<<endl;
 		for(uint i = 0; i < num; i++)
 		{
 			for(uint j = 1; j < workload_set.size(); j++)
@@ -146,7 +146,7 @@ cout<<"release:"<<release<<endl;
 				workload_set_total.insert(work);
 			}
 		}
-		cout<<"T:"<<T<<"Last deadline:"<<set_member<Work>(workload_set_total, workload_set_total.size() - 1).time<<endl;
+//		cout<<"T:"<<T<<"Last deadline:"<<set_member<Work>(workload_set_total, workload_set_total.size() - 1).time<<endl;
 	}
 	else
 	{
@@ -155,7 +155,7 @@ cout<<"release:"<<release<<endl;
 		uint begin;
 		ulong cutting_workload;
 		ulong cutting_time;
-cout<<"cutting:"<<cutting<<endl;
+//cout<<"cutting:"<<cutting<<endl;
 		for(uint i = 0; i < workload_set.size() - 1; i++)
 		{
 			if((set_member<Work>(workload_set, i).time <= cutting) && (set_member<Work>(workload_set, i + 1).time > cutting))
@@ -164,9 +164,9 @@ cout<<"cutting:"<<cutting<<endl;
 				cutting_workload;
 				cutting_time = cutting - set_member<Work>(workload_set, i).time;
 				cutting_workload = (cutting_time*(set_member<Work>(workload_set, i + 1).workload))/(set_member<Work>(workload_set, i + 1).time - set_member<Work>(workload_set, i).time);
-cout<<"i:"<<i<<endl;
-cout<<"cutting time:"<<cutting_time<<endl;
-cout<<"cutting workload:"<<cutting_workload<<endl;
+//cout<<"i:"<<i<<endl;
+//cout<<"cutting time:"<<cutting_time<<endl;
+//cout<<"cutting workload:"<<cutting_workload<<endl;
 				break;
 			}
 		}
@@ -180,11 +180,11 @@ cout<<"cutting workload:"<<cutting_workload<<endl;
 		{
 			work.time = set_member<Work>(workload_set, i).time - cutting;
 			work.workload = set_member<Work>(workload_set, i).workload;
-cout<<"0 work.time:"<<work.time<<" work.workload:"<<work.workload<<endl;
+//cout<<"0 work.time:"<<work.time<<" work.workload:"<<work.workload<<endl;
 			workload_set_total.insert(work);
 		}
 		ulong carry_in_workload = set_member<Work>(workload_set_total, workload_set_total.size() - 1).workload;
-cout<<"carry_in_workload:"<<carry_in_workload<<endl;
+//cout<<"carry_in_workload:"<<carry_in_workload<<endl;
 		for(uint i = 0; i < num; i++)
 		{
 			for(uint j = 0; j < workload_set.size(); j++)
@@ -208,7 +208,7 @@ ulong approximate_workload(DAG_Task &dag_task, ulong T)
 
 double approximation(DAG_TaskSet &dag_taskset, double e)
 {
-cout<<"11111"<<endl;
+//cout<<"11111"<<endl;
 	vector<set<Work>> piecewises;
 	vector<double> last_slopes;
 	ulong splitted_time;
@@ -217,23 +217,28 @@ cout<<"11111"<<endl;
 
 	for(uint i = 0; i < dag_taskset.get_taskset_size(); i++)
 	{
-		DAG_Task dag_task_i = dag_taskset.get_task_by_id(i);
+		DAG_Task& dag_task_i = dag_taskset.get_task_by_id(i);
 		ulong Ti = dag_task_i.get_period();
 		ulong Di = dag_task_i.get_deadline();
 		double slope_i = dag_task_i.get_vol();
 		slope_i /= Ti;
 		splitted_time = Ti/e + (1 + 1/e)*Di;
-cout<<"before:"<<endl;
-for(uint j = 0; j < dag_task_i.get_vnode_num(); j++)
-dag_task_i.display_precedences(j);
+//cout<<"before:"<<endl;
+//cout<<"dag_task "<<dag_task_i.get_id()<<":"<<endl;
+//		dag_task_i.display_arcs();
+//		for(uint j = 0; j < dag_task_i.get_vnode_num(); j++)
+//		{
+//			dag_task_i.display_follow_ups(j);
+//			dag_task_i.display_precedences(j);
+//		}
 		piecewises.push_back(precise_workload(dag_task_i, splitted_time));
 		last_slopes.push_back(slope_i);
-cout<<"splitted_time for task "<<i<<":"<<splitted_time<<endl;
+//cout<<"splitted_time for task "<<i<<":"<<splitted_time<<endl;
 	}
-cout<<"22222"<<endl;
+//cout<<"22222"<<endl;
 	for(uint i = 0; i < last_slopes.size(); i++)
 		last_slope += last_slopes[i];
-cout<<"last_slope:"<<last_slope<<endl;
+//cout<<"last_slope:"<<last_slope<<endl;
 	set<Work> workload_sum;
 	Work work;
 	work.time = 0;
@@ -243,7 +248,7 @@ cout<<"last_slope:"<<last_slope<<endl;
 	ulong current_time = MAX_LONG;
 	ulong current_workload = 0;
 	bool empty;
-cout<<"33333"<<endl;
+//cout<<"33333"<<endl;
 //aligning
 	for(uint i = 0; i < piecewises.size(); i++)//find latest time
 	{
@@ -256,7 +261,7 @@ cout<<"33333"<<endl;
 			}
 		}
 	}
-cout<<"latest_time:"<<latest_time<<endl;
+//cout<<"latest_time:"<<latest_time<<endl;
 	for(uint i = 0; i < piecewises.size(); i++)
 	{
 		if(piecewises[i].size() > 0)
@@ -273,15 +278,15 @@ cout<<"latest_time:"<<latest_time<<endl;
 
 	for(uint i = 0; i < piecewises.size(); i++)
 	{
-		cout<<"----"<<i<<"----"<<endl;
+//		cout<<"----"<<i<<"----"<<endl;
 		for(uint j = 0; j < piecewises[i].size(); j++)
 		{
 			Work temp = set_member(piecewises[i], j);
-			cout<<j<<": "<<"tt:"<<temp.time<<"tw:"<<temp.workload<<endl;
+//			cout<<j<<": "<<"tt:"<<temp.time<<"tw:"<<temp.workload<<endl;
 		}
 	}
-cout<<"size:"<<piecewises[0].size()<<endl;
-cout<<"44444"<<endl;
+//cout<<"size:"<<piecewises[0].size()<<endl;
+//cout<<"44444"<<endl;
 	do
 	{
 		empty = true;
@@ -311,9 +316,9 @@ cout<<"44444"<<endl;
 				if(temp.time == current_time)
 				{
 					current_workload += temp.workload;
-					cout<<"length:"<<piecewises[i].size()<<endl;
+//					cout<<"length:"<<piecewises[i].size()<<endl;
 					piecewises[i].erase(temp);
-					cout<<"length:"<<piecewises[i].size()<<endl;
+//					cout<<"length:"<<piecewises[i].size()<<endl;
 				}
 			}
 		}
@@ -325,19 +330,18 @@ cout<<"44444"<<endl;
 	}
 	while(!empty);
 
-cout<<"55555"<<endl;
+//cout<<"55555"<<endl;
 	for(uint i = 1; i < workload_sum.size(); i++)
 	{
-		Work w1 = set_member(workload_sum, i - 1);
-		Work w2 = set_member(workload_sum, i);
-	cout<<"w1-w:"<<w1.workload<<" w2-w:"<<w2.workload<<endl;
-	cout<<"w1-t:"<<w1.time<<" w2-t:"<<w2.time<<endl;
-		double s = w2.workload - w1.workload;
-		s /= (w2.time - w1.time);
-		if( s > max_slope)
+		Work w = set_member(workload_sum, i);
+//	cout<<"w-w:"<<w.workload<<endl;
+//	cout<<"w-t:"<<w.time<<endl;
+		double s = w.workload;
+		s /= w.time;
+		if(s > max_slope)
 			max_slope = s;
 	}
-cout<<"max_slope:"<<max_slope<<endl;
+//cout<<"max_slope:"<<max_slope<<endl;
 	if(last_slope > max_slope)
 		max_slope = last_slope;
 	
@@ -347,7 +351,8 @@ cout<<"max_slope:"<<max_slope<<endl;
 bool dag_schedulability_test(DAG_TaskSet &dag_taskset, uint m, double e)
 {
 	double max_slope = approximation(dag_taskset, e);
-	double speed_up = e + 2 - 1/m;
+	double speed_up = e + 2 - 1.0/m;
+//cout<<"speedup:"<<speed_up<<endl;
 	if(max_slope*speed_up < m)
 		return true;
 	else

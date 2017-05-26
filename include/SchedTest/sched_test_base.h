@@ -9,6 +9,8 @@
 //Test Method
 #define UTI_BOUND	0
 #define RTA 		1
+#define NC			2	//Necessary Condition
+#define SB			3	//Speedup Bound
 
 //Scheduling Method
 #define GLOBAL		0

@@ -68,6 +68,7 @@ class Task
 		fraction_t density;
 		Ratio ratio;//for heterogeneous platform
 		Resource_Requests requests;
+		ulong other_attr;
 	public:
 		Task(	uint id,
 			ulong wcet, 
@@ -94,6 +95,7 @@ class Task
 		ulong get_wcet() const;
 		ulong get_deadline() const;
 		ulong get_period() const;
+		ulong get_slack() const;
 		bool is_feasible() const;
 
 		Resource_Requests& get_requests();
@@ -131,6 +133,8 @@ class Task
 		bool is_carry_in() const;
 		void set_carry_in();
 		void clear_carry_in();
+		ulong get_other_attr() const;
+		void set_other_attr(ulong attr);
 
 		void add_request(uint res_id, uint num, ulong max_len, ulong total_len, uint locality = MAX_INT);
 		
@@ -189,12 +193,29 @@ class TaskSet
 		void get_density_sum(fraction_t &density_sum) const;
 		void get_density_max(fraction_t &density_max) const;
 
+		void sort_by_id();
 		void sort_by_period();//increase
+		void sort_by_deadline();//increase
 		void sort_by_utilization();//decrease
 		void sort_by_density();//decrease
+		void sort_by_DC();
+		void sort_by_DCC();
+		void sort_by_DDC();
+		void sort_by_UDC();
 		void RM_Order();
 		void DM_Order();
+		void DC_Order();
+		void DCC_Order();
+		void DDC_Order();
+		void UDC_Order();
+		void SM_PLUS_Order();
+		void SM_PLUS_2_Order();
+		void SM_PLUS_3_Order();
+		void Leisure_Order();
+		void SM_PLUS_4_Order(uint p_num);
 		ulong DBF(ulong time);
+
+		long leisure(uint index);
 
 		void display();
 
@@ -204,6 +225,8 @@ typedef struct ArcNode
 {
 	uint tail;//i
 	uint head;//j
+//	ArcPtr headlink;
+//	ArcPtr taillink;
 }ArcNode,*ArcPtr;
 
 typedef struct VNode
@@ -251,6 +274,7 @@ class DAG_Task:public Task
 		Ratio ratio;//for heterogeneous platform
 		Resource_Requests requests;
 	public:
+		DAG_Task(const DAG_Task &dt);
 		DAG_Task(uint task_id, ulong period, ulong deadline = 0, uint priority = 0);
 		DAG_Task(	uint task_id,
 					ResourceSet& resourceset,

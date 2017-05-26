@@ -6,33 +6,35 @@
 #include <iomanip>
 #include <unistd.h>
 #include <ctime>
-//#include "schedulability_test.h"
+#include <pthread.h>
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
-#include "mgl_chart.h"
 #include "xml.h"
 #include "param.h"
 #include "output.h"
 #include "random_gen.h"
 #include "test_model.h"
 #include "sched_test_factory.h"
+#include "iteration-helper.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
 
+#define typeof(x) __typeof(x)
 
 using namespace std;
 
+
 int main(int argc,char** argv)
 {	
+
 	Int_Set lambdas, p_num, methods;
 	Double_Set steps;
 	Range_Set p_ranges, u_ranges, d_ranges;
 	Test_Attribute_Set test_attributes;
 	uint exp_times;
 	Result_Set results[MAX_METHOD];
-	Chart chart;
 	Param parameters;
 	SchedTestFactory STFactory;
 
@@ -124,8 +126,6 @@ int main(int argc,char** argv)
 	
 	Output output(parameters);
 
-	//output.export_table_head();
-
 	Random_Gen::uniform_integral_gen(0,10);
 	double utilization = u_ranges[0].min;
 
@@ -141,22 +141,25 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 cout<<"Utilization:"<<utilization<<endl;
 		vector<int> success;
 		vector<int> exp;
+		vector<int> exc;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			exp.push_back(0);
 			success.push_back(0);
+			exc.push_back(0);
 		}
 		for(int i = 0; i < exp_times; i++)
 		{
 cout<<".";
 cout<<flush;
-
+			uint s_n = 0;
+			uint s_i = 0;
 	    	TaskSet taskset = TaskSet();
 			ProcessorSet processorset = ProcessorSet(parameters);
 			ResourceSet resourceset = ResourceSet();
 			resource_gen(&resourceset, parameters);
 			tast_gen(taskset, resourceset, parameters, utilization);
-
+//			taskset.SM_PLUS_4_Order(parameters.p_num);
 			for(uint j = 0; j < parameters.get_method_num(); j++)
 			{
 				taskset.init();
@@ -164,41 +167,99 @@ cout<<flush;
 				resourceset.init();
 				exp[j]++;
 
+
 				SchedTestBase *schedTest = STFactory.createSchedTest(test_attributes[j].test_name, taskset, processorset, resourceset);
 				if(NULL == schedTest)
 				{
 					cout<<"Incorrect test name."<<endl;
 					return -1;
 				}
-
+//cout<<test_attributes[j].test_name<<":";
 				if(schedTest->is_schedulable())
 				{
 					success[j]++;
+					s_n++;
+					s_i = j;
+#if SORT_DEBUG
+					cout<<test_attributes[j].test_name<<" success!"<<endl;
+#endif
 				}
-				
+			
 				delete(schedTest);
+				}	
 
+
+			if(1 == s_n)
+			{
+				exc[s_i]++;
+#if SORT_DEBUG
+				cout<<"Exclusive Success TaskSet:"<<endl;
+				cout<<"/////////////////"<<test_attributes[s_i].test_name<<"////////////////"<<endl;
+				foreach(taskset.get_tasks(), task)
+				{
+					cout<<"Task "<<task->get_id()<<":"<<endl;
+					cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
+					cout<<"-----------------------"<<endl;
+				}
+#endif
+				//sleep(1);
 			}
-			//result.x = taskset.get_utilization_sum().get_d();
-			result.x = utilization;
+/*
+			else if(0 == s_n)
+			{
+				cout<<"None Success TaskSet:"<<endl;
+				cout<<"////////////////RM/////////////////"<<endl;
+				taskset.RM_Order();
+				foreach(taskset.get_tasks(), task)
+				{
+					cout<<"Task "<<task->get_id()<<":"<<endl;
+					cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
+					cout<<"-----------------------"<<endl;
+				}
+				cout<<"////////////////DC/////////////////"<<endl;
+				taskset.DC_Order();
+				foreach(taskset.get_tasks(), task)
+				{
+					cout<<"Task "<<task->get_id()<<":"<<endl;
+					cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
+					cout<<"-----------------------"<<endl;
+				}
+				cout<<"////////////////SMP4/////////////////"<<endl;
+				taskset.SM_PLUS_4_Order(parameters.p_num);
+				foreach(taskset.get_tasks(), task)
+				{
+					cout<<"Task "<<task->get_id()<<":"<<endl;
+					cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
+					cout<<"-----------------------"<<endl;
+				}
+			}
+*/
+
+			result.utilization = utilization;
+//cout<<endl;
 		}
 cout<<endl;
 		for(uint i = 0; i < test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp[i]);
-			result.y = ratio.get_d();
-			result.exp_num = exp[i];
-			result.success_num = success[i];
+			output.add_result(test_attributes[i].test_name, utilization, exp[i], success[i]);
 
-			output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
-cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
+			stringstream buf;
+
+			if(0 == strcmp(test_attributes[i].rename.data(),""))
+				buf<<test_attributes[i].test_name;
+			else
+				buf<<test_attributes[i].rename;
+
+			buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
+
+			output.append2file("result-logs.csv", buf.str());
+
+cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<" exc_s:"<<exc[i]<<endl;
 		}
-		output.export_result_append();
-
+		output.export_result_append(utilization);
+		output.Export(PNG);
 		utilization += steps[0];
-		
-
-
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < _EPS);
 

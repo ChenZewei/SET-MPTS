@@ -4,6 +4,8 @@
 #include "param.h"
 #include "random_gen.h"
 #include "sort.h"
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 /////////////////////////////Resource///////////////////////////////
 Resource::Resource(uint id, uint locality, bool global_resource, bool processor_local_resource)
@@ -41,24 +43,20 @@ fraction_t Resource::get_utilization() const { return utilization; }
 
 bool Resource::is_global_resource()
 {
-	global_resource = false;
-	uint partition;
-//cout<<"111"<<endl;
-	list<void*>::iterator it = queue.begin();
-//cout<<"222"<<endl;
-	if(queue.end() == it)
+	if(1 >= queue.size())
 		return false;
-	partition = ((Task*)(*it))->get_partition();
-//cout<<"333"<<endl;
-	for(uint i = 0; it != queue.end(); it++, i++)
+
+	global_resource = false;
+	
+	foreach(queue, task)
 	{
-		if(partition != ((Task*)(*it))->get_partition())
+		if(((Task*)(*queue.begin()))->get_partition() != ((Task*)(*task))->get_partition())
 		{
 			global_resource = true;
 			break;
 		}
-//cout<<"444"<<endl;
 	}
+
 	return global_resource; 
 }
 

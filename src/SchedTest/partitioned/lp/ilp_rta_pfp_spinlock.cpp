@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iostream>
 #include <assert.h>
+#include "iteration-helper.h"
+#include "math-helper.h"
 
 ////////////////////ILPSpinLockMapper////////////////////
 static uint64_t ILPSpinLockMapper::encode_request(uint64_t type, uint64_t part_1, uint64_t part_2, uint64_t part_3, uint64_t part_4)
