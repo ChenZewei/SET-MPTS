@@ -56,13 +56,13 @@
 		<data RENAME="" REMARK="">RTA-PFP-GS</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
 	</schedulability_test>
-	<experiment_times>20</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="SVG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="TGA" BLACK_ONLY="true" >LineChart</data>
-		<data>JSON</data>]
+		<data>JSON</data>
 	</output>
 	<lambda>
 		<data>10</data>
@@ -95,7 +95,7 @@
 		<data>4</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>3</data>
+		<data>5</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.2</data>
@@ -105,8 +105,8 @@
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
-			<min>50</min>
-			<max>100</max>
+			<min>200</min>
+			<max>500</max>
 		</data>
 	</rrr>
 	<total_len_factor>
