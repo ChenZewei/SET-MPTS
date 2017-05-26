@@ -139,12 +139,9 @@ int main(int argc,char** argv)
 	
 	start = time(NULL);
 
-//cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
-
 	do
 	{	
 		Result result;
-//cout<<"Utilization:"<<utilization<<endl;
 		vector<int> success;
 		vector<int> exp;
 		for(uint i = 0; i < test_attributes.size(); i++)
@@ -154,39 +151,18 @@ int main(int argc,char** argv)
 		}
 		for(int i = 0; i < exp_times; i++)
 		{
-//cout<<".";
-//cout<<flush;
-
-
-			for(uint j = 0; j < parameters.get_method_num(); j++)
+			for(uint j = 0; j < test_attributes.size(); j++)
 			{
 				cout<<test_attributes[j].test_name<<"\t"<<utilization<<endl;
 			}
 
 		}
-//cout<<endl;
-/*
-		for(uint i = 0; i < test_attributes.size(); i++)
-		{
-			fraction_t ratio(success[i], exp[i]);
-			result.y = ratio.get_d();
-			result.exp_num = exp[i];
-			result.success_num = success[i];
 
-			//output.add_result(i, result.x, result.y, result.exp_num, result.success_num);
-//cout<<"Method "<<i<<": exp_times("<<result.exp_num<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
-		}
-		output.export_result_append();
-*/
 		utilization += steps[0];
-		
-
-
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < _EPS);
 
 	time(&end);
-//	cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
 
 	ulong gap = difftime(end, start);
 	uint hour = gap/3600;
@@ -196,11 +172,7 @@ int main(int argc,char** argv)
 //	cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
 
 //	XML::SaveConfig((output.get_path() + "config.xml").data());
-/*
-	output.export_csv();
 
-	output.Export(PNG|EPS|SVG|TGA|JSON);
-*/
 	return 0;
 }
 

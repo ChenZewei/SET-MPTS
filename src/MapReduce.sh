@@ -11,5 +11,5 @@ hadoop jar $HADOOP_STREAMING \
 -files master,slave,config.xml	\
 -input	$INPUT		\
 -output	$OUTPUT		\
--mapper	master	\
--reducer slave
+-mapper	master		\
+-reducer "cat"
