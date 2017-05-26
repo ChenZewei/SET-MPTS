@@ -6,10 +6,14 @@ OUTPUT=$HDFS_HOME/output
 
 hadoop fs -rm -r /user/hadoop/output
 
+rm -r output
+
 hadoop jar $HADOOP_STREAMING \
 -fs hdfs://czw-laptop:9000/	\
--files master,slave,config.xml	\
+-files master,reducer,config.xml	\
 -input	$INPUT		\
 -output	$OUTPUT		\
 -mapper	master		\
 -reducer "cat"
+
+hadoop fs -get output

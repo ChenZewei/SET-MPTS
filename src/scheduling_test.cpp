@@ -186,7 +186,7 @@ cout<<flush;
 				}
 			
 				delete(schedTest);
-				}	
+			}	
 
 
 			if(1 == s_n)

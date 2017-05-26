@@ -141,6 +141,7 @@ int main(int argc,char** argv)
 
 	do
 	{	
+/*
 		Result result;
 		vector<int> success;
 		vector<int> exp;
@@ -149,25 +150,19 @@ int main(int argc,char** argv)
 			exp.push_back(0);
 			success.push_back(0);
 		}
-		for(int i = 0; i < exp_times; i++)
-		{
-			for(uint j = 0; j < test_attributes.size(); j++)
-			{
-				cout<<test_attributes[j].test_name<<"\t"<<utilization<<endl;
-			}
-
-		}
+*/	
+		cout<<utilization<<'\t'<<exp_times<<endl;
 
 		utilization += steps[0];
 	}
 	while(utilization < u_ranges[0].max || fabs(u_ranges[0].max - utilization) < _EPS);
 
-	time(&end);
+//	time(&end);
 
-	ulong gap = difftime(end, start);
-	uint hour = gap/3600;
-	uint min = (gap%3600)/60;
-	uint sec = (gap%3600)%60;
+//	ulong gap = difftime(end, start);
+//	uint hour = gap/3600;
+//	uint min = (gap%3600)/60;
+//	uint sec = (gap%3600)%60;
 
 //	cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
 
