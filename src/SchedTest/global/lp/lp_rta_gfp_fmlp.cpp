@@ -118,20 +118,30 @@ LP_RTA_GFP_FMLP::~LP_RTA_GFP_FMLP()
 }
 bool LP_RTA_GFP_FMLP::is_schedulable()
 {
-	foreach(tasks.get_tasks(), ti)
+	bool update = false;
+	
+	do
 	{
-		
-		ulong response_time = fmlp_get_response_time(*ti);
-
-//cout<<"current response time:"<<temp<<endl;
-
-		if(response_time <= ti->get_deadline())
+		update = false;
+		foreach(tasks.get_tasks(), ti)
 		{
-			ti->set_response_time(response_time);
+			ulong old_response_time = ti->get_response_time();
+			ulong response_time = fmlp_get_response_time(*ti);
+
+			if(old_response_time != response_time)
+				update = true;
+
+	//cout<<"current response time:"<<temp<<endl;
+
+			if(response_time <= ti->get_deadline())
+			{
+				ti->set_response_time(response_time);
+			}
+			else
+				return false;
 		}
-		else
-			return false;
-	}
+	}while(update);
+
 	return true;
 }
 

@@ -40,6 +40,7 @@ class Output
 		void finish();
 
 		//export to csv
+		void export_param();
 		void export_csv();
 		void export_table_head();
 		void export_result_append(double utilization);
