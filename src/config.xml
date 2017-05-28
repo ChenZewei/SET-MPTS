@@ -34,6 +34,9 @@
 		<data RENAME="" REMARK="">ILP-RTA-PFP-spinlock</data>
 		<data RENAME="" REMARK="">RTA-PFP-GS</data>
 		<data RENAME="" REMARK="">NC-GEDF-VPR</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-NP</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-FEASIBLE</data>
 
 		
 		<data RENAME="" REMARK="">RTA-GDC-native</data>
@@ -51,12 +54,16 @@
 
 
 <!-->
-		<data RENAME="" REMARK="">LP-RTA-GFP-PIP</data>
-		<data RENAME="" REMARK="">LP-RTA-PFP-DPCP</data>
-		<data RENAME="" REMARK="">RTA-PFP-GS</data>
-		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
+		<data RENAME="LP-PIP" REMARK="">LP-RTA-GFP-PIP</data>
+		<data RENAME="LP-FMLP" REMARK="">LP-RTA-GFP-FMLP</data>
+		<data RENAME="LP-DPCP" REMARK="">LP-RTA-PFP-DPCP</data>
+		<data RENAME="LP-MPCP" REMARK="">LP-RTA-PFP-MPCP</data>
+		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
+		<data RENAME="ROP-PCP" REMARK="">RTA-PFP-RO-ML</data>
+		<data RENAME="ROP-NP" REMARK="">RTA-PFP-RO-NP</data>
+		<data RENAME="ROP-FEAS" REMARK="">RTA-PFP-RO-FEASIBLE</data>
 	</schedulability_test>
-	<experiment_times>500</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -69,7 +76,7 @@
 		<data>4</data>
 	</lambda>
 	<step>
-		<data>0.1</data>
+		<data>0.2</data>
 	</step>
 	<init_utilization_range>
 		<data>
@@ -103,7 +110,7 @@
 		<data>8</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>5</data>
+		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.1</data>
