@@ -25,7 +25,6 @@
 
 using namespace std;
 
-
 void getFiles(string path, string dir);
 void read_line(string path, vector<string>& files);
 vector<Param> get_parameters();
