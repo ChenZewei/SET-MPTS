@@ -255,23 +255,34 @@ ulong LP_RTA_PFP_DPCP::response_time(Task& task_i)
 
 bool LP_RTA_PFP_DPCP::alloc_schedulable()
 {
-	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+	bool update = false;
+	
+	do
 	{
-		Task& task = tasks.get_task_by_id(t_id);
-		//ulong response_bound = task.get_response_time();
-		if(task.get_partition() == MAX_LONG)
-			continue;
+		update = false;
+		for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+		{
+			Task& task = tasks.get_task_by_id(t_id);
+			//ulong response_bound = task.get_response_time();
+			ulong old_response_time = task.get_response_time();
+			if(task.get_partition() == MAX_LONG)
+				continue;
 
-		ulong response_bound = response_time(task);
+			ulong response_bound = response_time(task);
 
-		//assert(temp >= response_bound);
-		//response_bound = temp;
+			//assert(temp >= response_bound);
+			//response_bound = temp;
 
-		if(response_bound <= task.get_deadline())
-			task.set_response_time(response_bound);
-		else
-			return false;
-	}
+			if(old_response_time != response_bound)
+				update = true;
+
+			if(response_bound <= task.get_deadline())
+				task.set_response_time(response_bound);
+			else
+				return false;
+		}
+	}while(update);
+	
 	return true;
 }
 

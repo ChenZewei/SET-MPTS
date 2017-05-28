@@ -83,6 +83,26 @@ void Output::finish()
 }
 
 //export to csv
+void Output::export_param()
+{
+	string file_name = path + "parameters.csv";
+	ofstream output_file(file_name);
+
+	output_file<<"Lambda:"<<param.lambda<<"\n";
+	output_file<<"Processor num:"<<param.p_num<<"\n";
+	output_file<<"Period range: ["<<param.p_range.min<<","<<param.p_range.max<<"]"<<"\n";
+	output_file<<"Utilization range: ["<<param.u_range.min<<","<<param.u_range.max<<"]"<<"\n";
+	output_file<<"Deadline proportion range: ["<<param.d_range.min<<","<<param.d_range.max<<"]"<<"\n";
+	output_file<<"Resource num:"<<param.resource_num<<"\n";
+	output_file<<"Max critical section num:"<<param.mcsn<<"\n";
+	output_file<<"Resource request num:"<<param.rrn<<"\n";
+	output_file<<"Resource request probability:"<<param.rrp<<"\n";
+	output_file<<"Total length factor:"<<param.tlf<<"\n";
+	output_file<<"Resource request range: ["<<param.rrr.min<<","<<param.rrr.max<<"]"<<"\n";
+
+	output_file.flush();
+	output_file.close();
+}
 void Output::export_csv()
 {
 	string file_name = path + "result.csv";
