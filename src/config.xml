@@ -33,7 +33,7 @@
 		<data RENAME="" REMARK="">RTA-PFP-RO</data>
 		<data RENAME="" REMARK="">ILP-RTA-PFP-spinlock</data>
 		<data RENAME="" REMARK="">RTA-PFP-GS</data>
-		<data RENAME="" REMARK="">NC-GEDF-VPR</data>
+		<data RENAME="" REMARK="">NC-LP-EE-VPR</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO-NP</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO-FEASIBLE</data>
@@ -55,15 +55,13 @@
 
 <!-->
 		<data RENAME="LP-PIP" REMARK="">LP-RTA-GFP-PIP</data>
-		<data RENAME="LP-FMLP" REMARK="">LP-RTA-GFP-FMLP</data>
 		<data RENAME="LP-DPCP" REMARK="">LP-RTA-PFP-DPCP</data>
-		<data RENAME="LP-MPCP" REMARK="">LP-RTA-PFP-MPCP</data>
 		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
 		<data RENAME="ROP-PCP" REMARK="">RTA-PFP-RO-ML</data>
-		<data RENAME="ROP-NP" REMARK="">RTA-PFP-RO-NP</data>
+		<data RENAME="LP-EE-vpr" REMARK="">NC-LP-EE-VPR</data>
 		<data RENAME="ROP-FEAS" REMARK="">RTA-PFP-RO-FEASIBLE</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>500</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>

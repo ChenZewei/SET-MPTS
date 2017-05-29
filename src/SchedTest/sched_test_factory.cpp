@@ -15,7 +15,7 @@
 #include "rta_pfp_ro_feasible.h"
 #include "ilp_rta_pfp_spinlock.h"
 #include "rta_pfp_gs.h"
-#include "nc_gedf_vpr.h"
+#include "nc_lp_ee_vpr.h"
 #include "rta_gdc_native.h"
 #include "rta_pdc_ro.h"
 #include "rta_gfp_czw.h"
@@ -102,9 +102,9 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	{
 		return new RTA_PFP_GS(tasks, processors, resources);
 	}
-	else if(0 == strcmp(test_name.data(), "NC-GEDF-VPR"))
+	else if(0 == strcmp(test_name.data(), "NC-LP-EE-VPR"))
 	{
-		return new NC_GEDF_VPR(tasks, processors, resources);
+		return new NC_LP_EE_VPR(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-GRM"))
 	{
