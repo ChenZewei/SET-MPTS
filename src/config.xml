@@ -61,7 +61,7 @@
 		<data RENAME="LP-EE-vpr" REMARK="">NC-LP-EE-VPR</data>
 		<data RENAME="ROP-FEAS" REMARK="">RTA-PFP-RO-FEASIBLE</data>
 	</schedulability_test>
-	<experiment_times>500</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -102,13 +102,11 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>1</data>
 		<data>2</data>
 		<data>4</data>
-		<data>8</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>100</data>
+		<data>1</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.1</data>
@@ -116,8 +114,6 @@
 	</rrp>
 	<rrn>//resource_request_number
 		<data>1</data>
-		<data>3</data>
-		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>

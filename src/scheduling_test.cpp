@@ -34,7 +34,7 @@ int main(int argc,char** argv)
 {	
 
 	vector<Param> parameters = get_parameters();
-
+	cout<<parameters.size()<<endl;
 	foreach(parameters, param)
 	{
 		Result_Set results[MAX_METHOD];
