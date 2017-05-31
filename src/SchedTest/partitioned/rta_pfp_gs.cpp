@@ -252,7 +252,7 @@ long RTA_PFP_GS::pfp_gs_tryAssign(Task& ti, uint p_id)
 
 	for(int pi = queue_size - 1; pi >= 0; pi--) // pi from |U| -> 0
 	{
-//cout<<"try to assign priority "<<pi<<" on processor "<<p_id<<endl;
+cout<<"try to assign priority "<<pi<<" on processor "<<p_id<<endl;
 		TaskQueue C;
 /*
 		foreach_task_assign_to_processor(tasks.get_tasks(), p_id, tx)
@@ -265,7 +265,7 @@ long RTA_PFP_GS::pfp_gs_tryAssign(Task& ti, uint p_id)
 */
 		foreach(U, taskptr)
 		{
-//cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
+cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
 			((Task*)(*taskptr))->set_priority(pi);
 			if(alloc_schedulable(*((Task*)(*taskptr))))
 				C.push_back(*taskptr);
@@ -285,7 +285,7 @@ long RTA_PFP_GS::pfp_gs_tryAssign(Task& ti, uint p_id)
 		foreach(C, taskptr)
 		{
 
-//			cout<<"task:"<<((Task*)(*taskptr))->get_id()<<" partition:"<<((Task*)(*taskptr))->get_partition()<<" wcet:"<<((Task*)(*taskptr))->get_wcet()<<" period:"<<((Task*)(*taskptr))->get_period()<<" response time:"<<((Task*)(*taskptr))->get_response_time()<<endl;
+			cout<<"task:"<<((Task*)(*taskptr))->get_id()<<" partition:"<<((Task*)(*taskptr))->get_partition()<<" wcet:"<<((Task*)(*taskptr))->get_wcet()<<" period:"<<((Task*)(*taskptr))->get_period()<<" response time:"<<((Task*)(*taskptr))->get_response_time()<<endl;
 			if(max_period < ((Task*)(*taskptr))->get_period())
 			{
 				it = taskptr;
@@ -303,7 +303,7 @@ long RTA_PFP_GS::pfp_gs_tryAssign(Task& ti, uint p_id)
 	{
 		long slack = ((Task*)(*ti))->get_period() - ((Task*)(*ti))->get_response_time();
 
-//cout<<"slack:"<<slack<<endl;
+cout<<"slack:"<<slack<<endl;
 		if(s > slack)
 		{
 			s = slack;	
@@ -335,6 +335,22 @@ bool RTA_PFP_GS::is_schedulable()//Greedy Slacker heuristic partitioning
 	tasks.init();
 	uint p_num = processors.get_processor_num();
 
+cout<<"=====start====="<<endl;
+foreach(tasks.get_tasks(), task)
+{
+	cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<endl;
+	foreach(task->get_requests(), request)
+		cout<<request->get_resource_id()<<"\t";
+	cout<<endl;
+	cout<<"----------------------------"<<endl;
+}
+
+foreach(resources.get_resources(), resource)
+{
+	cout<<"Resource:"<<resource->get_resource_id()<<" ceiling:"<<resource->get_ceiling()<<" global:"<<(resource->is_global_resource()?"yes":"no")<<endl;
+	resource->display_task_queue();
+}
+
 	foreach(tasks.get_tasks(), tx)
 	{
 		vector<gs_tryAssign> C;
@@ -354,13 +370,14 @@ bool RTA_PFP_GS::is_schedulable()//Greedy Slacker heuristic partitioning
 		}
 		if(0 == C.size())
 		{
-/*
+
+cout<<"=====fail====="<<endl;
 			foreach(tasks.get_tasks(), task)
 			{
 				cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<endl;
 				cout<<"----------------------------"<<endl;
 			}
-*/
+
 			return false;
 		}
 		else
@@ -386,13 +403,14 @@ bool RTA_PFP_GS::is_schedulable()//Greedy Slacker heuristic partitioning
 			tx->set_priority(priority);
 		}
 	}
-/*
+
+cout<<"=====success====="<<endl;
 	foreach(tasks.get_tasks(), task)
 	{
 		cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<endl;
 		cout<<"----------------------------"<<endl;
 	}
-*/
+
 	return true;
 }
 

@@ -50,6 +50,7 @@ bool Resource::is_global_resource()
 	
 	foreach(queue, task)
 	{
+		cout<<"Task:"<<((Task*)(*task))->get_id()<<endl;
 		if(((Task*)(*queue.begin()))->get_partition() != ((Task*)(*task))->get_partition())
 		{
 			global_resource = true;
@@ -100,12 +101,23 @@ uint Resource::get_ceiling()
 {
 	uint ceiling = 0xffffffff;	
 	list<void*>::iterator it = queue.begin();
-	for(uint i = 0; it != queue.end(); it++, i++)
+	//for(uint i = 0; it != queue.end(); it++, i++)
+	foreach(queue, task)
 	{
-		if(ceiling >= ((Task*)(*it))->get_id())
-			ceiling = ((Task*)(*it))->get_id();
+		if(ceiling >= ((Task*)(*task))->get_priority())
+			ceiling = ((Task*)(*task))->get_priority();
 	}
 	return ceiling;
+}
+
+//for debug
+void Resource::display_task_queue()
+{
+	foreach(queue, it)
+	{
+		Task& task = *((Task*)(*it));
+		cout<<"Task:"<<task.get_id()<<" partition:"<<task.get_partition()<<" priority:"<<task.get_priority()<<endl;
+	}
 }
 
 /////////////////////////////ResourceSet///////////////////////////////

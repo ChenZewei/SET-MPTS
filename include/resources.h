@@ -38,6 +38,9 @@ class Resource
 		TaskQueue& get_taskqueue();
 		void add_task(void* taskptr);
 		uint get_ceiling();
+
+		//for debug
+		void display_task_queue();
 };
 
 typedef vector<Resource> Resources;
