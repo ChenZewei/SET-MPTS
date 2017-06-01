@@ -54,6 +54,7 @@
 
 
 <!-->
+		<data RENAME="" REMARK="">RTA-PFP-WF</data>
 		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
 	</schedulability_test>
 	<experiment_times>1</experiment_times>
@@ -65,15 +66,15 @@
 		<data>JSON</data>
 	</output>
 	<lambda>
-		<data>10</data>
+		<data>4</data>
 	</lambda>
 	<step>
 		<data>0.2</data>
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>4</min>
-			<max>4</max>
+			<min>2</min>
+			<max>2</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>

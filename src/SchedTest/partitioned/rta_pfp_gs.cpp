@@ -131,7 +131,8 @@ ulong RTA_PFP_GS::response_time(Task& ti)
 {
 	if(MAX_INT == ti.get_partition())
 		return ti.get_deadline();
-//cout<<"RTA for task:"<<ti.get_id()<<endl;
+cout<<"RTA for task:"<<ti.get_id()<<endl;
+cout<<"wcet:"<<ti.get_wcet()<<" period:"<<ti.get_period()<<" deadline:"<<ti.get_deadline()<<" r_t:"<<ti.get_response_time()<<endl;
 	ulong wcet = ti.get_wcet();
 	ulong jitter = ti.get_jitter();
 	//ti.set_response_time(wcet);
@@ -145,12 +146,12 @@ ulong RTA_PFP_GS::response_time(Task& ti)
 	ti.set_local_blocking(local_blocking);
 	ti.set_remote_blocking(remote_blocking);
 	ti.set_total_blocking(local_blocking + remote_blocking);
-/*
+
 	foreach(tasks.get_tasks(), tx)
 	{
-		cout<<"Task"<<tx->get_id()<<" partition:"<<tx->get_id()<<" priority:"<<tx->get_priority()<<endl;
+		cout<<"Task"<<tx->get_id()<<" partition:"<<tx->get_partition()<<" priority:"<<tx->get_priority()<<endl;
 	}
-*/
+
 	while(response_time + jitter <= test_end)
 	{
 		test_start = wcet + remote_blocking + max(local_blocking, NP_blocking);
@@ -159,13 +160,14 @@ cout<<"remote blocking:"<<remote_blocking<<" local_b:"<<local_blocking<<" NP_b:"
 		{
 			if(ti.get_partition() == th->get_partition())
 			{
-//cout<<"Task:"<<th->get_id()<<" Partition:"<<th->get_partition()<<" priority:"<<th->get_priority()<<endl;
-//cout<<"........................"<<endl;
 				ulong wcet_h = th->get_wcet();
 				ulong period_h = th->get_period();
 				ulong jitter_h = th->get_jitter();
 				ulong remote_blocking_h = th->get_remote_blocking();
-				test_start += ceiling(response_time + jitter_h, period_h)*(wcet_h + remote_blocking_h);
+				ulong interference = ceiling(response_time + jitter_h, period_h)*(wcet_h + remote_blocking_h);
+				test_start += interference;
+cout<<"Task:"<<th->get_id()<<" wcet:"<<th->get_wcet()<<" period:"<<th->get_period()<<" deadline:"<<th->get_deadline()<<" r_t:"<<th->get_response_time()<<" interference:"<<interference<<endl;
+cout<<"........................"<<endl;
 			}
 		}
 
@@ -176,10 +178,12 @@ cout<<"remote blocking:"<<remote_blocking<<" local_b:"<<local_blocking<<" NP_b:"
 		else
 		{
 			//ti.set_response_time(response_time);
-			//cout<<"rt:"<<response_time<<endl;
+			cout<<"rt:"<<response_time<<endl;
 			return response_time;
 		}	
 	}
+	
+	cout<<"rt(miss):"<<response_time<<endl;
 	return test_end + 100;
 }
 
@@ -265,7 +269,7 @@ cout<<"try to assign priority "<<pi<<" on processor "<<p_id<<endl;
 */
 		foreach(U, taskptr)
 		{
-cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
+//cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
 			((Task*)(*taskptr))->set_priority(pi);
 			if(alloc_schedulable(*((Task*)(*taskptr))))
 				C.push_back(*taskptr);
@@ -285,7 +289,7 @@ cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
 		foreach(C, taskptr)
 		{
 
-			cout<<"task:"<<((Task*)(*taskptr))->get_id()<<" partition:"<<((Task*)(*taskptr))->get_partition()<<" wcet:"<<((Task*)(*taskptr))->get_wcet()<<" period:"<<((Task*)(*taskptr))->get_period()<<" response time:"<<((Task*)(*taskptr))->get_response_time()<<endl;
+//			cout<<"task:"<<((Task*)(*taskptr))->get_id()<<" partition:"<<((Task*)(*taskptr))->get_partition()<<" wcet:"<<((Task*)(*taskptr))->get_wcet()<<" period:"<<((Task*)(*taskptr))->get_period()<<" response time:"<<((Task*)(*taskptr))->get_response_time()<<endl;
 			if(max_period < ((Task*)(*taskptr))->get_period())
 			{
 				it = taskptr;
@@ -303,7 +307,7 @@ cout<<"t"<<((Task*)(*taskptr))->get_id()<<endl;
 	{
 		long slack = ((Task*)(*ti))->get_period() - ((Task*)(*ti))->get_response_time();
 
-cout<<"slack:"<<slack<<endl;
+//cout<<"slack:"<<slack<<endl;
 		if(s > slack)
 		{
 			s = slack;	
@@ -334,7 +338,7 @@ bool RTA_PFP_GS::is_schedulable()//Greedy Slacker heuristic partitioning
 	tasks.DM_Order();
 	tasks.init();
 	uint p_num = processors.get_processor_num();
-
+/*
 cout<<"=====start====="<<endl;
 foreach(tasks.get_tasks(), task)
 {
@@ -344,13 +348,14 @@ foreach(tasks.get_tasks(), task)
 	cout<<endl;
 	cout<<"----------------------------"<<endl;
 }
-
+*/
+/*
 foreach(resources.get_resources(), resource)
 {
 	cout<<"Resource:"<<resource->get_resource_id()<<" ceiling:"<<resource->get_ceiling()<<" global:"<<(resource->is_global_resource()?"yes":"no")<<endl;
 	resource->display_task_queue();
 }
-
+*/
 	foreach(tasks.get_tasks(), tx)
 	{
 		vector<gs_tryAssign> C;
@@ -359,6 +364,7 @@ foreach(resources.get_resources(), resource)
 		{
 //			cout<<"TryAssign task_"<<tx->get_id()<<" to proc_"<<p_id<<endl;
 			long s = pfp_gs_tryAssign((*tx), p_id);
+//			cout<<s<<endl;
 			if(0 <= s)
 			{
 				gs_tryAssign temp;
@@ -370,14 +376,14 @@ foreach(resources.get_resources(), resource)
 		}
 		if(0 == C.size())
 		{
-
+/*
 cout<<"=====fail====="<<endl;
 			foreach(tasks.get_tasks(), task)
 			{
 				cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<endl;
 				cout<<"----------------------------"<<endl;
 			}
-
+*/
 			return false;
 		}
 		else
@@ -403,14 +409,14 @@ cout<<"=====fail====="<<endl;
 			tx->set_priority(priority);
 		}
 	}
-
+/*
 cout<<"=====success====="<<endl;
 	foreach(tasks.get_tasks(), task)
 	{
 		cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<endl;
 		cout<<"----------------------------"<<endl;
 	}
-
+*/
 	return true;
 }
 
