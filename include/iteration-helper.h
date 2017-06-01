@@ -87,7 +87,7 @@
 
 #define foreach_lower_priority_local_task(tasks, ti, tx) \
 		foreach(tasks, tx) \
-			if((tx->get_id() > ti.get_id()) && \
+			if((tx->get_priority() > ti.get_priority()) && \
 				(tx->get_partition() == ti.get_partition()))
 
 #endif

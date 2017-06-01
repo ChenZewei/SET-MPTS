@@ -50,7 +50,7 @@ bool Resource::is_global_resource()
 	
 	foreach(queue, task)
 	{
-		cout<<"Task:"<<((Task*)(*task))->get_id()<<endl;
+//		cout<<"Task:"<<((Task*)(*task))->get_id()<<endl;
 		if(((Task*)(*queue.begin()))->get_partition() != ((Task*)(*task))->get_partition())
 		{
 			global_resource = true;

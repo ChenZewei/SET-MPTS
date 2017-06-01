@@ -24,6 +24,7 @@ class Resource
 		bool processor_local_resource;
 		//Request_Tasks tasks;
 		TaskQueue queue;
+		vector<uint> tasks;
 	public:
 		Resource(uint id, uint locality = MAX_INT, bool global_resource = false, bool processor_local_resource = false);
 		~Resource();

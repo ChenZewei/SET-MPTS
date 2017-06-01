@@ -24,6 +24,8 @@ class Processor
 		bool tryed_assign;
 		TaskQueue tQueue;
 		ResourceQueue rQueue;
+		vector<uint> tasks;
+		vector<uint> resources;
 	public:
 		Processor(uint id, fraction_t speedfactor = 1);
 		~Processor();

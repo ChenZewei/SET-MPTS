@@ -99,7 +99,7 @@ ulong RTA_PFP_GS::pfp_gs_NP_blocking(Task& ti)
 			Resource& resource_q = resources.get_resources()[q];
 			if(!resource_q.is_global_resource())
 				continue;
-
+			cout<<"global resource:"<<resource_q.get_resource_id()<<endl;
 			ulong length = pfp_gs_spin_time((*tj), q) + request->get_max_length();
 			if(blocking < length)
 				blocking = length;
@@ -154,7 +154,7 @@ ulong RTA_PFP_GS::response_time(Task& ti)
 	while(response_time + jitter <= test_end)
 	{
 		test_start = wcet + remote_blocking + max(local_blocking, NP_blocking);
-//cout<<"remote blocking:"<<remote_blocking<<" max(local_b, NP_b):"<<max(local_blocking, NP_blocking)<<endl;
+cout<<"remote blocking:"<<remote_blocking<<" local_b:"<<local_blocking<<" NP_b:"<<NP_blocking<<endl;
 		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 		{
 			if(ti.get_partition() == th->get_partition())

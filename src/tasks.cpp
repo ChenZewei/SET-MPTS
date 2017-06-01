@@ -515,57 +515,57 @@ void TaskSet::sort_by_id()
 void TaskSet::sort_by_period()
 {
 	sort(tasks.begin(), tasks.end(), period_increase<Task>);
-	for(int i = 0; i < tasks.size(); i++)
-		tasks[i].set_id(i);
+//	for(int i = 0; i < tasks.size(); i++)
+//		tasks[i].set_id(i);
 }
 
 void TaskSet::sort_by_deadline()
 {
 	sort(tasks.begin(), tasks.end(), deadline_increase<Task>);
-	for(int i = 0; i < tasks.size(); i++)
-		tasks[i].set_id(i);
+//	for(int i = 0; i < tasks.size(); i++)
+//		tasks[i].set_id(i);
 }
 
 void TaskSet::sort_by_utilization()
 {
 	sort(tasks.begin(), tasks.end(), utilization_decrease<Task>);
-	for(int i = 0; i < tasks.size(); i++)
-		tasks[i].set_id(i);
+//	for(int i = 0; i < tasks.size(); i++)
+//		tasks[i].set_id(i);
 }
 
 void TaskSet::sort_by_density()
 {
 	sort(tasks.begin(), tasks.end(), density_decrease<Task>);
-	for(int i = 0; i < tasks.size(); i++)
-		tasks[i].set_id(i);
+//	for(int i = 0; i < tasks.size(); i++)
+//		tasks[i].set_id(i);
 }
 
 void TaskSet::sort_by_DC()
 {
 	sort(tasks.begin(), tasks.end(), task_DC_increase<Task>);
-	for(int i = 0; i < tasks.size(); i++)
-		tasks[i].set_id(i);
+//	for(int i = 0; i < tasks.size(); i++)
+//		tasks[i].set_id(i);
 }
 
 void TaskSet::sort_by_DCC()
 {
 	sort(tasks.begin(), tasks.end(), task_DCC_increase<Task>);
-	for(int i = 0; i < tasks.size(); i++)
-		tasks[i].set_id(i);
+//	for(int i = 0; i < tasks.size(); i++)
+//		tasks[i].set_id(i);
 }
 
 void TaskSet::sort_by_DDC()
 {
 	sort(tasks.begin(), tasks.end(), task_DDC_increase<Task>);
-	for(int i = 0; i < tasks.size(); i++)
-		tasks[i].set_id(i);
+//	for(int i = 0; i < tasks.size(); i++)
+//		tasks[i].set_id(i);
 }
 
 void TaskSet::sort_by_UDC()
 {
 	sort(tasks.begin(), tasks.end(), task_UDC_increase<Task>);
-	for(int i = 0; i < tasks.size(); i++)
-		tasks[i].set_id(i);
+//	for(int i = 0; i < tasks.size(); i++)
+//		tasks[i].set_id(i);
 }
 
 void TaskSet::RM_Order()
@@ -721,8 +721,8 @@ void TaskSet::SM_PLUS_Order()
 			}
 		}
 
-		for(int i = 0; i < tasks.size(); i++)
-			tasks[i].set_id(i);
+//		for(int i = 0; i < tasks.size(); i++)
+//			tasks[i].set_id(i);
 /*
 		cout<<"after plus:"<<endl;
 		cout<<"-----------------------"<<endl;
@@ -785,8 +785,8 @@ void TaskSet::SM_PLUS_2_Order()
 			}
 		}
 
-		for(int i = 0; i < tasks.size(); i++)
-			tasks[i].set_id(i);
+//		for(int i = 0; i < tasks.size(); i++)
+//			tasks[i].set_id(i);
 	}
 
 	for(uint i = 0; i < tasks.size(); i++)
@@ -848,8 +848,8 @@ void TaskSet::SM_PLUS_3_Order()
 			}
 		}
 
-		for(int i = 0; i < tasks.size(); i++)
-			tasks[i].set_id(i);
+//		for(int i = 0; i < tasks.size(); i++)
+//			tasks[i].set_id(i);
 	}
 
 	for(uint i = 0; i < tasks.size(); i++)
@@ -916,7 +916,7 @@ void TaskSet::Leisure_Order()
 
 	for(uint i = 0; i < tasks.size(); i++)
 	{
-		tasks[i].set_id(i);
+//		tasks[i].set_id(i);
 		tasks[i].set_priority(i);
 	}
 
@@ -1017,8 +1017,8 @@ cout<<"////////////////////////////////////////////"<<endl;
 			}
 		}
 
-		for(int i = 0; i < tasks.size(); i++)
-			tasks[i].set_id(i);
+//		for(int i = 0; i < tasks.size(); i++)
+//			tasks[i].set_id(i);
 
 	}
 
@@ -1733,8 +1733,8 @@ fraction_t DAG_TaskSet::get_density_max() const {return density_max;}
 void DAG_TaskSet::sort_by_period()
 {
 	sort(dag_tasks.begin(), dag_tasks.end(), period_increase<DAG_Task>);
-	for(int i = 0; i < dag_tasks.size(); i++)
-		dag_tasks[i].set_id(i);
+//	for(int i = 0; i < dag_tasks.size(); i++)
+//		dag_tasks[i].set_id(i);
 }
 
 //////////////////////////////Others//////////////////////////////
