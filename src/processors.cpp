@@ -34,19 +34,43 @@ fraction_t Processor::get_speedfactor() const
 	return speedfactor;
 }
 
-fraction_t Processor::get_utilization() const
+fraction_t Processor::get_utilization()
 {
+	utilization = 0;
+	if(0 == tQueue.size())
+		return utilization;
+	foreach(tQueue, t_id)
+	{
+		Task& task = tasks->get_task_by_id(*t_id);
+		utilization += task.get_utilization();
+	}
 	return utilization;
 }
 
-fraction_t Processor::get_density() const
+fraction_t Processor::get_density()
 {
+	density = 0;
+	if(0 == tQueue.size())
+		return density;
+	foreach(tQueue, t_id)
+	{
+		Task& task = tasks->get_task_by_id(*t_id);
+		density += task.get_density();
+	}
 	return density;
 }
 
 
-fraction_t Processor::get_resource_utilization() const
+fraction_t Processor::get_resource_utilization()
 {
+	resource_utilization = 0;
+	if(0 == rQueue.size())
+		return resource_utilization;
+	foreach(rQueue, r_id)
+	{
+		Resource& resource = resources->get_resources()[*r_id];
+		resource_utilization += resource.get_utilization();
+	}
 	return resource_utilization;
 }
 
@@ -55,64 +79,46 @@ bool Processor::get_tryed_assign() const
 	return tryed_assign;
 }
 
-TaskQueue& Processor::get_taskqueue()
+const set<uint>& Processor::get_taskqueue()
 {
 	return tQueue;
 }
 
-bool Processor::add_task(void* taskptr)
+bool Processor::add_task(uint t_id)
 {
-	if(1 < utilization + ((Task*)taskptr)->get_utilization())
+	Task& task = tasks->get_task_by_id(t_id);
+	if(1 < utilization + task.get_utilization())
 		return false;
-	tQueue.push_back(taskptr);
-	utilization += ((Task*)taskptr)->get_utilization();
-	density += ((Task*)taskptr)->get_density();
+
+	tQueue.insert(t_id);
 	return true;	
 }
 
-bool Processor::remove_task(void* taskptr)
+bool Processor::remove_task(uint t_id)
 {
-	TaskQueue::iterator it = tQueue.begin();
-	for(uint i = 0; it != tQueue.end(); it++, i++)
-	{
-		if(taskptr == *it)
-		{
-			tQueue.remove(*it);
-			utilization -= ((Task*)taskptr)->get_utilization();
-			density -= ((Task*)taskptr)->get_density();
-			return true;
-		}
-	}
-	return false;
+	tQueue.erase(t_id);
+	return true;
 }
 
 
-ResourceQueue& Processor::get_resourcequeue()
+const set<uint>& Processor::get_resourcequeue()
 {
 	return rQueue;
 }
 
-bool Processor::add_resource(void* resourceptr)
+bool Processor::add_resource(uint r_id)
 {
-	if(1 < resource_utilization + ((Resource*)resourceptr)->get_utilization())
+	Resource& resource = resources->get_resources()[r_id];
+	if(1 < resource_utilization + resource.get_utilization())
 			return false;
-		rQueue.push_back(resourceptr);
-		resource_utilization += ((Resource*)resourceptr)->get_utilization();
-		return true;
+
+	rQueue.insert(r_id);
+	return true;
 }
-bool Processor::remove_resource(void* resourceptr)
+bool Processor::remove_resource(uint r_id)
 {
-	ResourceQueue::iterator it = rQueue.begin();
-	for(uint i = 0; it != tQueue.end(); it++, i++)
-	{
-		if(resourceptr == *it)
-		{
-			rQueue.remove(*it);
-			resource_utilization -= ((Resource*)resourceptr)->get_utilization();
-			return true;
-		}
-	}
-	return false;
+	rQueue.erase(r_id);
+	return true;
 }
 
 void Processor::init()
@@ -124,6 +130,14 @@ void Processor::init()
 	tQueue.clear();
 	rQueue.clear();
 }
+
+
+void Processor::update(const TaskSet* tasks, const ResourceSet* resources)
+{
+	this->tasks = tasks;
+	this->resources = resources;
+}
+
 ///////////////////////////ProcessorSet/////////////////////////////
 
 ProcessorSet::ProcessorSet() {}
@@ -182,7 +196,11 @@ void ProcessorSet::sort_by_resource_utilization(uint dir)
 	}
 }
 
-
+void ProcessorSet::update(const TaskSet* tasks, const ResourceSet* resources)
+{
+	foreach(processors, processor)
+		processor->update(tasks, resources);
+}
 
 
 

@@ -140,6 +140,9 @@ ILP_RTA_PFP_spinlock::ILP_RTA_PFP_spinlock(TaskSet tasks, ProcessorSet processor
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->tasks.RM_Order();
 	this->processors.init();
@@ -309,7 +312,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_1(LinearProgram& lp, ILPSpinL
 	foreach(tasks.get_tasks(), ti)
 	{
 		LinearExpression *exp = new LinearExpression();
-		uint  i = ti->get_id();
+		uint  i = ti->get_index();
 		for(uint k = 1; k <= p_num; k++)
 		{
 			uint var_id;
@@ -329,7 +332,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_2(LinearProgram& lp, ILPSpinL
 	foreach(tasks.get_tasks(), ti)
 	{
 		LinearExpression *exp = new LinearExpression();
-		uint  i = ti->get_id();
+		uint  i = ti->get_index();
 		for(uint p = 1; p <= t_num; p++)
 		{
 			uint var_id;
@@ -350,7 +353,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_2_1(LinearProgram& lp, ILPSpi
 		LinearExpression *exp = new LinearExpression();
 		foreach(tasks.get_tasks(), ti)
 		{
-			uint  i = ti->get_id();
+			uint  i = ti->get_index();
 			uint var_id;
 
 			var_id = vars.lookup(ILPSpinLockMapper::PRIORITY_ASSIGNMENT, i, p);
@@ -366,10 +369,10 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_3(LinearProgram& lp, ILPSpinL
 
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		foreach_task_except(tasks.get_tasks(), (*ti), tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 			for(uint k = 1; k <= p_num; k++)
 			{
 				LinearExpression *exp = new LinearExpression();
@@ -397,10 +400,10 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_4(LinearProgram& lp, ILPSpinL
 	
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		foreach(tasks.get_tasks(), tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 			for(uint p = 1; p <= t_num - 1; p++)
 			{
 				LinearExpression *exp = new LinearExpression();
@@ -429,10 +432,10 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_5(LinearProgram& lp, ILPSpinL
 {
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		foreach_task_except(tasks.get_tasks(), (*ti), tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 		
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
@@ -452,7 +455,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_6(LinearProgram& lp, ILPSpinL
 {
 	foreach(tasks.get_tasks(), task)
 	{
-		uint i = task->get_id();
+		uint i = task->get_index();
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 
@@ -473,7 +476,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_7(LinearProgram& lp, ILPSpinL
 {
 	foreach(tasks.get_tasks(), task)
 	{
-		uint i = task->get_id();
+		uint i = task->get_index();
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 
@@ -503,7 +506,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_8(LinearProgram& lp, ILPSpinL
 {
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
@@ -513,7 +516,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_8(LinearProgram& lp, ILPSpinL
 		
 		foreach_task_except(tasks.get_tasks(), (*ti), tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 			
 			var_id = vars.lookup(ILPSpinLockMapper::MAX_PREEMEPT, i, x);
 			exp->sub_term(var_id, tx->get_wcet());
@@ -529,11 +532,11 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_9(LinearProgram& lp, ILPSpinL
 {
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		
 		foreach_task_except(tasks.get_tasks(), (*ti), tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
 
@@ -551,11 +554,11 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_10(LinearProgram& lp, ILPSpin
 {
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 
 		foreach_task_except(tasks.get_tasks(), (*ti), tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
 			
@@ -581,7 +584,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_11(LinearProgram& lp, ILPSpin
 	uint p_num = processors.get_processor_num();
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 		var_id = vars.lookup(ILPSpinLockMapper::SPIN_TIME, i);
@@ -605,7 +608,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_12(LinearProgram& lp, ILPSpin
 
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		for(uint k = 1; k <= p_num; k++)
 		{
 			LinearExpression *exp = new LinearExpression();
@@ -635,7 +638,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_13(LinearProgram& lp, ILPSpin
 
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 
 		ulong max_L = 0;
 		uint max_N = 0;
@@ -654,7 +657,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_13(LinearProgram& lp, ILPSpin
 
 		foreach_task_except(tasks.get_tasks(), (*ti), tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 			
 			for(uint q = 1; q <= r_num; q++)
 			{
@@ -690,7 +693,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_13(LinearProgram& lp, ILPSpin
 
 					foreach_higher_priority_task(tasks.get_tasks(), (*ti), th)
 					{
-						uint h = th->get_id();
+						uint h = th->get_index();
 						uint N_h_q;
 						if(th->is_request_exist(q - 1))
 						{	
@@ -722,7 +725,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_14(LinearProgram& lp, ILPSpin
 
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 
 		for(uint q = 1; q <= r_num; q++)
 		{
@@ -749,7 +752,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_15(LinearProgram& lp, ILPSpin
 
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 
 		for(uint q = 1; q <= r_num; q++)
 		{
@@ -778,7 +781,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_16(LinearProgram& lp, ILPSpin
 	
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		for(uint q = 1; q <= r_num; q++)
 		{
 			uint var_id;
@@ -788,12 +791,12 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_16(LinearProgram& lp, ILPSpin
 
 			foreach_task_except(tasks.get_tasks(), (*ti), tx)
 			{
-				uint x = tx->get_id();
+				uint x = tx->get_index();
 				if(tx->is_request_exist(q - 1))
 				{
 					foreach_higher_priority_task(tasks.get_tasks(), (*ti), th)
 					{
-						uint h = th->get_id();
+						uint h = th->get_index();
 
 						if(th->is_request_exist(q - 1))
 						{
@@ -829,7 +832,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_17(LinearProgram& lp, ILPSpin
 	
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		for(uint q = 1; q <= r_num; q++)
 		{
 			uint var_id;
@@ -839,12 +842,12 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_17(LinearProgram& lp, ILPSpin
 
 			foreach_task_except(tasks.get_tasks(), (*ti), tx)
 			{
-				uint x = tx->get_id();
+				uint x = tx->get_index();
 				if(tx->is_request_exist(q - 1))
 				{
 					foreach_higher_priority_task(tasks.get_tasks(), (*ti), th)
 					{
-						uint h = th->get_id();
+						uint h = th->get_index();
 
 						if(th->is_request_exist(q - 1))
 						{
@@ -878,7 +881,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_18(LinearProgram& lp, ILPSpin
 	
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		for(uint q = 1; q <= r_num; q++)
 		{
 			for(uint k = 1; k <= p_num; k++)
@@ -888,7 +891,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_18(LinearProgram& lp, ILPSpin
 					LinearExpression *exp = new LinearExpression();
 					uint var_id;
 
-					uint x = tx->get_id();
+					uint x = tx->get_index();
 					ulong L_x_q = 0;
 					if(tx->is_request_exist(q - 1))
 					{
@@ -925,7 +928,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_19(LinearProgram& lp, ILPSpin
 	
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
+		uint i = ti->get_index();
 		for(uint q = 1; q <= r_num; q++)
 		{
 			for(uint k = 1; k <= p_num; k++)
@@ -935,7 +938,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_19(LinearProgram& lp, ILPSpin
 					LinearExpression *exp = new LinearExpression();
 					uint var_id;
 
-					uint x = tx->get_id();
+					uint x = tx->get_index();
 					ulong L_x_q = 0;
 					if(tx->is_request_exist(q - 1))
 					{

@@ -7,6 +7,23 @@
 #include "processors.h"
 #include "resources.h"
 
+
+typedef struct
+{
+	uint p_id;
+	long s;
+	uint priority;
+}gs_tryAssign;
+
+typedef struct
+{
+	uint t_id;
+	uint priority;
+}priority_storage;
+
+typedef vector<priority_storage> Priorities;
+
+
 class RTA_PFP_GS: public PartitionedSched
 {
 	private:

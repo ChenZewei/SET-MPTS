@@ -53,11 +53,27 @@
 		<data RENAME="" REMARK="">RTA-GSMP4-NG</data>
 
 
-<!-->
-		<data RENAME="" REMARK="">RTA-PFP-WF</data>
+		<data RENAME="" REMARK="">NC-LP-EE-VPR</data>
 		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-NP</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-FEASIBLE</data>
+
+		
+#EXP1
+		<data RENAME="LP-PIP" REMARK="">LP-RTA-GFP-PIP</data>
+		<data RENAME="LP-FMLP" REMARK="">LP-RTA-GFP-FMLP</data>
+		<data RENAME="LP-DPCP" REMARK="">LP-RTA-PFP-DPCP</data>
+		<data RENAME="LP-MPCP" REMARK="">LP-RTA-PFP-MPCP</data>
+		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
+		<data RENAME="ROP-PCP" REMARK="">RTA-PFP-RO-ML</data>
+		<data RENAME="ROP-NP" REMARK="">RTA-PFP-RO-NP</data>
+		<data RENAME="ROP-FEAS" REMARK="">RTA-PFP-RO-FEASIBLE</data>
+<!-->	
+		<data RENAME="" REMARK="">NC-LP-EE-VPR</data>
+		<data RENAME="ROP-PCP" REMARK="">RTA-PFP-RO-ML</data>
 	</schedulability_test>
-	<experiment_times>1</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -66,15 +82,15 @@
 		<data>JSON</data>
 	</output>
 	<lambda>
-		<data>4</data>
+		<data>10</data>
 	</lambda>
 	<step>
 		<data>0.2</data>
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>2</min>
-			<max>2</max>
+			<min>0</min>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
@@ -93,21 +109,21 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>0</data>
+		<data>4</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
 		<data>1</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.25</data>
+		<data>1</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>1</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
-			<min>10</min>
-			<max>20</max>
+			<min>5</min>
+			<max>10</max>
 		</data>
 	</rrr>
 	<total_len_factor>

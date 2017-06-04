@@ -20,6 +20,12 @@ int id_increase(TaskModel t1, TaskModel t2)
 }
 
 template <typename TaskModel>
+int index_increase(TaskModel t1, TaskModel t2)
+{
+	return t1.get_index() < t2.get_index();
+}
+
+template <typename TaskModel>
 int period_increase(TaskModel t1, TaskModel t2)
 {
 	return t1.get_period() < t2.get_period();

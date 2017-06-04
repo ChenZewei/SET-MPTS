@@ -89,6 +89,9 @@ LP_RTA_PFP_MPCP::LP_RTA_PFP_MPCP(TaskSet tasks, ProcessorSet processors, Resourc
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->tasks.RM_Order();
 	this->processors.init();
@@ -205,12 +208,11 @@ ulong LP_RTA_PFP_MPCP::response_time(Task& task_i)
 		demand = task_i.get_total_blocking() + task_i.get_wcet();
 
 		ulong total_interf = 0;
-		for (uint th = 0; th < task_i.get_id(); th ++)
+		foreach_higher_priority_task(tasks.get_tasks(), task_i, task_h)
 		{
-			Task& task_h = tasks.get_task_by_id(th);
-			if (task_i.get_partition() == task_h.get_partition())
+			if (task_i.get_partition() == task_h->get_partition())
 			{
-				total_interf += interference(task_h, response);
+				total_interf += interference(*task_h, response);
 			}
 		}
 
@@ -231,21 +233,20 @@ bool LP_RTA_PFP_MPCP::alloc_schedulable()
 	do
 	{
 		update = false;
-		for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+		foreach(tasks.get_tasks(), task)
 		{
-			Task& task = tasks.get_task_by_id(t_id);
 			//ulong response_bound = task.get_response_time();
-			ulong old_response_time = task.get_response_time();
-			if(task.get_partition() == MAX_LONG)
+			ulong old_response_time = task->get_response_time();
+			if(task->get_partition() == MAX_LONG)
 				continue;
 
-			ulong response_bound = response_time(task);
+			ulong response_bound = response_time(*task);
 
 			if(old_response_time != response_bound)
 				update = true;
 
-			if(response_bound <= task.get_deadline())
-				task.set_response_time(response_bound);
+			if(response_bound <= task->get_deadline())
+				task->set_response_time(response_bound);
 			else
 				return false;
 		}
@@ -266,7 +267,7 @@ uint LP_RTA_PFP_MPCP::priority_ceiling(uint r_id, uint p_id)
 		if(!tj->is_request_exist(r_id))
 			continue;
 
-		uint j = tj->get_id();
+		uint j = tj->get_index();
 
 		if(min > j)
 			min = j;
@@ -300,7 +301,7 @@ uint LP_RTA_PFP_MPCP::DD(Task& ti, Task& tx, uint r_id)
 	if(!ti.is_request_exist(r_id))
 		return 0;
 
-	if(ti.get_id() < tx.get_id())
+	if(ti.get_index() < tx.get_index())
 		return ti.get_request_by_id(r_id).get_num_requests();
 	else
 		return tx.get_max_request_num(r_id, ti.get_response_time());
@@ -310,14 +311,14 @@ uint LP_RTA_PFP_MPCP::DD(Task& ti, Task& tx, uint r_id)
 uint LP_RTA_PFP_MPCP::PO(Task& ti, Task& tx)
 {
 	uint sum = 0;
-	uint x = tx.get_id();
-	uint i = ti.get_id();
+	uint x = tx.get_index();
+	uint i = ti.get_index();
 
 	uint p_id = tx.get_partition();
 
 	foreach(tasks.get_tasks(), ty)
 	{
-		uint y = ty->get_id();
+		uint y = ty->get_index();
 		if((p_id != ty->get_partition()) || (y == x) || (y == i))
 			continue;
 		
@@ -336,14 +337,14 @@ uint LP_RTA_PFP_MPCP::PO(Task& ti, Task& tx)
 uint LP_RTA_PFP_MPCP::PO(Task& ti, Task& tx, uint r_id)
 {
 	uint sum = 0;
-	uint x = tx.get_id();
-	uint i = ti.get_id();
+	uint x = tx.get_index();
+	uint i = ti.get_index();
 
 	uint p_id = tx.get_partition();
 
 	foreach(tasks.get_tasks(), ty)
 	{
-		uint y = ty->get_id();
+		uint y = ty->get_index();
 		if((p_id != ty->get_partition()) || (y == x) || (y == i))
 			continue;
 		
@@ -435,7 +436,7 @@ void LP_RTA_PFP_MPCP::set_objective(Task& ti, LinearProgram& lp, MPCPMapper& var
 	
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -497,7 +498,7 @@ void LP_RTA_PFP_MPCP::constraint_1(Task& ti, LinearProgram& lp, MPCPMapper& vars
 		
 		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 			foreach_request_instance(ti, *tx, q, v)
 			{
 				
@@ -525,7 +526,7 @@ void LP_RTA_PFP_MPCP::constraint_2(Task& ti, LinearProgram& lp, MPCPMapper& vars
 		LinearExpression *exp = new LinearExpression();
 		foreach_task_except(tasks.get_tasks(), ti, tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 			foreach_request_instance(ti, *tx, q, v)
 			{
 				
@@ -546,7 +547,7 @@ void LP_RTA_PFP_MPCP::constraint_3(Task& ti, LinearProgram& lp, MPCPMapper& vars
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		LinearExpression *exp = new LinearExpression();
 		foreach(resources.get_resources(), resource)
 		{
@@ -572,7 +573,7 @@ void LP_RTA_PFP_MPCP::constraint_4(Task& ti, LinearProgram& lp, MPCPMapper& vars
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach(resources.get_resources(), resource)
 		{
 			uint q = resource->get_resource_id();
@@ -596,7 +597,7 @@ void LP_RTA_PFP_MPCP::constraint_5(Task& ti, LinearProgram& lp, MPCPMapper& vars
 {
 	foreach_higher_priority_task(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach(ti.get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -640,7 +641,7 @@ void LP_RTA_PFP_MPCP::constraint_6(Task& ti, LinearProgram& lp, MPCPMapper& vars
 	
 	foreach(tasks.get_tasks(), tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		if(p_id == tx->get_partition())
 			continue;
 		foreach(resources.get_resources(), resource)

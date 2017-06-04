@@ -29,7 +29,7 @@ class RTA_GFP_NG: public GlobalSched
 
 		typedef struct
 		{
-			uint id;
+			uint priority;
 			ulong gap;
 		}Carry_in;
 		

@@ -76,6 +76,7 @@ int main(int argc,char** argv)
 				ProcessorSet processorset = ProcessorSet(*param);
 				ResourceSet resourceset = ResourceSet();
 				resource_gen(&resourceset, *param);
+				//resourceset.update(&taskset);
 				tast_gen(taskset, resourceset, *param, utilization);
 	//			taskset.SM_PLUS_4_Order(parameters.p_num);
 				for(uint j = 0; j < param->get_method_num(); j++)
@@ -129,11 +130,14 @@ int main(int argc,char** argv)
 			for(uint i = 0; i < param->test_attributes.size(); i++)
 			{
 				fraction_t ratio(success[i], exp[i]);
-				if(0 == strcmp(param->test_attributes[i].rename.data(), ""))
+				if(!param->test_attributes[i].rename.empty())
+				{
 					output.add_result(param->test_attributes[i].rename, utilization, exp[i], success[i]);
+				}
 				else
+				{
 					output.add_result(param->test_attributes[i].test_name, utilization, exp[i], success[i]);
-
+				}
 				stringstream buf;
 
 				if(0 == strcmp(param->test_attributes[i].rename.data(),""))

@@ -23,8 +23,10 @@ class Resource
 		bool global_resource;
 		bool processor_local_resource;
 		//Request_Tasks tasks;
-		TaskQueue queue;
-//		vector<uint> tasks;
+		//TaskQueue queue;
+		set<uint> queue;
+		const TaskSet* tasks;
+		const DAG_TaskSet* dag_tasks;
 	public:
 		Resource(uint id, uint locality = MAX_INT, bool global_resource = false, bool processor_local_resource = false);
 		~Resource();
@@ -32,14 +34,21 @@ class Resource
 		uint get_resource_id() const;
 		void set_locality(uint locality);
 		uint get_locality() const;
-		fraction_t get_utilization() const;
+		fraction_t get_utilization();
 		bool is_global_resource();
 		bool is_processor_local_resource() const;
 		//Request_Tasks get_tasks() const;
+		TaskSet* get_tasks();
+		set<uint> get_taskqueue();
+		void add_task(uint id);
+		uint get_ceiling();
+		void update(const TaskSet* tasks);
+		void update(const DAG_TaskSet* dag_tasks);
+/*
 		TaskQueue& get_taskqueue();
 		void add_task(void* taskptr);
 		uint get_ceiling();
-
+*/
 		//for debug
 		void display_task_queue();
 };
@@ -57,8 +66,10 @@ class ResourceSet
 		uint size() const;
 		Resources& get_resources();
 		uint get_resourceset_size() const;
-		void add_task(uint resource_id, void* taskptr);
+		void add_task(uint resource_id, uint id);
 		void sort_by_utilization();
+		void update(const TaskSet* tasks);
+		void update(const DAG_TaskSet* dag_tasks);
 };
 
 void resource_gen(ResourceSet *resourceset, Param param);

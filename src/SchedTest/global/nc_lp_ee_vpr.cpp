@@ -9,23 +9,39 @@ NC_LP_EE_VPR::NC_LP_EE_VPR(TaskSet tasks, ProcessorSet processors, ResourceSet r
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
-	this->tasks.RM_Order();
 
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
+
+	this->tasks.RM_Order();
+	this->processors.init();
 }
 
 bool NC_LP_EE_VPR::is_schedulable()
 {
 	//Non-Critical-Section Condition
 	if(!NCS_condition())
+	{
+//		cout<<"NCS"<<endl;
 		return false;
+	}
 	
 	//Critical-Section Condition
 	foreach(resources.get_resources(), resource)
 	{
 		uint r_id = resource->get_resource_id();
 
-		if((!condition_1(r_id)) || (!condition_2(r_id)))
+		if(!condition_1(r_id))
+		{
+//			cout<<"CS1"<<endl;
 			return false;
+		}
+
+		if(!condition_2(r_id))
+		{
+//			cout<<"CS2"<<endl;
+			return false;
+		}
 	}
 	return true;
 }
@@ -122,7 +138,6 @@ ulong NC_LP_EE_VPR::DBF_R(uint r_id, ulong interval)
 
 	foreach(tasks.get_tasks(), ti)
 	{
-		uint i = ti->get_id();
 		if((!ti->is_request_exist(r_id)))
 			continue;
 
@@ -140,7 +155,7 @@ ulong NC_LP_EE_VPR::blocking_time(uint r_id, ulong interval)
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint i = ti->get_id();
-		if((!ti->is_request_exist(r_id)) || (ti->get_deadline() <= interval))
+		if((!ti->is_request_exist(r_id)) || (ti->get_period() <= interval))
 			continue;
 		
 		ulong wcet_i = ti->get_wcet();

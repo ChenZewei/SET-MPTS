@@ -18,7 +18,7 @@ bool PartitionedSched::BinPacking_WF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 	if(processor.get_utilization() + ti.get_utilization() <= 1)
 	{
 		ti.set_partition(processor.get_processor_id());
-		processor.add_task(&ti);
+		processor.add_task(ti.get_id());
 	}
 	else
 		return false;
@@ -31,7 +31,7 @@ bool PartitionedSched::BinPacking_WF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 			if(!alloc_schedulable())
 			{
 				ti.set_partition(MAX_INT);
-				processor.remove_task(&ti);
+				processor.remove_task(ti.get_id());
 				return false;
 			}
 			break;
@@ -54,7 +54,7 @@ bool PartitionedSched::BinPacking_BF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 		if(processor.get_utilization() + ti.get_utilization() <= 1)
 		{
 			ti.set_partition(processor.get_processor_id());
-			processor.add_task(&ti);
+			processor.add_task(ti.get_id());
 			p_id = assign;
 			break;
 		}
@@ -72,7 +72,7 @@ bool PartitionedSched::BinPacking_BF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 			if(!alloc_schedulable())
 			{
 				ti.set_partition(MAX_INT);
-				processor.remove_task(&ti);
+				processor.remove_task(ti.get_id());
 				return false;
 			}
 			break;
