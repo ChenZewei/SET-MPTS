@@ -251,6 +251,7 @@ foreach_task_assign_to_processor(tasks.get_tasks(), p_id, task)
 	//temporarily assign ti to processor[p_id]
 	if(!processor.add_task(ti.get_id()))
 	{
+//cout<<"add task failed!"<<endl;
 		return -1;
 	}
 	ti.set_partition(p_id);
@@ -433,17 +434,14 @@ foreach(resources.get_resources(), resource)
 cout<<"=====fail====="<<endl;
 			foreach(tasks.get_tasks(), task)
 			{
-				cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<endl;
+				cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<" U:"<<task->get_utilization().get_d()<<endl;
 				cout<<"----------------------------"<<endl;
 			}
 
 	for(uint k = 0; k < p_num; k++)
 	{
-		Processor& processor = processors.get_processors()[k];
-//		cout<<"Processor "<<k<<" utilization:"<<processor.get_utilization().get_d()<<endl;
-//		if(0 == processor.get_taskqueue().size())
-//			continue;
-		foreach(processor.get_taskqueue(), t_id)
+		cout<<"Processor "<<k<<" utilization:"<<processors.get_processors()[k].get_utilization().get_d()<<endl;
+		foreach(processors.get_processors()[k].get_taskqueue(), t_id)
 		{
 			Task& task = tasks.get_task_by_id(*t_id);
 			cout<<"task"<<task.get_id()<<"\t";

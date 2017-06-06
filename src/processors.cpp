@@ -87,7 +87,8 @@ const set<uint>& Processor::get_taskqueue()
 bool Processor::add_task(uint t_id)
 {
 	Task& task = tasks->get_task_by_id(t_id);
-	if(1 < utilization + task.get_utilization())
+//cout<<"utilization_sum:"<<utilization.get_d()<<" u_t:"<<task.get_utilization().get_d()<<endl;
+	if(1 < get_utilization() + task.get_utilization())
 		return false;
 
 	tQueue.insert(t_id);
