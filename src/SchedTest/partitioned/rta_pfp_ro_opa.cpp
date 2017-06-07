@@ -80,9 +80,8 @@ ulong RTA_PFP_RO_OPA::request_bound(Task& ti, uint r_id)
 	return deadline + 100;
 }
 
-ulong RTA_PFP_RO_OPA::formula_30(Task& ti, uint p_id)
+ulong RTA_PFP_RO_OPA::formula_30(Task& ti, uint p_id, ulong interval)
 {
-	ulong deadline = ti.get_deadline();
 	ulong miu = 0;
 
 	foreach(ti.get_requests(), request)
@@ -103,14 +102,14 @@ ulong RTA_PFP_RO_OPA::formula_30(Task& ti, uint p_id)
 			Resource& resource_v = resources.get_resources()[v];
 			if(p_id == resource_v.get_locality())
 			{
-				miu += CS_workload(*tj, v, deadline);
+				miu += CS_workload(*tj, v, interval);
 			}
 		}
 	}
 	return miu;
 }
 
-ulong RTA_PFP_RO_OPA::angent_exec_bound(Task& ti, uint p_id)
+ulong RTA_PFP_RO_OPA::angent_exec_bound(Task& ti, uint p_id, ulong interval)
 {
 	ulong deadline = ti.get_deadline();
 	ulong lambda = 0;
@@ -132,7 +131,7 @@ ulong RTA_PFP_RO_OPA::angent_exec_bound(Task& ti, uint p_id)
 		}		
 	}
 
-	ulong miu = formula_30(ti, p_id);
+	ulong miu = formula_30(ti, p_id, interval);
 
 	return min(lambda, miu);
 }
@@ -160,7 +159,7 @@ ulong RTA_PFP_RO_OPA::response_time_UA(Task& ti)
 
 	for(uint k = 0; k < processors.get_processor_num(); k++)
 	{
-		response_time += formula_30(ti, k);
+		response_time += formula_30(ti, k, ti.get_deadline());
 	}
 
 	return response_time;
@@ -188,7 +187,7 @@ ulong RTA_PFP_RO_OPA::response_time_AP(Task& ti)
 
 		for(uint k = 0; k < processors.get_processor_num(); k++)
 		{
-			ulong agent_bound = angent_exec_bound(ti, k);
+			ulong agent_bound = angent_exec_bound(ti, k, response_time);
 //			cout<<"AB of processor "<<k<<":"<<agent_bound<<endl;
 			temp += agent_bound;
 		}
@@ -292,7 +291,7 @@ ulong RTA_PFP_RO_OPA::response_time_SP(Task& ti)
 			if(p_id == k)
 				continue;
 
-			temp += angent_exec_bound(ti, k);
+			temp += angent_exec_bound(ti, k, response_time);
 		}
 #if RTA_DEBUG == 1
 		cout<<"Theata:"<<temp-temp2<<endl;

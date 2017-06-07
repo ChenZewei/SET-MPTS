@@ -15,8 +15,8 @@ class RTA_PFP_RO_SM_OPA: public PartitionedSched
 
 		ulong blocking_bound(Task& ti, uint r_id);
 		ulong request_bound(Task& ti, uint r_id);
-		ulong formula_30(Task& ti, uint p_id);
-		ulong angent_exec_bound(Task& ti, uint p_id);
+		ulong formula_30(Task& ti, uint p_id, ulong interval);
+		ulong angent_exec_bound(Task& ti, uint p_id, ulong interval);
 		ulong NCS_workload(Task& ti, ulong interval);//Non-Critical-Section
 		ulong CS_workload(Task& ti, uint resource_id, ulong interval);//Critical-Section
 		ulong response_time_UA(Task& ti);
