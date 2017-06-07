@@ -78,7 +78,7 @@ ulong RTA_PFP_RO_ML::request_bound(Task& ti, uint r_id)
 	return deadline + 100;
 }
 
-ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id)
+ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id, ulong interval)
 {
 	ulong deadline = ti.get_deadline();
 	ulong lambda = 0;
@@ -119,7 +119,7 @@ ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id)
 			Resource& resource_v = resources.get_resources()[v];
 			if(p_id == resource_v.get_locality())
 			{
-				miu += CS_workload(*tj, v, deadline);
+				miu += CS_workload(*tj, v, interval);
 			}
 		}
 	}
@@ -183,7 +183,7 @@ ulong RTA_PFP_RO_ML::response_time_AP(Task& ti)
 		{
 			if(p_id == k)
 				continue;
-			ulong agent_bound = angent_exec_bound(ti, k);
+			ulong agent_bound = angent_exec_bound(ti, k, response_time);
 //			cout<<"AB of processor "<<k<<":"<<agent_bound<<endl;
 			temp += agent_bound;
 		}
@@ -287,7 +287,7 @@ ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
 			if(p_id == k)
 				continue;
 
-			temp += angent_exec_bound(ti, k);
+			temp += angent_exec_bound(ti, k, response_time);
 		}
 #if RTA_DEBUG == 1
 		cout<<"Theata:"<<temp-temp2<<endl;
