@@ -103,10 +103,12 @@ LP_RTA_GFP_PIP::LP_RTA_GFP_PIP(TaskSet tasks, ProcessorSet processors, ResourceS
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->tasks.RM_Order();
 	this->processors.init();
-
 }
 
 LP_RTA_GFP_PIP::~LP_RTA_GFP_PIP()
@@ -209,15 +211,15 @@ ulong LP_RTA_GFP_PIP::workload_bound(Task& tx, ulong Ri)
 ulong LP_RTA_GFP_PIP::holding_bound(Task& ti, Task& tx, uint resource_id)
 {
 
-	uint x = tx.get_id(), q = resource_id;
+	uint x = tx.get_priority(), q = resource_id;
 	uint p_num = processors.get_processor_num();
 	ulong L_x_q = tx.get_request_by_id(q).get_max_length();
 	ulong holding_time = L_x_q;
 
-	if(p_num < tx.get_id())
+	if(p_num < tx.get_priority())
 	{
-		uint y = min(ti.get_id(), tx.get_id());
-		uint z = max(ti.get_id(), tx.get_id());	
+		uint y = min(ti.get_priority(), tx.get_priority());
+		uint z = max(ti.get_priority(), tx.get_priority());	
 		bool update;
 		do
 		{
@@ -231,7 +233,7 @@ ulong LP_RTA_GFP_PIP::holding_bound(Task& ti, Task& tx, uint resource_id)
 
 			foreach_lower_priority_task_then(tasks.get_tasks(), y, tl)
 			{
-				uint l = tl->get_id();
+				uint l = tl->get_priority();
 				if(z != l)
 				{
 					foreach(tl->get_requests(), request)
@@ -329,7 +331,7 @@ ulong LP_RTA_GFP_PIP::wait_time_bound(Task& ti, uint resource_id)
 void LP_RTA_GFP_PIP::lp_pip_directed_blocking(Task& ti, Task& tx, PIPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
-	uint x = tx.get_id();
+	uint x = tx.get_priority();
 //cout<<"task:"<<x<<endl
 	foreach(tx.get_requests(), request)
 	{
@@ -348,7 +350,7 @@ void LP_RTA_GFP_PIP::lp_pip_directed_blocking(Task& ti, Task& tx, PIPMapper& var
 void LP_RTA_GFP_PIP::lp_pip_indirected_blocking(Task& ti, Task& tx, PIPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
-	uint x = tx.get_id();
+	uint x = tx.get_priority();
 	foreach(tx.get_requests(), request)
 	{
 		uint q = request->get_resource_id();
@@ -366,7 +368,7 @@ void LP_RTA_GFP_PIP::lp_pip_indirected_blocking(Task& ti, Task& tx, PIPMapper& v
 void LP_RTA_GFP_PIP::lp_pip_preemption_blocking(Task& ti, Task& tx, PIPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
-	uint x = tx.get_id();
+	uint x = tx.get_priority();
 	foreach(tx.get_requests(), request)
 	{
 		uint q = request->get_resource_id();
@@ -390,7 +392,7 @@ void LP_RTA_GFP_PIP::lp_pip_OD(Task& ti, PIPMapper& vars, LinearExpression *exp,
 
 	foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 	{
-		uint h = th->get_id();
+		uint h = th->get_priority();
 		
 		var_id = vars.lookup(h, 0, 0, PIPMapper::INTERF_REGULAR);
 		exp->add_term(var_id, coef*(1.0/p_num));
@@ -398,7 +400,7 @@ void LP_RTA_GFP_PIP::lp_pip_OD(Task& ti, PIPMapper& vars, LinearExpression *exp,
 
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
 	{
-		uint l = tl->get_id();
+		uint l = tl->get_priority();
 		
 		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
 		exp->add_term(var_id, coef*(1.0/p_num));
@@ -416,7 +418,7 @@ void LP_RTA_GFP_PIP::lp_pip_declare_variable_bounds(Task& ti, LinearProgram& lp,
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		uint var_id;
 	
 		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
@@ -434,18 +436,18 @@ void LP_RTA_GFP_PIP::lp_pip_objective(Task& ti, LinearProgram& lp, PIPMapper& va
 {
 	uint p_num = processors.get_processor_num();
 	uint var_id;
-//cout<<"foreach higher priority task then:"<<ti.get_id()<<endl;
+//cout<<"foreach higher priority task then:"<<ti.get_priority()<<endl;
 	foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 	{
-		uint h = th->get_id();
+		uint h = th->get_priority();
 //cout<<"task:"<<h<<endl;
 		var_id = vars.lookup(h, 0, 0, PIPMapper::INTERF_REGULAR);
 		obj->add_term(var_id, 1.0/p_num);
 	}
-//cout<<"foreach lower priority task then:"<<ti.get_id()<<endl;
+//cout<<"foreach lower priority task then:"<<ti.get_priority()<<endl;
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
 	{
-		uint l = tl->get_id();
+		uint l = tl->get_priority();
 //cout<<"task:"<<l<<endl;	
 		var_id = vars.lookup(l, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
 		obj->add_term(var_id, 1.0/p_num);
@@ -490,7 +492,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_1(Task& ti, LinearProgram& lp, PIPMapper&
 		LinearExpression *exp = new LinearExpression();
 
 		uint var_id;
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 				
 		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
 		exp->add_var(var_id);
@@ -517,7 +519,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_2(Task& ti, LinearProgram& lp, PIPMapper&
 	{
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 
 		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
 		exp->add_var(var_id);
@@ -542,7 +544,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_3(Task& ti, LinearProgram& lp, PIPMapper&
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -573,7 +575,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_4(Task& ti, LinearProgram& lp, PIPMapper&
 		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 		{	
 			LinearExpression *exp = new LinearExpression();
-			uint x = tx->get_id();
+			uint x = tx->get_priority();
 			uint var_id;
 		
 			var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
@@ -590,7 +592,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_5(Task& ti, LinearProgram& lp, PIPMapper&
 	
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -617,7 +619,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_6(Task& ti, LinearProgram& lp, PIPMapper&
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 	{
 		uint var_id;
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 
 		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_CO_BOOSTING);
 		exp->add_var(var_id);
@@ -630,14 +632,14 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_7(Task& ti, LinearProgram& lp, PIPMapper&
 {
 	uint p_num = processors.get_processor_num();
 
-	if(p_num >= ti.get_id())
+	if(p_num >= ti.get_priority())
 	{
 		foreach_task_except(tasks.get_tasks(), ti, tx)
 		{
 			LinearExpression *exp = new LinearExpression();
 
 			uint var_id;
-			uint x = tx->get_id();
+			uint x = tx->get_priority();
 				
 			var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_REGULAR);
 			exp->add_var(var_id);
@@ -661,7 +663,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_8(Task& ti, LinearProgram& lp, PIPMapper&
 {
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -690,7 +692,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_9(Task& ti, LinearProgram& lp, PIPMapper&
 
 	foreach_higher_priority_task(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		foreach(resources.get_resources(), resource)
 		{
 			
@@ -746,7 +748,7 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_10(Task& ti, LinearProgram& lp, PIPMapper
 
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		uint var_id;
 
 		var_id = vars.lookup(x, 0, 0, PIPMapper::INTERF_STALLING);
@@ -767,10 +769,10 @@ void LP_RTA_GFP_PIP::lp_pip_constraint_11(Task& ti, LinearProgram& lp, PIPMapper
 
 		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_priority();
 			if(tx->is_request_exist(q))
 			{
-				uint x = tx->get_id();
+				uint x = tx->get_priority();
 				
 				foreach_request_instance(ti, *tx, q, v)
 				{

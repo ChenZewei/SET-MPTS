@@ -1,11 +1,11 @@
-#include "rta_pfp_ro_ml.h"
+#include "rta_pfp_ro_opa.h"
 #include <assert.h>
 #include "iteration-helper.h"
 #include "math-helper.h"
 
-RTA_PFP_RO_ML::RTA_PFP_RO_ML():PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented") {}
+RTA_PFP_RO_OPA::RTA_PFP_RO_OPA():PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented") {}
 
-RTA_PFP_RO_ML::RTA_PFP_RO_ML(TaskSet tasks, ProcessorSet processors, ResourceSet resources):PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented")
+RTA_PFP_RO_OPA::RTA_PFP_RO_OPA(TaskSet tasks, ProcessorSet processors, ResourceSet resources):PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented")
 {
 	this->tasks = tasks;
 	this->processors = processors;
@@ -14,12 +14,13 @@ RTA_PFP_RO_ML::RTA_PFP_RO_ML(TaskSet tasks, ProcessorSet processors, ResourceSet
 	this->resources.update(&(this->tasks));
 	this->processors.update(&(this->tasks), &(this->resources));
 	
+	this->tasks.RM_Order();
 	this->processors.init();
 }
 
-RTA_PFP_RO_ML::~RTA_PFP_RO_ML() {}
+RTA_PFP_RO_OPA::~RTA_PFP_RO_OPA() {}
 
-ulong RTA_PFP_RO_ML::blocking_bound(Task& ti, uint r_id)
+ulong RTA_PFP_RO_OPA::blocking_bound(Task& ti, uint r_id)
 {
 	ulong bound = 0;
 	Request& request_q = ti.get_request_by_id(r_id);
@@ -40,7 +41,7 @@ ulong RTA_PFP_RO_ML::blocking_bound(Task& ti, uint r_id)
 	return bound;
 }
 
-ulong RTA_PFP_RO_ML::request_bound(Task& ti, uint r_id)
+ulong RTA_PFP_RO_OPA::request_bound(Task& ti, uint r_id)
 {
 	ulong deadline = ti.get_deadline();
 	Request& request_q = ti.get_request_by_id(r_id);
@@ -79,7 +80,37 @@ ulong RTA_PFP_RO_ML::request_bound(Task& ti, uint r_id)
 	return deadline + 100;
 }
 
-ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id, ulong interval)
+ulong RTA_PFP_RO_OPA::formula_30(Task& ti, uint p_id)
+{
+	ulong deadline = ti.get_deadline();
+	ulong miu = 0;
+
+	foreach(ti.get_requests(), request)
+	{
+		uint q = request->get_resource_id();
+		Resource& resource = resources.get_resources()[q];
+		if(p_id == resource.get_locality())
+		{
+			miu += request->get_num_requests() * request->get_max_length();
+		}
+	}
+
+	foreach_task_except(tasks.get_tasks(), ti, tj)
+	{
+		foreach(tj->get_requests(), request_v)
+		{
+			uint v = request_v->get_resource_id();
+			Resource& resource_v = resources.get_resources()[v];
+			if(p_id == resource_v.get_locality())
+			{
+				miu += CS_workload(*tj, v, deadline);
+			}
+		}
+	}
+	return miu;
+}
+
+ulong RTA_PFP_RO_OPA::angent_exec_bound(Task& ti, uint p_id)
 {
 	ulong deadline = ti.get_deadline();
 	ulong lambda = 0;
@@ -101,34 +132,12 @@ ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id, ulong interval)
 		}		
 	}
 
-	ulong miu = 0;
-	foreach(ti.get_requests(), request)
-	{
-		uint q = request->get_resource_id();
-		Resource& resource = resources.get_resources()[q];
-		if(p_id == resource.get_locality())
-		{
-			miu += request->get_num_requests() * request->get_max_length();
-		}
-	}
-
-	foreach_task_except(tasks.get_tasks(), ti, tj)
-	{
-		foreach(tj->get_requests(), request_v)
-		{
-			uint v = request_v->get_resource_id();
-			Resource& resource_v = resources.get_resources()[v];
-			if(p_id == resource_v.get_locality())
-			{
-				miu += CS_workload(*tj, v, interval);
-			}
-		}
-	}
+	ulong miu = formula_30(ti, p_id);
 
 	return min(lambda, miu);
 }
 
-ulong RTA_PFP_RO_ML::NCS_workload(Task& ti, ulong interval)
+ulong RTA_PFP_RO_OPA::NCS_workload(Task& ti, ulong interval)
 {
 	ulong e = ti.get_wcet_non_critical_sections();
 	ulong p = ti.get_period();
@@ -136,7 +145,7 @@ ulong RTA_PFP_RO_ML::NCS_workload(Task& ti, ulong interval)
 	return ceiling((interval + r - e), p) * e;
 }
 
-ulong RTA_PFP_RO_ML::CS_workload(Task& ti, uint resource_id, ulong interval)
+ulong RTA_PFP_RO_OPA::CS_workload(Task& ti, uint resource_id, ulong interval)
 {
 	ulong p = ti.get_period();
 	ulong r = ti.get_response_time();
@@ -145,7 +154,19 @@ ulong RTA_PFP_RO_ML::CS_workload(Task& ti, uint resource_id, ulong interval)
 	return ceiling((interval + r - agent_length), p) * agent_length;
 }
 
-ulong RTA_PFP_RO_ML::response_time_AP(Task& ti)
+ulong RTA_PFP_RO_OPA::response_time_UA(Task& ti)
+{
+	ulong response_time = ti.get_wcet_non_critical_sections();
+
+	for(uint k = 0; k < processors.get_processor_num(); k++)
+	{
+		response_time += formula_30(ti, k);
+	}
+
+	return response_time;
+}
+
+ulong RTA_PFP_RO_OPA::response_time_AP(Task& ti)
 {
 	uint p_id = ti.get_partition();
 	ulong test_bound = ti.get_deadline();
@@ -165,26 +186,9 @@ ulong RTA_PFP_RO_ML::response_time_AP(Task& ti)
 		ulong temp = test_start;
 		ulong temp2 = temp;
 
-		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
-		{
-#if RTA_DEBUG == 1
-			cout<<"Th:"<<th->get_id()<<" partition:"<<th->get_partition()<<" priority:"<<th->get_priority()<<endl;
-#endif
-			if (th->get_partition() == ti.get_partition())
-			{
-				temp += NCS_workload(*th, response_time);
-			}
-		}
-#if RTA_DEBUG == 1
-		cout<<"NCS workload:"<<temp-test_start<<endl;
-		temp2 = temp;
-#endif
-
 		for(uint k = 0; k < processors.get_processor_num(); k++)
 		{
-			if(p_id == k)
-				continue;
-			ulong agent_bound = angent_exec_bound(ti, k, response_time);
+			ulong agent_bound = angent_exec_bound(ti, k);
 //			cout<<"AB of processor "<<k<<":"<<agent_bound<<endl;
 			temp += agent_bound;
 		}
@@ -217,7 +221,7 @@ ulong RTA_PFP_RO_ML::response_time_AP(Task& ti)
 	return test_bound + 100;
 }
 
-ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
+ulong RTA_PFP_RO_OPA::response_time_SP(Task& ti)
 {
 	uint p_id = ti.get_partition();
 	ulong test_bound = ti.get_deadline();
@@ -288,7 +292,7 @@ ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
 			if(p_id == k)
 				continue;
 
-			temp += angent_exec_bound(ti, k, response_time);
+			temp += angent_exec_bound(ti, k);
 		}
 #if RTA_DEBUG == 1
 		cout<<"Theata:"<<temp-temp2<<endl;
@@ -320,7 +324,7 @@ ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
 	return test_bound + 100;
 }
 
-bool RTA_PFP_RO_ML::worst_fit_for_resources(uint active_processor_num)
+bool RTA_PFP_RO_OPA::worst_fit_for_resources(uint active_processor_num)
 {
 /*
 foreach(resources.get_resources(), resource)
@@ -359,7 +363,7 @@ foreach(resources.get_resources(), resource)
 	return true;
 }
 
-bool RTA_PFP_RO_ML::is_first_fit_for_tasks_schedulable(uint start_processor)
+bool RTA_PFP_RO_OPA::is_first_fit_for_tasks_schedulable(uint start_processor)
 {
 	bool schedulable;
 	uint p_num = processors.get_processor_num();
@@ -368,24 +372,30 @@ bool RTA_PFP_RO_ML::is_first_fit_for_tasks_schedulable(uint start_processor)
 	{
 		uint assignment;
 		schedulable = false;
-		for(uint i = start_processor; i < start_processor + p_num; i++)
+		for(uint k = start_processor; k < start_processor + p_num; k++)
 		{
-			assignment = i%p_num;
+			assignment = k%p_num;
 			Processor& processor = processors.get_processors()[assignment];
 
-			if(processor.add_task(ti->get_id()))
+//cout<<"Try to assign task:"<<ti->get_id()<<" to processor:"<<assignment<<endl;
+			//try to assign ti to processor k
+			if(!processor.add_task(ti->get_id()))
 			{
-				ti->set_partition(assignment);
-				if(alloc_schedulable(*ti))
-				{
-					schedulable = true;
-					break;
-				}
-				else
-				{
-					ti->init();
-					processor.remove_task(ti->get_id());
-				}
+				continue;
+			}
+			ti->set_partition(assignment);
+
+
+			if(OPA())
+			{
+//cout<<"OPA true."<<endl;
+				schedulable = true;
+				break;
+			}
+			else
+			{
+				processor.remove_task(ti->get_id());
+				ti->set_partition(MAX_INT);
 			}
 		}
 		if(!schedulable)
@@ -396,55 +406,87 @@ bool RTA_PFP_RO_ML::is_first_fit_for_tasks_schedulable(uint start_processor)
 	return schedulable;
 }
 
-bool RTA_PFP_RO_ML::alloc_schedulable()
+bool RTA_PFP_RO_OPA::OPA()
 {
-	ulong response_bound = 0;
+	set<uint> unassigned_queue;
+
 	foreach(tasks.get_tasks(), ti)
+		unassigned_queue.insert(ti->get_id());
+
+	for(int pi = tasks.get_taskset_size(); pi > 0; pi--)
 	{
-		uint p_id = ti->get_partition();
-		if(MAX_INT == p_id)
-			continue;
-		
-		Processor& processor = processors.get_processors()[p_id];
-		if(0 == processor.get_resourcequeue().size())//Application Processor
+		bool flag = false;
+//cout<<"Try to assign priority "<<pi<<endl;
+		foreach(unassigned_queue, t_id)
 		{
-			response_bound = response_time_AP((*ti));
+
+//cout<<"\ttask:"<<*t_id;
+			Task& ti = tasks.get_task_by_id(*t_id);
+			ti.set_priority(pi);
+			
+			foreach(unassigned_queue, th_id)
+			{
+				if((*th_id) == (*t_id))
+					continue;
+
+				Task& th = tasks.get_task_by_id(*th_id);
+				th.set_priority(0);
+				th.set_response_time(th.get_deadline());
+			}
+
+			if(alloc_schedulable(ti))
+			{
+//cout<<"\tsuccess."<<endl;
+				flag = true;
+				unassigned_queue.erase(ti.get_id());
+				break;
+			}
+//			else
+//cout<<"\ffailed."<<endl;
 		}
-		else//Synchronization Processor
+
+		if(!flag)
 		{
-			response_bound = response_time_SP((*ti));
-		}
-		if(response_bound <= ti->get_deadline())
-		{
-			ti->set_response_time(response_bound);
-		}
-		else
-		{	
-			return false;
+			foreach(unassigned_queue, t_id)
+			{
+				Task& ti = tasks.get_task_by_id(*t_id);
+				ti.set_priority(MAX_INT);
+			}
+			
+			return flag;
 		}
 	}
 	return true;
 }
 
-bool RTA_PFP_RO_ML::alloc_schedulable(Task& ti)
+bool RTA_PFP_RO_OPA::alloc_schedulable()
+{
+	return true;
+}
+
+bool RTA_PFP_RO_OPA::alloc_schedulable(Task& ti)
 {
 	uint p_id = ti.get_partition();
-	if(MAX_INT == p_id)
-		return false;
-
 	Processor& processor = processors.get_processors()[p_id];
 	ulong response_bound = 0;
-	if(0 == processor.get_resourcequeue().size())//Application Processor
+	if(MAX_INT == p_id)
 	{
-		response_bound = response_time_AP(ti);
+		response_bound = response_time_UA(ti);
 		ti.set_response_time(response_bound);
 	}
-	else//Synchronization Processor
+	else
 	{
-		response_bound = response_time_SP(ti);
-		ti.set_response_time(response_bound);
+		if(0 == processor.get_resourcequeue().size())//Application Processor
+		{
+			response_bound = response_time_AP(ti);
+			ti.set_response_time(response_bound);
+		}
+		else//Synchronization Processor
+		{
+			response_bound = response_time_SP(ti);
+			ti.set_response_time(response_bound);
+		}
 	}
-
 	if(response_bound <= ti.get_deadline())
 	{
 		return true;
@@ -455,7 +497,7 @@ bool RTA_PFP_RO_ML::alloc_schedulable(Task& ti)
 	}
 }
 
-bool RTA_PFP_RO_ML::is_schedulable()
+bool RTA_PFP_RO_OPA::is_schedulable()
 {
 	bool schedulable = false;
 	uint p_num = processors.get_processor_num();
@@ -471,34 +513,52 @@ bool RTA_PFP_RO_ML::is_schedulable()
 		if(!worst_fit_for_resources(i))
 			continue;
 
+		//erase all priorities
+		foreach(tasks.get_tasks(), ti)
+			ti->set_priority(MAX_INT);
+
 		schedulable = is_first_fit_for_tasks_schedulable(i%p_num);
 		if(schedulable)
+		{			
+/*		
+cout<<"=====success====="<<endl;
+	foreach(tasks.get_tasks(), task)
+	{
+		cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<" U:"<<task->get_utilization().get_d()<<endl;
+		cout<<"----------------------------"<<endl;
+	}
+
+	for(uint k = 0; k < p_num; k++)
+	{
+		cout<<"Processor "<<k<<" utilization:"<<processors.get_processors()[k].get_utilization().get_d()<<endl;
+		foreach(processors.get_processors()[k].get_taskqueue(), t_id)
 		{
-/*
-			foreach(tasks.get_tasks(), task)
-			{
-				cout<<"Task"<<task->get_id()<<": partition:"<<task->get_partition()<<endl;
-				cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
-				foreach(task->get_requests(), request)
-				{
-					cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
-				}
-				cout<<"-------------------------------------------"<<endl;
-			}
+			Task& task = tasks.get_task_by_id(*t_id);
+			cout<<"task"<<task.get_id()<<"\t";
+		}
+		cout<<endl;
+	}
 */
 			return schedulable;
 		}
 	}
 /*
-	foreach(tasks.get_tasks(), task)
+cout<<"=====fail====="<<endl;
+			foreach(tasks.get_tasks(), task)
+			{
+				cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<endl;
+				cout<<"----------------------------"<<endl;
+			}
+
+	for(uint k = 0; k < p_num; k++)
 	{
-		cout<<"Task"<<task->get_id()<<": partition:"<<task->get_partition()<<endl;
-		cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
-		foreach(task->get_requests(), request)
+		cout<<"Processor "<<k<<" utilization:"<<processors.get_processors()[k].get_utilization().get_d()<<endl;
+		foreach(processors.get_processors()[k].get_taskqueue(), t_id)
 		{
-			cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
+			Task& task = tasks.get_task_by_id(*t_id);
+			cout<<"task"<<task.get_id()<<"\t";
 		}
-		cout<<"-------------------------------------------"<<endl;
+		cout<<endl;
 	}
 */
 	return schedulable;

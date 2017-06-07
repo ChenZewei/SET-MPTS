@@ -37,6 +37,7 @@ Task::Task(uint id,
 		uint priority)
 {
 	this->id = id;
+	this->index = id;
 	this->wcet = wcet;
 	if(0 == deadline)
 		this->deadline = period;
@@ -64,6 +65,7 @@ Task::Task(	uint id,
 		uint priority)
 {
 	this->id = id;
+	this->index = id;
 	this->wcet = wcet;
 	if(0 == deadline)
 		this->deadline = period;
@@ -111,7 +113,7 @@ Task::Task(	uint id,
 
 				add_request(i, num, max_len, param.tlf*max_len, resourceset.get_resources()[i].get_locality());
 				
-				resourceset.add_task(i, this);
+				resourceset.add_task(i, id);
 				critical_section_num += num;
 			}
 		}
@@ -202,6 +204,8 @@ void Task::get_density(fraction_t &density)
 
 uint Task::get_id() const { return id; }
 void Task::set_id(uint id) { this->id = id; };
+uint Task::get_index() const { return index; }
+void Task::set_index(uint index) { this->index = index; };
 ulong Task::get_wcet() const	{ return wcet; }
 ulong Task::get_deadline() const { return deadline; }
 ulong Task::get_period() const { return period; }
@@ -361,15 +365,13 @@ void TaskSet::calculate_spin(ResourceSet& resourceset, ProcessorSet& processorse
 				if(processor_id != task_i.get_partition())
 				{
 					Processor &processor = processorset.get_processors()[processor_id];
-					TaskQueue &queue = processor.get_taskqueue();
-					list<void*>::iterator it = queue.begin();
 					ulong max_length = 0;
-					for(uint k = 0; it != queue.end(); it++, k++)
+					foreach(processor.get_taskqueue(), t_id)
 					{
-						Task* task_k = (Task*)*it;
-						Request &request_k = task_k->get_request_by_id(id);
-						if(&request_k)
-						{	
+						Task& task_k = get_task_by_id(*t_id);
+						if(task_k.is_request_exist(id))
+						{
+							Request &request_k = task_k.get_request_by_id(id);
 							if(max_length < request_k.get_max_length())
 								max_length = request_k.get_max_length();
 						}
@@ -454,8 +456,30 @@ Tasks& TaskSet::get_tasks()
 
 Task& TaskSet::get_task_by_id(uint id)
 {
-	return tasks[id];
+	foreach(tasks, task)
+	{
+		if(id == task->get_id())
+			return (*task);
+	}
+	return *(Task*)(0);
 }
+
+
+Task& TaskSet::get_task_by_index(uint index)
+{
+	return tasks[index];
+}
+
+Task& TaskSet::get_task_by_priority(uint pi)
+{
+	foreach(tasks, task)
+	{
+		if(pi == task->get_priority())
+			return (*task);
+	}
+	return *(Task*)(0);
+}
+
 /*
 Task& TaskSet::get_task_by_id(uint id)
 {
@@ -512,60 +536,65 @@ void TaskSet::sort_by_id()
 	sort(tasks.begin(), tasks.end(), id_increase<Task>);
 }
 
+void TaskSet::sort_by_index()
+{
+	sort(tasks.begin(), tasks.end(), index_increase<Task>);
+}
+
 void TaskSet::sort_by_period()
 {
 	sort(tasks.begin(), tasks.end(), period_increase<Task>);
-//	for(int i = 0; i < tasks.size(); i++)
-//		tasks[i].set_id(i);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_deadline()
 {
 	sort(tasks.begin(), tasks.end(), deadline_increase<Task>);
-//	for(int i = 0; i < tasks.size(); i++)
-//		tasks[i].set_id(i);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_utilization()
 {
 	sort(tasks.begin(), tasks.end(), utilization_decrease<Task>);
-//	for(int i = 0; i < tasks.size(); i++)
-//		tasks[i].set_id(i);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_density()
 {
 	sort(tasks.begin(), tasks.end(), density_decrease<Task>);
-//	for(int i = 0; i < tasks.size(); i++)
-//		tasks[i].set_id(i);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_DC()
 {
 	sort(tasks.begin(), tasks.end(), task_DC_increase<Task>);
-//	for(int i = 0; i < tasks.size(); i++)
-//		tasks[i].set_id(i);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_DCC()
 {
 	sort(tasks.begin(), tasks.end(), task_DCC_increase<Task>);
-//	for(int i = 0; i < tasks.size(); i++)
-//		tasks[i].set_id(i);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_DDC()
 {
 	sort(tasks.begin(), tasks.end(), task_DDC_increase<Task>);
-//	for(int i = 0; i < tasks.size(); i++)
-//		tasks[i].set_id(i);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_UDC()
 {
 	sort(tasks.begin(), tasks.end(), task_UDC_increase<Task>);
-//	for(int i = 0; i < tasks.size(); i++)
-//		tasks[i].set_id(i);
+	for(int i = 0; i < tasks.size(); i++)
+		tasks[i].set_index(i);
 }
 
 void TaskSet::RM_Order()
@@ -591,6 +620,15 @@ void TaskSet::RM_Order()
 void TaskSet::DM_Order()
 {
 	sort_by_deadline();
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		tasks[i].set_priority(i);
+	}
+}
+
+void TaskSet::Density_Decrease_Order()
+{
+	sort_by_density();
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		tasks[i].set_priority(i);
@@ -721,8 +759,8 @@ void TaskSet::SM_PLUS_Order()
 			}
 		}
 
-//		for(int i = 0; i < tasks.size(); i++)
-//			tasks[i].set_id(i);
+		for(int i = 0; i < tasks.size(); i++)
+			tasks[i].set_index(i);
 /*
 		cout<<"after plus:"<<endl;
 		cout<<"-----------------------"<<endl;
@@ -785,8 +823,8 @@ void TaskSet::SM_PLUS_2_Order()
 			}
 		}
 
-//		for(int i = 0; i < tasks.size(); i++)
-//			tasks[i].set_id(i);
+		for(int i = 0; i < tasks.size(); i++)
+			tasks[i].set_index(i);
 	}
 
 	for(uint i = 0; i < tasks.size(); i++)
@@ -848,8 +886,8 @@ void TaskSet::SM_PLUS_3_Order()
 			}
 		}
 
-//		for(int i = 0; i < tasks.size(); i++)
-//			tasks[i].set_id(i);
+		for(int i = 0; i < tasks.size(); i++)
+			tasks[i].set_index(i);
 	}
 
 	for(uint i = 0; i < tasks.size(); i++)
@@ -916,7 +954,7 @@ void TaskSet::Leisure_Order()
 
 	for(uint i = 0; i < tasks.size(); i++)
 	{
-//		tasks[i].set_id(i);
+		tasks[i].set_index(i);
 		tasks[i].set_priority(i);
 	}
 
@@ -1017,8 +1055,8 @@ cout<<"////////////////////////////////////////////"<<endl;
 			}
 		}
 
-//		for(int i = 0; i < tasks.size(); i++)
-//			tasks[i].set_id(i);
+		for(int i = 0; i < tasks.size(); i++)
+			tasks[i].set_index(i);
 
 	}
 
@@ -1057,7 +1095,7 @@ void TaskSet::display()
 {
 	for(int i = 0; i < tasks.size(); i++)
 	{
-		cout<<"Task id:"<<tasks[i].get_id()<<" Task period:"<<tasks[i].get_period()<<endl;
+		cout<<"Task index:"<<tasks[i].get_index()<<" Task id:"<<tasks[i].get_id()<<" Task priority:"<<tasks[i].get_priority()<<endl;
 	}
 }
 
@@ -1717,7 +1755,12 @@ DAG_Tasks& DAG_TaskSet::get_tasks()
 
 DAG_Task& DAG_TaskSet::get_task_by_id(uint id)
 {
-	return dag_tasks[id];
+	foreach(dag_tasks, task)
+	{
+		if(id == task->get_id())
+			return (*task);
+	}
+	return *(DAG_Task*)(0);
 }
 
 uint DAG_TaskSet::get_taskset_size() const

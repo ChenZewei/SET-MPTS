@@ -10,6 +10,9 @@ RTA_PFP_RO_FEASIBLE::RTA_PFP_RO_FEASIBLE(TaskSet tasks, ProcessorSet processors,
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->tasks.RM_Order();
 	this->processors.init();

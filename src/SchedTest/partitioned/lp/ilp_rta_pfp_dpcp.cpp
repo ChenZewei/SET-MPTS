@@ -155,6 +155,9 @@ ILP_RTA_PFP_DPCP::ILP_RTA_PFP_DPCP(TaskSet tasks, ProcessorSet processors, Resou
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->tasks.RM_Order();
 	this->processors.init();

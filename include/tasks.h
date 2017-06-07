@@ -46,6 +46,7 @@ class Task
 	private:
 		uint model = TPS_TASK_MODEL;
 		uint id;
+		uint index;
 		ulong wcet;
 		ulong wcet_critical_sections;
 		ulong wcet_non_critical_sections;
@@ -92,6 +93,8 @@ class Task
 
 		uint get_id() const;
 		void set_id(uint id);
+		uint get_index() const;
+		void set_index(uint index);
 		ulong get_wcet() const;
 		ulong get_deadline() const;
 		ulong get_period() const;
@@ -172,6 +175,8 @@ class TaskSet
 
 		Tasks& get_tasks();
 		Task& get_task_by_id(uint id);
+		Task& get_task_by_index(uint index);
+		Task& get_task_by_priority(uint pi);
 
 		bool is_implicit_deadline();
 		bool is_constrained_deadline();
@@ -194,6 +199,7 @@ class TaskSet
 		void get_density_max(fraction_t &density_max) const;
 
 		void sort_by_id();
+		void sort_by_index();
 		void sort_by_period();//increase
 		void sort_by_deadline();//increase
 		void sort_by_utilization();//decrease
@@ -204,6 +210,7 @@ class TaskSet
 		void sort_by_UDC();
 		void RM_Order();
 		void DM_Order();
+		void Density_Decrease_Order();
 		void DC_Order();
 		void DCC_Order();
 		void DDC_Order();

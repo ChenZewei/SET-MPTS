@@ -10,10 +10,12 @@ RTA_PFP_RO_NP::RTA_PFP_RO_NP(TaskSet tasks, ProcessorSet processors, ResourceSet
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->tasks.RM_Order();
 	this->processors.init();
-
 }
 
 RTA_PFP_RO_NP::~RTA_PFP_RO_NP() {}
@@ -317,6 +319,13 @@ ulong RTA_PFP_RO_NP::response_time_SP(Task& ti)
 
 bool RTA_PFP_RO_NP::worst_fit_for_resources(uint active_processor_num)
 {
+/*
+foreach(resources.get_resources(), resource)
+{
+	cout<<"task size:"<<resource->get_tasks()->get_taskset_size()<<endl;
+	cout<<"resource:"<<resource->get_resource_id()<<" utilization:"<<resource->get_utilization();
+}
+*/
 	resources.sort_by_utilization();
 
 	foreach(resources.get_resources(), resource)
@@ -335,7 +344,7 @@ bool RTA_PFP_RO_NP::worst_fit_for_resources(uint active_processor_num)
 			}
 		}
 		Processor& processor = processors.get_processors()[assignment];
-		if(processor.add_resource(&(*resource)))
+		if(processor.add_resource(resource->get_resource_id()))
 		{
 			resource->set_locality(assignment);
 		}
@@ -361,7 +370,7 @@ bool RTA_PFP_RO_NP::is_first_fit_for_tasks_schedulable(uint start_processor)
 			assignment = i%p_num;
 			Processor& processor = processors.get_processors()[assignment];
 
-			if(processor.add_task(&(*ti)))
+			if(processor.add_task(ti->get_id()))
 			{
 				ti->set_partition(assignment);
 				if(alloc_schedulable(*ti))
@@ -372,7 +381,7 @@ bool RTA_PFP_RO_NP::is_first_fit_for_tasks_schedulable(uint start_processor)
 				else
 				{
 					ti->init();
-					processor.remove_task(&(*ti));
+					processor.remove_task(ti->get_id());
 				}
 			}
 		}
@@ -446,7 +455,6 @@ bool RTA_PFP_RO_NP::alloc_schedulable(Task& ti)
 bool RTA_PFP_RO_NP::is_schedulable()
 {
 	bool schedulable = false;
-
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
 	
@@ -456,7 +464,7 @@ bool RTA_PFP_RO_NP::is_schedulable()
 		tasks.init();
 		processors.init();
 		resources.init();
-		
+
 		if(!worst_fit_for_resources(i))
 			continue;
 

@@ -9,6 +9,9 @@ RTA_PFP_WF::RTA_PFP_WF(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	//this->tasks.RM_Order();
 	this->processors.init();

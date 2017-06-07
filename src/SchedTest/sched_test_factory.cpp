@@ -19,6 +19,9 @@
 #include "rta_gdc_native.h"
 #include "rta_pdc_ro.h"
 #include "rta_gfp_czw.h"
+#include "rta_pfp_ro_opa.h"
+#include "rta_pfp_ro_sm_opa.h"
+#include "rta_pfp_ro_sm.h"
 
 SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources)
 {
@@ -84,7 +87,25 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-ML"))
 	{
+		tasks.RM_Order();
 		return new RTA_PFP_RO_ML(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-DC"))
+	{
+		tasks.DC_Order();
+		return new RTA_PFP_RO_ML(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-SM"))
+	{
+		return new RTA_PFP_RO_SM(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-OPA"))
+	{
+		return new RTA_PFP_RO_OPA(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-SM-OPA"))
+	{
+		return new RTA_PFP_RO_SM_OPA(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-NP"))
 	{

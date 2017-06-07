@@ -10,6 +10,9 @@ RTA_PFP_RO::RTA_PFP_RO(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->tasks.RM_Order();
 	this->processors.init();
@@ -255,7 +258,7 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 			assignment = i%p_num;
 			Processor& processor = processors.get_processors()[assignment];
 
-			if(processor.add_task(&(*ti)))
+			if(processor.add_task(ti->get_id()))
 			{
 				ti->set_partition(assignment);
 				if(alloc_schedulable(*ti))
@@ -266,7 +269,7 @@ bool RTA_PFP_RO::is_first_fit_for_tasks_schedulable(uint start_processor)
 				else
 				{
 					ti->init();
-					processor.remove_task(&(*ti));
+					processor.remove_task(ti->get_id());
 
 				}
 			}
