@@ -1,6 +1,7 @@
 #include "mgl_chart.h"
 #include "iteration-helper.h"
 #include "math-helper.h"
+#include "random_gen.h"
 
 Chart::Chart()
 {
@@ -28,10 +29,24 @@ Chart::Chart()
 string Chart::get_line_style(int index)
 {
 
+	if(color.size() <= index)
+	{	
+		stringstream buf;
+		buf<<"{x";
+		buf<<hex;
+		uint r, g, b;
+		r = Random_Gen::uniform_integral_gen(1, 255);
+		g = Random_Gen::uniform_integral_gen(1, 255);
+		b = Random_Gen::uniform_integral_gen(1, 255);
+		buf<<r<<g<<b;
+		buf<<"}";
+		color.push_back(buf.str());
+	}
+
 	string style = "";
 	style += color[index];
 	style += width;
-	style += dot[index];
+	style += dot[index%8];
 	return style;
 }
 
@@ -42,7 +57,7 @@ void Chart::AddColor(string newColor)
 
 void Chart::SetLineWidth(uint w)
 {
-	else if(9 < w)
+	if(9 < w)
 		w = 9;
 	width = std::to_string(w);
 }
