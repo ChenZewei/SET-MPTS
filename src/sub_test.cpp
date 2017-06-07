@@ -140,9 +140,9 @@ cout<<endl;
 		{
 			fraction_t ratio(success[i], exp[i]);
 			if(0 == strcmp(param->test_attributes[i].rename.data(), ""))
-				output.add_result(param->test_attributes[i].rename, utilization, exp[i], success[i]);
+				output.add_result(param->test_attributes[i].rename, param->test_attributes[i].style, utilization, exp[i], success[i]);
 			else
-				output.add_result(param->test_attributes[i].test_name, utilization, exp[i], success[i]);
+				output.add_result(param->test_attributes[i].test_name, param->test_attributes[i].style, utilization, exp[i], success[i]);
 
 			stringstream buf;
 
