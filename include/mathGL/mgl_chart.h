@@ -10,6 +10,7 @@
 typedef struct
 {
 	string name;
+	string style;
 	mglData data;
 }Chart_Data;
 

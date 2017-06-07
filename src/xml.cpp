@@ -31,6 +31,7 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		int test_type = subtitle->IntAttribute("TEST_TYPE");
 		string remark;
 		string rename;
+		string style;
 		if(NULL == subtitle->Attribute("REMARK"))
 			remark = "";
 		else
@@ -39,6 +40,10 @@ void XML::get_method(Test_Attribute_Set *t_set)
 			rename = "";
 		else
 			rename = subtitle->Attribute("RENAME");
+		if(NULL == subtitle->Attribute("STYLE"))
+			style = "";
+		else
+			style = subtitle->Attribute("STYLE");
 		int transform = 0;
 		if(0 == strcmp(content,"P-EDF"))
 		{
@@ -101,6 +106,7 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		ta.test_name = content;
 		ta.remark = remark;
 		ta.rename = rename;
+		ta.style = style;
 		t_set->push_back(ta);
 //		i_set->push_back(transform);
 		subtitle = subtitle->NextSiblingElement();

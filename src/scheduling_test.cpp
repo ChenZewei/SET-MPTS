@@ -86,7 +86,6 @@ int main(int argc,char** argv)
 					resourceset.init();
 					exp[j]++;
 
-
 					SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
 					if(NULL == schedTest)
 					{
@@ -132,11 +131,11 @@ int main(int argc,char** argv)
 				fraction_t ratio(success[i], exp[i]);
 				if(!param->test_attributes[i].rename.empty())
 				{
-					output.add_result(param->test_attributes[i].rename, utilization, exp[i], success[i]);
+					output.add_result(param->test_attributes[i].rename, param->test_attributes[i].style, utilization, exp[i], success[i]);
 				}
 				else
 				{
-					output.add_result(param->test_attributes[i].test_name, utilization, exp[i], success[i]);
+					output.add_result(param->test_attributes[i].test_name, param->test_attributes[i].style, utilization, exp[i], success[i]);
 				}
 				stringstream buf;
 

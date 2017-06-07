@@ -115,6 +115,7 @@ typedef struct
 	string test_name;
 	string remark;
 	string rename;
+	string style;
 }Test_Attribute;
 
 typedef vector<int> Int_Set;

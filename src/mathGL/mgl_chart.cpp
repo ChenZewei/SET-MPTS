@@ -117,6 +117,7 @@ void Chart::ExportLineChart(string path, const char* title, double min, double m
 		uint num = (max - min)/step + 1;
 		Chart_Data c_data;
 		c_data.name = results->get_test_name();
+		c_data.style = results->get_line_style();
 		c_data.data = mglData(num);
 		{
 			double i = min; int j = 0;
@@ -141,10 +142,20 @@ void Chart::ExportLineChart(string path, const char* title, double min, double m
 		data_sets.push_back(c_data);
 	}
 
+	uint j = 0;
 	for(int i = 0; i < data_sets.size(); i++)
 	{
-		graph.Plot(data_sets[i].data, get_line_style(i).c_str());
-		graph.AddLegend(data_sets[i].name.c_str(), get_line_style(i).c_str());
+		if(!data_sets[i].style.empty())
+		{
+			graph.Plot(data_sets[i].data, data_sets[i].style.c_str());
+			graph.AddLegend(data_sets[i].name.c_str(), data_sets[i].style.c_str());
+		}
+		else
+		{
+			graph.Plot(data_sets[i].data, get_line_style(j).c_str());
+			graph.AddLegend(data_sets[i].name.c_str(), get_line_style(j).c_str());
+			j++;
+		}
 	}
 	
 	graph.Box();

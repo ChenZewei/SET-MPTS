@@ -42,9 +42,9 @@ string Output::get_path()
 	return path;
 }
 
-void Output::add_result(string test_name, double utilization, uint e_num, uint s_num)
+void Output::add_result(string test_name, string line_style, double utilization, uint e_num, uint s_num)
 {
-	SchedResult& sr = srs.get_sched_result(test_name);
+	SchedResult& sr = srs.get_sched_result(test_name, line_style);
 	sr.insert_result(utilization, e_num, s_num);
 }
 
