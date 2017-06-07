@@ -13,16 +13,7 @@ Chart::Chart()
 	color.push_back("{x44546A}");//dark grey
 	color.push_back("{x954F72}");//pupil
 
-	width.push_back("0");
-	width.push_back("1");
-	width.push_back("2");
-	width.push_back("3");
-	width.push_back("4");
-	width.push_back("5");
-	width.push_back("6");
-	width.push_back("7");
-	width.push_back("8");
-	width.push_back("9");
+	width = "2";
 
 	dot.push_back("*");
 	dot.push_back("o");
@@ -36,9 +27,10 @@ Chart::Chart()
 
 string Chart::get_line_style(int index)
 {
+
 	string style = "";
 	style += color[index];
-	style += width[2];
+	style += width;
 	style += dot[index];
 	return style;
 }
@@ -46,6 +38,13 @@ string Chart::get_line_style(int index)
 void Chart::AddColor(string newColor)
 {
 	color.push_back(newColor);
+}
+
+void Chart::SetLineWidth(uint w)
+{
+	else if(9 < w)
+		w = 9;
+	width = std::to_string(w);
 }
 /*
 void Chart::AddData(string name, double* d, int size)
