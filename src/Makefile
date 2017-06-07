@@ -18,12 +18,13 @@ DEL_DIR       = rmdir
 MOVE          = mv -f
 MKDIR         = mkdir -p
 TARGET	      = SchedulingAnalysis
+OBJ_FILES	  = tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_lp_ee_vpr.o rta_gdc_native.o rta_pdc_ro.o rta_gfp_czw.o rta_pfp_ro_ml.o rta_pfp_ro_sm.o rta_pfp_ro_np.o rta_pfp_ro_opa.o rta_pfp_ro_sm_opa.o rta_pfp_ro_feasible.o  
 
-SchedulingAnalysis:scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_lp_ee_vpr.o rta_gdc_native.o rta_pdc_ro.o rta_gfp_czw.o rta_pfp_ro_ml.o rta_pfp_ro_np.o rta_pfp_ro_opa.o  rta_pfp_ro_feasible.o  
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_lp_ee_vpr.o rta_gdc_native.o rta_pdc_ro.o rta_gfp_czw.o rta_pfp_ro_ml.o rta_pfp_ro_np.o rta_pfp_ro_opa.o rta_pfp_ro_feasible.o  $(LFLAGS) $(LIBS) -std=gnu++11
+SchedulingAnalysis:scheduling_test.o $(OBJ_FILES) 
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
 
-SubTest:sub_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_lp_ee_vpr.o rta_gdc_native.o rta_pdc_ro.o rta_gfp_czw.o rta_pfp_ro_ml.o rta_pfp_ro_np.o rta_pfp_ro_opa.o  rta_pfp_ro_feasible.o  
-	$(CXX) $(CXXFLAGS) $(INCPATH) -o SubTest sub_test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_lp_ee_vpr.o rta_gdc_native.o rta_pdc_ro.o rta_gfp_czw.o rta_pfp_ro_ml.o rta_pfp_ro_np.o rta_pfp_ro_opa.o rta_pfp_ro_feasible.o  $(LFLAGS) $(LIBS) -std=gnu++11
+SubTest:sub_test.o $(OBJ_FILES)   
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o SubTest sub_test.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
 
 test:test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o 
 	$(CXX) $(CXXFLAGS) $(INCPATH) -o test test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o  $(LFLAGS) $(LIBS) -std=gnu++11
@@ -145,11 +146,17 @@ rta_gfp_czw.o:SchedTest/global/rta_gfp_czw.cpp
 rta_pfp_ro_ml.o:SchedTest/partitioned/rta_pfp_ro_ml.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/rta_pfp_ro_ml.cpp $(LIBS)
 
+rta_pfp_ro_sm.o:SchedTest/partitioned/rta_pfp_ro_sm.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/rta_pfp_ro_sm.cpp $(LIBS)
+
 rta_pfp_ro_np.o:SchedTest/partitioned/rta_pfp_ro_np.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/rta_pfp_ro_np.cpp $(LIBS)
 
 rta_pfp_ro_opa.o:SchedTest/partitioned/rta_pfp_ro_opa.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/rta_pfp_ro_opa.cpp $(LIBS)
+
+rta_pfp_ro_sm_opa.o:SchedTest/partitioned/rta_pfp_ro_sm_opa.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/rta_pfp_ro_sm_opa.cpp $(LIBS)
 
 rta_pfp_ro_feasible.o:SchedTest/partitioned/rta_pfp_ro_feasible.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/rta_pfp_ro_feasible.cpp $(LIBS)

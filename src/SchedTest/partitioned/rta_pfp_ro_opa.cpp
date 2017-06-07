@@ -367,7 +367,7 @@ bool RTA_PFP_RO_OPA::is_first_fit_for_tasks_schedulable(uint start_processor)
 {
 	bool schedulable;
 	uint p_num = processors.get_processor_num();
-	tasks.RM_Order();
+//	tasks.RM_Order();
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint assignment;

@@ -14,7 +14,6 @@ RTA_PFP_RO_SM::RTA_PFP_RO_SM(TaskSet tasks, ProcessorSet processors, ResourceSet
 	this->resources.update(&(this->tasks));
 	this->processors.update(&(this->tasks), &(this->resources));
 	
-	this->tasks.RM_Order();
 	this->processors.init();
 }
 
@@ -80,29 +79,11 @@ ulong RTA_PFP_RO_SM::request_bound(Task& ti, uint r_id)
 	return deadline + 100;
 }
 
-ulong RTA_PFP_RO_SM::angent_exec_bound(Task& ti, uint p_id)
+ulong RTA_PFP_RO_SM::formula_30(Task& ti, uint p_id)
 {
 	ulong deadline = ti.get_deadline();
-	ulong lambda = 0;
-	foreach(ti.get_requests(), request)
-	{
-		uint q = request->get_resource_id();
-		Resource& resource = resources.get_resources()[q];
-
-		if(p_id == resource.get_locality())
-		{
-			uint N_i_q = request->get_num_requests();
-			ulong r_b = request_bound(ti, q);
-			if(deadline < r_b)
-			{
-//				cout<<"exceed."<<endl;
-				return r_b;
-			}
-			lambda += N_i_q*r_b;
-		}		
-	}
-
 	ulong miu = 0;
+
 	foreach(ti.get_requests(), request)
 	{
 		uint q = request->get_resource_id();
@@ -125,6 +106,32 @@ ulong RTA_PFP_RO_SM::angent_exec_bound(Task& ti, uint p_id)
 			}
 		}
 	}
+	return miu;
+}
+
+ulong RTA_PFP_RO_SM::angent_exec_bound(Task& ti, uint p_id)
+{
+	ulong deadline = ti.get_deadline();
+	ulong lambda = 0;
+	foreach(ti.get_requests(), request)
+	{
+		uint q = request->get_resource_id();
+		Resource& resource = resources.get_resources()[q];
+
+		if(p_id == resource.get_locality())
+		{
+			uint N_i_q = request->get_num_requests();
+			ulong r_b = request_bound(ti, q);
+			if(deadline < r_b)
+			{
+//				cout<<"exceed."<<endl;
+				return r_b;
+			}
+			lambda += N_i_q*r_b;
+		}		
+	}
+
+	ulong miu = formula_30(ti, p_id);
 
 	return min(lambda, miu);
 }
@@ -364,7 +371,7 @@ bool RTA_PFP_RO_SM::is_first_fit_for_tasks_schedulable(uint start_processor)
 {
 	bool schedulable;
 	uint p_num = processors.get_processor_num();
-	tasks.RM_Order();
+//	tasks.RM_Order();
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint assignment;
@@ -456,12 +463,22 @@ bool RTA_PFP_RO_SM::alloc_schedulable(Task& ti)
 	}
 }
 
+
+int RTA_PFP_RO_SM::ROP_SM_Order(Task t1, Task t2)
+{
+	long slack1 = t1.get_deadline();
+	long slack2 = t2.get_deadline();
+	slack1 -= t1.get_wcet() + t1.get_other_attr();
+	slack2 -= t2.get_wcet() + t2.get_other_attr();
+	return slack1 < slack2;
+}
+
 bool RTA_PFP_RO_SM::is_schedulable()
 {
 	bool schedulable = false;
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
-	
+
 	for(uint i = 1; i <= p_num; i++)
 	{
 		//initialzation
@@ -472,6 +489,42 @@ bool RTA_PFP_RO_SM::is_schedulable()
 		if(!worst_fit_for_resources(i))
 			continue;
 
+/*
+cout<<"Before sorting."<<endl;
+foreach(tasks.get_tasks(), task)
+{
+	long slack = task->get_deadline();
+	slack -= task->get_wcet() + task->get_other_attr();
+	cout<<"Task:"<<task->get_id()<<" Slack:"<<slack<<endl;
+	cout<<"----------------------------"<<endl;
+}
+*/
+
+		//ROP-SM Order
+		foreach(tasks.get_tasks(), task)
+		{
+			ulong rr_delay = 0;
+			for(uint k = 0; k < p_num; k++)
+			{
+				rr_delay += formula_30(*task, k);
+			}
+			task->set_other_attr(rr_delay);
+		}
+
+		Tasks& taskset = tasks.get_tasks();
+		sort(taskset.begin(), taskset.end(), ROP_SM_Order);
+		for(int i = 0; i < taskset.size(); i++)
+			taskset[i].set_index(i);
+/*
+cout<<"After sorting."<<endl;
+foreach(tasks.get_tasks(), task)
+{
+	long slack = task->get_deadline();
+	slack -= task->get_wcet() + task->get_other_attr();
+	cout<<"Task:"<<task->get_id()<<" Slack:"<<slack<<endl;
+	cout<<"----------------------------"<<endl;
+}
+*/
 		schedulable = is_first_fit_for_tasks_schedulable(i%p_num);
 		if(schedulable)
 		{
@@ -504,3 +557,4 @@ bool RTA_PFP_RO_SM::is_schedulable()
 */
 	return schedulable;
 }
+

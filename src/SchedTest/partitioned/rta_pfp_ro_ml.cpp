@@ -14,7 +14,6 @@ RTA_PFP_RO_ML::RTA_PFP_RO_ML(TaskSet tasks, ProcessorSet processors, ResourceSet
 	this->resources.update(&(this->tasks));
 	this->processors.update(&(this->tasks), &(this->resources));
 	
-	this->tasks.RM_Order();
 	this->processors.init();
 }
 
@@ -364,7 +363,7 @@ bool RTA_PFP_RO_ML::is_first_fit_for_tasks_schedulable(uint start_processor)
 {
 	bool schedulable;
 	uint p_num = processors.get_processor_num();
-	tasks.RM_Order();
+//	tasks.RM_Order();
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint assignment;
