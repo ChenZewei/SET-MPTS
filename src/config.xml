@@ -112,6 +112,7 @@
 	</output>
 	<lambda>
 		<data>10</data>
+		<data>4</data>
 	</lambda>
 	<step>
 		<data>0.2</data>
@@ -127,8 +128,12 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>1000</min>
+			<min>10000</min>
 			<max>100000</max>
+		</data>
+		<data>
+			<min>10000</min>
+			<max>1000000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>
@@ -139,20 +144,34 @@
 	</deadline_propotion>
 	<resource_num>
 		<data>1</data>
+		<data>2</data>
+		<data>4</data>
+		<data>8</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.1</data>
+		<data>0.25</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>1</data>
+		<data>3</data>
+		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
 			<min>1</min>
 			<max>10</max>
+		</data>
+		<data>
+			<min>20</min>
+			<max>40</max>
+		</data>
+		<data>
+			<min>50</min>
+			<max>80</max>
 		</data>
 	</rrr>
 	<total_len_factor>
