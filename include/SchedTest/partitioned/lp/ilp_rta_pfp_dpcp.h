@@ -21,7 +21,7 @@ class ILPDPCPMapper: public VarMapperBase
 		enum var_type
 		{
 			LOCALITY_ASSIGNMENT,//A_i_k Task i assign on processor k(k start from 1)
-			RESOURCE_ASSIGNMENT,//Q_i_k resource i assign to processor x(k start from 1)
+			RESOURCE_ASSIGNMENT,//Q_r_k resource r assign to processor x(k start from 1)
 			SAME_TASK_LOCALITY,//U_i_x Task i and task x assigned on same processor
 			SAME_RESOURCE_LOCALITY,//V_u_v resource u and resource v assigned on same processor
 			SAME_TR_LOCALITY,//W_i_u task i and resource u assigned on same processor

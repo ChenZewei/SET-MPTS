@@ -98,7 +98,7 @@
 <!-->	
 		<data RENAME="ILP-DPCP" REMARK="">ILP-RTA-PFP-DPCP</data>
 	</schedulability_test>
-	<experiment_times>50</experiment_times>
+	<experiment_times>1</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -114,7 +114,7 @@
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>3.6</min>
+			<min>4</min>
 			<max>4</max>
 		</data>
 	</init_utilization_range>
@@ -134,7 +134,7 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>1</data>
+		<data>4</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
 		<data>100</data>
