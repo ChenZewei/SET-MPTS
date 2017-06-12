@@ -101,13 +101,15 @@
 	<experiment_times>1</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
+<!-->
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="SVG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="TGA" BLACK_ONLY="true" >LineChart</data>
 		<data>JSON</data>
+<!-->
 	</output>
 	<lambda>
-		<data>10</data>
+		<data>4</data>
 	</lambda>
 	<step>
 		<data>0.2</data>
@@ -140,7 +142,7 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.1</data>
+		<data>0.5</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>3</data>
