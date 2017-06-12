@@ -204,13 +204,13 @@ bool GLPKSolution::is_solved() const
 }
 void GLPKSolution::solve(double var_lb, double var_ub)
 {
-/*
+
 #if GLPK_TERM_OUT == 0
 		glp_term_out(GLP_OFF);
 #else if GLPK_TERM_OUT == 1
 		glp_term_out(GLP_ON);
 #endif
-*/
+
 	switch(dir)
 	{
 		case 0:
@@ -239,13 +239,13 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 		// to the relaxed LP.
 
 		glpk_params.presolve = GLP_ON;
-
+/*
 #if GLPK_TERM_OUT == 0
 		glpk_params.msg_lev = (GLP_MSG_OFF);
 #else if GLPK_TERM_OUT == 1
 		glpk_params.msg_lev = (GLP_MSG_ON);
 #endif
-
+*/
 //		glpk_params.sr_heur = GLP_OFF;
 
 //		glpk_params.fp_heur = GLP_ON;
@@ -254,7 +254,9 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 
 		glpk_params.mip_gap = 1;
 
+#if TIME_LIMIT > 0
 		glpk_params.tm_lim = TIME_LIMIT;
+#endif
 
 		if(0 == aim)
 			solved = glp_intopt(glpk, &glpk_params) == 0 && glp_mip_status(glpk) == GLP_OPT;
