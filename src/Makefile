@@ -26,6 +26,12 @@ SchedulingAnalysis:scheduling_test.o $(OBJ_FILES)
 SubTest:sub_test.o $(OBJ_FILES)   
 	$(CXX) $(CXXFLAGS) $(INCPATH) -o SubTest sub_test.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
 
+server:server.o $(OBJ_FILES)   
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o server server.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
+
+client:client.o $(OBJ_FILES)   
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o client client.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
+
 test:test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o 
 	$(CXX) $(CXXFLAGS) $(INCPATH) -o test test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o  $(LFLAGS) $(LIBS) -std=gnu++11
 	
@@ -34,6 +40,12 @@ scheduling_test.o:scheduling_test.cpp
 	
 sub_test.o:sub_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c sub_test.cpp $(LIBS)
+	
+server.o:server.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c server.cpp $(LIBS)
+	
+client.o:client.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c client.cpp $(LIBS)
 
 test.o:test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c test.cpp $(LIBS)
