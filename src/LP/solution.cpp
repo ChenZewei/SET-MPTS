@@ -239,6 +239,12 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 		// to the relaxed LP.
 
 		glpk_params.presolve = GLP_ON;
+
+		glpk_params.br_tech = GLP_BR_FFV;
+
+		glpk_params.bt_tech = GLP_BT_BFS;
+
+		
 /*
 #if GLPK_TERM_OUT == 0
 		glpk_params.msg_lev = (GLP_MSG_OFF);
