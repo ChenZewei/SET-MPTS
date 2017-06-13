@@ -11,7 +11,7 @@
 /*
 |________________|_______________|_____________|_____________|_____________|____________|
 |                |               |             |             |             |            |
-|(63-42)Reserved |(43-40)var type|(39-30)part1 |(29-20)part2 |(19-10)part3 |(9-0)part4  |
+|(63-45)Reserved |(44-40)var type|(39-30)part1 |(29-20)part2 |(19-10)part3 |(9-0)part4  |
 |________________|_______________|_____________|_____________|_____________|____________|
 */
 
@@ -21,20 +21,23 @@ class ILPDPCPMapper: public VarMapperBase
 		enum var_type
 		{
 			LOCALITY_ASSIGNMENT,//A_i_k Task i assign on processor k(k start from 1)
-			RESOURCE_ASSIGNMENT,//Q_i_k resource i assign to processor x(k start from 1)
+			RESOURCE_ASSIGNMENT,//Q_r_k resource r assign to processor x(k start from 1)
 			SAME_TASK_LOCALITY,//U_i_x Task i and task x assigned on same processor
 			SAME_RESOURCE_LOCALITY,//V_u_v resource u and resource v assigned on same processor
 			SAME_TR_LOCALITY,//W_i_u task i and resource u assigned on same processor
 			APPLICATION_CORE,//AP_k
-			UNIFORM_CORE,//UC_k
-			RESPONSE_TIME//R_i
+			TASK_ONLY,//TO_i
+			TASK_ONLY_PROCESSOR,//TO_i_K
+			TBT_PREEMPT_NUM,//H_i_x
+			RBT_PREEMPT_NUM,//H_i_x_v resource v is requested by task x
+			RBR_PREEMPT_NUM,//H_i_x_u_v
+			RESPONSE_TIME,//R_i
 			BLOCKING_TIME,//B_i
 			REQUEST_BLOCKING_TIME,//b_i_r
 			INTERFERENCE_TIME_R,//IR_i
-			INTERFERENCE_TIME_R_PROCESSOR,//IR_i_k
-			WORKLOAD_R,//WR_i_x_v
-			INTERFERENCE_TIME_C,//IR_c
-			WORKLOAD_C//WC_i_j
+			INTERFERENCE_TIME_R_RESOURCE,//IR_i_u
+			INTERFERENCE_TIME_C,//IC_i
+			INTERFERENCE_TIME_C_TASK,//IC_i_x
 		};
 	private:
 		static uint64_t encode_request(uint64_t type, uint64_t part_1 = 0, uint64_t part_2 = 0, uint64_t part_3 = 0, uint64_t part_4 = 0);
@@ -96,6 +99,18 @@ class ILP_RTA_PFP_DPCP: public PartitionedSched
 		void constraint_15(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C16
 		void constraint_16(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C17
+		void constraint_17(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C18
+		void constraint_18(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C19
+		void constraint_19(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C20
+		void constraint_20(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C21
+		void constraint_21(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C22
+		void constraint_22(LinearProgram& lp, ILPDPCPMapper& vars);
 
 		bool alloc_schedulable();
 

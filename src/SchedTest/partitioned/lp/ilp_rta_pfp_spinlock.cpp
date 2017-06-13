@@ -220,12 +220,13 @@ cout<<"deadline of task "<<i<<":"<<tasks.get_tasks()[i].get_deadline()<<endl;
 		}
 #endif
 		
+//		rb_solution->show_error();
 		delete rb_solution;
 		return true;
 	}
 	else
 	{
-		rb_solution->show_error();
+//		rb_solution->show_error();
 	}
 
 	delete rb_solution;
