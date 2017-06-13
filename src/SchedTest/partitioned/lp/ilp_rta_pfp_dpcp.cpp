@@ -179,7 +179,7 @@ bool ILP_RTA_PFP_DPCP::is_schedulable()
 
 //cout<<"var num:"<<vars.get_num_vars()<<endl;
 
-	GLPKSolution *rb_solution = new GLPKSolution(response_bound, vars.get_num_vars(), 0.0, 1.0, 1, 1);
+	GLPKSolution *rb_solution = new GLPKSolution(response_bound, vars.get_num_vars(), 0.0, 1.0, 0, 1);
 
 	assert(rb_solution != NULL);
 
@@ -330,8 +330,12 @@ void ILP_RTA_PFP_DPCP::set_objective(LinearProgram& lp, ILPDPCPMapper& vars)
 	LinearExpression *obj = new LinearExpression();
 	uint var_id;
 
-	var_id = vars.lookup(ILPDPCPMapper::RESPONSE_TIME, 0, 0, 0);
-	obj->add_term(var_id, 1);
+	foreach(tasks.get_tasks(), task)
+	{
+		uint i = task->get_index();
+		var_id = vars.lookup(ILPDPCPMapper::RESPONSE_TIME, i, 0, 0);
+		obj->add_term(var_id, 1);
+	}
 
 	lp.set_objective(obj);
 }

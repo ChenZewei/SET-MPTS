@@ -240,9 +240,9 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 
 		glpk_params.presolve = GLP_ON;
 
-		glpk_params.br_tech = GLP_BR_FFV;
+		glpk_params.br_tech = GLP_BR_DTH;
 
-		glpk_params.bt_tech = GLP_BT_BFS;
+		glpk_params.bt_tech = GLP_BT_BLB;
 
 		
 /*
@@ -254,9 +254,14 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 */
 //		glpk_params.sr_heur = GLP_OFF;
 
+		//Feasibility pump heuristic		
 //		glpk_params.fp_heur = GLP_ON;
 
-//		glpk_params.ps_heur = GLP_OFF;
+		//Proximity search heuristic
+		glpk_params.ps_heur = GLP_ON;
+
+		//Gomory's mixed integer cut
+		glpk_params.gmi_cuts = GLP_ON;
 
 		glpk_params.mip_gap = 1;
 
