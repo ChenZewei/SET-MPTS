@@ -311,6 +311,8 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 			if(glp_mip_status(glpk) == GLP_FEAS)
 				solved = true;
 		}
+
+		show_error();
 	}
 	else
 	{

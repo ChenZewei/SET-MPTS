@@ -28,6 +28,7 @@ class ILPDPCPMapper: public VarMapperBase
 			APPLICATION_CORE,//AP_k
 			TASK_ONLY,//TO_i
 			TASK_ONLY_PROCESSOR,//TO_i_K
+			PREEMPT_NUM,//P_i_x
 			TBT_PREEMPT_NUM,//H_i_x
 			RBT_PREEMPT_NUM,//H_i_x_v resource v is requested by task x
 			RBR_PREEMPT_NUM,//H_i_x_u_v
@@ -73,10 +74,16 @@ class ILP_RTA_PFP_DPCP: public PartitionedSched
 		void constraint_2(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C3
 		void constraint_3(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C3-1
+		void constraint_3_1(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C4
 		void constraint_4(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C4-1
+		void constraint_4_1(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C5
 		void constraint_5(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C5-1
+		void constraint_5_1(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C6
 		void constraint_6(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C7
@@ -95,6 +102,8 @@ class ILP_RTA_PFP_DPCP: public PartitionedSched
 		void constraint_13(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C14
 		void constraint_14(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C14-1
+		void constraint_14_1(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C15
 		void constraint_15(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C16
@@ -111,6 +120,8 @@ class ILP_RTA_PFP_DPCP: public PartitionedSched
 		void constraint_21(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C22
 		void constraint_22(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C22-1
+		void constraint_22_1(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C23
 		void constraint_23(LinearProgram& lp, ILPDPCPMapper& vars);
 

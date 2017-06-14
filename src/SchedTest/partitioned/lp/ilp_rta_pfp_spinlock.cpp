@@ -464,7 +464,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_6(LinearProgram& lp, ILPSpinL
 
 		var_id = vars.lookup(ILPSpinLockMapper::RESPONSE_TIME, i);
 		exp->add_term(var_id, 1);
-		lp.declare_variable_integer(var_id);
+		//lp.declare_variable_integer(var_id);
 //cout<<"var_id:"<<var_id<<endl;
 //cout<<"R_"<<i<<" lower bound:"<<task->get_wcet()<<endl;
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
@@ -486,17 +486,17 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_7(LinearProgram& lp, ILPSpinL
 
 		var_id = vars.lookup(ILPSpinLockMapper::BLOCKING_TIME, i);
 		exp->sub_term(var_id, 1);
-		lp.declare_variable_integer(var_id);
+		//lp.declare_variable_integer(var_id);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
 		var_id = vars.lookup(ILPSpinLockMapper::SPIN_TIME, i);
 		exp->sub_term(var_id, 1);
-		lp.declare_variable_integer(var_id);
+		//lp.declare_variable_integer(var_id);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
 		var_id = vars.lookup(ILPSpinLockMapper::INTERFERENCE_TIME, i);
 		exp->sub_term(var_id, 1);
-		lp.declare_variable_integer(var_id);
+		//lp.declare_variable_integer(var_id);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 //cout<<"wcet:"<<task->get_wcet()<<endl;
 		lp.add_equality(exp, task->get_wcet());
@@ -595,7 +595,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_11(LinearProgram& lp, ILPSpin
 		{
 			var_id = vars.lookup(ILPSpinLockMapper::SPIN_TIME, i, k);
 			exp->sub_term(var_id, 1);
-			lp.declare_variable_integer(var_id);
+			//lp.declare_variable_integer(var_id);
 			lp.declare_variable_bounds(var_id, true, 0, false, -1);
 		}
 		lp.add_equality(exp, 0);
@@ -622,7 +622,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_12(LinearProgram& lp, ILPSpin
 			{
 				var_id = vars.lookup(ILPSpinLockMapper::SPIN_TIME, i, k, q);
 				exp->sub_term(var_id, 1);
-				lp.declare_variable_integer(var_id);
+				//lp.declare_variable_integer(var_id);
 				lp.declare_variable_bounds(var_id, true, 0, false, -1);
 			}
 
@@ -738,7 +738,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_14(LinearProgram& lp, ILPSpin
 
 			var_id = vars.lookup(ILPSpinLockMapper::BLOCKING_TIME, i, q);
 			exp->add_term(var_id, 1);
-			lp.declare_variable_integer(var_id);
+			//lp.declare_variable_integer(var_id);
 			lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
 			lp.add_inequality(exp, 0);
@@ -767,7 +767,7 @@ void ILP_RTA_PFP_spinlock::ILP_SpinLock_constraint_15(LinearProgram& lp, ILPSpin
 			{
 				var_id = vars.lookup(ILPSpinLockMapper::BLOCKING_TIME, i, q, k);
 				exp->add_term(var_id, 1);
-				lp.declare_variable_integer(var_id);
+				//lp.declare_variable_integer(var_id);
 				lp.declare_variable_bounds(var_id, true, 0, false, -1);
 			}
 
