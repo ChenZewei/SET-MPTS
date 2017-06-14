@@ -308,8 +308,11 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 		else if(1 == aim)
 		{
 			solved = glp_intopt(glpk, &glpk_params) == 0;
-			if(glp_mip_status(glpk) == GLP_FEAS)
+			int ret = glp_mip_status(glpk);
+			if(ret == GLP_FEAS || ret == GLP_OPT)
 				solved = true;
+			else
+				solved = false;
 		}
 
 		show_error();

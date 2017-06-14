@@ -23,8 +23,11 @@ class ILPDPCPMapper: public VarMapperBase
 			LOCALITY_ASSIGNMENT,//A_i_k Task i assign on processor k(k start from 1)
 			RESOURCE_ASSIGNMENT,//Q_r_k resource r assign to processor x(k start from 1)
 			SAME_TASK_LOCALITY,//U_i_x Task i and task x assigned on same processor
+			SAME_TASK_ON_PROCESSOR,//U_i_x_k Task i and task x assigned on processor k
 			SAME_RESOURCE_LOCALITY,//V_u_v resource u and resource v assigned on same processor
+			SAME_RESOURCE_ON_PROCESSOR,//V_u_v_k resource u and resource v assigned on processor k
 			SAME_TR_LOCALITY,//W_i_u task i and resource u assigned on same processor
+			SAME_TR_ON_PROCESSOR,//W_i_u_k task i and resource u assigned on processor k
 			APPLICATION_CORE,//AP_k
 			TASK_ONLY,//TO_i
 			TASK_ONLY_PROCESSOR,//TO_i_K
@@ -76,14 +79,20 @@ class ILP_RTA_PFP_DPCP: public PartitionedSched
 		void constraint_3(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C3-1
 		void constraint_3_1(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C3-2
+		void constraint_3_2(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C4
 		void constraint_4(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C4-1
 		void constraint_4_1(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C4-2
+		void constraint_4_2(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C5
 		void constraint_5(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C5-1
 		void constraint_5_1(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C5-2
+		void constraint_5_2(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C6
 		void constraint_6(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C7
