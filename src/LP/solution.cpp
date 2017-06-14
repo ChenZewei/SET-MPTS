@@ -34,6 +34,38 @@ GLPKSolution::~GLPKSolution()
 	glp_delete_prob(glpk);
 }
 
+static void GLPKSolution::callback(glp_tree *T, void* info)
+{
+	switch(glp_ios_reason(T))
+	{
+		case GLP_ISELECT:
+			//cout<<"GLP_ISELECT"<<endl;
+			break;
+		case GLP_IPREPRO:
+			//cout<<"GLP_IPREPRO"<<endl;
+			break;
+		case GLP_IROWGEN:
+			//cout<<"GLP_IROWGEN"<<endl;
+			break;
+		case GLP_IHEUR:
+			//cout<<"GLP_IHEUR"<<endl;
+			break;
+		case GLP_ICUTGEN:
+			//cout<<"GLP_ICUTGEN"<<endl;
+			break;
+		case GLP_IBRANCH:
+			//cout<<"GLP_IBRANCH"<<endl;
+			break;
+		case GLP_IBINGO:
+			//cout<<"GLP_IBINGO"<<endl;
+			break;
+		default:
+			//cout<<"DEFAULT"<<endl;
+			break;
+	}
+	return;
+}
+
 void GLPKSolution::show_error()
 {
 	if (!solved)
@@ -258,7 +290,7 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 //		glpk_params.fp_heur = GLP_ON;
 
 		//Proximity search heuristic
-		glpk_params.ps_heur = GLP_ON;
+//		glpk_params.ps_heur = GLP_ON;
 
 		//Gomory's mixed integer cut
 		glpk_params.gmi_cuts = GLP_ON;
@@ -268,6 +300,8 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 #if TIME_LIMIT > 0
 		glpk_params.tm_lim = TIME_LIMIT;
 #endif
+
+		//glpk_params.cb_func = callback;
 
 		if(0 == aim)
 			solved = glp_intopt(glpk, &glpk_params) == 0 && glp_mip_status(glpk) == GLP_OPT;

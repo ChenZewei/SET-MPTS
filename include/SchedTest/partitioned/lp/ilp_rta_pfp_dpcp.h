@@ -111,6 +111,8 @@ class ILP_RTA_PFP_DPCP: public PartitionedSched
 		void constraint_21(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C22
 		void constraint_22(LinearProgram& lp, ILPDPCPMapper& vars);
+		//C23
+		void constraint_23(LinearProgram& lp, ILPDPCPMapper& vars);
 
 		bool alloc_schedulable();
 
