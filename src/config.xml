@@ -67,10 +67,12 @@
 	<experiment_times>200</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
+<!-->
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="SVG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="TGA" BLACK_ONLY="true" >LineChart</data>
 		<data>JSON</data>
+<!-->
 	</output>
 	<lambda>
 		<data>10</data>
@@ -95,7 +97,7 @@
 		</data>
 		<data>
 			<min>10000</min>
-			<max>10000000</max>
+			<max>1000000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>
@@ -114,8 +116,7 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.1</data>
-		<data>0.25</data>
+		<data>0.2</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>1</data>

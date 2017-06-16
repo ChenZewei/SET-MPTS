@@ -22,6 +22,7 @@ class GLPKSolution
 		int simplex_code;
 		bool solved;
 		
+		static void callback(glp_tree *T, void* info);
 		void solve(double var_lb, double var_ub);
 		void set_objective();
 		void set_bounds(double col_lb, double col_ub);

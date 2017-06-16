@@ -34,11 +34,113 @@ GLPKSolution::~GLPKSolution()
 	glp_delete_prob(glpk);
 }
 
+static void GLPKSolution::callback(glp_tree *T, void* info)
+{
+	switch(glp_ios_reason(T))
+	{
+		case GLP_ISELECT:
+			//cout<<"GLP_ISELECT"<<endl;
+			break;
+		case GLP_IPREPRO:
+			//cout<<"GLP_IPREPRO"<<endl;
+			break;
+		case GLP_IROWGEN:
+			//cout<<"GLP_IROWGEN"<<endl;
+			break;
+		case GLP_IHEUR:
+			//cout<<"GLP_IHEUR"<<endl;
+			break;
+		case GLP_ICUTGEN:
+			//cout<<"GLP_ICUTGEN"<<endl;
+			break;
+		case GLP_IBRANCH:
+			//cout<<"GLP_IBRANCH"<<endl;
+			break;
+		case GLP_IBINGO:
+			//cout<<"GLP_IBINGO"<<endl;
+			break;
+		default:
+			//cout<<"DEFAULT"<<endl;
+			break;
+	}
+	return;
+}
+
 void GLPKSolution::show_error()
 {
 	if (!solved)
 	{
 		std::cerr << "NOT SOLVED => status: "
+			<< (is_mip?glp_mip_status(glpk):glp_get_status(glpk))
+			<< " (";
+		switch (is_mip?glp_mip_status(glpk):glp_get_status(glpk))
+		{
+			case GLP_OPT:
+				std::cerr << "GLP_OPT";
+				break;
+			case GLP_FEAS:
+				std::cerr << "GLP_FEAS";
+				break;
+			case GLP_INFEAS:
+				std::cerr << "GLP_INFEAS";
+				break;
+			case GLP_NOFEAS:
+				std::cerr << "GLP_NOFEAS";
+				break;
+			case GLP_UNBND:
+				std::cerr << "GLP_UNBND";
+				break;
+			case GLP_UNDEF:
+				std::cerr << "GLP_UNDEF";
+				break;
+			default:
+				std::cerr << "???";
+		}
+		if(!is_mip)
+		{
+			std::cerr << ") simplex: " << simplex_code << " (";
+			switch (glp_get_status(glpk))
+			{
+				case GLP_EBADB:
+					std::cerr << "GLP_EBADB";
+					break;
+				case GLP_ESING:
+					std::cerr << "GLP_ESING";
+					break;
+				case GLP_ECOND:
+					std::cerr << "GLP_ECOND";
+					break;
+				case GLP_EBOUND:
+					std::cerr << "GLP_EBOUND";
+					break;
+				case GLP_EFAIL:
+					std::cerr << "GLP_EFAIL";
+					break;
+				case GLP_EOBJLL:
+					std::cerr << "GLP_EOBJLL";
+					break;
+				case GLP_EOBJUL:
+					std::cerr << "GLP_EOBJUL";
+					break;
+				case GLP_EITLIM:
+					std::cerr << "GLP_EITLIM";
+					break;
+				case GLP_ENOPFS:
+					std::cerr << "GLP_ENOPFS";
+					break;
+				case GLP_ENODFS:
+					std::cerr << "GLP_ENODFS";
+					break;
+				default:
+					std::cerr << "???";
+			}
+		}
+
+		std::cerr << ")" << std::endl;
+	}
+	else
+	{
+		std::cerr << "SOLVED => status: "
 			<< (is_mip?glp_mip_status(glpk):glp_get_status(glpk))
 			<< " (";
 		switch (is_mip?glp_mip_status(glpk):glp_get_status(glpk))
@@ -134,11 +236,11 @@ bool GLPKSolution::is_solved() const
 }
 void GLPKSolution::solve(double var_lb, double var_ub)
 {
-//cout<<"111"<<endl;
+
 #if GLPK_TERM_OUT == 0
-	glp_term_out(GLP_OFF);
+		glp_term_out(GLP_OFF);
 #else if GLPK_TERM_OUT == 1
-	glp_term_out(GLP_ON);
+		glp_term_out(GLP_ON);
 #endif
 
 	switch(dir)
@@ -153,42 +255,73 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 			glp_set_obj_dir(glpk, GLP_MAX);
 	}
 	glp_add_cols(glpk, col_num);
-//cout<<row_num<<endl;
 	glp_add_rows(glpk, row_num);
-//cout<<"222"<<endl;
 	set_objective();
-//cout<<"333"<<endl;
 	set_bounds(var_lb, var_ub);
-//cout<<"444"<<endl;
 	set_coefficients();
 	if (is_mip)
 		set_column_types();
-//cout<<"555"<<endl;
 	if (is_mip)
 	{
 		glp_iocp glpk_params;
-//cout<<"666"<<endl;
 		glp_init_iocp(&glpk_params);
-//cout<<"777"<<endl;
+
 		// presolver is required because otherwise
 		// GLPK expects glpk to hold an optimal solution
 		// to the relaxed LP.
+
 		glpk_params.presolve = GLP_ON;
-//cout<<"888"<<endl;
+
+		glpk_params.br_tech = GLP_BR_DTH;
+
+		glpk_params.bt_tech = GLP_BT_BLB;
+
+		
+/*
+#if GLPK_TERM_OUT == 0
+		glpk_params.msg_lev = (GLP_MSG_OFF);
+#else if GLPK_TERM_OUT == 1
+		glpk_params.msg_lev = (GLP_MSG_ON);
+#endif
+*/
+//		glpk_params.sr_heur = GLP_OFF;
+
+		//Feasibility pump heuristic		
+//		glpk_params.fp_heur = GLP_ON;
+
+		//Proximity search heuristic
+//		glpk_params.ps_heur = GLP_ON;
+
+		//Gomory's mixed integer cut
+		glpk_params.gmi_cuts = GLP_ON;
+
+		glpk_params.mip_gap = 1;
+
+#if TIME_LIMIT > 0
+		glpk_params.tm_lim = TIME_LIMIT;
+#endif
+
+		//glpk_params.cb_func = callback;
+
 		if(0 == aim)
 			solved = glp_intopt(glpk, &glpk_params) == 0 && glp_mip_status(glpk) == GLP_OPT;
 		else if(1 == aim)
 		{
-			solved = glp_intopt(glpk, &glpk_params) == 0 && (glp_mip_status(glpk) == GLP_FEAS || glp_mip_status(glpk) == GLP_OPT);
-//cout<<"mip status:"<<glp_mip_status(glpk)<<endl;
+			solved = glp_intopt(glpk, &glpk_params) == 0;
+			int ret = glp_mip_status(glpk);
+			if(ret == GLP_FEAS || ret == GLP_OPT)
+				solved = true;
+			else
+				solved = false;
 		}
+
+		show_error();
 	}
 	else
 	{
 		glp_smcp glpk_params;
-//cout<<"666"<<endl;
 		glp_init_smcp(&glpk_params);
-//cout<<"777"<<endl;
+
 		/* Set solver options. The presolver is essential. The other two
 		 * options seem to make the solver slightly faster.
 		 *
@@ -197,15 +330,13 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 		glpk_params.presolve = GLP_ON;
 		glpk_params.pricing  = GLP_PT_STD;
 		glpk_params.r_test   = GLP_RT_STD;
-//cout<<"888"<<endl;
+
 		simplex_code = glp_simplex(glpk, &glpk_params);
-//cout<<"999"<<endl;
 		if(0 == aim)
 			solved = simplex_code == 0 && glp_get_status(glpk) == GLP_OPT;
 		else if(1 == aim)
 			solved = simplex_code == 0 && (glp_get_status(glpk) == GLP_FEAS || glp_get_status(glpk) == GLP_OPT);
 	}
-//cout<<"100000"<<endl;
 }
 
 void GLPKSolution::set_objective()

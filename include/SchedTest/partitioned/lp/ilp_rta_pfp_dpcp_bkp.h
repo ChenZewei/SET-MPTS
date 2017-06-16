@@ -28,9 +28,9 @@ class ILPDPCPMapper: public VarMapperBase
 			SAME_RESOURCE_ON_PROCESSOR,//V_u_v_k resource u and resource v assigned on processor k
 			SAME_TR_LOCALITY,//W_i_u task i and resource u assigned on same processor
 			SAME_TR_ON_PROCESSOR,//W_i_u_k task i and resource u assigned on processor k
-//			APPLICATION_CORE,//AP_k
-//			TASK_ONLY,//TO_i
-//			TASK_ONLY_PROCESSOR,//TO_i_K
+			APPLICATION_CORE,//AP_k
+			TASK_ONLY,//TO_i
+			TASK_ONLY_PROCESSOR,//TO_i_K
 			PREEMPT_NUM,//P_i_x
 			TBT_PREEMPT_NUM,//H_i_x
 			RBT_PREEMPT_NUM,//H_i_x_v resource v is requested by task x
@@ -40,7 +40,8 @@ class ILPDPCPMapper: public VarMapperBase
 			REQUEST_BLOCKING_TIME,//b_i_r
 			INTERFERENCE_TIME_R,//IR_i
 			INTERFERENCE_TIME_R_RESOURCE,//IR_i_u
-			INTERFERENCE_TIME_T,//IC_i
+			INTERFERENCE_TIME_C,//IC_i
+			INTERFERENCE_TIME_C_TASK,//IC_i_x
 		};
 	private:
 		static uint64_t encode_request(uint64_t type, uint64_t part_1 = 0, uint64_t part_2 = 0, uint64_t part_3 = 0, uint64_t part_4 = 0);

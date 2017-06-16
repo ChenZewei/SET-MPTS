@@ -18,13 +18,19 @@ DEL_DIR       = rmdir
 MOVE          = mv -f
 MKDIR         = mkdir -p
 TARGET	      = SchedulingAnalysis
-OBJ_FILES	  = tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o rta_pfp_gs.o nc_lp_ee_vpr.o rta_gdc_native.o rta_pdc_ro.o rta_gfp_czw.o rta_pfp_ro_ml.o rta_pfp_ro_sm.o rta_pfp_ro_np.o rta_pfp_ro_opa.o rta_pfp_ro_sm_opa.o rta_pfp_ro_feasible.o  
+OBJ_FILES	  = tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o lp.o solution.o varmapper.o sched_test_base.o sched_test_factory.o p_sched.o g_sched.o rta_gfp_native.o rta_gfp_bc.o rta_gfp_ng.o rta_pfp_wf.o rta_pfp_wf_spinlock.o rta_pfp_wf_semaphore.o lp_rta_gfp_pip.o lp_rta_gfp_fmlp.o lp_rta_pfp_dpcp.o lp_rta_pfp_mpcp.o rta_pfp_ro.o ilp_rta_pfp_spinlock.o ilp_rta_pfp_dpcp.o ilp_rta_pfp_dpcp_2.o rta_pfp_gs.o nc_lp_ee_vpr.o rta_gdc_native.o rta_pdc_ro.o rta_gfp_czw.o rta_pfp_ro_ml.o rta_pfp_ro_sm.o rta_pfp_ro_np.o rta_pfp_ro_opa.o rta_pfp_ro_sm_opa.o rta_pfp_ro_feasible.o  
 
 SchedulingAnalysis:scheduling_test.o $(OBJ_FILES) 
 	$(CXX) $(CXXFLAGS) $(INCPATH) -o $(TARGET) scheduling_test.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
 
 SubTest:sub_test.o $(OBJ_FILES)   
 	$(CXX) $(CXXFLAGS) $(INCPATH) -o SubTest sub_test.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
+
+server:server.o $(OBJ_FILES)   
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o server server.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
+
+client:client.o $(OBJ_FILES)   
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o client client.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
 
 test:test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o 
 	$(CXX) $(CXXFLAGS) $(INCPATH) -o test test.o tasks.o processors.o tinyxml2.o random_gen.o mgl_chart.o resources.o xml.o param.o sched_result.o output.o  $(LFLAGS) $(LIBS) -std=gnu++11
@@ -34,6 +40,12 @@ scheduling_test.o:scheduling_test.cpp
 	
 sub_test.o:sub_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c sub_test.cpp $(LIBS)
+	
+server.o:server.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c server.cpp $(LIBS)
+	
+client.o:client.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c client.cpp $(LIBS)
 
 test.o:test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c test.cpp $(LIBS)
@@ -127,6 +139,12 @@ rta_pfp_ro.o:SchedTest/partitioned/rta_pfp_ro.cpp
 
 ilp_rta_pfp_spinlock.o:SchedTest/partitioned/lp/ilp_rta_pfp_spinlock.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/lp/ilp_rta_pfp_spinlock.cpp $(LIBS)
+
+ilp_rta_pfp_dpcp.o:SchedTest/partitioned/lp/ilp_rta_pfp_dpcp.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/lp/ilp_rta_pfp_dpcp.cpp $(LIBS)
+
+ilp_rta_pfp_dpcp_2.o:SchedTest/partitioned/lp/ilp_rta_pfp_dpcp_2.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/lp/ilp_rta_pfp_dpcp_2.cpp $(LIBS)
 
 rta_pfp_gs.o:SchedTest/partitioned/rta_pfp_gs.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c SchedTest/partitioned/rta_pfp_gs.cpp $(LIBS)
