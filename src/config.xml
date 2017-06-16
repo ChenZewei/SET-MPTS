@@ -134,7 +134,7 @@
 		<data RENAME="PFP-WF" REMARK="">RTA-PFP-WF</data>
 		<data RENAME="ILP-DPCP" 	REMARK="">ILP-RTA-PFP-DPCP</data>
 	</schedulability_test>
-	<experiment_times>100</experiment_times>
+	<experiment_times>20</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->

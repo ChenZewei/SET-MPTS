@@ -272,7 +272,7 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 
 		glpk_params.presolve = GLP_ON;
 
-		glpk_params.br_tech = GLP_BR_DTH;
+		glpk_params.br_tech = GLP_BR_MFV;
 
 		glpk_params.bt_tech = GLP_BT_BLB;
 
@@ -291,6 +291,7 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 
 		//Proximity search heuristic
 //		glpk_params.ps_heur = GLP_ON;
+//		glpk_params.ps_tm_lim = 300000;
 
 		//Gomory's mixed integer cut
 		glpk_params.gmi_cuts = GLP_ON;
