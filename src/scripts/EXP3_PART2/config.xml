@@ -33,7 +33,7 @@
 		<data RENAME="" REMARK="">RTA-PFP-RO</data>
 		<data RENAME="" REMARK="">ILP-RTA-PFP-spinlock</data>
 		<data RENAME="" REMARK="">RTA-PFP-GS</data>
-		<data RENAME="" REMARK="">NC-GEDF-VPR</data>
+		<data RENAME="" REMARK="">NC-LP-EE-VPR</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO-NP</data>
 		<data RENAME="" REMARK="">RTA-PFP-RO-FEASIBLE</data>
@@ -53,26 +53,64 @@
 		<data RENAME="" REMARK="">RTA-GSMP4-NG</data>
 
 
-<!-->
-		<data RENAME="LP-GFP-FMLP"	    STYLE="{x5B9BD5}2o">LP-RTA-GFP-FMLP</data>
-		<data RENAME="LP-PFP-DPCP"      STYLE="{xEB5B5B}2+">LP-RTA-PFP-DPCP</data>
-		<data RENAME="LP-PFP-MPCP" 	    STYLE="{x00A000}2s">LP-RTA-PFP-MPCP</data>
+		<data RENAME="" REMARK="">NC-LP-EE-VPR</data>
+		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-ML</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-NP</data>
+		<data RENAME="" REMARK="">RTA-PFP-RO-FEASIBLE</data>
+
+		
+#EXP1
+		<data RENAME="LP-PIP"	    STYLE="{x000000}2*">LP-RTA-GFP-PIP</data>
+		<data RENAME="LP-FMLP"	    STYLE="{x5B9BD5}2o">LP-RTA-GFP-FMLP</data>
+		<data RENAME="LP-DPCP"      STYLE="{xEB5B5B}2+">LP-RTA-PFP-DPCP</data>
+		<data RENAME="LP-MPCP" 	    STYLE="{x00A000}2s">LP-RTA-PFP-MPCP</data>
 		<data RENAME="GS-MSRP" 	    STYLE="{x8080FF}2d">RTA-PFP-GS</data>
-		<data RENAME="R-PCP"     STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
-		<data RENAME="R-PCP-opa" STYLE="{xED7D31}2=^">RTA-PFP-RO-OPA</data>
+		<data RENAME="R-PCP-rm"     STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
+		<data RENAME="R-PCP-rm-opa" STYLE="{x0080FF}2^">RTA-PFP-RO-OPA</data>
+		<data RENAME="R-PCP-sm"     STYLE="{x0080FF}2#^">RTA-PFP-RO-SM</data>
+		<data RENAME="R-PCP-sm-opa" STYLE="{x0080FF}2#v">RTA-PFP-RO-SM-OPA</data>
+		<data RENAME="R-NP-rm" 	    STYLE="{x44546A}2#s">RTA-PFP-RO-NP</data>
+		<data RENAME="NC"           STYLE="{x954F72}2#d">RTA-PFP-RO-FEASIBLE</data>
+
+
+		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
+		<data RENAME="ROP-PCP" REMARK="">RTA-PFP-RO-ML</data>
+		<data RENAME="ROP-PCP-OPA" REMARK="">RTA-PFP-RO-OPA</data>
+
+#EXP3
+		<data RENAME="LP-PIP"	    STYLE="{x000000}2*">LP-RTA-GFP-PIP</data>
+		<data RENAME="LP-DPCP"      STYLE="{xEB5B5B}2+">LP-RTA-PFP-DPCP</data>
+		<data RENAME="GS-MSRP" 	    STYLE="{x8080FF}2d">RTA-PFP-GS</data>
+		<data RENAME="LL-EE-vpr"    STYLE="{x5B9BD5}2o">NC-LP-EE-VPR</data>
+		<data RENAME="R-PCP-rm"     STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
+		<data RENAME="R-PCP-rm-opa" STYLE="{xED7D31}2=^">RTA-PFP-RO-OPA</data>
 		<data RENAME="R-PCP-sm"     STYLE="{x0080FF}2j#^">RTA-PFP-RO-SM</data>
 		<data RENAME="R-PCP-sm-opa" STYLE="{xED7D31}2:#v">RTA-PFP-RO-SM-OPA</data>
-		<data RENAME="R-NP" 	    STYLE="{x44546A}2:s">RTA-PFP-RO-NP</data>
+		<data RENAME="R-NP-rm" 	    STYLE="{x44546A}2:s">RTA-PFP-RO-NP</data>
+		<data RENAME="NC"           STYLE="{x954F72}2=#d">RTA-PFP-RO-FEASIBLE</data>
+
+		
+
+<!-->	
+		<data RENAME="LP-PIP"	    STYLE="{x000000}2*">LP-RTA-GFP-PIP</data>
+		<data RENAME="LP-DPCP"      STYLE="{xEB5B5B}2+">LP-RTA-PFP-DPCP</data>
+		<data RENAME="GS-MSRP" 	    STYLE="{x8080FF}2d">RTA-PFP-GS</data>
+		<data RENAME="LL-EE-vpr"    STYLE="{x5B9BD5}2o">NC-LP-EE-VPR</data>
+		<data RENAME="R-PCP-rm"     STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
+		<data RENAME="R-PCP-rm-opa" STYLE="{xED7D31}2=^">RTA-PFP-RO-OPA</data>
+		<data RENAME="R-PCP-sm"     STYLE="{x0080FF}2j#^">RTA-PFP-RO-SM</data>
+		<data RENAME="R-PCP-sm-opa" STYLE="{xED7D31}2:#v">RTA-PFP-RO-SM-OPA</data>
+		<data RENAME="R-NP-rm" 	    STYLE="{x44546A}2:s">RTA-PFP-RO-NP</data>
+		<data RENAME="NC"           STYLE="{x954F72}2=#d">RTA-PFP-RO-FEASIBLE</data>
 	</schedulability_test>
-	<experiment_times>200</experiment_times>
+	<experiment_times>1000</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
-<!-->
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="SVG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="TGA" BLACK_ONLY="true" >LineChart</data>
 		<data>JSON</data>
-<!-->
 	</output>
 	<lambda>
 		<data>10</data>
@@ -107,13 +145,11 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>1</data>
-		<data>2</data>
 		<data>4</data>
 		<data>8</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
-		<data>100</data>
+		<data>1</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.1</data>
@@ -121,8 +157,6 @@
 	</rrp>
 	<rrn>//resource_request_number
 		<data>1</data>
-		<data>3</data>
-		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>

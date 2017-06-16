@@ -175,7 +175,8 @@ cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") s
 
 	output.export_csv();
 
-	output.Export(PNG|EPS|SVG|TGA|JSON);
+	output.Export(PNG);
+	//output.Export(PNG|EPS|SVG|TGA|JSON);
 	
 	
 
