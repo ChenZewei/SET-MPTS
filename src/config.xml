@@ -116,7 +116,8 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.2</data>
+		<data>0.1</data>
+		<data>0.25</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>1</data>
