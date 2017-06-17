@@ -272,9 +272,16 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 
 		glpk_params.presolve = GLP_ON;
 
-		glpk_params.br_tech = GLP_BR_MFV;
+		//glpk_params.br_tech = GLP_BR_FFV;//First Fractional Variable
+		//glpk_params.br_tech = GLP_BR_LFV;//Last Fractional Variable
+		//glpk_params.br_tech = GLP_BR_MFV;//Most Fractional Variable
+		glpk_params.br_tech = GLP_BR_DTH;//D&T Heuristic
+		//glpk_params.br_tech = GLP_BR_PCH;//Pseudo-Cost Heuristic
 
-		glpk_params.bt_tech = GLP_BT_BLB;
+		//glpk_params.bt_tech = GLP_BT_DFS;//Depth First Search
+		//glpk_params.bt_tech = GLP_BT_BFS;//Breadth First Search
+		glpk_params.bt_tech = GLP_BT_BLB;//Best Local Branch
+		//glpk_params.bt_tech = GLP_BT_BPH;//Best Projection Heuristic
 
 		
 /*
@@ -295,6 +302,12 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 
 		//Gomory's mixed integer cut
 		glpk_params.gmi_cuts = GLP_ON;
+
+		glpk_params.mir_cuts = GLP_ON;
+
+		glpk_params.cov_cuts = GLP_ON;
+
+		glpk_params.clq_cuts = GLP_ON;
 
 		glpk_params.mip_gap = 1;
 

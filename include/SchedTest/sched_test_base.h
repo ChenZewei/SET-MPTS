@@ -48,11 +48,14 @@ class SchedTestBase
 		uint LockingProtocol;
 		string name;
 		string remark;
+		int status;
 	public:
 		SchedTestBase(bool LinearProgramming, uint TestMethod, uint SchedMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 		virtual ~SchedTestBase();
 		string get_test_name();
 		virtual bool is_schedulable() = 0;
+		void set_status(int status);
+		int get_status();
 };
 
 
