@@ -1,5 +1,5 @@
 #PROC_NUM=`cat /proc/cpuinfo | grep "processor" | wc -l`
-PROC_NUM=15
+PROC_NUM=24
 ROOT=`pwd`
 FOLDER="EXP"
 PARAM_NUM=288
@@ -26,7 +26,7 @@ do
 		echo "$index2" >> "$FOLDER/sp$index/param"
 	done
 	cd $FOLDER/sp$index
-	echo "--------------Processor $index--------------"
-	nohup ./start.sh &
+#	echo "--------------Processor $index--------------"
+#	nohup ./start.sh &
 done
 
