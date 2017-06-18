@@ -26,7 +26,7 @@ do
 		echo "$index2" >> "$FOLDER/sp$index/param"
 	done
 	cd $FOLDER/sp$index
-	echo "--------------Processor $index--------------"
-	nohup ./start.sh &
+#	echo "--------------Processor $index--------------"
+#	nohup ./start.sh &
 done
 
