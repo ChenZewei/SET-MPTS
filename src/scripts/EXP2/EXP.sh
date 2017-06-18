@@ -1,5 +1,5 @@
 #PROC_NUM=`cat /proc/cpuinfo | grep "processor" | wc -l`
-PROC_NUM=15
+PROC_NUM=24
 ROOT=`pwd`
 FOLDER="EXP"
 PARAM_NUM=288
