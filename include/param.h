@@ -11,6 +11,7 @@
 class Param
 {
 	public:
+		uint id;
 		//basic parameters
 		int lambda;
 		int p_num;

@@ -193,7 +193,7 @@ bool ILP_RTA_PFP_DPCP::is_schedulable()
 	{	
 
 #if ILP_SOLUTION_VAR_CHECK == 1
-
+/*
 		for(uint r = 0; r < resources.get_resourceset_size(); r++)
 		{
 			Resource& resoruce = resources.get_resources()[r];
@@ -238,7 +238,7 @@ cout<<"|===========SAME_RESOURCE_LOCALITY===========|"<<endl;
 cout<<"U_"<<i<<"_"<<j<<":"<<result<<endl;
 			}
 		}
-
+*/
 		for(uint i = 0; i < tasks.get_tasks().size(); i++)
 		{
 			Task& task = tasks.get_task_by_index(i);
@@ -276,12 +276,13 @@ cout<<"IR_"<<i<<":"<<result<<endl;
 				result = rb_solution->evaluate(*exp);
 cout<<"IR_"<<i<<"_"<<u<<":"<<result<<endl;
 			}
-*/
+
 			construct_exp(vars, exp, ILPDPCPMapper::INTERFERENCE_TIME_T, i);
 			result = rb_solution->evaluate(*exp);
 cout<<"IT_"<<i<<":"<<result<<endl;
+*/
 
-
+/*
 cout<<"|===========Locailty Assignment===========|"<<endl;
 			for(uint k = 1; k <= processors.get_processor_num(); k++)
 			{
@@ -289,7 +290,6 @@ cout<<"|===========Locailty Assignment===========|"<<endl;
 				result = rb_solution->evaluate(*exp);
 cout<<"A_"<<i<<"_"<<k<<":"<<result<<endl;
 			}
-/*
 */
 cout<<"C_"<<i<<":"<<tasks.get_tasks()[i].get_wcet()<<endl;
 cout<<"D_"<<i<<":"<<tasks.get_tasks()[i].get_deadline()<<endl;
@@ -1429,6 +1429,11 @@ void ILP_RTA_PFP_DPCP::constraint_23(LinearProgram& lp, ILPDPCPMapper& vars)
 
 		lp.add_inequality(exp, 1);
 	}
+}
+
+void constraint_24(LinearProgram& lp, ILPDPCPMapper& vars)
+{
+	
 }
 
 bool ILP_RTA_PFP_DPCP::alloc_schedulable() {}

@@ -1,5 +1,5 @@
 #PROC_NUM=`cat /proc/cpuinfo | grep "processor" | wc -l`
-PROC_NUM=24
+PROC_NUM=4
 ROOT=`pwd`
 FOLDER="EXP"
 PARAM_NUM=288
@@ -16,7 +16,7 @@ for ((index=0; index < $PROC_NUM; index++))
 do
 	cd $ROOT
 	mkdir "$FOLDER/sp$index"
-	cp SubTest "$FOLDER/sp$index"
+#	cp SubTest "$FOLDER/sp$index"
 	cp config.xml "$FOLDER/sp$index"
 	cp start.sh "$FOLDER/sp$index"
 	START=`expr $index \* $GAP`
