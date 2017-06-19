@@ -64,7 +64,7 @@
 		<data RENAME="R-PCP-sm-opa" STYLE="{xED7D31}2:#v">RTA-PFP-RO-SM-OPA</data>
 		<data RENAME="R-NP" 	    STYLE="{x44546A}2:s">RTA-PFP-RO-NP</data>
 	</schedulability_test>
-	<experiment_times>200</experiment_times>
+	<experiment_times>100</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->
