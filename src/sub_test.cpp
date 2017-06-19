@@ -63,6 +63,13 @@ int main(int argc,char** argv)
 
 cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
+	vector<int> last_success;
+
+	for(uint i = 0; i < param->get_method_num(); i++)
+	{
+		last_success.push_back(1);
+	}
+
 	do
 	{	
 		Result result;
@@ -95,27 +102,28 @@ cout<<flush;
 				resourceset.init();
 				exp[j]++;
 
-
-				SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
-				if(NULL == schedTest)
+				if(0 != last_success[j])
 				{
-					cout<<"Incorrect test name."<<endl;
-					return -1;
-				}
-//cout<<test_attributes[j].test_name<<":";
-				if(schedTest->is_schedulable())
-				{
-					success[j]++;
-					s_n++;
-					s_i = j;
+					SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
+					if(NULL == schedTest)
+					{
+						cout<<"Incorrect test name."<<endl;
+						return -1;
+					}
+	//cout<<test_attributes[j].test_name<<":";
+					if(schedTest->is_schedulable())
+					{
+						success[j]++;
+						s_n++;
+						s_i = j;
 #if SORT_DEBUG
-					cout<<param->test_attributes[j].test_name<<" success!"<<endl;
+						cout<<param->test_attributes[j].test_name<<" success!"<<endl;
 #endif
-				}
+					}
 	
-				delete(schedTest);
-				}	
-
+					delete(schedTest);
+				}
+			}
 
 			if(1 == s_n)
 			{
@@ -160,6 +168,11 @@ cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") s
 		output.export_result_append(utilization);
 		output.Export(PNG);
 		utilization += param->step;
+
+		for(uint i = 0; i < param->get_method_num(); i++)
+		{
+			last_success[i] = success[i];
+		}
 	}
 	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
 
