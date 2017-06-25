@@ -75,7 +75,7 @@
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>0</min>
+			<min>3</min>
 			<max>4</max>
 		</data>
 	</init_utilization_range>
@@ -83,10 +83,6 @@
 		<data>4</data>	
 	</processor_num>
 	<period_range>
-		<data>
-			<min>10000</min>
-			<max>100000</max>
-		</data>
 		<data>
 			<min>10000</min>
 			<max>1000000</max>
@@ -105,10 +101,10 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.1</data>
+		<data>0.2</data>
 	</rrp>
 	<rrn>//resource_request_number
-		<data>1</data>
+		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>

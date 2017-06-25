@@ -30,7 +30,7 @@ class ILPDPCPMapper: public VarMapperBase
 			SAME_TR_ON_PROCESSOR,//W_i_u_k task i and resource u assigned on processor k
 //			APPLICATION_CORE,//AP_k
 //			TASK_ONLY,//TO_i
-//			TASK_ONLY_PROCESSOR,//TO_i_K
+	//		TASK_ONLY_PROCESSOR,//TO_i_K
 			PREEMPT_NUM,//P_i_x
 			TBT_PREEMPT_NUM,//H_i_x
 			RBT_PREEMPT_NUM,//H_i_x_v resource v is requested by task x
@@ -40,7 +40,9 @@ class ILPDPCPMapper: public VarMapperBase
 			REQUEST_BLOCKING_TIME,//b_i_r
 			INTERFERENCE_TIME_R,//IR_i
 			INTERFERENCE_TIME_R_RESOURCE,//IR_i_u
-			INTERFERENCE_TIME_T,//IC_i
+			INTERFERENCE_TIME_C,//IC_i
+			INTERFERENCE_TIME_C_TASK,//IC_i_x
+			INTERFERENCE_TIME_C_RESOURCE,//IC_i_y_u
 		};
 	private:
 		static uint64_t encode_request(uint64_t type, uint64_t part_1 = 0, uint64_t part_2 = 0, uint64_t part_3 = 0, uint64_t part_4 = 0);
@@ -110,8 +112,6 @@ class ILP_RTA_PFP_DPCP: public PartitionedSched
 		void constraint_13(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C14
 		void constraint_14(LinearProgram& lp, ILPDPCPMapper& vars);
-		//C14-1
-		void constraint_14_1(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C15
 		void constraint_15(LinearProgram& lp, ILPDPCPMapper& vars);
 		//C16

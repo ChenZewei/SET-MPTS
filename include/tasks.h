@@ -85,6 +85,15 @@ class Task
 			ulong deadline = 0,
 			uint priority = MAX_INT);
 
+		Task(	uint id,
+			uint r_id,
+			ResourceSet& resourceset,
+			ulong ncs_wcet, 
+			ulong cs_wcet, 
+			ulong period,
+			ulong deadline = 0,
+			uint priority = MAX_INT);
+
 		~Task();
 		
 		void init();
