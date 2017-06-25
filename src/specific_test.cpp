@@ -29,6 +29,7 @@ using namespace std;
 void getFiles(string path, string dir);
 void read_line(string path, vector<string>& files);
 vector<Param> get_parameters();
+void extract_element(vector<floating_t>& elements, string bufline, uint start = 0, uint num = MAX_INT, const char seperator = ',');
 
 int main(int argc,char** argv)
 {	
@@ -40,12 +41,12 @@ int main(int argc,char** argv)
 		Result_Set results[MAX_METHOD];
 		SchedTestFactory STFactory;		
 		Output output(*param);
+		string buf;
 	
 		XML::SaveConfig((output.get_path() + "config.xml").data());
 		output.export_param();
 
 		Random_Gen::uniform_integral_gen(0,10);
-		double utilization = param->u_range.min;
 
 		time_t start, end;
 
@@ -53,32 +54,48 @@ int main(int argc,char** argv)
 
 	cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
-		do
-		{	
-			Result result;
-	cout<<"Utilization:"<<utilization<<endl;
-			vector<int> success;
-			vector<int> exp;
-			vector<int> exc;
-			for(uint i = 0; i < param->test_attributes.size(); i++)
+
+
+		double utilization;
+
+
+
+		TaskSet taskset;
+		ProcessorSet processorset;
+		ResourceSet resourceset;
+
+		vector<int> success;
+		vector<int> exp;
+		vector<int> exc;
+		Result result;
+
+		ifstream input_file("input/input.csv", ifstream::in);
+
+		while(getline(input_file, buf))
+		{
+			vector<floating_t> elements;
+			if(NULL != strstr(buf.data(), "utilization"))
 			{
-				exp.push_back(0);
-				success.push_back(0);
-				exc.push_back(0);
-			}
-			for(int i = 0; i < param->exp_times; i++)
-			{
-	cout<<".";
-	cout<<flush;
-				uint s_n = 0;
-				uint s_i = 0;
-				TaskSet taskset = TaskSet();
-				ProcessorSet processorset = ProcessorSet(*param);
-				ResourceSet resourceset = ResourceSet();
+				vector<floating_t> utilizations;
+				extract_element(utilizations, buf, 1, 1, ": ");
+				utilization = utilizations[0].get_d();
+				cout<<"Utilization:"<<utilizations[0]<<endl;
+				result.utilization = utilization;
+
+				taskset = TaskSet();
+				processorset = ProcessorSet(*param);
+				resourceset = ResourceSet();
 				resource_gen(&resourceset, *param);
-				//resourceset.update(&taskset);
-				tast_gen(taskset, resourceset, *param, utilization);
-	//			taskset.SM_PLUS_4_Order(parameters.p_num);
+
+				for(uint i = 0; i < param->test_attributes.size(); i++)
+				{
+					exp.push_back(0);
+					success.push_back(0);
+					exc.push_back(0);
+				}
+			}
+			else if(0 == strcmp(buf.data(), "\r"))
+			{
 				for(uint j = 0; j < param->get_method_num(); j++)
 				{
 					taskset.init();
@@ -92,69 +109,59 @@ int main(int argc,char** argv)
 						cout<<"Incorrect test name."<<endl;
 						return -1;
 					}
-	//cout<<test_attributes[j].test_name<<":";
+				//cout<<test_attributes[j].test_name<<":";
 					if(schedTest->is_schedulable())
 					{
 						success[j]++;
-						s_n++;
-						s_i = j;
-	#if SORT_DEBUG
-						cout<<param->test_attributes[j].test_name<<" success!"<<endl;
-	#endif
 					}
-		
+
 					delete(schedTest);
-					}	
+				}
 
-
-				if(1 == s_n)
+				for(uint i = 0; i < param->test_attributes.size(); i++)
 				{
-					exc[s_i]++;
-	#if SORT_DEBUG
-					cout<<"Exclusive Success TaskSet:"<<endl;
-					cout<<"/////////////////"<<param->test_attributes[s_i].test_name<<"////////////////"<<endl;
-					foreach(taskset.get_tasks(), task)
+					fraction_t ratio(success[i], exp[i]);
+					if(!param->test_attributes[i].rename.empty())
 					{
-						cout<<"Task "<<task->get_id()<<":"<<endl;
-						cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
-						cout<<"-----------------------"<<endl;
+						output.add_result(param->test_attributes[i].rename, param->test_attributes[i].style, utilization, exp[i], success[i]);
 					}
-	#endif
-					//sleep(1);
-				}
+					else
+					{
+						output.add_result(param->test_attributes[i].test_name, param->test_attributes[i].style, utilization, exp[i], success[i]);
+					}
+					stringstream buf;
 
-				result.utilization = utilization;
+					if(0 == strcmp(param->test_attributes[i].rename.data(),""))
+						buf<<param->test_attributes[i].test_name;
+					else
+						buf<<param->test_attributes[i].rename;
+
+					buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
+
+					output.append2file("result-logs.csv", buf.str());
+
+				cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
+				}
+				output.export_result_append(utilization);
+				output.Export(PNG);
+
+				taskset = TaskSet();
+				processorset = ProcessorSet(*param);
+				resourceset = ResourceSet();
+				resource_gen(&resourceset, *param);
 			}
-	cout<<endl;
-			for(uint i = 0; i < param->test_attributes.size(); i++)
+			else
 			{
-				fraction_t ratio(success[i], exp[i]);
-				if(!param->test_attributes[i].rename.empty())
-				{
-					output.add_result(param->test_attributes[i].rename, param->test_attributes[i].style, utilization, exp[i], success[i]);
-				}
-				else
-				{
-					output.add_result(param->test_attributes[i].test_name, param->test_attributes[i].style, utilization, exp[i], success[i]);
-				}
-				stringstream buf;
+				extract_element(elements, buf);
+				
+				ulong ncs_wcet = (elements[1].get_d() + elements[2].get_d())*(param->p_range.min);
+				ulong cs_wcet = elements[4].get_d()*(param->p_range.min);
+				ulong period = elements[0].get_d()*(param->p_range.min);
+				uint r_id = elements[3].get_d();
 
-				if(0 == strcmp(param->test_attributes[i].rename.data(),""))
-					buf<<param->test_attributes[i].test_name;
-				else
-					buf<<param->test_attributes[i].rename;
-
-				buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
-
-				output.append2file("result-logs.csv", buf.str());
-
-	cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<" exc_s:"<<exc[i]<<endl;
+				taskset.add_task(r_id, resourceset, *param, ncs_wcet, cs_wcet, period);
 			}
-			output.export_result_append(utilization);
-			output.Export(PNG);
-			utilization += param->step;
 		}
-		while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
 
 		time(&end);
 		cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
@@ -322,5 +329,34 @@ vector<Param> get_parameters()
 	}
 cout<<"param num:"<<parameters.size()<<endl;
 	return parameters;
+}
+
+void extract_element(vector<floating_t>& elements, string bufline, uint start, uint num, const char seperator)
+{
+	char *charbuf;
+	string cut = " \t\r\n";
+	cut += seperator;
+
+	uint count = 0;
+
+	try
+	{
+		if(NULL != (charbuf = strtok(bufline.data(), cut.data())))
+			do
+			{
+				if(count >= start && count < start + num)
+				{
+					//cout<<"element:"<<charbuf<<endl;
+					floating_t element(charbuf, 100);
+					elements.push_back(element);
+				}
+				count++;
+			}
+			while(NULL != (charbuf = strtok(NULL, cut.data())));
+	}
+	catch(exception &e)
+	{
+		cout<<"extract exception."<<endl;
+	}
 }
 

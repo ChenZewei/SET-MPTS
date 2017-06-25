@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
+#include <istream>
 #include <fstream>
 #include <sstream>
+#include <streambuf>
 #include <string>
 #include <iomanip>
 #include <unistd.h>

@@ -127,7 +127,7 @@ Task::Task(	uint id,
 			ulong cs_wcet, 
 			ulong period,
 			ulong deadline,
-			uint priority);
+			uint priority)
 {
 	this->id = id;
 	this->index = id;
@@ -162,7 +162,7 @@ Task::Task(	uint id,
 	other_attr = 0;
 
 
-	add_request(r_id, 1, cs_wcet, param.tlf*cs_wcet, resourceset.get_resources()[r_id].get_locality());
+	add_request(r_id, 1, cs_wcet, cs_wcet, resourceset.get_resources()[r_id].get_locality());
 	resourceset.add_task(r_id, id);
 }
 
@@ -385,6 +385,31 @@ void TaskSet::add_task(ResourceSet& resourceset, Param param, long wcet, long pe
 			wcet, 
 			period,
 			deadline));
+	utilization_sum += utilization_new;
+	density_sum += density_new;
+	if(utilization_max < utilization_new)
+		utilization_max = utilization_new;
+	if(density_max < density_new)
+		density_max = density_new;
+}
+
+void TaskSet::add_task(uint r_id, ResourceSet& resourceset, Param param, long ncs_wcet, long cs_wcet, long period, long deadline)
+{
+	
+	fraction_t utilization_new = ncs_wcet + cs_wcet, density_new = ncs_wcet + cs_wcet;
+	utilization_new /= period;
+	if(0 == deadline)
+		density_new /= period;
+	else
+		density_new /= min(deadline, period);
+	tasks.push_back(Task(tasks.size(),
+			r_id,
+			resourceset,
+			ncs_wcet, 
+			cs_wcet, 
+			period,
+			deadline));
+
 	utilization_sum += utilization_new;
 	density_sum += density_new;
 	if(utilization_max < utilization_new)

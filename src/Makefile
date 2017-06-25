@@ -26,6 +26,9 @@ SchedulingAnalysis:scheduling_test.o $(OBJ_FILES)
 SubTest:sub_test.o $(OBJ_FILES)   
 	$(CXX) $(CXXFLAGS) $(INCPATH) -o SubTest sub_test.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
 
+SpecificTest:specific_test.o $(OBJ_FILES)   
+	$(CXX) $(CXXFLAGS) $(INCPATH) -o SpecificTest specific_test.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
+
 server:server.o $(OBJ_FILES)   
 	$(CXX) $(CXXFLAGS) $(INCPATH) -o server server.o $(OBJ_FILES) $(LFLAGS) $(LIBS) -std=gnu++11
 
@@ -40,6 +43,9 @@ scheduling_test.o:scheduling_test.cpp
 	
 sub_test.o:sub_test.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c sub_test.cpp $(LIBS)
+	
+specific_test.o:specific_test.cpp
+	$(CXX) $(CXXFLAGS) $(INCPATH) -c specific_test.cpp $(LIBS)
 	
 server.o:server.cpp
 	$(CXX) $(CXXFLAGS) $(INCPATH) -c server.cpp $(LIBS)

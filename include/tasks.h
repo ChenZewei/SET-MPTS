@@ -181,6 +181,7 @@ class TaskSet
 		
 		void add_task(long wcet, long period, long deadline = 0);
 		void add_task(ResourceSet& resourceset, Param param, long wcet, long period, long deadline = 0);
+		void add_task(uint r_id, ResourceSet& resourceset, Param param, long ncs_wcet, long cs_wcet, long period, long deadline = 0);
 
 		Tasks& get_tasks();
 		Task& get_task_by_id(uint id);
