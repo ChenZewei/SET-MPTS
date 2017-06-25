@@ -69,7 +69,7 @@ int main(int argc,char** argv)
 		vector<int> exc;
 		Result result;
 
-		ifstream input_file("input/input.csv", ifstream::in);
+		ifstream input_file("input.csv", ifstream::in);
 
 		while(getline(input_file, buf))
 		{
@@ -86,6 +86,10 @@ int main(int argc,char** argv)
 				processorset = ProcessorSet(*param);
 				resourceset = ResourceSet();
 				resource_gen(&resourceset, *param);
+
+				exp.clear();
+				success.clear();
+				exc.clear();
 
 				for(uint i = 0; i < param->test_attributes.size(); i++)
 				{
