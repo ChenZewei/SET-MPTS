@@ -126,8 +126,8 @@ Task::Task(	uint id,
 			ulong ncs_wcet, 
 			ulong cs_wcet, 
 			ulong period,
-			ulong deadline = 0,
-			uint priority = MAX_INT);
+			ulong deadline,
+			uint priority);
 {
 	this->id = id;
 	this->index = id;
@@ -161,30 +161,9 @@ Task::Task(	uint id,
 	carry_in = false;
 	other_attr = 0;
 
-	uint critical_section_num = 0;
 
-	for(int i = 0; i < resourceset.size(); i++)
-	{
-		if((param.mcsn > critical_section_num) && (param.rrr.min < wcet))
-		{
-			if(Random_Gen::probability(param.rrp))
-			{
-				uint num = Random_Gen::uniform_integral_gen(1, min(param.rrn, int(param.mcsn - critical_section_num)));
-				uint max_len = Random_Gen::uniform_integral_gen(param.rrr.min, min(double(wcet), param.rrr.max));
-				ulong length = num * max_len;
-				if(length >= wcet_non_critical_sections)
-					continue;
-
-				wcet_non_critical_sections -= length;
-				wcet_critical_sections += length;
-
-				add_request(i, num, max_len, param.tlf*max_len, resourceset.get_resources()[i].get_locality());
-				
-				resourceset.add_task(i, id);
-				critical_section_num += num;
-			}
-		}
-	}
+	add_request(r_id, 1, cs_wcet, param.tlf*cs_wcet, resourceset.get_resources()[r_id].get_locality());
+	resourceset.add_task(r_id, id);
 }
 
 Task::~Task()
