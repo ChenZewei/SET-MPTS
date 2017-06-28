@@ -328,8 +328,6 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 			else
 				solved = false;
 		}
-
-		show_error();
 	}
 	else
 	{
