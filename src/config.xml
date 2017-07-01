@@ -55,7 +55,8 @@
 
 <!-->
 		<data RENAME="PFP-WF" REMARK="">RTA-PFP-WF</data>
-		<data RENAME="ILP-PFP-DPCP" REMARK="">ILP-RTA-PFP-DPCP</data>
+		<data RENAME="ILP-1" REMARK="">ILP-RTA-PFP-DPCP</data>
+		<data RENAME="ILP-3" REMARK="">ILP-RTA-PFP-DPCP-3</data>
 	</schedulability_test>
 	<experiment_times>10</experiment_times>
 	<output>
@@ -75,7 +76,7 @@
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>0</min>
+			<min>3.6</min>
 			<max>4</max>
 		</data>
 	</init_utilization_range>
@@ -84,12 +85,8 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>10000</min>
-			<max>100000</max>
-		</data>
-		<data>
-			<min>10000</min>
-			<max>1000000</max>
+			<min>1000</min>
+			<max>1000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>
@@ -105,10 +102,10 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.1</data>
+		<data>0.2</data>
 	</rrp>
 	<rrn>//resource_request_number
-		<data>1</data>
+		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>

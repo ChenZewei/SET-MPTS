@@ -16,6 +16,7 @@
 #include "ilp_rta_pfp_spinlock.h"
 #include "ilp_rta_pfp_dpcp.h"
 #include "ilp_rta_pfp_dpcp_2.h"
+#include "ilp_rta_pfp_dpcp_3.h"
 #include "rta_pfp_gs.h"
 #include "nc_lp_ee_vpr.h"
 #include "rta_gdc_native.h"
@@ -128,6 +129,10 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	else if(0 == strcmp(test_name.data(), "ILP-RTA-PFP-DPCP-2"))
 	{
 		return new ILP_RTA_PFP_DPCP_2(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "ILP-RTA-PFP-DPCP-3"))
+	{
+		return new ILP_RTA_PFP_DPCP_3(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-GS"))
 	{
