@@ -36,8 +36,10 @@ int main(int argc,char** argv)
 
 	vector<Param> parameters = get_parameters();
 	cout<<parameters.size()<<endl;
-	foreach(parameters, param)
+	//foreach(parameters, param)
 	{
+
+		Param* param = &parameters[0];
 		Result_Set results[MAX_METHOD];
 		SchedTestFactory STFactory;		
 		Output output(*param);
@@ -73,13 +75,15 @@ int main(int argc,char** argv)
 
 		while(getline(input_file, buf))
 		{
+//cout<<buf<<endl;
 			vector<floating_t> elements;
 			if(NULL != strstr(buf.data(), "utilization"))
 			{
 				vector<floating_t> utilizations;
 				extract_element(utilizations, buf, 1, 1, ": ");
-				utilization = utilizations[0].get_d();
+//cout<<utilizations[0]<<endl;
 				cout<<"Utilization:"<<utilizations[0]<<endl;
+				utilization = utilizations[0].get_d();
 				result.utilization = utilization;
 
 				taskset = TaskSet();
@@ -98,7 +102,7 @@ int main(int argc,char** argv)
 					exc.push_back(0);
 				}
 			}
-			else if(0 == strcmp(buf.data(), "\r"))
+			else if((0 == strcmp(buf.data(), "\r"))||(0 == strcmp(buf.data(), "")))
 			{
 				for(uint j = 0; j < param->get_method_num(); j++)
 				{
@@ -133,21 +137,29 @@ int main(int argc,char** argv)
 					{
 						output.add_result(param->test_attributes[i].test_name, param->test_attributes[i].style, utilization, exp[i], success[i]);
 					}
-					stringstream buf;
 
-					if(0 == strcmp(param->test_attributes[i].rename.data(),""))
-						buf<<param->test_attributes[i].test_name;
-					else
-						buf<<param->test_attributes[i].rename;
+					if(param->exp_times == exp[i] || abs(utilization-param->u_range.min)<=_EPS)
+					{
+						stringstream buf;
 
-					buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
+						if(0 == strcmp(param->test_attributes[i].rename.data(),""))
+							buf<<param->test_attributes[i].test_name;
+						else
+							buf<<param->test_attributes[i].rename;
 
-					output.append2file("result-logs.csv", buf.str());
+						buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
 
-				cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
+						output.append2file("result-logs.csv", buf.str());
+
+					}
+					cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<endl;
 				}
-				output.export_result_append(utilization);
-				output.Export(PNG);
+
+				if(param->exp_times == exp[0] || abs(utilization-param->u_range.min)<=_EPS)
+				{
+					output.export_result_append(utilization);
+					output.Export(PNG);
+				}
 
 				taskset = TaskSet();
 				processorset = ProcessorSet(*param);
@@ -350,8 +362,8 @@ void extract_element(vector<floating_t>& elements, string bufline, uint start, u
 			{
 				if(count >= start && count < start + num)
 				{
-					//cout<<"element:"<<charbuf<<endl;
-					floating_t element(charbuf, 100);
+//					cout<<"element:"<<charbuf<<endl;
+					floating_t element(charbuf);
 					elements.push_back(element);
 				}
 				count++;

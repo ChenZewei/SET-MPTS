@@ -59,7 +59,7 @@
 		<data RENAME="LP-MPCP" REMARK="">LP-RTA-PFP-MPCP</data>
 		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
 	</schedulability_test>
-	<experiment_times>10</experiment_times>
+	<experiment_times>100</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->
@@ -73,11 +73,11 @@
 		<data>10</data>
 	</lambda>
 	<step>
-		<data>50</data>
+		<data>5</data>
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>50</min>
+			<min>0</min>
 			<max>100</max>
 		</data>
 	</init_utilization_range>
