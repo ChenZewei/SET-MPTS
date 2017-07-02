@@ -78,6 +78,7 @@ int main(int argc,char** argv)
 				resource_gen(&resourceset, *param);
 				//resourceset.update(&taskset);
 				tast_gen(taskset, resourceset, *param, utilization);
+				taskset.export_taskset("taskset.xml");
 	//			taskset.SM_PLUS_4_Order(parameters.p_num);
 				for(uint j = 0; j < param->get_method_num(); j++)
 				{

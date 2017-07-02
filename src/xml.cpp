@@ -394,6 +394,18 @@ void XML::add_element(const char* parent, const char* name, const char* text)
 	element->SetText(text);
 	title->InsertEndChild(element);
 }
+	
+void XML::add_element(const char* parent, int index, const char* name, const char* text)
+{
+	XMLElement *root = output->RootElement();
+	XMLElement *title = output->FirstChildElement(parent);
+	for(int i = 0; i < index; i++)
+		title = title->NextSiblingElement();
+	XMLElement *element = output->NewElement(name);
+	element->SetText(text);
+	title->InsertEndChild(element);
+
+}
 
 void XML::add_range(const char* parent, Range range)
 {

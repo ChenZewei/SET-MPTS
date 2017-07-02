@@ -58,7 +58,7 @@
 		<data RENAME="ILP-1" REMARK="">ILP-RTA-PFP-DPCP</data>
 		<data RENAME="ILP-3" REMARK="">ILP-RTA-PFP-DPCP-3</data>
 	</schedulability_test>
-	<experiment_times>10</experiment_times>
+	<experiment_times>1</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->
@@ -77,7 +77,7 @@
 	<init_utilization_range>
 		<data>
 			<min>3.6</min>
-			<max>4</max>
+			<max>3.6</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>

@@ -4,6 +4,7 @@
 #include "sort.h"
 #include "random_gen.h"
 #include "param.h"
+#include "xml.h"
 #include "iteration-helper.h"
 #include "math-helper.h"
 
@@ -1099,21 +1100,35 @@ void TaskSet::display()
 	}
 }
 
-void TaskSet::export_taskset(string path)
+void TaskSet::export_taskset(const char* path)
 {
-	ofstream file(path);
-	
-	streambuf buf;
-
-	buf<<"utilization: "<<get_utilization().get_d()<<"\r";
-
 	XML output;
 
 	output.initialization();
 
 	output.add_element("taskset");
 
-	output.add_element("taskset", "utilization", get_utilization.get_str());
+	output.add_element("taskset", "utilization", to_string(get_utilization_sum().get_d()).data());
+
+	
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		output.add_element("taskset", "task");
+	output.save_file(path);
+		output.add_element("task", "wcet");
+	output.save_file(path);
+		//output.add_element("task", i, "wcet", to_string(tasks[i].get_wcet()).data());
+
+/*
+		output.add_element("task", "wcet");
+		output.add_element("task", "ncs-wcet", to_string(task->get_wcet_non_critical_sections()).data());
+		output.add_element("task", "cs-wcet", to_string(task->get_wcet_critical_sections()).data());
+		output.add_element("task", "deadline", to_string(task->get_deadline()).data());
+		output.add_element("task", "period", to_string(task->get_period()).data());
+*/
+	}
+
+	output.save_file(path);
 }
 
 ////////////////////////////DAG Tasks//////////////////////////////
