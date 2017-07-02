@@ -1442,7 +1442,6 @@ void ILP_RTA_PFP_DPCP_3::constraint_23(LinearProgram& lp, ILPDPCPMapper_3& vars)
 
 		lp.add_inequality(exp, 1);
 	}
-
 }
 
 void constraint_24(LinearProgram& lp, ILPDPCPMapper_3& vars)

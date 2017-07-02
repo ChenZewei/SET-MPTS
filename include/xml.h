@@ -18,6 +18,8 @@ class XML
 		XMLDocument *output;
 	public:
 		XML();
+
+		~XML();
 		
 		static void LoadFile(const char* path);		
 

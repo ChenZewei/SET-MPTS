@@ -5,6 +5,11 @@ XML::XML()
 	output = new XMLDocument();
 }
 
+XML::~XML()
+{
+	delete(output);
+}
+
 XMLDocument XML::config;
 
 void XML::LoadFile(const char* path)

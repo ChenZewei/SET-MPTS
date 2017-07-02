@@ -1099,6 +1099,23 @@ void TaskSet::display()
 	}
 }
 
+void TaskSet::export_taskset(string path)
+{
+	ofstream file(path);
+	
+	streambuf buf;
+
+	buf<<"utilization: "<<get_utilization().get_d()<<"\r";
+
+	XML output;
+
+	output.initialization();
+
+	output.add_element("taskset");
+
+	output.add_element("taskset", "utilization", get_utilization.get_str());
+}
+
 ////////////////////////////DAG Tasks//////////////////////////////
 
 DAG_Task::DAG_Task(const DAG_Task &dt):Task(dt.get_id(), 0, dt.get_period(), dt.get_deadline(), dt.get_priority())

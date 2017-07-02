@@ -226,6 +226,8 @@ class TaskSet
 
 		void display();
 
+		void export_taskset(string path);
+
 };
 
 typedef struct ArcNode
