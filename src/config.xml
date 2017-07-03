@@ -53,12 +53,14 @@
 		<data RENAME="" REMARK="">RTA-GSMP4-NG</data>
 
 
-<!-->
 		<data RENAME="PFP-WF" REMARK="">RTA-PFP-WF</data>
 		<data RENAME="ILP-1" REMARK="">ILP-RTA-PFP-DPCP</data>
 		<data RENAME="ILP-3" REMARK="">ILP-RTA-PFP-DPCP-3</data>
+<!-->
+		<data RENAME="PFP-WF" REMARK="">RTA-PFP-WF</data>
+		<data RENAME="ILP-3" REMARK="">ILP-RTA-PFP-DPCP-3</data>
 	</schedulability_test>
-	<experiment_times>1</experiment_times>
+	<experiment_times>100</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->
@@ -76,8 +78,8 @@
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>3.6</min>
-			<max>3.6</max>
+			<min>0</min>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
@@ -102,7 +104,7 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.2</data>
+		<data>0.8</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>

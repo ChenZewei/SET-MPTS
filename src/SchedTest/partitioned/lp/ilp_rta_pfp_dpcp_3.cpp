@@ -182,6 +182,8 @@ bool ILP_RTA_PFP_DPCP_3::is_schedulable()
 {
 	if(0 == tasks.get_tasks().size())
 		return true;
+	else if(abs(tasks.get_utilization_sum()-4)<=_EPS)
+		return false;
 
 	ILPDPCPMapper_3 vars;
 	LinearProgram response_bound;
@@ -217,12 +219,17 @@ cout<<"|===========SAME_LOCALITY===========|"<<endl;
 	{
 		LinearExpression *exp = new LinearExpression();
 		double result;
+		fraction_t sum = 0;
 		for(uint j = 0; j < t_num + r_num; j++)
 		{
 			construct_exp(vars, exp, ILPDPCPMapper_3::SAME_LOCALITY, i, j);
 			result = rb_solution->evaluate(*exp);
 cout<<result<<"  ";
+			Task& task = tasks.get_task_by_index(j);
+			fraction_t u = task.get_utilization();
+			sum += u * result;
 		}
+cout<<"\t"<<sum.get_d();
 cout<<endl;
 	}
 
@@ -1435,7 +1442,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_23(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		{
 			Task& task = tasks.get_task_by_index(j);
 			fraction_t utilization = task.get_utilization();
-			
+
 			var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, j);
 			exp->add_term(var_id, utilization.get_d());
 		}
@@ -1444,7 +1451,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_23(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	}
 }
 
-void constraint_24(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_DPCP_3::constraint_24(LinearProgram& lp, ILPDPCPMapper_3& vars)
 {
 	
 }

@@ -1114,18 +1114,38 @@ void TaskSet::export_taskset(const char* path)
 	for(uint i = 0; i < tasks.size(); i++)
 	{
 		output.add_element("taskset", "task");
-	output.save_file(path);
-		output.add_element("task", "wcet");
-	output.save_file(path);
-		//output.add_element("task", i, "wcet", to_string(tasks[i].get_wcet()).data());
+		XMLElement* ts = output.get_element("taskset");
+		XMLElement* t = output.get_element(ts, "task", i);
 
-/*
-		output.add_element("task", "wcet");
-		output.add_element("task", "ncs-wcet", to_string(task->get_wcet_non_critical_sections()).data());
-		output.add_element("task", "cs-wcet", to_string(task->get_wcet_critical_sections()).data());
-		output.add_element("task", "deadline", to_string(task->get_deadline()).data());
-		output.add_element("task", "period", to_string(task->get_period()).data());
-*/
+		output.add_element(t, "wcet", to_string(tasks[i].get_wcet()).data());
+
+		output.add_element(t, "ncs-wcet", to_string(tasks[i].get_wcet_non_critical_sections()).data());
+
+		output.add_element(t, "cs-wcet", to_string(tasks[i].get_wcet_critical_sections()).data());
+
+		output.add_element(t, "deadline", to_string(tasks[i].get_deadline()).data());
+
+		output.add_element(t, "period", to_string(tasks[i].get_period()).data());
+
+		output.add_element(t, "u", to_string(tasks[i].get_utilization().get_d()).data());
+
+		if(0 != tasks[i].get_requests().size())
+		{
+			output.add_element(t, "request");
+			XMLElement* req = output.get_element(t, "request");
+			
+			for(uint j = 0; j < tasks[i].get_requests().size(); j++)
+			{
+				output.add_element(req, "resource");
+				XMLElement* res = output.get_element(req, "resource", j);
+				
+				output.add_element(res, "id", to_string(tasks[i].get_requests()[j].get_resource_id()).data());
+
+				output.add_element(res, "N", to_string(tasks[i].get_requests()[j].get_num_requests()).data());
+
+				output.add_element(res, "L", to_string(tasks[i].get_requests()[j].get_max_length()).data());
+			}
+		}
 	}
 
 	output.save_file(path);
