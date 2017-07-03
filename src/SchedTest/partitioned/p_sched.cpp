@@ -85,7 +85,44 @@ bool PartitionedSched::BinPacking_BF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 
 bool PartitionedSched::BinPacking_FF(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint MODE)
 {
+	//processors.sort_by_task_utilization(INCREASE);
 
+	uint p_num = processors.get_processor_num();
+
+	Processor& processor = processors.get_processors()[0];
+	
+
+	for(uint k = 0; k < p_num; k++)
+	{
+		Processor& processor = processors.get_processors()[k];
+
+		if(processor.add_task(ti.get_id());)
+		{
+			ti.set_partition(processor.get_processor_id());
+		}
+		else
+			continue;
+
+		switch(MODE)
+		{
+			case PartitionedSched::UNTEST:
+				break;
+			case PartitionedSched::TEST:
+				if(!alloc_schedulable())
+				{
+					ti.set_partition(MAX_INT);
+					processor.remove_task(ti.get_id());
+					continue;
+				}
+				else
+					return true;
+				break;
+			default:
+				break;
+		}
+	}
+
+	return false;
 }
 
 bool PartitionedSched::BinPacking_NF(Task& ti, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources, uint MODE)
