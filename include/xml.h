@@ -18,6 +18,8 @@ class XML
 		XMLDocument *output;
 	public:
 		XML();
+
+		~XML();
 		
 		static void LoadFile(const char* path);		
 
@@ -67,8 +69,12 @@ class XML
 
 		//xml construction
 		void initialization();
+		XMLElement* get_element(const char* parent);
+		XMLElement* get_element(const XMLElement* parent, const char* name, int index = 0);
 		void add_element(const char* name);
 		void add_element(const char* parent, const char* name, const char* text = "");
+		void add_element(const XMLElement* parent, const char* name, const char* text = "");
+		void add_element(const char* parent, int index, const char* name, const char* text = "");
 		void add_range(const char* parent, Range range);
 		void set_text(const char* parent, int index1, const char* element, int index2,const char* text);
 		void save_file(const char* path);

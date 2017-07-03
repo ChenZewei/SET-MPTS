@@ -278,9 +278,9 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 		glpk_params.br_tech = GLP_BR_DTH;//D&T Heuristic
 		//glpk_params.br_tech = GLP_BR_PCH;//Pseudo-Cost Heuristic
 
-		//glpk_params.bt_tech = GLP_BT_DFS;//Depth First Search
+		glpk_params.bt_tech = GLP_BT_DFS;//Depth First Search
 		//glpk_params.bt_tech = GLP_BT_BFS;//Breadth First Search
-		glpk_params.bt_tech = GLP_BT_BLB;//Best Local Branch
+		//glpk_params.bt_tech = GLP_BT_BLB;//Best Local Branch
 		//glpk_params.bt_tech = GLP_BT_BPH;//Best Projection Heuristic
 
 		
@@ -328,8 +328,6 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 			else
 				solved = false;
 		}
-
-		show_error();
 	}
 	else
 	{

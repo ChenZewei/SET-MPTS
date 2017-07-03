@@ -4,6 +4,7 @@
 #include "sort.h"
 #include "random_gen.h"
 #include "param.h"
+#include "xml.h"
 #include "iteration-helper.h"
 #include "math-helper.h"
 
@@ -1097,6 +1098,57 @@ void TaskSet::display()
 	{
 		cout<<"Task index:"<<tasks[i].get_index()<<" Task id:"<<tasks[i].get_id()<<" Task priority:"<<tasks[i].get_priority()<<endl;
 	}
+}
+
+void TaskSet::export_taskset(const char* path)
+{
+	XML output;
+
+	output.initialization();
+
+	output.add_element("taskset");
+
+	output.add_element("taskset", "utilization", to_string(get_utilization_sum().get_d()).data());
+
+	
+	for(uint i = 0; i < tasks.size(); i++)
+	{
+		output.add_element("taskset", "task");
+		XMLElement* ts = output.get_element("taskset");
+		XMLElement* t = output.get_element(ts, "task", i);
+
+		output.add_element(t, "wcet", to_string(tasks[i].get_wcet()).data());
+
+		output.add_element(t, "ncs-wcet", to_string(tasks[i].get_wcet_non_critical_sections()).data());
+
+		output.add_element(t, "cs-wcet", to_string(tasks[i].get_wcet_critical_sections()).data());
+
+		output.add_element(t, "deadline", to_string(tasks[i].get_deadline()).data());
+
+		output.add_element(t, "period", to_string(tasks[i].get_period()).data());
+
+		output.add_element(t, "u", to_string(tasks[i].get_utilization().get_d()).data());
+
+		if(0 != tasks[i].get_requests().size())
+		{
+			output.add_element(t, "request");
+			XMLElement* req = output.get_element(t, "request");
+			
+			for(uint j = 0; j < tasks[i].get_requests().size(); j++)
+			{
+				output.add_element(req, "resource");
+				XMLElement* res = output.get_element(req, "resource", j);
+				
+				output.add_element(res, "id", to_string(tasks[i].get_requests()[j].get_resource_id()).data());
+
+				output.add_element(res, "N", to_string(tasks[i].get_requests()[j].get_num_requests()).data());
+
+				output.add_element(res, "L", to_string(tasks[i].get_requests()[j].get_max_length()).data());
+			}
+		}
+	}
+
+	output.save_file(path);
 }
 
 ////////////////////////////DAG Tasks//////////////////////////////
