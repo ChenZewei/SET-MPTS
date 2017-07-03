@@ -93,6 +93,9 @@
 		<data RENAME="LP-MPCP" 	    STYLE="{x00A000}2s">LP-RTA-PFP-MPCP</data>
 
 <!-->	
+		<data RENAME="LP-FMLP"	    STYLE="{x5B9BD5}2o">LP-RTA-GFP-FMLP</data>
+		<data RENAME="LP-DPCP"      STYLE="{xEB5B5B}2+">LP-RTA-PFP-DPCP</data>
+		<data RENAME="LP-MPCP" 	    STYLE="{x00A000}2s">LP-RTA-PFP-MPCP</data>
 		<data RENAME="GS-MSRP" 	    STYLE="{x8080FF}2d">RTA-PFP-GS</data>
 		<data RENAME="R-PCP"     	STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
 		<data RENAME="R-PCP-opa" 	STYLE="{xED7D31}2=^">RTA-PFP-RO-OPA</data>
