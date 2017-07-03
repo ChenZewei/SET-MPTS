@@ -512,8 +512,9 @@ foreach(tasks.get_tasks(), task)
 
 		Tasks& taskset = tasks.get_tasks();
 		sort(taskset.begin(), taskset.end(), ROP_SM_Order);
-		for(int i = 0; i < taskset.size(); i++)
-			taskset[i].set_index(i);
+		for(int t = 0; t < taskset.size(); t++)
+			taskset[t].set_index(t);
+
 /*
 cout<<"After sorting."<<endl;
 foreach(tasks.get_tasks(), task)
@@ -546,7 +547,7 @@ foreach(tasks.get_tasks(), task)
 	foreach(tasks.get_tasks(), task)
 	{
 		cout<<"Task"<<task->get_id()<<": partition:"<<task->get_partition()<<endl;
-		cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
+		cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<" utilization:"<<task->get_utilization().get_d()<<endl;
 		foreach(task->get_requests(), request)
 		{
 			cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;

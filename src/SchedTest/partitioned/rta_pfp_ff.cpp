@@ -22,6 +22,13 @@ ulong RTA_PFP_FF::interference(Task& task, ulong interval)
 	return task.get_wcet() * ceiling((interval + task.get_jitter()), task.get_period());
 }
 
+/*
+ulong RTA_PFP_FF::interference(Task& task, ulong interval)
+{
+	return task.get_wcet() * ceiling((interval + task.get_response_time() - task.get_wcet()), task.get_period());
+}
+*/
+
 ulong RTA_PFP_FF::response_time(Task& ti)
 {
 	//uint t_id = ti.get_id();
@@ -39,6 +46,7 @@ ulong RTA_PFP_FF::response_time(Task& ti)
 		{
 			if (th->get_partition() == ti.get_partition())
 			{
+				//cout<<"Task:"<<th->get_id()<<" < Task:"<<ti.get_id()<<endl;
 				total_interference += interference((*th), response);
 			}
 		}
@@ -56,13 +64,19 @@ ulong RTA_PFP_FF::response_time(Task& ti)
 bool RTA_PFP_FF::alloc_schedulable()
 {
 	ulong response_bound;
+/*
+	foreach(tasks.get_tasks(), task)
+	{
+		cout<<"Task"<<task->get_id()<<": partition:"<<task->get_partition()<<endl;
+	}
+*/
 
-	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
+//	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
 	foreach(tasks.get_tasks(), ti)
 	{
 		if (ti->get_partition() == 0XFFFFFFFF)
 			continue;
-		
+//	cout<<"RTA Task:"<<ti->get_id()<<endl;	
 		response_bound = response_time((*ti));
 		
 		if (response_bound <= ti->get_deadline())
@@ -75,8 +89,20 @@ bool RTA_PFP_FF::alloc_schedulable()
 
 bool RTA_PFP_FF::is_schedulable()
 {
+/*
+	cout<<"After sorting."<<endl;
+	foreach(tasks.get_tasks(), task)
+	{
+		long slack = task->get_deadline();
+		slack -= task->get_wcet();
+		cout<<"Task:"<<task->get_id()<<" Slack:"<<slack<<endl;
+		cout<<"----------------------------"<<endl;
+	}
+*/
+
 	foreach(tasks.get_tasks(), ti)
 	{
+//		cout<<"<==========Task"<<ti->get_id()<<"==========>"<<endl;
 		if(!BinPacking_FF((*ti), tasks, processors, resources, TEST))
 			return false;
 	}

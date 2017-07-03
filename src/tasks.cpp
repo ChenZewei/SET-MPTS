@@ -143,6 +143,7 @@ void Task::init()
 	//wcet_non_critical_sections = this->wcet;
 	//wcet_critical_sections = 0;
 	carry_in = false;
+	other_attr = 0;
 }
 
 uint Task::task_model()

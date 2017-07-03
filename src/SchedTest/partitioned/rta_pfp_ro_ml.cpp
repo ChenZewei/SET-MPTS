@@ -79,29 +79,10 @@ ulong RTA_PFP_RO_ML::request_bound(Task& ti, uint r_id)
 	return deadline + 100;
 }
 
-ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id, ulong interval)
+ulong RTA_PFP_RO_ML::formula_30(Task& ti, uint p_id, ulong interval)
 {
-	ulong deadline = ti.get_deadline();
-	ulong lambda = 0;
-	foreach(ti.get_requests(), request)
-	{
-		uint q = request->get_resource_id();
-		Resource& resource = resources.get_resources()[q];
-
-		if(p_id == resource.get_locality())
-		{
-			uint N_i_q = request->get_num_requests();
-			ulong r_b = request_bound(ti, q);
-			if(deadline < r_b)
-			{
-//				cout<<"exceed."<<endl;
-				return r_b;
-			}
-			lambda += N_i_q*r_b;
-		}		
-	}
-
 	ulong miu = 0;
+
 	foreach(ti.get_requests(), request)
 	{
 		uint q = request->get_resource_id();
@@ -124,6 +105,32 @@ ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id, ulong interval)
 			}
 		}
 	}
+	return miu;
+}
+
+ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id, ulong interval)
+{
+	ulong deadline = ti.get_deadline();
+	ulong lambda = 0;
+	foreach(ti.get_requests(), request)
+	{
+		uint q = request->get_resource_id();
+		Resource& resource = resources.get_resources()[q];
+
+		if(p_id == resource.get_locality())
+		{
+			uint N_i_q = request->get_num_requests();
+			ulong r_b = request_bound(ti, q);
+			if(deadline < r_b)
+			{
+//				cout<<"exceed."<<endl;
+				return r_b;
+			}
+			lambda += N_i_q*r_b;
+		}		
+	}
+
+	ulong miu = formula_30(ti, p_id, interval);
 
 	return min(lambda, miu);
 }

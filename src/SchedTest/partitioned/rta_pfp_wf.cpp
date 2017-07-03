@@ -57,7 +57,7 @@ bool RTA_PFP_WF::alloc_schedulable()
 {
 	ulong response_bound;
 
-	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
+	//for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
 	foreach(tasks.get_tasks(), ti)
 	{
 

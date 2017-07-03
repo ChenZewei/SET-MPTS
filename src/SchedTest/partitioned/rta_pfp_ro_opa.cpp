@@ -185,6 +185,21 @@ ulong RTA_PFP_RO_OPA::response_time_AP(Task& ti)
 		ulong temp = test_start;
 		ulong temp2 = temp;
 
+		foreach_higher_priority_task(tasks.get_tasks(), ti, th)
+		{
+#if RTA_DEBUG == 1
+			cout<<"Th:"<<th->get_id()<<" partition:"<<th->get_partition()<<" priority:"<<th->get_priority()<<endl;
+#endif
+			if (th->get_partition() == ti.get_partition())
+			{
+				temp += NCS_workload(*th, response_time);
+			}
+		}
+#if RTA_DEBUG == 1
+		cout<<"NCS workload:"<<temp-test_start<<endl;
+		temp2 = temp;
+#endif
+
 		for(uint k = 0; k < processors.get_processor_num(); k++)
 		{
 			ulong agent_bound = angent_exec_bound(ti, k, response_time);

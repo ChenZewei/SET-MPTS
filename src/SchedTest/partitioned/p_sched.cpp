@@ -94,9 +94,10 @@ bool PartitionedSched::BinPacking_FF(Task& ti, TaskSet& tasks, ProcessorSet& pro
 
 	for(uint k = 0; k < p_num; k++)
 	{
+//cout<<"Try to assign Task"<<ti.get_id()<<" on processor"<<k<<endl;
 		Processor& processor = processors.get_processors()[k];
 
-		if(processor.add_task(ti.get_id());)
+		if(processor.add_task(ti.get_id()))
 		{
 			ti.set_partition(processor.get_processor_id());
 		}

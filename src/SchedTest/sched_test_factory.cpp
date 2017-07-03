@@ -4,6 +4,7 @@
 #include "rta_gfp_ng.h"
 #include "rta_pfp_wf.h"
 #include "rta_pfp_ff.h"
+#include "rta_pfp_ff_opa.h"
 #include "rta_pfp_wf_spinlock.h"
 #include "rta_pfp_wf_semaphore.h"
 #include "lp_rta_gfp_pip.h"
@@ -53,6 +54,21 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	{
 		tasks.RM_Order();
 		return new RTA_PFP_FF(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-FF-2"))
+	{
+		tasks.DC_Order();
+		return new RTA_PFP_FF(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-FF-OPA"))
+	{
+		tasks.RM_Order();
+		return new RTA_PFP_FF_OPA(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-FF-SM-OPA"))
+	{
+		tasks.DC_Order();
+		return new RTA_PFP_FF_OPA(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-WF-spinlock"))
 	{
