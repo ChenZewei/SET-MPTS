@@ -1,7 +1,7 @@
 #PROC_NUM=`cat /proc/cpuinfo | grep "processor" | wc -l`
 PROC_NUM=24
 ROOT=`pwd`
-FOLDER="EXP1"
+FOLDER="EXP"
 PARAM_NUM=288
 GAP=`expr $PARAM_NUM / $PROC_NUM `
 

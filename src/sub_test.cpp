@@ -94,7 +94,6 @@ cout<<flush;
 			ResourceSet resourceset = ResourceSet();
 			resource_gen(&resourceset, *param);
 			tast_gen(taskset, resourceset, *param, utilization);
-//			taskset.SM_PLUS_4_Order(parameters.p_num);
 			for(uint j = 0; j < param->get_method_num(); j++)
 			{
 				taskset.init();
@@ -147,10 +146,14 @@ cout<<endl;
 		for(uint i = 0; i < param->test_attributes.size(); i++)
 		{
 			fraction_t ratio(success[i], exp[i]);
-			if(0 == strcmp(param->test_attributes[i].rename.data(), ""))
+			if(!param->test_attributes[i].rename.empty())
+			{
 				output.add_result(param->test_attributes[i].rename, param->test_attributes[i].style, utilization, exp[i], success[i]);
+			}
 			else
+			{
 				output.add_result(param->test_attributes[i].test_name, param->test_attributes[i].style, utilization, exp[i], success[i]);
+			}
 
 			stringstream buf;
 

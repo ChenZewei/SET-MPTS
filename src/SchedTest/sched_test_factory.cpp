@@ -14,6 +14,9 @@
 #include "rta_pfp_ro.h"
 #include "rta_pfp_ro_ml.h"
 #include "rta_pfp_ro_np.h"
+#include "rta_pfp_ro_np_opa.h"
+#include "rta_pfp_ro_np_sm.h"
+#include "rta_pfp_ro_np_sm_opa.h"
 #include "rta_pfp_ro_feasible.h"
 #include "ilp_rta_pfp_spinlock.h"
 #include "ilp_rta_pfp_dpcp.h"
@@ -134,7 +137,20 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-NP"))
 	{
+		tasks.RM_Order();
 		return new RTA_PFP_RO_NP(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-NP-OPA"))
+	{
+		return new RTA_PFP_RO_NP_OPA(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-NP-SM"))
+	{
+		return new RTA_PFP_RO_NP_SM(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-NP-SM-OPA"))
+	{
+		return new RTA_PFP_RO_NP_SM_OPA(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-FEASIBLE"))
 	{

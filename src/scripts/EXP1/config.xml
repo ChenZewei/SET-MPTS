@@ -88,21 +88,22 @@
 		<data RENAME="R-PCP-sm-opa" STYLE="{x0080FF}2#v">RTA-PFP-RO-SM-OPA</data>
 		<data RENAME="R-NP-rm" 	    STYLE="{x44546A}2#s">RTA-PFP-RO-NP</data>
 		<data RENAME="NC"           STYLE="{x954F72}2#d">RTA-PFP-RO-FEASIBLE</data>
-
-<!-->	
-		<data RENAME="LP-PIP"	    STYLE="{x000000}2*">LP-RTA-GFP-PIP</data>
 		<data RENAME="LP-FMLP"	    STYLE="{x5B9BD5}2o">LP-RTA-GFP-FMLP</data>
 		<data RENAME="LP-DPCP"      STYLE="{xEB5B5B}2+">LP-RTA-PFP-DPCP</data>
 		<data RENAME="LP-MPCP" 	    STYLE="{x00A000}2s">LP-RTA-PFP-MPCP</data>
+
+<!-->	
 		<data RENAME="GS-MSRP" 	    STYLE="{x8080FF}2d">RTA-PFP-GS</data>
-		<data RENAME="R-PCP-rm"     STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
-		<data RENAME="R-PCP-rm-opa" STYLE="{xED7D31}2=^">RTA-PFP-RO-OPA</data>
+		<data RENAME="R-PCP"     	STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
+		<data RENAME="R-PCP-opa" 	STYLE="{xED7D31}2=^">RTA-PFP-RO-OPA</data>
 		<data RENAME="R-PCP-sm"     STYLE="{x0080FF}2j#^">RTA-PFP-RO-SM</data>
 		<data RENAME="R-PCP-sm-opa" STYLE="{xED7D31}2:#v">RTA-PFP-RO-SM-OPA</data>
-		<data RENAME="R-NP-rm" 	    STYLE="{x44546A}2:s">RTA-PFP-RO-NP</data>
-		<data RENAME="NC"           STYLE="{x954F72}2=#d">RTA-PFP-RO-FEASIBLE</data>
+		<data RENAME="R-NP" 	    STYLE="{x0080FF}2:s">RTA-PFP-RO-NP</data>
+		<data RENAME="R-NP-opa" 	STYLE="{xED7D31}2:s">RTA-PFP-RO-NP-OPA</data>
+		<data RENAME="R-NP-sm" 	    STYLE="{x0080FF}2:s">RTA-PFP-RO-NP-SM</data>
+		<data RENAME="R-NP-sm-opa" 	STYLE="{xED7D31}2:s">RTA-PFP-RO-NP-SM-OPA</data>
 	</schedulability_test>
-	<experiment_times>1000</experiment_times>
+	<experiment_times>200</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 		<data FORMAT="EPS" BLACK_ONLY="true" >LineChart</data>
@@ -119,7 +120,7 @@
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>0</min>
+			<min>2</min>
 			<max>4</max>
 		</data>
 	</init_utilization_range>
@@ -163,15 +164,15 @@
 	<rrr>//resource_request_range
 		<data>
 			<min>1</min>
-			<max>10</max>
-		</data>
-		<data>
-			<min>20</min>
-			<max>40</max>
+			<max>50</max>
 		</data>
 		<data>
 			<min>50</min>
-			<max>80</max>
+			<max>100</max>
+		</data>
+		<data>
+			<min>100</min>
+			<max>200</max>
 		</data>
 	</rrr>
 	<total_len_factor>
