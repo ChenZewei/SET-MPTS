@@ -65,18 +65,11 @@
 		<data RENAME="R-PCP-sm"     STYLE="{x0080FF}2j#^">RTA-PFP-RO-SM</data>
 		<data RENAME="R-PCP-sm-opa" STYLE="{xED7D31}2:#v">RTA-PFP-RO-SM-OPA</data>
 <!-->
-		<data RENAME="PFP-FF" 		STYLE="{x000000}2o">RTA-PFP-FF</data>
 		<data RENAME="GS-MSRP" 	    STYLE="{x8080FF}2d">RTA-PFP-GS</data>
 		<data RENAME="R-PCP"     	STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
-		<data RENAME="R-PCP-opa" 	STYLE="{xED7D31}2=^">RTA-PFP-RO-OPA</data>
 		<data RENAME="R-PCP-sm"     STYLE="{x0080FF}2j#^">RTA-PFP-RO-SM</data>
-		<data RENAME="R-PCP-sm-opa" STYLE="{xED7D31}2:#v">RTA-PFP-RO-SM-OPA</data>
-		<data RENAME="R-NP" 	    STYLE="{x0080FF}2:s">RTA-PFP-RO-NP</data>
-		<data RENAME="R-NP-opa" 	STYLE="{xED7D31}2:s">RTA-PFP-RO-NP-OPA</data>
-		<data RENAME="R-NP-sm" 	    STYLE="{x0080FF}2:s">RTA-PFP-RO-NP-SM</data>
-		<data RENAME="R-NP-sm-opa" 	STYLE="{xED7D31}2:s">RTA-PFP-RO-NP-SM-OPA</data>
 	</schedulability_test>
-	<experiment_times>200</experiment_times>
+	<experiment_times>100</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->
@@ -115,20 +108,31 @@
 	</deadline_propotion>
 	<resource_num>
 		<data>4</data>
+		<data>8</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
 		<data>0.1</data>
+		<data>0.25</data>
+		<data>0.5</data>
 	</rrp>
 	<rrn>//resource_request_number
-		<data>5</data>
+		<data>3</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
 			<min>1</min>
 			<max>50</max>
+		</data>
+		<data>
+			<min>50</min>
+			<max>100</max>
+		</data>
+		<data>
+			<min>100</min>
+			<max>200</max>
 		</data>
 	</rrr>
 	<total_len_factor>

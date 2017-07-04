@@ -53,6 +53,13 @@ int main(int argc,char** argv)
 
 	cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
+		vector<int> last_success;
+
+		for(uint i = 0; i < param->get_method_num(); i++)
+		{
+			last_success.push_back(1);
+		}
+
 		do
 		{	
 			Result result;
@@ -84,56 +91,70 @@ int main(int argc,char** argv)
 					resourceset.init();
 					exp[j]++;
 
-					SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
-					if(NULL == schedTest)
+					if(0 != last_success[j])
 					{
-						cout<<"Incorrect test name."<<endl;
-						return -1;
-					}
+						SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
+						if(NULL == schedTest)
+						{
+							cout<<"Incorrect test name."<<endl;
+							return -1;
+						}
 
-					if(!param->test_attributes[i].rename.empty())
-					{
-						cout<<param->test_attributes[j].rename<<":";
-					}
-					else
-					{
-						cout<<param->test_attributes[j].test_name<<":";
-					}
+						if(!param->test_attributes[i].rename.empty())
+						{
+							cout<<param->test_attributes[j].rename<<":";
+						}
+						else
+						{
+							cout<<param->test_attributes[j].test_name<<":";
+						}
 					
-					time_t s, e;
-					s = time(NULL);
+						time_t s, e;
+						s = time(NULL);
 
-					if(schedTest->is_schedulable())
-					{
-						time(&e);
-						ulong gap = difftime(e, s);
-						uint hour = gap/3600;
-						uint min = (gap%3600)/60;
-						uint sec = (gap%3600)%60;
-						cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"success!"<<endl;
+						if(schedTest->is_schedulable())
+						{
+							time(&e);
+							ulong gap = difftime(e, s);
+							uint hour = gap/3600;
+							uint min = (gap%3600)/60;
+							uint sec = (gap%3600)%60;
+							cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"success!"<<endl;
 
-						success[j]++;
-						s_n++;
-						s_i = j;
-	#if SORT_DEBUG
-						cout<<param->test_attributes[j].test_name<<" success!"<<endl;
-	#endif
+							success[j]++;
+							s_n++;
+							s_i = j;
+		#if SORT_DEBUG
+							cout<<param->test_attributes[j].test_name<<" success!"<<endl;
+		#endif
+						}
+						else
+						{
+							time(&e);
+
+							ulong gap = difftime(e, s);
+							uint hour = gap/3600;
+							uint min = (gap%3600)/60;
+							uint sec = (gap%3600)%60;
+
+							cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"failed!"<<endl;
+
+						}
+
+						delete(schedTest);
 					}
 					else
 					{
-						time(&e);
-
-						ulong gap = difftime(e, s);
-						uint hour = gap/3600;
-						uint min = (gap%3600)/60;
-						uint sec = (gap%3600)%60;
-
-						cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"failed!"<<endl;
-
+						if(!param->test_attributes[i].rename.empty())
+						{
+							cout<<param->test_attributes[j].rename<<": Abandoned!"<<endl;
+						}
+						else
+						{
+							cout<<param->test_attributes[j].test_name<<": Abandoned!"<<endl;
+						}
 					}
-
-					delete(schedTest);
-					}	
+				}	
 
 
 				if(1 == s_n)
@@ -182,6 +203,11 @@ cout<<endl;
 			output.export_result_append(utilization);
 			output.Export(PNG);
 			utilization += param->step;
+
+			for(uint j = 0; j < param->test_attributes.size(); j++)
+			{
+				last_success[j] = success[j];
+			}
 		}
 		while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
 

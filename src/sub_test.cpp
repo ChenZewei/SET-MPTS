@@ -70,10 +70,6 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 		last_success.push_back(1);
 	}
 
-cout<<param->get_method_num()<<endl;
-cout<<param->test_attributes.size()<<endl;
-cout<<param->test_attributes.size()<<endl;
-
 	do
 	{	
 		Result result;
