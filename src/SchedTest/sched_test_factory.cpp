@@ -125,14 +125,17 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-SM"))
 	{
+		tasks.RM_Order();
 		return new RTA_PFP_RO_SM(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-OPA"))
 	{
+		tasks.RM_Order();
 		return new RTA_PFP_RO_OPA(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-SM-OPA"))
 	{
+		tasks.RM_Order();
 		return new RTA_PFP_RO_SM_OPA(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-NP"))
@@ -142,14 +145,17 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-NP-OPA"))
 	{
+		tasks.RM_Order();
 		return new RTA_PFP_RO_NP_OPA(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-NP-SM"))
 	{
+		tasks.RM_Order();
 		return new RTA_PFP_RO_NP_SM(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-NP-SM-OPA"))
 	{
+		tasks.RM_Order();
 		return new RTA_PFP_RO_NP_SM_OPA(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-FEASIBLE"))

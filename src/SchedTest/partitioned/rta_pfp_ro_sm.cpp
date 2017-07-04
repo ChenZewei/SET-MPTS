@@ -517,7 +517,7 @@ foreach(tasks.get_tasks(), task)
 		for(int t = 0; t < taskset.size(); t++)
 		{
 			taskset[t].set_index(t);
-			taskset[t].set_priority(t);
+			//taskset[t].set_priority(t);
 		}
 
 /*

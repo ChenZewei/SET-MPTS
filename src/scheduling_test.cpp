@@ -341,6 +341,7 @@ vector<Param> get_parameters()
 	{
 		Param param;
 		//set parameters
+		param.id = parameters.size();
 		param.lambda = *lambda;
 		param.p_num = *p_num;
 		param.step = *step;
