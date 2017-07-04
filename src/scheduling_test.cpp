@@ -76,10 +76,7 @@ int main(int argc,char** argv)
 				ProcessorSet processorset = ProcessorSet(*param);
 				ResourceSet resourceset = ResourceSet();
 				resource_gen(&resourceset, *param);
-				//resourceset.update(&taskset);
 				tast_gen(taskset, resourceset, *param, utilization);
-	//			taskset.export_taskset("taskset.xml");
-	//			taskset.SM_PLUS_4_Order(parameters.p_num);
 				for(uint j = 0; j < param->get_method_num(); j++)
 				{
 					taskset.init();
@@ -94,14 +91,14 @@ int main(int argc,char** argv)
 						return -1;
 					}
 
-	if(!param->test_attributes[i].rename.empty())
-	{
-		cout<<param->test_attributes[j].rename<<":";
-	}
-	else
-	{
-		cout<<param->test_attributes[j].test_name<<":";
-	}
+					if(!param->test_attributes[i].rename.empty())
+					{
+						cout<<param->test_attributes[j].rename<<":";
+					}
+					else
+					{
+						cout<<param->test_attributes[j].test_name<<":";
+					}
 					
 					time_t s, e;
 					s = time(NULL);
@@ -113,8 +110,8 @@ int main(int argc,char** argv)
 						uint hour = gap/3600;
 						uint min = (gap%3600)/60;
 						uint sec = (gap%3600)%60;
-
 						cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"success!"<<endl;
+
 						success[j]++;
 						s_n++;
 						s_i = j;
@@ -134,6 +131,7 @@ int main(int argc,char** argv)
 						cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"failed!"<<endl;
 
 					}
+
 					delete(schedTest);
 					}	
 
@@ -157,29 +155,29 @@ int main(int argc,char** argv)
 				result.utilization = utilization;
 			}
 cout<<endl;
-			for(uint i = 0; i < param->test_attributes.size(); i++)
+			for(uint j = 0; j < param->test_attributes.size(); j++)
 			{
-				fraction_t ratio(success[i], exp[i]);
-				if(!param->test_attributes[i].rename.empty())
+				fraction_t ratio(success[j], exp[j]);
+				if(!param->test_attributes[j].rename.empty())
 				{
-					output.add_result(param->test_attributes[i].rename, param->test_attributes[i].style, utilization, exp[i], success[i]);
+					output.add_result(param->test_attributes[j].rename, param->test_attributes[j].style, utilization, exp[j], success[j]);
 				}
 				else
 				{
-					output.add_result(param->test_attributes[i].test_name, param->test_attributes[i].style, utilization, exp[i], success[i]);
+					output.add_result(param->test_attributes[j].test_name, param->test_attributes[j].style, utilization, exp[j], success[j]);
 				}
 				stringstream buf;
 
-				if(0 == strcmp(param->test_attributes[i].rename.data(),""))
-					buf<<param->test_attributes[i].test_name;
+				if(0 == strcmp(param->test_attributes[j].rename.data(),""))
+					buf<<param->test_attributes[j].test_name;
 				else
-					buf<<param->test_attributes[i].rename;
+					buf<<param->test_attributes[j].rename;
 
-				buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
+				buf<<"\t"<<utilization<<"\t"<<exp[j]<<"\t"<<success[j];
 
 				output.append2file("result-logs.csv", buf.str());
 
-	cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<" exc_s:"<<exc[i]<<endl;
+	cout<<"Method "<<j<<": exp_times("<<exp[j]<<") success times("<<success[j]<<") success ratio:"<<ratio.get_d()<<" exc_s:"<<exc[j]<<endl;
 			}
 			output.export_result_append(utilization);
 			output.Export(PNG);

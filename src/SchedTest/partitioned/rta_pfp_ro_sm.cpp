@@ -488,16 +488,18 @@ bool RTA_PFP_RO_SM::is_schedulable()
 		if(!worst_fit_for_resources(i))
 			continue;
 
+
 /*
 cout<<"Before sorting."<<endl;
 foreach(tasks.get_tasks(), task)
 {
 	long slack = task->get_deadline();
 	slack -= task->get_wcet() + task->get_other_attr();
-	cout<<"Task:"<<task->get_id()<<" Slack:"<<slack<<endl;
+	cout<<"Task:"<<task->get_id()<<" priority:"<<task->get_priority()<<" Slack:"<<slack<<endl;
 	cout<<"----------------------------"<<endl;
 }
 */
+
 
 		//ROP-SM Order
 		foreach(tasks.get_tasks(), task)
@@ -513,7 +515,10 @@ foreach(tasks.get_tasks(), task)
 		Tasks& taskset = tasks.get_tasks();
 		sort(taskset.begin(), taskset.end(), ROP_SM_Order);
 		for(int t = 0; t < taskset.size(); t++)
+		{
 			taskset[t].set_index(t);
+			taskset[t].set_priority(t);
+		}
 
 /*
 cout<<"After sorting."<<endl;
@@ -521,17 +526,19 @@ foreach(tasks.get_tasks(), task)
 {
 	long slack = task->get_deadline();
 	slack -= task->get_wcet() + task->get_other_attr();
-	cout<<"Task:"<<task->get_id()<<" Slack:"<<slack<<endl;
+	cout<<"Task:"<<task->get_id()<<" priority:"<<task->get_priority()<<" Slack:"<<slack<<endl;
 	cout<<"----------------------------"<<endl;
 }
 */
+
 		schedulable = is_first_fit_for_tasks_schedulable(i%p_num);
 		if(schedulable)
 		{
+
 /*
 			foreach(tasks.get_tasks(), task)
 			{
-				cout<<"Task"<<task->get_id()<<": partition:"<<task->get_partition()<<endl;
+				cout<<"Task:"<<task->get_id()<<" priority:"<<task->get_priority()<<" partition:"<<task->get_partition()<<endl;
 				cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
 				foreach(task->get_requests(), request)
 				{
@@ -540,6 +547,8 @@ foreach(tasks.get_tasks(), task)
 				cout<<"-------------------------------------------"<<endl;
 			}
 */
+
+
 			return schedulable;
 		}
 	}

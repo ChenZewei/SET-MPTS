@@ -509,7 +509,10 @@ foreach(tasks.get_tasks(), task)
 		Tasks& taskset = tasks.get_tasks();
 		sort(taskset.begin(), taskset.end(), ROP_SM_Order);
 		for(int t = 0; t < taskset.size(); t++)
+		{
 			taskset[t].set_index(t);
+			taskset[t].set_priority(t);
+		}
 
 /*
 cout<<"After sorting."<<endl;

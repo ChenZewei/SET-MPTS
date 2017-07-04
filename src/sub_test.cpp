@@ -70,6 +70,10 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 		last_success.push_back(1);
 	}
 
+cout<<param->get_method_num()<<endl;
+cout<<param->test_attributes.size()<<endl;
+cout<<param->test_attributes.size()<<endl;
+
 	do
 	{	
 		Result result;
@@ -85,7 +89,7 @@ cout<<"Utilization:"<<utilization<<endl;
 		}
 		for(int i = 0; i < param->exp_times; i++)
 		{
-cout<<".";
+cout<<"EXP: "<<i+1<<" of "<<param->exp_times<<endl;
 cout<<flush;
 			uint s_n = 0;
 			uint s_i = 0;
@@ -94,6 +98,13 @@ cout<<flush;
 			ResourceSet resourceset = ResourceSet();
 			resource_gen(&resourceset, *param);
 			tast_gen(taskset, resourceset, *param, utilization);
+
+
+			for(uint j = 0; j < param->get_method_num(); j++)
+			{
+				cout<<"last success:"<<last_success[j]<<endl;
+			}
+
 			for(uint j = 0; j < param->get_method_num(); j++)
 			{
 				taskset.init();
@@ -109,9 +120,28 @@ cout<<flush;
 						cout<<"Incorrect test name."<<endl;
 						return -1;
 					}
-	//cout<<test_attributes[j].test_name<<":";
+
+					if(!param->test_attributes[i].rename.empty())
+					{
+						cout<<param->test_attributes[j].rename<<":";
+					}
+					else
+					{
+						cout<<param->test_attributes[j].test_name<<":";
+					}
+
+					time_t s, e;
+					s = time(NULL);
+
 					if(schedTest->is_schedulable())
 					{
+						time(&e);
+						ulong gap = difftime(e, s);
+						uint hour = gap/3600;
+						uint min = (gap%3600)/60;
+						uint sec = (gap%3600)%60;
+						cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"success!"<<endl;
+
 						success[j]++;
 						s_n++;
 						s_i = j;
@@ -119,8 +149,31 @@ cout<<flush;
 						cout<<param->test_attributes[j].test_name<<" success!"<<endl;
 #endif
 					}
-	
+					else
+					{
+						time(&e);
+
+						ulong gap = difftime(e, s);
+						uint hour = gap/3600;
+						uint min = (gap%3600)/60;
+						uint sec = (gap%3600)%60;
+
+						cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"failed!"<<endl;
+
+					}
+
 					delete(schedTest);
+				}
+				else
+				{
+					if(!param->test_attributes[i].rename.empty())
+					{
+						cout<<param->test_attributes[j].rename<<": Abandoned!"<<endl;
+					}
+					else
+					{
+						cout<<param->test_attributes[j].test_name<<": Abandoned!"<<endl;
+					}
 				}
 			}
 
@@ -143,38 +196,37 @@ cout<<flush;
 			result.utilization = utilization;
 		}
 cout<<endl;
-		for(uint i = 0; i < param->test_attributes.size(); i++)
+		for(uint j = 0; j < param->test_attributes.size(); j++)
 		{
-			fraction_t ratio(success[i], exp[i]);
-			if(!param->test_attributes[i].rename.empty())
+			fraction_t ratio(success[j], exp[j]);
+			if(!param->test_attributes[j].rename.empty())
 			{
-				output.add_result(param->test_attributes[i].rename, param->test_attributes[i].style, utilization, exp[i], success[i]);
+				output.add_result(param->test_attributes[j].rename, param->test_attributes[j].style, utilization, exp[j], success[j]);
 			}
 			else
 			{
-				output.add_result(param->test_attributes[i].test_name, param->test_attributes[i].style, utilization, exp[i], success[i]);
+				output.add_result(param->test_attributes[j].test_name, param->test_attributes[j].style, utilization, exp[j], success[j]);
 			}
-
 			stringstream buf;
 
-			if(0 == strcmp(param->test_attributes[i].rename.data(),""))
-				buf<<param->test_attributes[i].test_name;
+			if(0 == strcmp(param->test_attributes[j].rename.data(),""))
+				buf<<param->test_attributes[j].test_name;
 			else
-				buf<<param->test_attributes[i].rename;
+				buf<<param->test_attributes[j].rename;
 
-			buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
+			buf<<"\t"<<utilization<<"\t"<<exp[j]<<"\t"<<success[j];
 
 			output.append2file("result-logs.csv", buf.str());
 
-cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<" exc_s:"<<exc[i]<<endl;
+cout<<"Method "<<j<<": exp_times("<<exp[j]<<") success times("<<success[j]<<") success ratio:"<<ratio.get_d()<<" exc_s:"<<exc[j]<<endl;
 		}
 		output.export_result_append(utilization);
 		output.Export(PNG);
 		utilization += param->step;
 
-		for(uint i = 0; i < param->get_method_num(); i++)
+		for(uint j = 0; j < param->test_attributes.size(); j++)
 		{
-			last_success[i] = success[i];
+			last_success[j] = success[j];
 		}
 	}
 	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
