@@ -28,6 +28,12 @@
 #define	MPCP	4
 #define	FMLP	5
 
+//Status
+#define INIT		-1
+#define SUCCESS 	0
+#define UNDEF		1
+#define UNSUCCESS	2
+
 class Task;
 class TaskSet;
 class Request;

@@ -66,6 +66,11 @@ static void GLPKSolution::callback(glp_tree *T, void* info)
 	return;
 }
 
+int GLPKSolution::get_status()
+{
+	return (is_mip?glp_mip_status(glpk):glp_get_status(glpk));
+}
+
 void GLPKSolution::show_error()
 {
 	if (!solved)
@@ -278,8 +283,8 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 		glpk_params.br_tech = GLP_BR_DTH;//D&T Heuristic
 		//glpk_params.br_tech = GLP_BR_PCH;//Pseudo-Cost Heuristic
 
-		glpk_params.bt_tech = GLP_BT_DFS;//Depth First Search
-		//glpk_params.bt_tech = GLP_BT_BFS;//Breadth First Search
+		//glpk_params.bt_tech = GLP_BT_DFS;//Depth First Search
+		glpk_params.bt_tech = GLP_BT_BFS;//Breadth First Search
 		//glpk_params.bt_tech = GLP_BT_BLB;//Best Local Branch
 		//glpk_params.bt_tech = GLP_BT_BPH;//Best Projection Heuristic
 

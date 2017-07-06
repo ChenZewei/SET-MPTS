@@ -182,7 +182,7 @@ bool ILP_RTA_PFP_DPCP_3::is_schedulable()
 {
 	if(0 == tasks.get_tasks().size())
 		return true;
-	else if(abs(tasks.get_utilization_sum()-4)<=_EPS)
+	else if(abs(tasks.get_utilization_sum()-processors.get_processor_num())<=_EPS)
 		return false;
 
 	ILPDPCPMapper_3 vars;
@@ -321,13 +321,17 @@ cout<<"D_"<<i<<":"<<tasks.get_tasks()[i].get_deadline()<<endl;
 		}
 #endif
 
-		//rb_solution->show_error();
+		rb_solution->show_error();
+		cout<<rb_solution->get_status()<<endl;
+		set_status(rb_solution->get_status());
 		delete rb_solution;
 		return true;
 	}
 	else
 	{
-		//rb_solution->show_error();
+		rb_solution->show_error();
+		cout<<rb_solution->get_status()<<endl;
+		set_status(rb_solution->get_status());
 	}
 
 	delete rb_solution;
@@ -820,6 +824,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_6(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		
 		var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, i);
 		exp->add_term(var_id, 1);
+		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 		
 		lp.add_inequality(exp, deadline);
 	}
@@ -838,7 +843,6 @@ void ILP_RTA_PFP_DPCP_3::constraint_7(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, i);
 		exp->add_term(var_id, 1);
 		//lp.declare_variable_integer(var_id);
-		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
 //		var_id = vars.lookup(ILPDPCPMapper_3::BLOCKING_TIME, i);
 //		exp->add_term(var_id, -1);
@@ -936,7 +940,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_10(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint i = ti->get_index();
-		ulong di = ti->get_deadline();
+		ulong pi = ti->get_period();
 
 		foreach(tasks.get_tasks(), tx)
 		{
@@ -946,7 +950,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_10(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
 
-			uint upper_bound = ceiling(di, px);
+			uint upper_bound = ceiling(pi + px, px);
 
 			var_id = vars.lookup(ILPDPCPMapper_3::PREEMPT_NUM, i, x);
 			exp->add_term(var_id, 1);
@@ -968,11 +972,12 @@ void ILP_RTA_PFP_DPCP_3::constraint_11(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint i = ti->get_index();
-		ulong di = ti->get_deadline();
+		ulong pi = ti->get_period();
 
 		foreach(tasks.get_tasks(), tx)
 		{
 			uint x = tx->get_index();
+			ulong cx = tx->get_wcet();
 			ulong px = tx->get_period();
 
 			LinearExpression *exp = new LinearExpression();
@@ -984,7 +989,13 @@ void ILP_RTA_PFP_DPCP_3::constraint_11(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, i);
 			exp->add_term(var_id, 1.0/px);
 
-			lp.add_inequality(exp, 0);
+			var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, x);
+			exp->add_term(var_id, 1.0/px);
+
+			double ux = cx;
+			ux /= px;
+
+			lp.add_inequality(exp, ux);
 		}
 	}
 }
@@ -995,7 +1006,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_12(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint i = ti->get_index();
-		ulong di = ti->get_deadline();
+		ulong pi = ti->get_period();
 
 		foreach(tasks.get_tasks(), tx)
 		{
@@ -1005,14 +1016,14 @@ void ILP_RTA_PFP_DPCP_3::constraint_12(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
 
-			uint bound = ceiling(di, px);
+			uint bound = ceiling(pi + px, px);
 
 			var_id = vars.lookup(ILPDPCPMapper_3::PREEMPT_NUM, i, x);
 			exp->add_term(var_id, 1);
 
 			var_id = vars.lookup(ILPDPCPMapper_3::TBT_PREEMPT_NUM, i, x);
 			exp->add_term(var_id, -1);
-			lp.declare_variable_integer(var_id);
+			//lp.declare_variable_integer(var_id);
 			lp.declare_variable_bounds(var_id, true, 0, true, bound);
 
 			var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, x);
@@ -1031,7 +1042,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_13(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint i = ti->get_index();
-		ulong di = ti->get_deadline();
+		ulong pi = ti->get_period();
 
 		foreach(tasks.get_tasks(), tx)
 		{
@@ -1046,14 +1057,14 @@ void ILP_RTA_PFP_DPCP_3::constraint_13(LinearProgram& lp, ILPDPCPMapper_3& vars)
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
 
-				uint bound = ceiling(di, px);
+				uint bound = ceiling(pi + px, px);
 
 				var_id = vars.lookup(ILPDPCPMapper_3::TBT_PREEMPT_NUM, i, x);
 				exp->add_term(var_id, N_x_v);
 
 				var_id = vars.lookup(ILPDPCPMapper_3::RBT_PREEMPT_NUM, i, x, t_num + v);
 				exp->add_term(var_id, -1);
-				lp.declare_variable_integer(var_id);
+				//lp.declare_variable_integer(var_id);
 				lp.declare_variable_bounds(var_id, true, 0, true, bound);
 
 				var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, t_num + v);
@@ -1073,7 +1084,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_14(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	foreach(tasks.get_tasks(), ti)
 	{
 		uint i = ti->get_index();
-		ulong di = ti->get_deadline();
+		ulong pi = ti->get_period();
 
 		foreach(tasks.get_tasks(), tx)
 		{
@@ -1092,14 +1103,14 @@ void ILP_RTA_PFP_DPCP_3::constraint_14(LinearProgram& lp, ILPDPCPMapper_3& vars)
 					LinearExpression *exp = new LinearExpression();
 					uint var_id;
 
-					uint bound = ceiling(di, px);
+					uint bound = ceiling(pi + px, px);
 
 					var_id = vars.lookup(ILPDPCPMapper_3::TBT_PREEMPT_NUM, i, x);
 					exp->add_term(var_id, N_x_v);
 
 					var_id = vars.lookup(ILPDPCPMapper_3::RBR_PREEMPT_NUM, i, x, t_num + u, t_num + v);
 					exp->add_term(var_id, -1);
-					lp.declare_variable_integer(var_id);
+					//lp.declare_variable_integer(var_id);
 					lp.declare_variable_bounds(var_id, true, 0, true, bound);
 
 					var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, t_num + u, t_num + v);

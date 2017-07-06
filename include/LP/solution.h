@@ -31,6 +31,7 @@ class GLPKSolution
 	public:
 		GLPKSolution(const LinearProgram &lp, unsigned int max_var_num, double var_lb = 0.0, double var_ub = 1.0, uint dir = 0, uint aim = 0);
 		~GLPKSolution();
+		int get_status();
 		void show_error();
 		double get_value(unsigned int var) const;
 		double evaluate(const LinearExpression &exp) const;

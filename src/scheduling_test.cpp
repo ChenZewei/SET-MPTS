@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <ctime>
 #include <pthread.h>
+#include <glpk.h>
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
@@ -79,6 +80,15 @@ int main(int argc,char** argv)
 	cout<<flush;
 				uint s_n = 0;
 				uint s_i = 0;
+
+				vector<int> temp_success;
+				bool abandon = false;
+
+				for(uint t = 0; t < param->test_attributes.size(); t++)
+				{
+					temp_success.push_back(0);
+				}
+
 				TaskSet taskset = TaskSet();
 				ProcessorSet processorset = ProcessorSet(*param);
 				ResourceSet resourceset = ResourceSet();
@@ -120,8 +130,8 @@ int main(int argc,char** argv)
 							uint min = (gap%3600)/60;
 							uint sec = (gap%3600)%60;
 							cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"success!"<<endl;
-
-							success[j]++;
+							temp_success[j]++;
+							//success[j]++;
 							s_n++;
 							s_i = j;
 		#if SORT_DEBUG
@@ -138,10 +148,24 @@ int main(int argc,char** argv)
 							uint sec = (gap%3600)%60;
 
 							cout<<hour<<"hour "<<min<<"min "<<sec<<"sec. "<<"failed!"<<endl;
-
 						}
 
-						delete(schedTest);
+						if(GLP_UNDEF == schedTest->get_status())
+						{
+cout<<"Abandon cause GLP_UNDEF"<<endl;
+							abandon = true;
+							for(uint k = 0; k <= j; k++)
+							{
+								temp_success[k] = 0;
+								exp[k]--;
+							}
+							s_n = 0;
+							delete(schedTest);
+							break;
+						}
+						else
+
+							delete(schedTest);
 					}
 					else
 					{
@@ -156,6 +180,16 @@ int main(int argc,char** argv)
 					}
 				}	
 
+				if(abandon)
+				{
+					i--;
+					continue;
+				}
+
+				for(uint t = 0; t < param->test_attributes.size(); t++)
+				{
+					success[t] += temp_success[t];
+				}
 
 				if(1 == s_n)
 				{
@@ -174,7 +208,7 @@ int main(int argc,char** argv)
 				}
 
 				result.utilization = utilization;
-			}
+			}//exp_times
 cout<<endl;
 			for(uint j = 0; j < param->test_attributes.size(); j++)
 			{

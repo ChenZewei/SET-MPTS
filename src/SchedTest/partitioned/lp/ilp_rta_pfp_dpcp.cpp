@@ -341,13 +341,17 @@ cout<<"D_"<<i<<":"<<tasks.get_tasks()[i].get_deadline()<<endl;
 		}
 #endif
 
-//		rb_solution->show_error();
+		rb_solution->show_error();
+		cout<<rb_solution->get_status()<<endl;
+		set_status(rb_solution->get_status());
 		delete rb_solution;
 		return true;
 	}
 	else
 	{
-//		rb_solution->show_error();
+		rb_solution->show_error();
+		cout<<rb_solution->get_status()<<endl;
+		set_status(rb_solution->get_status());
 	}
 
 	delete rb_solution;
