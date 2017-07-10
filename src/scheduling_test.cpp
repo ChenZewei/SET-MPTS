@@ -134,9 +134,9 @@ int main(int argc,char** argv)
 							//success[j]++;
 							s_n++;
 							s_i = j;
-		#if SORT_DEBUG
+#if SORT_DEBUG
 							cout<<param->test_attributes[j].test_name<<" success!"<<endl;
-		#endif
+#endif
 						}
 						else
 						{
@@ -180,12 +180,13 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 					}
 				}	
 
+#if UNDEF_ABANDON
 				if(abandon)
 				{
 					i--;
 					continue;
 				}
-
+#endif
 				for(uint t = 0; t < param->test_attributes.size(); t++)
 				{
 					success[t] += temp_success[t];
@@ -194,7 +195,7 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 				if(1 == s_n)
 				{
 					exc[s_i]++;
-	#if SORT_DEBUG
+#if SORT_DEBUG
 					cout<<"Exclusive Success TaskSet:"<<endl;
 					cout<<"/////////////////"<<param->test_attributes[s_i].test_name<<"////////////////"<<endl;
 					foreach(taskset.get_tasks(), task)
@@ -203,7 +204,7 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 						cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
 						cout<<"-----------------------"<<endl;
 					}
-	#endif
+#endif
 					//sleep(1);
 				}
 

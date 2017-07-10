@@ -9,7 +9,8 @@ GLPKSolution::GLPKSolution(const LinearProgram &lp,
 							double var_lb, 
 							double var_ub,
 							uint dir,
-							uint aim):
+							uint aim,
+							long t_limit):
 							glpk(glp_create_prob()),
 							lp(lp),
 							col_num(max_var_num),
@@ -18,7 +19,8 @@ GLPKSolution::GLPKSolution(const LinearProgram &lp,
 							is_mip(lp.has_binary_variables() || lp.has_integer_variables()),
 	  						solved(false),
 							dir(dir),
-							aim(aim)
+							aim(aim),
+							t_limit(t_limit)
 {
 	if (col_num)
 		solve(var_lb, var_ub);
@@ -484,4 +486,10 @@ void GLPKSolution::set_column_types()
 		col_idx = 1 + *var_id;
 		glp_set_col_kind(glpk, col_idx, GLP_BV);
 	}
+}
+
+
+static GLPKSolution::set_time_limit(long t_limit)
+{
+	this->t_limit = t_limit;
 }

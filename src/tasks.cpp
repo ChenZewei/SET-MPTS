@@ -1841,8 +1841,8 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double ut
 	while(taskset.get_utilization_sum() < utilization)//generate tasks
 	{
 		ulong period = Random_Gen::uniform_integral_gen(int(param.p_range.min),int(param.p_range.max));
-		fraction_t u = Random_Gen::exponential_gen(param.lambda);
-		//fraction_t u = Random_Gen::uniform_real_gen(0.25, 0.35);
+		//fraction_t u = Random_Gen::exponential_gen(param.lambda);
+		fraction_t u = Random_Gen::uniform_real_gen(0.1, 0.4);
 		ulong wcet = period*u.get_d();
 		if(0 == wcet)
 			wcet++;

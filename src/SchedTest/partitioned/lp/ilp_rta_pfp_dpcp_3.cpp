@@ -1023,7 +1023,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_12(LinearProgram& lp, ILPDPCPMapper_3& vars)
 
 			var_id = vars.lookup(ILPDPCPMapper_3::TBT_PREEMPT_NUM, i, x);
 			exp->add_term(var_id, -1);
-			//lp.declare_variable_integer(var_id);
+			lp.declare_variable_integer(var_id);
 			lp.declare_variable_bounds(var_id, true, 0, true, bound);
 
 			var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, x);
