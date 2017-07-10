@@ -71,7 +71,7 @@
 		<data RENAME="PFP-WF" STYLE="">RTA-PFP-WF</data>
 		<data RENAME="PFP-FF" STYLE="">RTA-PFP-FF</data>
 	</schedulability_test>
-	<experiment_times>10</experiment_times>
+	<experiment_times>1</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->

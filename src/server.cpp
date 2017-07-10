@@ -15,6 +15,7 @@
 #include "output.h"
 #include "random_gen.h"
 #include "iteration-helper.h"
+#include "toolkit.h"
 //Socket
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -38,7 +39,7 @@ int main(int argc,char** argv)
 
 	vector<Param> parameters = get_parameters();
 
-	int listenfd,connectfd;
+	int listenfd;
 	int sin_size;
 	int recvlen;
 	char recvbuffer[MAXBUFFER];
@@ -46,6 +47,8 @@ int main(int argc,char** argv)
 	memset(recvbuffer,0,MAXBUFFER);
 	memset(sendbuffer,0,MAXBUFFER);
 	struct sockaddr_in server,client;
+
+	vector<struct sockaddr_in> clients;
 
 	if((listenfd=socket(AF_INET, SOCK_DGRAM, 0))==-1)
 	{
@@ -70,6 +73,7 @@ cout<<"index:"<<index<<endl;
 		
 		Result_Set results[MAX_METHOD];
 		Output output(*param);
+		SchedResultSet srs;
 
 		XML::SaveConfig((output.get_path() + "config.xml").data());
 		output.export_param();
@@ -115,30 +119,69 @@ cout<<"Utilization:"<<utilization<<endl;
 
 				cout<<buffer<<endl;
 
+				string str_buf = buffer;
+
 				if(0 != strcmp(buffer,"-1"))
 				{
 					cout<<"Extract result..."<<endl;
+					vector<string> elements;
+					extract_element(elements, str_buf, 0, param->test_attributes.size() + 1, ',');
+
+					for(uint i = 0; i < param->test_attributes.size(); i++)
+					{
+						string test_name;
+						if(!param->test_attributes[i].rename.empty())
+						{
+							test_name = param->test_attributes[i].rename;
+						}
+						else
+						{
+							test_name = param->test_attributes[i].test_name;
+						}
+
+						output.add_result(test_name, param->test_attributes[i].style, utilization, 1, atoi(elements[i+1].data()));
+
+						stringstream buf;
+
+						buf<<test_name;
+
+						buf<<"\t"<<utilization<<"\t"<<1<<"\t"<<elements[i+1];
+
+						output.append2file("result-logs.csv", buf.str());
+					}
 
 					exp_time++;
 				}
+				
+			//	if(exp_time == param->exp_times - 1)
+			//		break;
 
 				if(sendto(listenfd, to_string(utilization).data(), sizeof(to_string(utilization).data()), 0, (struct sockaddr*)&client_addr, sizeof(client_addr)) < 0) 
 				{ 
-					printf("Send failed.");
+					cout<<"Send failed."<<endl;
 				}
+				else
+					cout<<"mdg sent."<<endl;
 
-				result.utilization = utilization;
 			}
+
+			
+			output.export_result_append(utilization);
+			output.Export(PNG);			
+
 			utilization += param->step;
 		}
 		while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
+
+		output.export_csv();
+		output.Export(PNG|EPS|SVG|TGA|JSON);
 
 		time(&end);
 cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
 
 		ulong gap = difftime(end, start);
 		uint hour = gap/3600;
-		uint min = (gap%3600)/60;
+		uint min = (gap%3600)/60;																				
 		uint sec = (gap%3600)%60;
 
 cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;

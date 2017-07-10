@@ -73,7 +73,8 @@ int main(int argc,char** argv)
 */
 	if(sendto(socketfd, "-1", sizeof("-1"), 0, (struct sockaddr*)&server, sizeof(server)) < 0) 
 	{
-		printf("Send failed.%d\n",status);
+		//cout<<"Send failed! Resend in 1 second."<<endl;
+		//sleep(1);
 	}
 
 	while(1)
@@ -95,6 +96,9 @@ int main(int argc,char** argv)
 		cout<<recvbuffer<<endl;
 
 		floating_t utilization(recvbuffer);
+
+		if(abs(utilization + 1) < _EPS)// if utilization == -1
+			break;
 
 		stringstream buf;
 
@@ -141,9 +145,10 @@ int main(int argc,char** argv)
 		
 		cout<<buf.str()<<endl;		
 
-		if(sendto(socketfd, buf.str().data(), sizeof(buf.str().data()), 0, (struct sockaddr*)&server, sizeof(server)) < 0) 
+		if(sendto(socketfd, buf.str().data(), sizeof(buf.str().data()), 0, (struct sockaddr*)&server, sizeof(server)) < 0)
 		{
-			printf("Send failed.%d\n",status);
+			//cout<<"Send failed! Resend in 1 second."<<endl;
+			//sleep(1);
 		}
 	}
 	
