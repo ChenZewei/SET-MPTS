@@ -95,7 +95,10 @@ cout<<"Utilization:"<<utilization<<endl;
 				success.push_back(0);
 				exc.push_back(0);
 			}
-			for(int i = 0; i < param->exp_times; i++)
+
+			int exp_time = 0;
+
+			while(exp_time < param->exp_times)
 			{
 				cout<<"waiting for connect..."<<endl;
 
@@ -116,9 +119,8 @@ cout<<"Utilization:"<<utilization<<endl;
 				{
 					cout<<"Extract result..."<<endl;
 
-					
+					exp_time++;
 				}
-
 
 				if(sendto(listenfd, to_string(utilization).data(), sizeof(to_string(utilization).data()), 0, (struct sockaddr*)&client_addr, sizeof(client_addr)) < 0) 
 				{ 
