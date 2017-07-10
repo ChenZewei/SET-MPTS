@@ -18,6 +18,7 @@
 #include "test_model.h"
 #include "sched_test_factory.h"
 #include "iteration-helper.h"
+#include "solution.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
@@ -44,6 +45,10 @@ int main(int argc,char** argv)
 	
 		XML::SaveConfig((output.get_path() + "config.xml").data());
 		output.export_param();
+
+#if UNDEF_ABANDON
+		GLPKSolution::set_time_limit(TIME_LIMIT_INIT);
+#endif
 
 		Random_Gen::uniform_integral_gen(0,10);
 		double utilization = param->u_range.min;
@@ -183,6 +188,10 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 #if UNDEF_ABANDON
 				if(abandon)
 				{
+					long current_lmt = GLPKSolution::get_time_limit();
+					long new_lmt = (current_lmt+TIME_LIMIT_GAP <= TIME_LIMIT_UPPER_BOUND)?current_lmt+TIME_LIMIT_GAP:TIME_LIMIT_UPPER_BOUND;
+					cout<<"Set GLPK time limit to:"<<new_lmt/1000<<" s"<<endl;
+					GLPKSolution::set_time_limit(new_lmt);
 					i--;
 					continue;
 				}

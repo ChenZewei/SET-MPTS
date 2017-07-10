@@ -22,6 +22,22 @@ void XML::SaveConfig(const char* path)
 	config.SaveFile(path);
 }
 
+char* XML::get_server_ip()
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("server_ip");
+	return title->GetText();
+}
+
+uint XML::get_server_port()
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("server_port");
+	return atoi(title->GetText());
+}
+
 void XML::get_method(Test_Attribute_Set *t_set)
 {
 	const char* content;

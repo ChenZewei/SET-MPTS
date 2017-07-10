@@ -4,13 +4,14 @@
 #include "iteration-helper.h"
 #include "math-helper.h"
 
+long GLPKSolution::t_limit = -1;
+
 GLPKSolution::GLPKSolution(const LinearProgram &lp, 
 							unsigned int max_var_num, 
 							double var_lb, 
 							double var_ub,
 							uint dir,
-							uint aim,
-							long t_limit):
+							uint aim):
 							glpk(glp_create_prob()),
 							lp(lp),
 							col_num(max_var_num),
@@ -19,8 +20,7 @@ GLPKSolution::GLPKSolution(const LinearProgram &lp,
 							is_mip(lp.has_binary_variables() || lp.has_integer_variables()),
 	  						solved(false),
 							dir(dir),
-							aim(aim),
-							t_limit(t_limit)
+							aim(aim)
 {
 	if (col_num)
 		solve(var_lb, var_ub);
@@ -318,9 +318,8 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 
 		glpk_params.mip_gap = 1;
 
-#if TIME_LIMIT > 0
-		glpk_params.tm_lim = TIME_LIMIT;
-#endif
+		if(0 < t_limit)
+			glpk_params.tm_lim = t_limit;
 
 		//glpk_params.cb_func = callback;
 
@@ -489,7 +488,16 @@ void GLPKSolution::set_column_types()
 }
 
 
-static GLPKSolution::set_time_limit(long t_limit)
+void GLPKSolution::set_time_limit(long time)
 {
-	this->t_limit = t_limit;
+	t_limit = time;
 }
+
+
+const long GLPKSolution::get_time_limit()
+{
+	return t_limit;
+}
+
+
+

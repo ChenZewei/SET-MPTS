@@ -14,8 +14,6 @@
 #include "param.h"
 #include "output.h"
 #include "random_gen.h"
-#include "test_model.h"
-#include "sched_test_factory.h"
 #include "iteration-helper.h"
 //Socket
 #include <sys/socket.h>
@@ -28,11 +26,11 @@
 
 #define typeof(x) __typeof(x)
 
+
+#define BUFFER_SIZE 1024
+
 using namespace std;
 
-
-void getFiles(string path, string dir);
-void read_line(string path, vector<string>& files);
 vector<Param> get_parameters();
 
 int main(int argc,char** argv)
@@ -57,7 +55,7 @@ int main(int argc,char** argv)
 	
 	bzero(&server,sizeof(server));
 	server.sin_family = AF_INET;
-	server.sin_port = htons(PORT);
+	server.sin_port = htons(parameters[0].port);
 	server.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	if(bind(listenfd, (struct sockaddr *)&server, sizeof(struct sockaddr))==-1)
@@ -65,44 +63,17 @@ int main(int argc,char** argv)
 		printf("Bind error.");
 		exit(EXIT_SUCCESS);
 	}
-
-	if(listen(listenfd, 1)==-1)
-	{
-		printf("Listen error.");
-		exit(EXIT_SUCCESS);	
-	}
-	
-	while(1)
-	{
-		if((connectfd=accept(listenfd, (struct sockaddr *)&client, &sin_size))==-1)
-		{
-			printf("Accept error.");
-			exit(EXIT_SUCCESS);
-		}
-
-		if((recvlen = recv(socketfd,recvbuffer,sizeof(recvbuffer),0))==-1)
-		{
-			printf("Recieve error.\n");
-			exit(EXIT_SUCCESS);	
-		}
-		else if(0 == recvlen)
-		{
-			printf("Disconnected!\n");
-			exit(EXIT_SUCCESS);
-		}
-
-		int index = atoi(recvbuffer);
+		
+		int index = 0;
 cout<<"index:"<<index<<endl;
 		Param* param = &(parameters[index]);
 		
 		Result_Set results[MAX_METHOD];
-		SchedTestFactory STFactory;		
 		Output output(*param);
 
 		XML::SaveConfig((output.get_path() + "config.xml").data());
 		output.export_param();
 
-		Random_Gen::uniform_integral_gen(0,10);
 		double utilization = param->u_range.min;
 
 		time_t start, end;
@@ -126,87 +97,36 @@ cout<<"Utilization:"<<utilization<<endl;
 			}
 			for(int i = 0; i < param->exp_times; i++)
 			{
-cout<<".";
-cout<<flush;
-				uint s_n = 0;
-				uint s_i = 0;
-				TaskSet taskset = TaskSet();
-				ProcessorSet processorset = ProcessorSet(*param);
-				ResourceSet resourceset = ResourceSet();
-				resource_gen(&resourceset, *param);
-				tast_gen(taskset, resourceset, *param, utilization);
-	//			taskset.SM_PLUS_4_Order(parameters.p_num);
-				for(uint j = 0; j < param->get_method_num(); j++)
+				cout<<"waiting for connect..."<<endl;
+
+				struct sockaddr_in client_addr; 
+				int client_addr_length = sizeof(client_addr);
+
+				char buffer[BUFFER_SIZE]; 
+				bzero(buffer, BUFFER_SIZE); 
+				if(recvfrom(listenfd, buffer, BUFFER_SIZE,0,(struct sockaddr*)&client_addr, &client_addr_length) == -1) 
+				{ 
+					perror("Receive Data Failed:"); 
+					exit(1); 
+				}
+
+				cout<<buffer<<endl;
+
+				if(0 != strcmp(buffer,"-1"))
 				{
-					taskset.init();
-					processorset.init();	
-					resourceset.init();
-					exp[j]++;
+					cout<<"Extract result..."<<endl;
+
+					
+				}
 
 
-					SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
-					if(NULL == schedTest)
-					{
-						cout<<"Incorrect test name."<<endl;
-						return -1;
-					}
-	//cout<<test_attributes[j].test_name<<":";
-					if(schedTest->is_schedulable())
-					{
-						success[j]++;
-						s_n++;
-						s_i = j;
-	#if SORT_DEBUG
-						cout<<param->test_attributes[j].test_name<<" success!"<<endl;
-	#endif
-					}
-	
-					delete(schedTest);
-					}	
-
-
-				if(1 == s_n)
-				{
-					exc[s_i]++;
-	#if SORT_DEBUG
-					cout<<"Exclusive Success TaskSet:"<<endl;
-					cout<<"/////////////////"<<param->test_attributes[s_i].test_name<<"////////////////"<<endl;
-					foreach(taskset.get_tasks(), task)
-					{
-						cout<<"Task "<<task->get_id()<<":"<<endl;
-						cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
-						cout<<"-----------------------"<<endl;
-					}
-	#endif
-					//sleep(1);
+				if(sendto(listenfd, to_string(utilization).data(), sizeof(to_string(utilization).data()), 0, (struct sockaddr*)&client_addr, sizeof(client_addr)) < 0) 
+				{ 
+					printf("Send failed.");
 				}
 
 				result.utilization = utilization;
 			}
-cout<<endl;
-			for(uint i = 0; i < param->test_attributes.size(); i++)
-			{
-				fraction_t ratio(success[i], exp[i]);
-				if(0 == strcmp(param->test_attributes[i].rename.data(), ""))
-					output.add_result(param->test_attributes[i].rename, utilization, exp[i], success[i]);
-				else
-					output.add_result(param->test_attributes[i].test_name, utilization, exp[i], success[i]);
-
-				stringstream buf;
-
-				if(0 == strcmp(param->test_attributes[i].rename.data(),""))
-					buf<<param->test_attributes[i].test_name;
-				else
-					buf<<param->test_attributes[i].rename;
-
-				buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
-
-				output.append2file("result-logs.csv", buf.str());
-
-cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<" exc_s:"<<exc[i]<<endl;
-			}
-			output.export_result_append(utilization);
-			output.Export(PNG);
 			utilization += param->step;
 		}
 		while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
@@ -220,43 +140,16 @@ cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
 		uint sec = (gap%3600)%60;
 
 cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
-
+/*
 		output.export_csv();
-
 		output.Export(PNG|EPS|SVG|TGA|JSON);
-	
-		
-//		break;
-	}
-	
+*/
 
 	return 0;
 }
 
-void getFiles(string path, string dir)  
-{  
-	string cmd = "ls " + path + " > " + path + dir;
-	system(cmd.data());
-}  
-
-void read_line(string path, vector<string>& files)
-{
-	string buf;
-	ifstream dir(path.data(), ifstream::in);
-	getline(dir, buf);
-	while(getline(dir, buf))
-	{
-		files.push_back("config/" + buf);
-//cout<<"file name:"<<buf<<endl;
-	}
-}
-
 vector<Param> get_parameters()
 {
-	//getFiles("config/", "0");
-	//read_line("config/0", configurations);
-	//vector<string> configurations;
-	
 	vector<Param> parameters;
 
 	XML::LoadFile("config.xml");

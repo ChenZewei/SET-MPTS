@@ -39,12 +39,19 @@ int main(int argc,char** argv)
 {	
 
 	vector<Param> parameters = get_parameters();
-
+	Param* param = &(parameters[0]);
+	SchedTestFactory STFactory;	
 	int socketfd;
 	int status,recvlen;
 	char recvbuffer[MAXBUFFER];
 	memset(recvbuffer,0,MAXBUFFER);
 	struct sockaddr_in server;
+
+	if((socketfd=socket(AF_INET, SOCK_DGRAM, 0))==-1)
+	{
+		printf("Create socket failed.");
+		exit(EXIT_SUCCESS);
+	}
 
 	if(inet_aton(parameters[0].server_ip, &(server.sin_addr))==0)
 	{
@@ -52,33 +59,29 @@ int main(int argc,char** argv)
 		exit(EXIT_SUCCESS);
 	}
 	
-	if((socketfd=socket(AF_INET, SOCK_DGRAM, 0))==-1)
-	{
-		printf("Create socket failed.");
-		exit(EXIT_SUCCESS);
-	}
-	
 	bzero(&server,sizeof(server));
 	server.sin_family = AF_INET;
+	server.sin_addr.s_addr = inet_addr(parameters[0].server_ip); 
 	server.sin_port = htons(parameters[0].port);
 
+/*
 	if(connect(socketfd,(struct sockaddr *)&server,sizeof(struct sockaddr))==-1)
 	{
 		printf("Connect failed.");
 		exit(EXIT_SUCCESS);
 	}
-	
-
+*/
+	if(sendto(socketfd, "-1", sizeof("-1"), 0, (struct sockaddr*)&server, sizeof(server)) < 0) 
+	{
+		printf("Send failed.%d\n",status);
+	}
 
 	while(1)
 	{
 		memset(recvbuffer,0,MAXBUFFER);
-		if(status = send(socketfd, "00", strlen("00"), 0)==-1)
-		{
-			printf("Send failed.%d\n",status);
-		}
+		
 
-		if((recvlen = recv(socketfd,recvbuffer,sizeof(recvbuffer),0))==-1)
+		if((recvlen = recv(socketfd, recvbuffer,sizeof(recvbuffer),0))==-1)
 		{
 			printf("Recieve error.\n");
 			exit(EXIT_SUCCESS);	
@@ -89,8 +92,64 @@ int main(int argc,char** argv)
 			exit(EXIT_SUCCESS);
 		}
 
-		int index = atoi(recvbuffer);
-cout<<"index:"<<index<<endl;
+		cout<<recvbuffer<<endl;
+
+		floating_t utilization(recvbuffer);
+
+		stringstream buf;
+
+		buf<<utilization.get_d();
+
+		vector<int> success;
+		for(uint i = 0; i < param->test_attributes.size(); i++)
+		{
+			success.push_back(0);
+		}
+
+		TaskSet taskset = TaskSet();
+		ProcessorSet processorset = ProcessorSet(*param);
+		ResourceSet resourceset = ResourceSet();
+		resource_gen(&resourceset, *param);
+		tast_gen(taskset, resourceset, *param, utilization.get_d());
+		
+		
+		for(uint j = 0; j < param->get_method_num(); j++)
+		{
+			taskset.init();
+			processorset.init();	
+			resourceset.init();
+
+			SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
+			if(NULL == schedTest)
+			{
+				cout<<"Incorrect test name."<<endl;
+				return -1;
+			}
+//cout<<test_attributes[j].test_name<<":";
+			if(schedTest->is_schedulable())
+			{
+				success[j]++;
+				buf<<","<<1;
+			}
+			else
+				buf<<","<<0;
+
+			delete(schedTest);
+		}	
+		
+		buf<<"\n";
+		
+		cout<<buf.str()<<endl;		
+
+		if(sendto(socketfd, buf.str().data(), sizeof(buf.str().data()), 0, (struct sockaddr*)&server, sizeof(server)) < 0) 
+		{
+			printf("Send failed.%d\n",status);
+		}
+	}
+	
+
+
+/*
 		Param* param = &(parameters[index]);
 		
 		Result_Set results[MAX_METHOD];
@@ -225,7 +284,8 @@ cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
 	
 		
 //		break;
-	}
+
+*/
 	
 
 	return 0;

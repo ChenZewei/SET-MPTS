@@ -30,14 +30,15 @@ class GLPKSolution
 		void set_coefficients();
 		void set_column_types();
 	public:
-		GLPKSolution(const LinearProgram &lp, unsigned int max_var_num, double var_lb = 0.0, double var_ub = 1.0, uint dir = 0, uint aim = 0, long t_limit = -1);
+		GLPKSolution(const LinearProgram &lp, unsigned int max_var_num, double var_lb = 0.0, double var_ub = 1.0, uint dir = 0, uint aim = 0);
 		~GLPKSolution();
 		int get_status();
 		void show_error();
 		double get_value(unsigned int var) const;
 		double evaluate(const LinearExpression &exp) const;
 		bool is_solved() const;
-		static set_time_limit(long t_limit);
+		static void set_time_limit(long time);
+		const static long get_time_limit();
 };
 
 

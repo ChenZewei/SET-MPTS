@@ -20,10 +20,16 @@ class XML
 		XML();
 
 		~XML();
+
 		
 		static void LoadFile(const char* path);		
 
 		static void SaveConfig(const char* path);
+
+		//Network
+		static char*  get_server_ip();
+		
+		static uint get_server_port();
 		
 		static void get_method(Test_Attribute_Set *t_set);
 
