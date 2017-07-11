@@ -16,14 +16,12 @@
 #include "random_gen.h"
 #include "iteration-helper.h"
 #include "toolkit.h"
-//Socket
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include "network.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
 #define MAXBUFFER 100
+#define BACKLOG 64
 
 #define typeof(x) __typeof(x)
 
@@ -36,158 +34,260 @@ vector<Param> get_parameters();
 
 int main(int argc,char** argv)
 {	
-
+	
+//Experiment parameters
 	vector<Param> parameters = get_parameters();
+	Param* param = &(parameters[0]);
+	Result_Set results[MAX_METHOD];
+	Output output(*param);
+	SchedResultSet srs;
+	XML::SaveConfig((output.get_path() + "config.xml").data());
+	output.export_param();
 
-	int listenfd;
-	int sin_size;
+//Network parameters
+	int maxi, maxfd;
+	int nready;	
+	int listenfd, connectfd;
+	int sin_size = sizeof(struct sockaddr_in);
 	int recvlen;
+	ssize_t n;
+	fd_set rset,allset;
 	char recvbuffer[MAXBUFFER];
 	char sendbuffer[MAXBUFFER];
 	memset(recvbuffer,0,MAXBUFFER);
 	memset(sendbuffer,0,MAXBUFFER);
-	struct sockaddr_in server,client;
-
-	vector<struct sockaddr_in> clients;
-
-	if((listenfd=socket(AF_INET, SOCK_DGRAM, 0))==-1)
+	struct sockaddr_in server,client_addr;
+	list<NetWork> clients;
+	if((listenfd=socket(AF_INET,SOCK_STREAM,0))==-1)
 	{
-		printf("Create socket failed.");
+		cout<<"Create socket failed."<<endl;
 		exit(EXIT_SUCCESS);
 	}
-	
 	bzero(&server,sizeof(server));
 	server.sin_family = AF_INET;
 	server.sin_port = htons(parameters[0].port);
 	server.sin_addr.s_addr = htonl(INADDR_ANY);
-	
 	if(bind(listenfd, (struct sockaddr *)&server, sizeof(struct sockaddr))==-1)
 	{
-		printf("Bind error.");
+		cout<<"Bind error."<<endl;
 		exit(EXIT_SUCCESS);
 	}
-		
-		int index = 0;
-cout<<"index:"<<index<<endl;
-		Param* param = &(parameters[index]);
-		
-		Result_Set results[MAX_METHOD];
-		Output output(*param);
-		SchedResultSet srs;
+	if(listen(listenfd,BACKLOG)==-1)
+	{
+		printf("Listen error.");
+		exit(EXIT_SUCCESS);	
+	}
+	maxfd = listenfd;
+	maxi = -1;
 
-		XML::SaveConfig((output.get_path() + "config.xml").data());
-		output.export_param();
+	FD_ZERO(&allset);
+	FD_SET(listenfd, &allset);
 
-		double utilization = param->u_range.min;
-
-		time_t start, end;
-
-		start = time(NULL);
-
+	double utilization = param->u_range.min;
+	time_t start, end;
+	start = time(NULL);
 cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
-		do
-		{	
-			Result result;
-cout<<"Utilization:"<<utilization<<endl;
-			vector<int> success;
-			vector<int> exp;
-			vector<int> exc;
-			for(uint i = 0; i < param->test_attributes.size(); i++)
+	while(1)
+	{	
+		rset = allset;
+		nready = select(maxfd+1, &rset,NULL,NULL,NULL);
+		if(FD_ISSET(listenfd,&rset))
+		{
+			if((connectfd=accept(listenfd,(struct sockaddr *)&client_addr, &sin_size))==-1)
 			{
-				exp.push_back(0);
-				success.push_back(0);
-				exc.push_back(0);
+				printf("Accept error.");
+				continue;
 			}
-
-			int exp_time = 0;
-
-			while(exp_time < param->exp_times)
+			
+			if(clients.size() < FD_SETSIZE)
 			{
-				cout<<"waiting for connect..."<<endl;
-
-				struct sockaddr_in client_addr; 
-				int client_addr_length = sizeof(client_addr);
-
-				char buffer[BUFFER_SIZE]; 
-				bzero(buffer, BUFFER_SIZE); 
-				if(recvfrom(listenfd, buffer, BUFFER_SIZE,0,(struct sockaddr*)&client_addr, &client_addr_length) == -1) 
-				{ 
-					perror("Receive Data Failed:"); 
-					exit(1); 
-				}
-
-				cout<<buffer<<endl;
-
-				string str_buf = buffer;
-
-				if(0 != strcmp(buffer,"-1"))
-				{
-					cout<<"Extract result..."<<endl;
-					vector<string> elements;
-					extract_element(elements, str_buf, 0, param->test_attributes.size() + 1, ',');
-
-					for(uint i = 0; i < param->test_attributes.size(); i++)
-					{
-						string test_name;
-						if(!param->test_attributes[i].rename.empty())
-						{
-							test_name = param->test_attributes[i].rename;
-						}
-						else
-						{
-							test_name = param->test_attributes[i].test_name;
-						}
-
-						output.add_result(test_name, param->test_attributes[i].style, utilization, 1, atoi(elements[i+1].data()));
-
-						stringstream buf;
-
-						buf<<test_name;
-
-						buf<<"\t"<<utilization<<"\t"<<1<<"\t"<<elements[i+1];
-
-						output.append2file("result-logs.csv", buf.str());
-					}
-
-					exp_time++;
-				}
+				clients.insert(NetWork(connectfd, client_addr));
 				
-			//	if(exp_time == param->exp_times - 1)
-			//		break;
+				cout<<"Connection from [ip:"<<inet_ntoa(client_addr.sin_addr)<<"] has already established."<<endl;
+			}	
 
-				if(sendto(listenfd, to_string(utilization).data(), sizeof(to_string(utilization).data()), 0, (struct sockaddr*)&client_addr, sizeof(client_addr)) < 0) 
-				{ 
-					cout<<"Send failed."<<endl;
+			if(clients.size() == FD_SETSIZE)
+				cout<<"Too many clients."<<endl;
+
+			FD_SET(connectfd,&allset);
+
+			if(connectfd > maxfd)
+				maxfd = connectfd;
+
+			if(clients.size() > maxi)
+				maxi = clients.size();
+
+			if(nready <= 0)
+				continue;
+		}
+
+		foreach(clients, client)
+		{
+			if(FD_ISSET(client->get_socket(), &rset))
+			{
+				string recvbuf = client->recv();
+				
+				if(client->get_status())
+				{
+					cout<<"Disconnected."<<endl;
+					clients.erase(client);
 				}
 				else
-					cout<<"mdg sent."<<endl;
+				{
+					cout<<recvbuf<<endl;
+				}
+/*
+				if((n = recv(sockfd,recvbuf,sizeof(recvbuf),0)) == 0)
+				{
+					close(sockfd);
+					printf("Client %s closed connection.\n",client[i].name);
+					printf("%s's data:%s\n",client[i].name,client[i].data);
+					FD_CLR(sockfd,&allset);
+					client[i].fd = -1;
+					free(client[i].name);
+					free(client[i].data);
+				}
+				else
+				{
+					process(client[i],recvbuf);
+				}
+*/
+				if(nready <=0)
+					break;
+			}
+		}
+/*
+		for(i = 0; i <= maxi; i++)
+		{
+			if((sockfd = client[i].fd) < 0)
+				continue;
+			if(FD_ISSET(sockfd,&rset))
+			{
+				if((n = recv(sockfd,recvbuf,sizeof(recvbuf),0)) == 0)
+				{
+					close(sockfd);
+					printf("Client %s closed connection.\n",client[i].name);
+					printf("%s's data:%s\n",client[i].name,client[i].data);
+					FD_CLR(sockfd,&allset);
+					client[i].fd = -1;
+					free(client[i].name);
+					free(client[i].data);
+				}
+				else
+				{
+					process(client[i],recvbuf);
+				}
+				if(nready <=0)
+					break;
+			}
+		}
+*/
+	}
 
+/*
+	do
+	{	
+		Result result;
+cout<<"Utilization:"<<utilization<<endl;
+		vector<int> success;
+		vector<int> exp;
+		vector<int> exc;
+		for(uint i = 0; i < param->test_attributes.size(); i++)
+		{
+			exp.push_back(0);
+			success.push_back(0);
+			exc.push_back(0);
+		}
+
+		int exp_time = 0;
+
+		while(exp_time < param->exp_times)
+		{
+			cout<<"waiting for connect..."<<endl;
+
+			struct sockaddr_in client_addr; 
+			int client_addr_length = sizeof(client_addr);
+
+			char buffer[BUFFER_SIZE]; 
+			bzero(buffer, BUFFER_SIZE); 
+			if(recvfrom(listenfd, buffer, BUFFER_SIZE,0,(struct sockaddr*)&client_addr, &client_addr_length) == -1) 
+			{ 
+				perror("Receive Data Failed:"); 
+				exit(1); 
 			}
 
+			cout<<buffer<<endl;
+
+			string str_buf = buffer;
+
+			if(0 != strcmp(buffer,"-1"))
+			{
+				cout<<"Extract result..."<<endl;
+				vector<string> elements;
+				extract_element(elements, str_buf, 0, param->test_attributes.size() + 1, ',');
+
+				for(uint i = 0; i < param->test_attributes.size(); i++)
+				{
+					string test_name;
+					if(!param->test_attributes[i].rename.empty())
+					{
+						test_name = param->test_attributes[i].rename;
+					}
+					else
+					{
+						test_name = param->test_attributes[i].test_name;
+					}
+
+					output.add_result(test_name, param->test_attributes[i].style, utilization, 1, atoi(elements[i+1].data()));
+
+					stringstream buf;
+
+					buf<<test_name;
+
+					buf<<"\t"<<utilization<<"\t"<<1<<"\t"<<elements[i+1];
+
+					output.append2file("result-logs.csv", buf.str());
+				}
+
+				exp_time++;
+			}
 			
-			output.export_result_append(utilization);
-			output.Export(PNG);			
+		//	if(exp_time == param->exp_times - 1)
+		//		break;
 
-			utilization += param->step;
+			if(sendto(listenfd, to_string(utilization).data(), sizeof(to_string(utilization).data()), 0, (struct sockaddr*)&client_addr, sizeof(client_addr)) < 0) 
+			{ 
+				cout<<"Send failed."<<endl;
+			}
+			else
+				cout<<"mdg sent."<<endl;
+
 		}
-		while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
 
-		output.export_csv();
-		output.Export(PNG|EPS|SVG|TGA|JSON);
+		
+		output.export_result_append(utilization);
+		output.Export(PNG);			
 
-		time(&end);
+		utilization += param->step;
+	}
+	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
+*/
+	output.export_csv();
+	output.Export(PNG|EPS|SVG|TGA|JSON);
+
+	time(&end);
 cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
 
-		ulong gap = difftime(end, start);
-		uint hour = gap/3600;
-		uint min = (gap%3600)/60;																				
-		uint sec = (gap%3600)%60;
+	ulong gap = difftime(end, start);
+	uint hour = gap/3600;
+	uint min = (gap%3600)/60;																				
+	uint sec = (gap%3600)%60;
 
 cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
 /*
-		output.export_csv();
-		output.Export(PNG|EPS|SVG|TGA|JSON);
+	output.export_csv();
+	output.Export(PNG|EPS|SVG|TGA|JSON);
 */
 
 	return 0;
