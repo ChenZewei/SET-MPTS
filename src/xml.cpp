@@ -3,6 +3,7 @@
 XML::XML()
 {
 	output = new XMLDocument();
+	initialization();
 }
 
 XML::~XML()
@@ -461,6 +462,11 @@ void XML::add_range(const char* parent, Range range)
 	max->SetText(transform.get_str().data());
 	data->InsertEndChild(max);
 	title->InsertFirstChild(data);
+}
+
+void XML::set_text(XMLElement* element, const char* text)
+{
+	element->SetText(text);
 }
 
 void XML::set_text(const char* parent, int index1, const char* element, int index2,const char* text)

@@ -82,6 +82,7 @@ class XML
 		void add_element(const XMLElement* parent, const char* name, const char* text = "");
 		void add_element(const char* parent, int index, const char* name, const char* text = "");
 		void add_range(const char* parent, Range range);
+		void set_text(XMLElement* element, const char* text);
 		void set_text(const char* parent, int index1, const char* element, int index2,const char* text);
 		void save_file(const char* path);
 		void clear();

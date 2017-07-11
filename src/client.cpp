@@ -17,6 +17,7 @@
 #include "test_model.h"
 #include "sched_test_factory.h"
 #include "iteration-helper.h"
+#include "toolkit.h"
 //Socket
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -34,25 +35,35 @@ using namespace std;
 void getFiles(string path, string dir);
 void read_line(string path, vector<string>& files);
 vector<Param> get_parameters();
+unsigned int alarm(unsigned int seconds);
 
 int main(int argc,char** argv)
 {	
+/*
+	if(2 != argc)
+	{
+		printf("Usage: %s [port]\n",argv[0]);
+		exit(EXIT_SUCCESS);
+	}
+	int port = atoi(argv[1]);
+*/
 
 	vector<Param> parameters = get_parameters();
 	Param* param = &(parameters[0]);
-	SchedTestFactory STFactory;	
+	SchedTestFactory STFactory;
+
 	int socketfd;
 	int status,recvlen;
+	int sin_size = sizeof(struct sockaddr_in);
 	char recvbuffer[MAXBUFFER];
 	memset(recvbuffer,0,MAXBUFFER);
 	struct sockaddr_in server;
 
-	if((socketfd=socket(AF_INET, SOCK_DGRAM, 0))==-1)
+	if((socketfd=socket(AF_INET, SOCK_STREAM, 0))==-1)
 	{
 		printf("Create socket failed.");
 		exit(EXIT_SUCCESS);
 	}
-
 	if(inet_aton(parameters[0].server_ip, &(server.sin_addr))==0)
 	{
 		printf("Server ip illegal.");
@@ -64,24 +75,21 @@ int main(int argc,char** argv)
 	server.sin_addr.s_addr = inet_addr(parameters[0].server_ip); 
 	server.sin_port = htons(parameters[0].port);
 
-/*
-	if(connect(socketfd,(struct sockaddr *)&server,sizeof(struct sockaddr))==-1)
+	while(connect(socketfd,(struct sockaddr *)&server,sizeof(struct sockaddr)) == -1)
 	{
-		printf("Connect failed.");
-		exit(EXIT_SUCCESS);
+		cout<<"Connect failed! Reconnect in 10 second..."<<endl;
+		sleep(10);
 	}
-*/
-	if(sendto(socketfd, "-1", sizeof("-1"), 0, (struct sockaddr*)&server, sizeof(server)) < 0) 
+
+	if(send(socketfd, "0", sizeof("0"), 0) < 0) 
 	{
-		//cout<<"Send failed! Resend in 1 second."<<endl;
+		cout<<"Send failed!"<<endl;
 		//sleep(1);
 	}
 
 	while(1)
 	{
 		memset(recvbuffer,0,MAXBUFFER);
-		
-
 		if((recvlen = recv(socketfd, recvbuffer,sizeof(recvbuffer),0))==-1)
 		{
 			printf("Recieve error.\n");
@@ -95,60 +103,76 @@ int main(int argc,char** argv)
 
 		cout<<recvbuffer<<endl;
 
-		floating_t utilization(recvbuffer);
+		vector<string> elements;
 
-		if(abs(utilization + 1) < _EPS)// if utilization == -1
-			break;
+		extract_element(elements, recvbuffer);
 
-		stringstream buf;
-
-		buf<<utilization.get_d();
-
-		vector<int> success;
-		for(uint i = 0; i < param->test_attributes.size(); i++)
+		if(0 == strcmp(elements[0].data(), "-1"))//termination
 		{
-			success.push_back(0);
+			exit(EXIT_SUCCESS);
 		}
-
-		TaskSet taskset = TaskSet();
-		ProcessorSet processorset = ProcessorSet(*param);
-		ResourceSet resourceset = ResourceSet();
-		resource_gen(&resourceset, *param);
-		tast_gen(taskset, resourceset, *param, utilization.get_d());
-		
-		
-		for(uint j = 0; j < param->get_method_num(); j++)
+		else if(0 == strcmp(elements[0].data(), "3"))//heartbeat
 		{
-			taskset.init();
-			processorset.init();	
-			resourceset.init();
-
-			SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
-			if(NULL == schedTest)
+			if(send(socketfd, "3", sizeof("3"), 0) < 0) 
 			{
-				cout<<"Incorrect test name."<<endl;
-				return -1;
+				cout<<"Send failed!"<<endl;
 			}
-//cout<<test_attributes[j].test_name<<":";
-			if(schedTest->is_schedulable())
-			{
-				success[j]++;
-				buf<<","<<1;
-			}
-			else
-				buf<<","<<0;
-
-			delete(schedTest);
-		}	
-		
-		buf<<"\n";
-		
-		cout<<buf.str()<<endl;		
-
-		if(sendto(socketfd, buf.str().data(), sizeof(buf.str().data()), 0, (struct sockaddr*)&server, sizeof(server)) < 0)
+		}
+		else if(0 == strcmp(elements[0].data(), "1"))//work
 		{
-			//cout<<"Send failed! Resend in 1 second."<<endl;
-			//sleep(1);
+			floating_t utilization(elements[1]);
+
+			stringstream buf;
+
+			buf<<"2,";
+
+			buf<<utilization.get_d();
+
+			vector<int> success;
+			for(uint i = 0; i < param->test_attributes.size(); i++)
+			{
+				success.push_back(0);
+			}
+
+			TaskSet taskset = TaskSet();
+			ProcessorSet processorset = ProcessorSet(*param);
+			ResourceSet resourceset = ResourceSet();
+			resource_gen(&resourceset, *param);
+			tast_gen(taskset, resourceset, *param, utilization.get_d());
+		
+		
+			for(uint j = 0; j < param->get_method_num(); j++)
+			{
+				taskset.init();
+				processorset.init();	
+				resourceset.init();
+
+				SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
+				if(NULL == schedTest)
+				{
+					cout<<"Incorrect test name."<<endl;
+					return -1;
+				}
+				if(schedTest->is_schedulable())
+				{
+					success[j]++;
+					buf<<","<<1;
+				}
+				else
+					buf<<","<<0;
+
+				delete(schedTest);
+			}	
+		
+			//buf<<"\n";
+		
+			cout<<buf.str()<<endl;		
+
+			if(send(socketfd, buf.str().data(), strlen(buf.str().data()), 0) < 0)
+			{
+				//cout<<"Send failed! Resend in 1 second."<<endl;
+				//sleep(1);
+			}
 		}
 	}
 	

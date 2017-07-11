@@ -68,10 +68,12 @@
 
 		<data RENAME="ILP-3"  STYLE="">ILP-RTA-PFP-DPCP-3</data>
 <!-->
-		<data RENAME="PFP-WF" STYLE="">RTA-PFP-WF</data>
-		<data RENAME="PFP-FF" STYLE="">RTA-PFP-FF</data>
+		<data RENAME="R-PCP"     STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
+		<data RENAME="R-PCP-opa" STYLE="{xED7D31}2=^">RTA-PFP-RO-OPA</data>
+		<data RENAME="R-PCP-sm"     STYLE="{x0080FF}2j#^">RTA-PFP-RO-SM</data>
+		<data RENAME="R-PCP-sm-opa" STYLE="{xED7D31}2:#v">RTA-PFP-RO-SM-OPA</data>
 	</schedulability_test>
-	<experiment_times>1</experiment_times>
+	<experiment_times>100</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->
@@ -82,7 +84,7 @@
 <!-->
 	</output>
 	<lambda>
-		<data>10</data>
+		<data>4</data>
 	</lambda>
 	<step>
 		<data>0.2</data>
@@ -98,8 +100,8 @@
 	</processor_num>
 	<period_range>
 		<data>
-			<min>1000</min>
-			<max>10000</max>
+			<min>10000</min>
+			<max>10000000</max>
 		</data>
 	</period_range>
 	<deadline_propotion>
@@ -109,7 +111,7 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>0</data>
+		<data>4</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
 		<data>100</data>
@@ -118,12 +120,12 @@
 		<data>0.1</data>
 	</rrp>
 	<rrn>//resource_request_number
-		<data>1</data>
+		<data>3</data>
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
-			<min>50</min>
-			<max>100</max>
+			<min>100</min>
+			<max>200</max>
 		</data>
 	</rrr>
 	<total_len_factor>

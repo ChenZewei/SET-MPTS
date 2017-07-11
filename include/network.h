@@ -12,6 +12,8 @@
 
 #define CONNECTED		0
 #define DISCONNECTED	1
+#define IDLE			2
+#define BUSY			3
 
 class NetWork
 {
@@ -20,62 +22,59 @@ class NetWork
 		struct sockaddr_in addr;
 		int status;
 	public:
-		NetWork(int socket, struct sockaddr_in addr);
-		NetWork(int socket, string ip, long port);
-		~NetWork();
-		int get_socket();
-		int get_status();
-		string recv();
-		int send(string buffer);
-		
+		NetWork(int socketfd, struct sockaddr_in addr)
+		{
+			connectfd = socketfd;
+			this->addr = addr;
+			status = CONNECTED;
+		}
+
+		NetWork(int socketfd, string ip, long port)
+		{
+			connectfd = socketfd;
+			bzero(&addr,sizeof(addr));
+			addr.sin_family = AF_INET;
+			addr.sin_port = htons(port);
+			addr.sin_addr.s_addr = inet_addr(ip.c_str());
+			status = CONNECTED;
+		}
+
+		~NetWork() {}
+
+		int get_socket()
+		{
+			return connectfd;
+		}
+
+		void set_status(int stat)
+		{
+			status = stat;
+		}
+
+		int get_status()
+		{
+			return status;
+		}
+
+		string recvbuf()
+		{
+			char recvbuf[MAX_BUFFER];
+			memset(recvbuf,0,MAX_BUFFER);
+			int recv_len;
+			if((recv_len = recv(connectfd, recvbuf, sizeof(recvbuf), 0)) == 0)
+			{
+				status = DISCONNECTED;
+				return "";
+			}
+
+			cout<<"receive:"<<recv_len<<" "<<recvbuf<<endl;
+			return recvbuf;
+		}
+
+		int sendbuf(string buffer)
+		{
+			return send(connectfd, buffer.c_str(), strlen(buffer.c_str()), 0);
+		}
 };
-
-NetWork::NetWork(int socketfd, struct sockaddr_in addr)
-{
-	connectfd = socketfd;
-	this->addr = addr;
-	status = CONNECTED;
-}
-
-NetWork::NetWork(int socketfd, string ip, long port)
-{
-	connectfd = socketfd;
-	bzero(&addr,sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
-	addr.sin_addr.s_addr = inet_addr(ip.c_str());
-	status = CONNECTED;
-}
-
-NetWork::~NetWork() {}
-
-int NetWork::get_socket()
-{
-	return connectfd;
-}
-
-int NetWork::get_status()
-{
-	return status;
-}
-
-string NetWork::recv()
-{
-	char recvbuf[MAX_BUFFER];
-
-	if(recv(connectfd, recvbuf, sizeof(recvbuf), 0) == 0)
-	{
-		status = DISCONNECTED;
-		return "";
-	}
-
-	return recvbuf;
-}
-
-int NetWork::send(string buffer)
-{
-	return send(connectfd, buffer.c_str(), strlen(buffer.c_str()), 0);
-}
-
 
 #endif
