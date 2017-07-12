@@ -169,7 +169,6 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 							break;
 						}
 						else
-
 							delete(schedTest);
 					}
 					else

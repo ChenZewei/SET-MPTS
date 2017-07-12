@@ -61,9 +61,10 @@ class NetWork
 			char recvbuf[MAX_BUFFER];
 			memset(recvbuf,0,MAX_BUFFER);
 			int recv_len;
-			if((recv_len = recv(connectfd, recvbuf, sizeof(recvbuf), 0)) == 0)
+			if((recv_len = recv(connectfd, recvbuf, sizeof(recvbuf), 0)) <= 0)
 			{
 				status = DISCONNECTED;
+				cout<<"receive:"<<recv_len<<" "<<recvbuf<<endl;
 				return "";
 			}
 

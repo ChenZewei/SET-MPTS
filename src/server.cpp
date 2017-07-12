@@ -60,6 +60,8 @@ int main(int argc,char** argv)
 		cout<<"Create socket failed."<<endl;
 		exit(EXIT_SUCCESS);
 	}
+//	int flags = fcntl(listenfd, F_GETFL, 0);
+//　	fcntl(listenfd, F_SETFL, flags|O_NONBLOCK);
 	bzero(&server,sizeof(server));
 	server.sin_family = AF_INET;
 	server.sin_port = htons(parameters[0].port);
@@ -89,19 +91,23 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
 
 	int pre_exp_time = 0;
+	int exp_time = pre_exp_time;
+	int recv_exp = 0;
 	do
 	{	
-		//Experiment parameter
-		int exp_time = pre_exp_time;
-		pre_exp_time = 0;
-
-
+		//cout<<"In the circle."<<endl;
+		if(recv_exp == param->exp_times)
+		{
+			output.Export(PNG);	
+			recv_exp = 0;
+		}
 
 		//Network
 		rset = allset;
 		nready = select(maxfd+1, &rset,NULL,NULL,NULL);
 		if(FD_ISSET(listenfd,&rset))
 		{
+			cout<<"waiting for connect"<<endl;
 			if((connectfd=accept(listenfd,(struct sockaddr *)&client_addr, &sin_size))==-1)
 			{
 				printf("Accept error.");
@@ -142,12 +148,16 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 		{
 			if(FD_ISSET(client->get_socket(), &rset))
 			{
+				cout<<"waiting for clien:"<<client->get_socket()<<endl;
 				string recvbuf = client->recvbuf();
 				
 				if(client->get_status())
 				{
 					cout<<"Disconnected."<<endl;
+					FD_CLR(client->get_socket(),&allset);
 					clients.erase(client);
+					client = clients.begin();
+					continue;
 				}
 				else
 				{
@@ -157,7 +167,6 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 				vector<string> elements;
 
 				extract_element(elements, recvbuf);
-
 
 //				foreach(elements, element)
 //					cout<<"element:"<<*element<<endl;
@@ -170,7 +179,7 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 				else if(0 == strcmp(elements[0].data(), "0"))//connection
 				{
 					sendbuffer = "1,";
-					if(exp_time == param->exp_times)
+					if(exp_time >= param->exp_times)
 					{
 						sendbuffer += to_string(utilization + param->step);
 						client->sendbuf(sendbuffer);
@@ -186,7 +195,7 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 				else if(0 == strcmp(elements[0].data(), "2"))//result
 				{
 					cout<<"Extract result..."<<endl;
-
+					recv_exp++;
 					for(uint i = 0; i < param->test_attributes.size(); i++)
 					{
 						string test_name;
@@ -207,13 +216,15 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
 						buf<<test_name;
 
-						buf<<"\t"<<utilization<<"\t"<<1<<"\t"<<elements[i+1];
-
+						buf<<"\t"<<u.get_d()<<"\t"<<1<<"\t"<<elements[i+2];
+cout<<buf.str()<<endl;
 						output.append2file("result-logs.csv", buf.str());
 					}
 
+cout<<exp_time<<" "<<param->exp_times<<endl;
+
 					sendbuffer = "1,";
-					if(exp_time == param->exp_times)
+					if(exp_time >= param->exp_times)
 					{
 						sendbuffer += to_string(utilization + param->step);
 						client->sendbuf(sendbuffer);
@@ -238,9 +249,17 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 		if(exp_time == param->exp_times)
 		{
 			utilization += param->step;
+			//Experiment parameter
+			exp_time = pre_exp_time;
+			pre_exp_time = 0;
 		}
 	}
-	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
+	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS || recv_exp < param->exp_times);
+
+	foreach(clients, client)
+	{
+		client->sendbuf("-1");
+	}
 
 	output.export_csv();
 	output.Export(PNG|EPS|SVG|TGA|JSON);

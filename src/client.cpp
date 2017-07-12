@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <ctime>
 #include <pthread.h>
+#include <glpk.h>
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
@@ -16,6 +17,7 @@
 #include "random_gen.h"
 #include "test_model.h"
 #include "sched_test_factory.h"
+#include "solution.h"
 #include "iteration-helper.h"
 #include "toolkit.h"
 //Socket
@@ -51,7 +53,9 @@ int main(int argc,char** argv)
 	vector<Param> parameters = get_parameters();
 	Param* param = &(parameters[0]);
 	SchedTestFactory STFactory;
-
+#if UNDEF_ABANDON
+	GLPKSolution::set_time_limit(TIME_LIMIT_INIT);
+#endif
 	int socketfd;
 	int status,recvlen;
 	int sin_size = sizeof(struct sockaddr_in);
@@ -122,58 +126,76 @@ int main(int argc,char** argv)
 		{
 			floating_t utilization(elements[1]);
 
-			stringstream buf;
-
-			buf<<"2,";
-
-			buf<<utilization.get_d();
-
 			vector<int> success;
 			for(uint i = 0; i < param->test_attributes.size(); i++)
 			{
 				success.push_back(0);
 			}
 
-			TaskSet taskset = TaskSet();
-			ProcessorSet processorset = ProcessorSet(*param);
-			ResourceSet resourceset = ResourceSet();
-			resource_gen(&resourceset, *param);
-			tast_gen(taskset, resourceset, *param, utilization.get_d());
-		
-		
-			for(uint j = 0; j < param->get_method_num(); j++)
+			bool abandon;
+			string sendbuf;
+			do
 			{
-				taskset.init();
-				processorset.init();	
-				resourceset.init();
+				abandon = false;
+				stringstream buf;
+				buf<<"2,";
+				buf<<utilization.get_d();
 
-				SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
-				if(NULL == schedTest)
-				{
-					cout<<"Incorrect test name."<<endl;
-					return -1;
-				}
-				if(schedTest->is_schedulable())
-				{
-					success[j]++;
-					buf<<","<<1;
-				}
-				else
-					buf<<","<<0;
+				TaskSet taskset = TaskSet();
+				ProcessorSet processorset = ProcessorSet(*param);
+				ResourceSet resourceset = ResourceSet();
+				resource_gen(&resourceset, *param);
+				tast_gen(taskset, resourceset, *param, utilization.get_d());
 
-				delete(schedTest);
-			}	
-		
+				for(uint j = 0; j < param->get_method_num(); j++)
+				{
+					taskset.init();
+					processorset.init();	
+					resourceset.init();
+
+					SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
+					if(NULL == schedTest)
+					{
+						cout<<"Incorrect test name."<<endl;
+						return -1;
+					}
+					if(schedTest->is_schedulable())
+					{
+						success[j]++;
+						buf<<","<<1;
+					}
+					else
+						buf<<","<<0;
+#if UNDEF_ABANDON
+					if(GLP_UNDEF == schedTest->get_status())
+					{
+cout<<"Abandon cause GLP_UNDEF"<<endl;
+						long current_lmt = GLPKSolution::get_time_limit();
+						long new_lmt = (current_lmt+TIME_LIMIT_GAP <= TIME_LIMIT_UPPER_BOUND)?current_lmt+TIME_LIMIT_GAP:TIME_LIMIT_UPPER_BOUND;
+cout<<"Set GLPK time limit to:"<<new_lmt/1000<<" s"<<endl;
+						GLPKSolution::set_time_limit(new_lmt);
+						abandon = true;
+						delete(schedTest);
+						break;
+					}
+#endif				
+					delete(schedTest);
+				}
+				sendbuf = buf.str();
+			}
+			while(abandon);
+
 			//buf<<"\n";
 		
-			cout<<buf.str()<<endl;		
+			cout<<sendbuf<<endl;		
 
-			if(send(socketfd, buf.str().data(), strlen(buf.str().data()), 0) < 0)
+			if(send(socketfd, sendbuf.data(), strlen(sendbuf.data()), 0) < 0)
 			{
 				//cout<<"Send failed! Resend in 1 second."<<endl;
 				//sleep(1);
 			}
 		}
+		sleep(2);
 	}
 	
 
