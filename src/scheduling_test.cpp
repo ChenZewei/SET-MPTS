@@ -18,6 +18,7 @@
 #include "test_model.h"
 #include "sched_test_factory.h"
 #include "iteration-helper.h"
+#include "solution.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
@@ -44,6 +45,10 @@ int main(int argc,char** argv)
 	
 		XML::SaveConfig((output.get_path() + "config.xml").data());
 		output.export_param();
+
+#if UNDEF_ABANDON
+		GLPKSolution::set_time_limit(TIME_LIMIT_INIT);
+#endif
 
 		Random_Gen::uniform_integral_gen(0,10);
 		double utilization = param->u_range.min;
@@ -134,9 +139,9 @@ int main(int argc,char** argv)
 							//success[j]++;
 							s_n++;
 							s_i = j;
-		#if SORT_DEBUG
+#if SORT_DEBUG
 							cout<<param->test_attributes[j].test_name<<" success!"<<endl;
-		#endif
+#endif
 						}
 						else
 						{
@@ -164,7 +169,6 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 							break;
 						}
 						else
-
 							delete(schedTest);
 					}
 					else
@@ -180,12 +184,17 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 					}
 				}	
 
+#if UNDEF_ABANDON
 				if(abandon)
 				{
+					long current_lmt = GLPKSolution::get_time_limit();
+					long new_lmt = (current_lmt+TIME_LIMIT_GAP <= TIME_LIMIT_UPPER_BOUND)?current_lmt+TIME_LIMIT_GAP:TIME_LIMIT_UPPER_BOUND;
+					cout<<"Set GLPK time limit to:"<<new_lmt/1000<<" s"<<endl;
+					GLPKSolution::set_time_limit(new_lmt);
 					i--;
 					continue;
 				}
-
+#endif
 				for(uint t = 0; t < param->test_attributes.size(); t++)
 				{
 					success[t] += temp_success[t];
@@ -194,7 +203,7 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 				if(1 == s_n)
 				{
 					exc[s_i]++;
-	#if SORT_DEBUG
+#if SORT_DEBUG
 					cout<<"Exclusive Success TaskSet:"<<endl;
 					cout<<"/////////////////"<<param->test_attributes[s_i].test_name<<"////////////////"<<endl;
 					foreach(taskset.get_tasks(), task)
@@ -203,7 +212,7 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 						cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
 						cout<<"-----------------------"<<endl;
 					}
-	#endif
+#endif
 					//sleep(1);
 				}
 

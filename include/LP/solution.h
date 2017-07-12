@@ -21,6 +21,7 @@ class GLPKSolution
 		const uint aim;
 		int simplex_code;
 		bool solved;
+		static long t_limit;
 		
 		static void callback(glp_tree *T, void* info);
 		void solve(double var_lb, double var_ub);
@@ -36,6 +37,8 @@ class GLPKSolution
 		double get_value(unsigned int var) const;
 		double evaluate(const LinearExpression &exp) const;
 		bool is_solved() const;
+		static void set_time_limit(long time);
+		const static long get_time_limit();
 };
 
 

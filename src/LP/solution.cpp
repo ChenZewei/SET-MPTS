@@ -4,6 +4,8 @@
 #include "iteration-helper.h"
 #include "math-helper.h"
 
+long GLPKSolution::t_limit = -1;
+
 GLPKSolution::GLPKSolution(const LinearProgram &lp, 
 							unsigned int max_var_num, 
 							double var_lb, 
@@ -316,9 +318,8 @@ void GLPKSolution::solve(double var_lb, double var_ub)
 
 		glpk_params.mip_gap = 1;
 
-#if TIME_LIMIT > 0
-		glpk_params.tm_lim = TIME_LIMIT;
-#endif
+		if(0 < t_limit)
+			glpk_params.tm_lim = t_limit;
 
 		//glpk_params.cb_func = callback;
 
@@ -485,3 +486,18 @@ void GLPKSolution::set_column_types()
 		glp_set_col_kind(glpk, col_idx, GLP_BV);
 	}
 }
+
+
+void GLPKSolution::set_time_limit(long time)
+{
+	t_limit = time;
+}
+
+
+const long GLPKSolution::get_time_limit()
+{
+	return t_limit;
+}
+
+
+

@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <ctime>
 #include <pthread.h>
+#include <glpk.h>
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
@@ -16,7 +17,9 @@
 #include "random_gen.h"
 #include "test_model.h"
 #include "sched_test_factory.h"
+#include "solution.h"
 #include "iteration-helper.h"
+#include "toolkit.h"
 //Socket
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -34,51 +37,64 @@ using namespace std;
 void getFiles(string path, string dir);
 void read_line(string path, vector<string>& files);
 vector<Param> get_parameters();
+unsigned int alarm(unsigned int seconds);
 
 int main(int argc,char** argv)
 {	
+/*
+	if(2 != argc)
+	{
+		printf("Usage: %s [port]\n",argv[0]);
+		exit(EXIT_SUCCESS);
+	}
+	int port = atoi(argv[1]);
+*/
 
 	vector<Param> parameters = get_parameters();
-
+	Param* param = &(parameters[0]);
+	SchedTestFactory STFactory;
+#if UNDEF_ABANDON
+	GLPKSolution::set_time_limit(TIME_LIMIT_INIT);
+#endif
 	int socketfd;
 	int status,recvlen;
+	int sin_size = sizeof(struct sockaddr_in);
 	char recvbuffer[MAXBUFFER];
 	memset(recvbuffer,0,MAXBUFFER);
 	struct sockaddr_in server;
 
+	if((socketfd=socket(AF_INET, SOCK_STREAM, 0))==-1)
+	{
+		printf("Create socket failed.");
+		exit(EXIT_SUCCESS);
+	}
 	if(inet_aton(parameters[0].server_ip, &(server.sin_addr))==0)
 	{
 		printf("Server ip illegal.");
 		exit(EXIT_SUCCESS);
 	}
 	
-	if((socketfd=socket(AF_INET, SOCK_DGRAM, 0))==-1)
-	{
-		printf("Create socket failed.");
-		exit(EXIT_SUCCESS);
-	}
-	
 	bzero(&server,sizeof(server));
 	server.sin_family = AF_INET;
+	server.sin_addr.s_addr = inet_addr(parameters[0].server_ip); 
 	server.sin_port = htons(parameters[0].port);
 
-	if(connect(socketfd,(struct sockaddr *)&server,sizeof(struct sockaddr))==-1)
+	while(connect(socketfd,(struct sockaddr *)&server,sizeof(struct sockaddr)) == -1)
 	{
-		printf("Connect failed.");
-		exit(EXIT_SUCCESS);
+		cout<<"Connect failed! Reconnect in 10 second..."<<endl;
+		sleep(10);
 	}
-	
 
+	if(send(socketfd, "0", sizeof("0"), 0) < 0) 
+	{
+		cout<<"Send failed!"<<endl;
+		//sleep(1);
+	}
 
 	while(1)
 	{
 		memset(recvbuffer,0,MAXBUFFER);
-		if(status = send(socketfd, "00", strlen("00"), 0)==-1)
-		{
-			printf("Send failed.%d\n",status);
-		}
-
-		if((recvlen = recv(socketfd,recvbuffer,sizeof(recvbuffer),0))==-1)
+		if((recvlen = recv(socketfd, recvbuffer,sizeof(recvbuffer),0))==-1)
 		{
 			printf("Recieve error.\n");
 			exit(EXIT_SUCCESS);	
@@ -89,8 +105,102 @@ int main(int argc,char** argv)
 			exit(EXIT_SUCCESS);
 		}
 
-		int index = atoi(recvbuffer);
-cout<<"index:"<<index<<endl;
+		cout<<recvbuffer<<endl;
+
+		vector<string> elements;
+
+		extract_element(elements, recvbuffer);
+
+		if(0 == strcmp(elements[0].data(), "-1"))//termination
+		{
+			exit(EXIT_SUCCESS);
+		}
+		else if(0 == strcmp(elements[0].data(), "3"))//heartbeat
+		{
+			if(send(socketfd, "3", sizeof("3"), 0) < 0) 
+			{
+				cout<<"Send failed!"<<endl;
+			}
+		}
+		else if(0 == strcmp(elements[0].data(), "1"))//work
+		{
+			floating_t utilization(elements[1]);
+
+			vector<int> success;
+			for(uint i = 0; i < param->test_attributes.size(); i++)
+			{
+				success.push_back(0);
+			}
+
+			bool abandon;
+			string sendbuf;
+			do
+			{
+				abandon = false;
+				stringstream buf;
+				buf<<"2,";
+				buf<<utilization.get_d();
+
+				TaskSet taskset = TaskSet();
+				ProcessorSet processorset = ProcessorSet(*param);
+				ResourceSet resourceset = ResourceSet();
+				resource_gen(&resourceset, *param);
+				tast_gen(taskset, resourceset, *param, utilization.get_d());
+
+				for(uint j = 0; j < param->get_method_num(); j++)
+				{
+					taskset.init();
+					processorset.init();	
+					resourceset.init();
+
+					SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
+					if(NULL == schedTest)
+					{
+						cout<<"Incorrect test name."<<endl;
+						return -1;
+					}
+					if(schedTest->is_schedulable())
+					{
+						success[j]++;
+						buf<<","<<1;
+					}
+					else
+						buf<<","<<0;
+#if UNDEF_ABANDON
+					if(GLP_UNDEF == schedTest->get_status())
+					{
+cout<<"Abandon cause GLP_UNDEF"<<endl;
+						long current_lmt = GLPKSolution::get_time_limit();
+						long new_lmt = (current_lmt+TIME_LIMIT_GAP <= TIME_LIMIT_UPPER_BOUND)?current_lmt+TIME_LIMIT_GAP:TIME_LIMIT_UPPER_BOUND;
+cout<<"Set GLPK time limit to:"<<new_lmt/1000<<" s"<<endl;
+						GLPKSolution::set_time_limit(new_lmt);
+						abandon = true;
+						delete(schedTest);
+						break;
+					}
+#endif				
+					delete(schedTest);
+				}
+				sendbuf = buf.str();
+			}
+			while(abandon);
+
+			//buf<<"\n";
+		
+			cout<<sendbuf<<endl;		
+
+			if(send(socketfd, sendbuf.data(), strlen(sendbuf.data()), 0) < 0)
+			{
+				//cout<<"Send failed! Resend in 1 second."<<endl;
+				//sleep(1);
+			}
+		}
+		sleep(2);
+	}
+	
+
+
+/*
 		Param* param = &(parameters[index]);
 		
 		Result_Set results[MAX_METHOD];
@@ -225,7 +335,8 @@ cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
 	
 		
 //		break;
-	}
+
+*/
 	
 
 	return 0;

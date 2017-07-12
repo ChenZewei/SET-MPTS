@@ -3,6 +3,7 @@
 XML::XML()
 {
 	output = new XMLDocument();
+	initialization();
 }
 
 XML::~XML()
@@ -20,6 +21,22 @@ void XML::LoadFile(const char* path)
 void XML::SaveConfig(const char* path)
 {
 	config.SaveFile(path);
+}
+
+char* XML::get_server_ip()
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("server_ip");
+	return title->GetText();
+}
+
+uint XML::get_server_port()
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("server_port");
+	return atoi(title->GetText());
 }
 
 void XML::get_method(Test_Attribute_Set *t_set)
@@ -445,6 +462,11 @@ void XML::add_range(const char* parent, Range range)
 	max->SetText(transform.get_str().data());
 	data->InsertEndChild(max);
 	title->InsertFirstChild(data);
+}
+
+void XML::set_text(XMLElement* element, const char* text)
+{
+	element->SetText(text);
 }
 
 void XML::set_text(const char* parent, int index1, const char* element, int index2,const char* text)

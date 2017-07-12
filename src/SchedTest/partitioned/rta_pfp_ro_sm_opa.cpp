@@ -520,6 +520,16 @@ int RTA_PFP_RO_SM_OPA::ROP_SM_Order(Task t1, Task t2)
 	return slack1 < slack2;
 }
 
+
+static int RTA_PFP_RO_SM_OPA::ROP_SM_Order_reverse(Task t1, Task t2)
+{
+	long slack1 = t1.get_deadline();
+	long slack2 = t2.get_deadline();
+	slack1 -= t1.get_wcet() + t1.get_other_attr();
+	slack2 -= t2.get_wcet() + t2.get_other_attr();
+	return slack1 > slack2;
+}
+
 bool RTA_PFP_RO_SM_OPA::is_schedulable()
 {
 	bool schedulable = false;
@@ -550,7 +560,10 @@ bool RTA_PFP_RO_SM_OPA::is_schedulable()
 		Tasks& taskset = tasks.get_tasks();
 		sort(taskset.begin(), taskset.end(), ROP_SM_Order);
 		for(int t = 0; t < taskset.size(); t++)
+		{
 			taskset[t].set_index(t);
+			taskset[t].set_priority(t);
+		}
 
 		//erase all priorities
 		foreach(tasks.get_tasks(), ti)

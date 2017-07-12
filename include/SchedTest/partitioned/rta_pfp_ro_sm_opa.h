@@ -28,6 +28,7 @@ class RTA_PFP_RO_SM_OPA: public PartitionedSched
 		bool alloc_schedulable();
 		bool alloc_schedulable(Task& ti);
 		static int ROP_SM_Order(Task t1, Task t2);
+		static int ROP_SM_Order_reverse(Task t1, Task t2);
 	public:
 		RTA_PFP_RO_SM_OPA();
 		RTA_PFP_RO_SM_OPA(TaskSet tasks, ProcessorSet processors, ResourceSet resources);

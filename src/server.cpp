@@ -14,249 +14,275 @@
 #include "param.h"
 #include "output.h"
 #include "random_gen.h"
-#include "test_model.h"
-#include "sched_test_factory.h"
 #include "iteration-helper.h"
-//Socket
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include "toolkit.h"
+#include "network.h"
 
 #define MAX_LEN 100
 #define MAX_METHOD 8
 #define MAXBUFFER 100
+#define BACKLOG 64
 
 #define typeof(x) __typeof(x)
 
+
+#define BUFFER_SIZE 1024
+
 using namespace std;
 
-
-void getFiles(string path, string dir);
-void read_line(string path, vector<string>& files);
 vector<Param> get_parameters();
 
 int main(int argc,char** argv)
 {	
-
+//Experiment parameters
 	vector<Param> parameters = get_parameters();
+	Param* param = &(parameters[0]);
+	Result_Set results[MAX_METHOD];
+	Output output(*param);
+	SchedResultSet srs;
+	XML::SaveConfig((output.get_path() + "config.xml").data());
+	output.export_param();
 
-	int listenfd,connectfd;
-	int sin_size;
+//Network parameters
+	int maxi, maxfd;
+	int nready;	
+	int listenfd, connectfd;
+	int sin_size = sizeof(struct sockaddr_in);
 	int recvlen;
-	char recvbuffer[MAXBUFFER];
-	char sendbuffer[MAXBUFFER];
-	memset(recvbuffer,0,MAXBUFFER);
-	memset(sendbuffer,0,MAXBUFFER);
-	struct sockaddr_in server,client;
-
-	if((listenfd=socket(AF_INET, SOCK_DGRAM, 0))==-1)
+	ssize_t n;
+	fd_set rset,allset;
+	string sendbuffer;
+	struct sockaddr_in server,client_addr;
+	list<NetWork> clients;
+	list<NetWork*> idle, busy;
+	if((listenfd=socket(AF_INET, SOCK_STREAM, 0))==-1)
 	{
-		printf("Create socket failed.");
+		cout<<"Create socket failed."<<endl;
 		exit(EXIT_SUCCESS);
 	}
-	
+//	int flags = fcntl(listenfd, F_GETFL, 0);
+//　	fcntl(listenfd, F_SETFL, flags|O_NONBLOCK);
 	bzero(&server,sizeof(server));
 	server.sin_family = AF_INET;
-	server.sin_port = htons(PORT);
+	server.sin_port = htons(parameters[0].port);
 	server.sin_addr.s_addr = htonl(INADDR_ANY);
-	
+
 	if(bind(listenfd, (struct sockaddr *)&server, sizeof(struct sockaddr))==-1)
 	{
-		printf("Bind error.");
+		cout<<"Bind error."<<endl;
 		exit(EXIT_SUCCESS);
 	}
 
-	if(listen(listenfd, 1)==-1)
+	if(listen(listenfd,BACKLOG)==-1)
 	{
 		printf("Listen error.");
 		exit(EXIT_SUCCESS);	
 	}
-	
-	while(1)
-	{
-		if((connectfd=accept(listenfd, (struct sockaddr *)&client, &sin_size))==-1)
-		{
-			printf("Accept error.");
-			exit(EXIT_SUCCESS);
-		}
+	maxfd = listenfd;
+	maxi = -1;
 
-		if((recvlen = recv(socketfd,recvbuffer,sizeof(recvbuffer),0))==-1)
-		{
-			printf("Recieve error.\n");
-			exit(EXIT_SUCCESS);	
-		}
-		else if(0 == recvlen)
-		{
-			printf("Disconnected!\n");
-			exit(EXIT_SUCCESS);
-		}
+	FD_ZERO(&allset);
+	FD_SET(listenfd, &allset);
 
-		int index = atoi(recvbuffer);
-cout<<"index:"<<index<<endl;
-		Param* param = &(parameters[index]);
-		
-		Result_Set results[MAX_METHOD];
-		SchedTestFactory STFactory;		
-		Output output(*param);
-
-		XML::SaveConfig((output.get_path() + "config.xml").data());
-		output.export_param();
-
-		Random_Gen::uniform_integral_gen(0,10);
-		double utilization = param->u_range.min;
-
-		time_t start, end;
-
-		start = time(NULL);
-
+	double utilization = param->u_range.min;
+	time_t start, end;
+	start = time(NULL);
 cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
-		do
-		{	
-			Result result;
-cout<<"Utilization:"<<utilization<<endl;
-			vector<int> success;
-			vector<int> exp;
-			vector<int> exc;
-			for(uint i = 0; i < param->test_attributes.size(); i++)
+
+	int pre_exp_time = 0;
+	int exp_time = pre_exp_time;
+	int recv_exp = 0;
+	do
+	{	
+		//cout<<"In the circle."<<endl;
+		if(recv_exp == param->exp_times)
+		{
+			output.Export(PNG);	
+			recv_exp = 0;
+		}
+
+		//Network
+		rset = allset;
+		nready = select(maxfd+1, &rset,NULL,NULL,NULL);
+		if(FD_ISSET(listenfd,&rset))
+		{
+			cout<<"waiting for connect"<<endl;
+			if((connectfd=accept(listenfd,(struct sockaddr *)&client_addr, &sin_size))==-1)
 			{
-				exp.push_back(0);
-				success.push_back(0);
-				exc.push_back(0);
+				printf("Accept error.");
+				continue;
 			}
-			for(int i = 0; i < param->exp_times; i++)
+			
+			if(clients.size() < FD_SETSIZE)
 			{
-cout<<".";
-cout<<flush;
-				uint s_n = 0;
-				uint s_i = 0;
-				TaskSet taskset = TaskSet();
-				ProcessorSet processorset = ProcessorSet(*param);
-				ResourceSet resourceset = ResourceSet();
-				resource_gen(&resourceset, *param);
-				tast_gen(taskset, resourceset, *param, utilization);
-	//			taskset.SM_PLUS_4_Order(parameters.p_num);
-				for(uint j = 0; j < param->get_method_num(); j++)
+				NetWork client(connectfd, client_addr);
+				clients.push_back(client);
+				
+				cout<<"Connection from [ip:"<<inet_ntoa(client_addr.sin_addr)<<"] has already established."<<endl;
+/*
+				foreach(clients, c)
 				{
-					taskset.init();
-					processorset.init();	
-					resourceset.init();
-					exp[j]++;
+					cout<<"clien:"<<c->get_socket()<<endl;
+					cout<<"\tstatus:"<<c->get_status()<<endl;
+				}
+*/
+			}	
 
+			if(clients.size() == FD_SETSIZE)
+				cout<<"Too many clients."<<endl;
 
-					SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
-					if(NULL == schedTest)
-					{
-						cout<<"Incorrect test name."<<endl;
-						return -1;
-					}
-	//cout<<test_attributes[j].test_name<<":";
-					if(schedTest->is_schedulable())
-					{
-						success[j]++;
-						s_n++;
-						s_i = j;
-	#if SORT_DEBUG
-						cout<<param->test_attributes[j].test_name<<" success!"<<endl;
-	#endif
-					}
-	
-					delete(schedTest);
-					}	
+			FD_SET(connectfd,&allset);
 
+			if(connectfd > maxfd)
+				maxfd = connectfd;
 
-				if(1 == s_n)
+			if(clients.size() > maxi)
+				maxi = clients.size();
+
+			if(nready <= 0)
+				continue;
+		}
+
+		foreach(clients, client)
+		{
+			if(FD_ISSET(client->get_socket(), &rset))
+			{
+				cout<<"waiting for clien:"<<client->get_socket()<<endl;
+				string recvbuf = client->recvbuf();
+				
+				if(client->get_status())
 				{
-					exc[s_i]++;
-	#if SORT_DEBUG
-					cout<<"Exclusive Success TaskSet:"<<endl;
-					cout<<"/////////////////"<<param->test_attributes[s_i].test_name<<"////////////////"<<endl;
-					foreach(taskset.get_tasks(), task)
-					{
-						cout<<"Task "<<task->get_id()<<":"<<endl;
-						cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
-						cout<<"-----------------------"<<endl;
-					}
-	#endif
-					//sleep(1);
+					cout<<"Disconnected."<<endl;
+					FD_CLR(client->get_socket(),&allset);
+					clients.erase(client);
+					client = clients.begin();
+					continue;
+				}
+				else
+				{
+					cout<<recvbuf<<endl;
 				}
 
-				result.utilization = utilization;
+				vector<string> elements;
+
+				extract_element(elements, recvbuf);
+
+//				foreach(elements, element)
+//					cout<<"element:"<<*element<<endl;
+
+
+				if(0 == strcmp(elements[0].data(), "3"))//heartbeat
+				{
+					//do nothing
+				}
+				else if(0 == strcmp(elements[0].data(), "0"))//connection
+				{
+					sendbuffer = "1,";
+					if(exp_time >= param->exp_times)
+					{
+						sendbuffer += to_string(utilization + param->step);
+						client->sendbuf(sendbuffer);
+						pre_exp_time++;
+					}
+					else
+					{
+						sendbuffer += to_string(utilization);
+						client->sendbuf(sendbuffer);
+						exp_time++;
+					}
+				}
+				else if(0 == strcmp(elements[0].data(), "2"))//result
+				{
+					cout<<"Extract result..."<<endl;
+					recv_exp++;
+					for(uint i = 0; i < param->test_attributes.size(); i++)
+					{
+						string test_name;
+						if(!param->test_attributes[i].rename.empty())
+						{
+							test_name = param->test_attributes[i].rename;
+						}
+						else
+						{
+							test_name = param->test_attributes[i].test_name;
+						}
+
+						floating_t u(elements[1]);
+
+						output.add_result(test_name, param->test_attributes[i].style, u.get_d(), 1, atoi(elements[i+2].data()));
+
+						stringstream buf;
+
+						buf<<test_name;
+
+						buf<<"\t"<<u.get_d()<<"\t"<<1<<"\t"<<elements[i+2];
+cout<<buf.str()<<endl;
+						output.append2file("result-logs.csv", buf.str());
+					}
+
+cout<<exp_time<<" "<<param->exp_times<<endl;
+
+					sendbuffer = "1,";
+					if(exp_time >= param->exp_times)
+					{
+						sendbuffer += to_string(utilization + param->step);
+						client->sendbuf(sendbuffer);
+						pre_exp_time++;
+					}
+					else
+					{
+						sendbuffer += to_string(utilization);
+						client->sendbuf(sendbuffer);
+						exp_time++;
+					}
+				}
+
+				if(nready <=0)
+					break;
 			}
-cout<<endl;
-			for(uint i = 0; i < param->test_attributes.size(); i++)
-			{
-				fraction_t ratio(success[i], exp[i]);
-				if(0 == strcmp(param->test_attributes[i].rename.data(), ""))
-					output.add_result(param->test_attributes[i].rename, utilization, exp[i], success[i]);
-				else
-					output.add_result(param->test_attributes[i].test_name, utilization, exp[i], success[i]);
-
-				stringstream buf;
-
-				if(0 == strcmp(param->test_attributes[i].rename.data(),""))
-					buf<<param->test_attributes[i].test_name;
-				else
-					buf<<param->test_attributes[i].rename;
-
-				buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
-
-				output.append2file("result-logs.csv", buf.str());
-
-cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<" exc_s:"<<exc[i]<<endl;
-			}
-			output.export_result_append(utilization);
-			output.Export(PNG);
-			utilization += param->step;
 		}
-		while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
 
-		time(&end);
+//		output.export_result_append(utilization);
+//		output.Export(PNG);		
+
+		if(exp_time == param->exp_times)
+		{
+			utilization += param->step;
+			//Experiment parameter
+			exp_time = pre_exp_time;
+			pre_exp_time = 0;
+		}
+	}
+	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS || recv_exp < param->exp_times);
+
+	foreach(clients, client)
+	{
+		client->sendbuf("-1");
+	}
+
+	output.export_csv();
+	output.Export(PNG|EPS|SVG|TGA|JSON);
+
+	time(&end);
 cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
 
-		ulong gap = difftime(end, start);
-		uint hour = gap/3600;
-		uint min = (gap%3600)/60;
-		uint sec = (gap%3600)%60;
+	ulong gap = difftime(end, start);
+	uint hour = gap/3600;
+	uint min = (gap%3600)/60;																				
+	uint sec = (gap%3600)%60;
 
 cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
-
-		output.export_csv();
-
-		output.Export(PNG|EPS|SVG|TGA|JSON);
-	
-		
-//		break;
-	}
-	
+/*
+	output.export_csv();
+	output.Export(PNG|EPS|SVG|TGA|JSON);
+*/
 
 	return 0;
 }
 
-void getFiles(string path, string dir)  
-{  
-	string cmd = "ls " + path + " > " + path + dir;
-	system(cmd.data());
-}  
-
-void read_line(string path, vector<string>& files)
-{
-	string buf;
-	ifstream dir(path.data(), ifstream::in);
-	getline(dir, buf);
-	while(getline(dir, buf))
-	{
-		files.push_back("config/" + buf);
-//cout<<"file name:"<<buf<<endl;
-	}
-}
-
 vector<Param> get_parameters()
 {
-	//getFiles("config/", "0");
-	//read_line("config/0", configurations);
-	//vector<string> configurations;
-	
 	vector<Param> parameters;
 
 	XML::LoadFile("config.xml");
