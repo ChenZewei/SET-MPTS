@@ -66,9 +66,10 @@
 		<data RENAME="R-PCP-sm-opa" STYLE="{xED7D31}2:#v">RTA-PFP-RO-SM-OPA</data>
 <!-->
 		<data RENAME="PFP-FF" STYLE="{x000000}2o">RTA-PFP-FF</data>
-		<data RENAME="ILP-3" REMARK="">ILP-RTA-PFP-DPCP-3</data>
+		<data RENAME="GFP-RM" REMARK="">RTA-GFP-NG</data>
+		<data RENAME="GFP-SMP4" REMARK="">RTA-GSMP4-NG</data>
 	</schedulability_test>
-	<experiment_times>10</experiment_times>
+	<experiment_times>200</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->
@@ -79,19 +80,19 @@
 <!-->
 	</output>
 	<lambda>
-		<data>4</data>
+		<data>10</data>
 	</lambda>
 	<step>
-		<data>0.2</data>
+		<data>0.1</data>
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>3.2</min>
-			<max>4</max>
+			<min>0</min>
+			<max>10</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>4</data>	
+		<data>10</data>	
 	</processor_num>
 	<period_range>
 		<data>
