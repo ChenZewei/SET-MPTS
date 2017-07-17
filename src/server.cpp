@@ -90,18 +90,10 @@ int main(int argc,char** argv)
 cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
 
-	int pre_exp_time = 0;
-	int exp_time = pre_exp_time;
-	int recv_exp = 0;
 	do
 	{	
 		//cout<<"In the circle."<<endl;
-		if(recv_exp == param->exp_times)
-		{
-			output.Export(PNG);	
-			recv_exp = 0;
-		}
-
+		uint exp_time;
 		//Network
 		rset = allset;
 		nready = select(maxfd+1, &rset,NULL,NULL,NULL);
@@ -120,13 +112,6 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 				clients.push_back(client);
 				
 				cout<<"Connection from [ip:"<<inet_ntoa(client_addr.sin_addr)<<"] has already established."<<endl;
-/*
-				foreach(clients, c)
-				{
-					cout<<"clien:"<<c->get_socket()<<endl;
-					cout<<"\tstatus:"<<c->get_status()<<endl;
-				}
-*/
 			}	
 
 			if(clients.size() == FD_SETSIZE)
@@ -146,11 +131,18 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
 		foreach(clients, client)
 		{
+				cout<<"client:"<<client->get_socket()<<endl;
+		}
+
+		foreach(clients, client)
+		{
 			if(FD_ISSET(client->get_socket(), &rset))
 			{
-				cout<<"waiting for clien:"<<client->get_socket()<<endl;
+
+				cout<<"waiting for client:"<<client->get_socket()<<endl;
 				string recvbuf = client->recvbuf();
 				
+
 				if(client->get_status())
 				{
 					cout<<"Disconnected."<<endl;
@@ -179,23 +171,12 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 				else if(0 == strcmp(elements[0].data(), "0"))//connection
 				{
 					sendbuffer = "1,";
-					if(exp_time >= param->exp_times)
-					{
-						sendbuffer += to_string(utilization + param->step);
-						client->sendbuf(sendbuffer);
-						pre_exp_time++;
-					}
-					else
-					{
-						sendbuffer += to_string(utilization);
-						client->sendbuf(sendbuffer);
-						exp_time++;
-					}
+					sendbuffer += to_string(utilization);
+					client->sendbuf(sendbuffer);
 				}
 				else if(0 == strcmp(elements[0].data(), "2"))//result
 				{
 					cout<<"Extract result..."<<endl;
-					recv_exp++;
 					for(uint i = 0; i < param->test_attributes.size(); i++)
 					{
 						string test_name;
@@ -210,32 +191,22 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
 						floating_t u(elements[1]);
 
-						output.add_result(test_name, param->test_attributes[i].style, u.get_d(), 1, atoi(elements[i+2].data()));
-
-						stringstream buf;
-
-						buf<<test_name;
-
-						buf<<"\t"<<u.get_d()<<"\t"<<1<<"\t"<<elements[i+2];
-cout<<buf.str()<<endl;
-						output.append2file("result-logs.csv", buf.str());
+						if(output.add_result(test_name, param->test_attributes[i].style, u.get_d(), 1, atoi(elements[i+2].data())))
+						{
+							stringstream buf;
+							buf<<test_name;
+							buf<<"\t"<<u.get_d()<<"\t"<<1<<"\t"<<elements[i+2];
+							cout<<buf.str()<<endl;
+							output.append2file("result-logs.csv", buf.str());
+						}
+						
 					}
 
 cout<<exp_time<<" "<<param->exp_times<<endl;
 
 					sendbuffer = "1,";
-					if(exp_time >= param->exp_times)
-					{
-						sendbuffer += to_string(utilization + param->step);
-						client->sendbuf(sendbuffer);
-						pre_exp_time++;
-					}
-					else
-					{
-						sendbuffer += to_string(utilization);
-						client->sendbuf(sendbuffer);
-						exp_time++;
-					}
+					sendbuffer += to_string(utilization);
+					client->sendbuf(sendbuffer);
 				}
 
 				if(nready <=0)
@@ -246,15 +217,15 @@ cout<<exp_time<<" "<<param->exp_times<<endl;
 //		output.export_result_append(utilization);
 //		output.Export(PNG);		
 
+		exp_time = output.get_exp_time_by_utilization(utilization);
+
+
 		if(exp_time == param->exp_times)
 		{
 			utilization += param->step;
-			//Experiment parameter
-			exp_time = pre_exp_time;
-			pre_exp_time = 0;
 		}
 	}
-	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS || recv_exp < param->exp_times);
+	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
 
 	foreach(clients, client)
 	{

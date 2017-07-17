@@ -42,10 +42,30 @@ string Output::get_path()
 	return path;
 }
 
-void Output::add_result(string test_name, string line_style, double utilization, uint e_num, uint s_num)
+
+SchedResultSet& Output::get_results()
+{
+	return srs;
+}
+
+bool Output::add_result(string test_name, string line_style, double utilization, uint e_num, uint s_num)
 {
 	SchedResult& sr = srs.get_sched_result(test_name, line_style);
-	sr.insert_result(utilization, e_num, s_num);
+	if(sr.get_result_by_utilization(utilization).exp_num + e_num <= param.exp_times)
+	{
+		sr.insert_result(utilization, e_num, s_num);
+		return true;
+	}
+	return false;
+}
+
+uint Output::get_exp_time_by_utilization(double utilization)
+{
+	if(0 == srs.size())
+		return 0;
+
+	Result result = srs.get_sched_result_set()[0].get_result_by_utilization(utilization);
+	return result.exp_num;
 }
 
 string Output::output_filename()

@@ -33,6 +33,13 @@
 
 using namespace std;
 
+struct ARG
+{
+	int connectfd;
+	struct sockaddr_in server;
+	double utilization;
+	Param param;
+}typedef ARG;
 
 void getFiles(string path, string dir);
 void read_line(string path, vector<string>& files);
@@ -166,19 +173,19 @@ int main(int argc,char** argv)
 					}
 					else
 						buf<<","<<0;
-#if UNDEF_ABANDON
+		#if UNDEF_ABANDON
 					if(GLP_UNDEF == schedTest->get_status())
 					{
-cout<<"Abandon cause GLP_UNDEF"<<endl;
+		cout<<"Abandon cause GLP_UNDEF"<<endl;
 						long current_lmt = GLPKSolution::get_time_limit();
 						long new_lmt = (current_lmt+TIME_LIMIT_GAP <= TIME_LIMIT_UPPER_BOUND)?current_lmt+TIME_LIMIT_GAP:TIME_LIMIT_UPPER_BOUND;
-cout<<"Set GLPK time limit to:"<<new_lmt/1000<<" s"<<endl;
+		cout<<"Set GLPK time limit to:"<<new_lmt/1000<<" s"<<endl;
 						GLPKSolution::set_time_limit(new_lmt);
 						abandon = true;
 						delete(schedTest);
 						break;
 					}
-#endif				
+		#endif				
 					delete(schedTest);
 				}
 				sendbuf = buf.str();
@@ -186,7 +193,7 @@ cout<<"Set GLPK time limit to:"<<new_lmt/1000<<" s"<<endl;
 			while(abandon);
 
 			//buf<<"\n";
-		
+
 			cout<<sendbuf<<endl;		
 
 			if(send(socketfd, sendbuf.data(), strlen(sendbuf.data()), 0) < 0)
@@ -195,149 +202,7 @@ cout<<"Set GLPK time limit to:"<<new_lmt/1000<<" s"<<endl;
 				//sleep(1);
 			}
 		}
-		sleep(2);
 	}
-	
-
-
-/*
-		Param* param = &(parameters[index]);
-		
-		Result_Set results[MAX_METHOD];
-		SchedTestFactory STFactory;		
-		Output output(*param);
-
-		XML::SaveConfig((output.get_path() + "config.xml").data());
-		output.export_param();
-
-		Random_Gen::uniform_integral_gen(0,10);
-		double utilization = param->u_range.min;
-
-		time_t start, end;
-
-		start = time(NULL);
-
-cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
-
-		do
-		{	
-			Result result;
-cout<<"Utilization:"<<utilization<<endl;
-			vector<int> success;
-			vector<int> exp;
-			vector<int> exc;
-			for(uint i = 0; i < param->test_attributes.size(); i++)
-			{
-				exp.push_back(0);
-				success.push_back(0);
-				exc.push_back(0);
-			}
-			for(int i = 0; i < param->exp_times; i++)
-			{
-cout<<".";
-cout<<flush;
-				uint s_n = 0;
-				uint s_i = 0;
-				TaskSet taskset = TaskSet();
-				ProcessorSet processorset = ProcessorSet(*param);
-				ResourceSet resourceset = ResourceSet();
-				resource_gen(&resourceset, *param);
-				tast_gen(taskset, resourceset, *param, utilization);
-	//			taskset.SM_PLUS_4_Order(parameters.p_num);
-				for(uint j = 0; j < param->get_method_num(); j++)
-				{
-					taskset.init();
-					processorset.init();	
-					resourceset.init();
-					exp[j]++;
-
-
-					SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
-					if(NULL == schedTest)
-					{
-						cout<<"Incorrect test name."<<endl;
-						return -1;
-					}
-	//cout<<test_attributes[j].test_name<<":";
-					if(schedTest->is_schedulable())
-					{
-						success[j]++;
-						s_n++;
-						s_i = j;
-	#if SORT_DEBUG
-						cout<<param->test_attributes[j].test_name<<" success!"<<endl;
-	#endif
-					}
-	
-					delete(schedTest);
-					}	
-
-
-				if(1 == s_n)
-				{
-					exc[s_i]++;
-	#if SORT_DEBUG
-					cout<<"Exclusive Success TaskSet:"<<endl;
-					cout<<"/////////////////"<<param->test_attributes[s_i].test_name<<"////////////////"<<endl;
-					foreach(taskset.get_tasks(), task)
-					{
-						cout<<"Task "<<task->get_id()<<":"<<endl;
-						cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<" Leisure:"<<taskset.leisure(task->get_id())<<endl;
-						cout<<"-----------------------"<<endl;
-					}
-	#endif
-					//sleep(1);
-				}
-
-				result.utilization = utilization;
-			}
-cout<<endl;
-			for(uint i = 0; i < param->test_attributes.size(); i++)
-			{
-				fraction_t ratio(success[i], exp[i]);
-				if(0 == strcmp(param->test_attributes[i].rename.data(), ""))
-					output.add_result(param->test_attributes[i].rename, utilization, exp[i], success[i]);
-				else
-					output.add_result(param->test_attributes[i].test_name, utilization, exp[i], success[i]);
-
-				stringstream buf;
-
-				if(0 == strcmp(param->test_attributes[i].rename.data(),""))
-					buf<<param->test_attributes[i].test_name;
-				else
-					buf<<param->test_attributes[i].rename;
-
-				buf<<"\t"<<utilization<<"\t"<<exp[i]<<"\t"<<success[i];
-
-				output.append2file("result-logs.csv", buf.str());
-
-cout<<"Method "<<i<<": exp_times("<<exp[i]<<") success times("<<success[i]<<") success ratio:"<<ratio.get_d()<<" exc_s:"<<exc[i]<<endl;
-			}
-			output.export_result_append(utilization);
-			output.Export(PNG);
-			utilization += param->step;
-		}
-		while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
-
-		time(&end);
-cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
-
-		ulong gap = difftime(end, start);
-		uint hour = gap/3600;
-		uint min = (gap%3600)/60;
-		uint sec = (gap%3600)%60;
-
-cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
-
-		output.export_csv();
-
-		output.Export(PNG|EPS|SVG|TGA|JSON);
-	
-		
-//		break;
-
-*/
-	
 
 	return 0;
 }
