@@ -141,7 +141,7 @@ int main(int argc,char** argv)
 
 			bool abandon;
 			string sendbuf;
-			do
+//			do
 			{
 				abandon = false;
 				stringstream buf;
@@ -190,17 +190,28 @@ int main(int argc,char** argv)
 				}
 				sendbuf = buf.str();
 			}
-			while(abandon);
+//			while(abandon);
 
 			//buf<<"\n";
 
-			cout<<sendbuf<<endl;		
-
-			if(send(socketfd, sendbuf.data(), strlen(sendbuf.data()), 0) < 0)
+			if(abandon)
 			{
-				//cout<<"Send failed! Resend in 1 second."<<endl;
-				//sleep(1);
+				if(send(socketfd, "0", sizeof("0"), 0) < 0) 
+				{
+					cout<<"Send failed!"<<endl;
+					//sleep(1);
+				}
 			}
+			else
+			{
+				cout<<sendbuf<<endl;	
+				if(send(socketfd, sendbuf.data(), strlen(sendbuf.data()), 0) < 0)
+				{
+					cout<<"Send failed!"<<endl;
+					//sleep(1);
+				}
+			}	
+
 		}
 	}
 
