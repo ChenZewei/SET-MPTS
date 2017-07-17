@@ -182,7 +182,7 @@ bool ILP_RTA_PFP_DPCP_3::is_schedulable()
 {
 	if(0 == tasks.get_tasks().size())
 		return true;
-	else if(fabs(tasks.get_utilization_sum()-processors.get_processor_num())<=_EPS)
+	else if(fabs(tasks.get_utilization_sum().get_d()-processors.get_processor_num())<=_EPS)
 		return false;
 
 
