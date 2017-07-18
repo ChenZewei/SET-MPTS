@@ -283,11 +283,19 @@ cout<<"/===========Task "<<i<<"===========/"<<endl;
 
 			construct_exp(vars, exp, ILPDPCPMapper_3::RESPONSE_TIME, i);
 			result = rb_solution->evaluate(*exp);
-cout<<"R"<<i<<":"<<result<<endl;
+cout<<"R_"<<i<<":"<<result<<endl;
+
+			construct_exp(vars, exp, ILPDPCPMapper_3::BLOCKING_TIME, i);
+			result = rb_solution->evaluate(*exp);
+cout<<"B_"<<i<<":"<<result<<endl;
 
 			construct_exp(vars, exp, ILPDPCPMapper_3::INTERFERENCE_TIME_C, i);
 			result = rb_solution->evaluate(*exp);
-cout<<"IC_"<<i<<":"<<result<<endl;
+cout<<"INCS_"<<i<<":"<<result<<endl;
+
+			construct_exp(vars, exp, ILPDPCPMapper_3::INTERFERENCE_TIME_R, i);
+			result = rb_solution->evaluate(*exp);
+cout<<"ICS_"<<i<<":"<<result<<endl;
 
 cout<<"C_"<<i<<":"<<tasks.get_tasks()[i].get_wcet()<<endl;
 cout<<"D_"<<i<<":"<<tasks.get_tasks()[i].get_deadline()<<endl;

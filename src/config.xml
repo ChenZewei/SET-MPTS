@@ -94,7 +94,7 @@
 	</step>
 	<init_utilization_range>
 		<data>
-			<min>3</min>
+			<min>0</min>
 			<max>4</max>
 		</data>
 	</init_utilization_range>
@@ -127,8 +127,8 @@
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
-			<min>100</min>
-			<max>200</max>
+			<min>50</min>
+			<max>100</max>
 		</data>
 	</rrr>
 	<total_len_factor>
@@ -170,6 +170,6 @@
 	<max_outdegree>
 		<data>2</data>
 	</max_outdegree>
-	<server_ip>192.168.1.161</server_ip>
+	<server_ip>127.0.0.1</server_ip>
 	<server_port>8000</server_port>
 </parameters>
