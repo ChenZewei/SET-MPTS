@@ -16,14 +16,14 @@ Output::Output(Param param)
 	{
 		int suffix = 0;
 		printf("result folder exsists.\n");
+/*
 		do
 		{
 			suffix++;
 		}
 		while(0 == access(string("results/" + output_filename() + "-" + to_string(suffix)).data(), 0));
 		if(0 == mkdir(string("results/" + output_filename() + "-" + to_string(suffix)).data(), S_IRWXU))
-			printf("result folder has been created.\n");
-		
+	
 		this->path = "results/" + output_filename() + "-" + to_string(suffix) + "/";
 	}
 	else
@@ -31,8 +31,11 @@ Output::Output(Param param)
 		printf("result folder does not exsist.\n");
 		if(0 == mkdir(string("results/" + output_filename()).data(), S_IRWXU))
 			printf("result folder has been created.\n");
-		this->path = "results/" + output_filename() + "/";
+		this->path = "results/" + output_filename() + "/";		printf("result folder has been created.\n");
+*/
 	}
+	
+	this->path = "results/" + output_filename() + "/";
 	chart.SetGraphSize(1280,640);
 	chart.SetGraphQual(3);
 }
