@@ -173,7 +173,7 @@ int main(int argc,char** argv)
 					}
 					else
 						buf<<","<<0;
-		#if UNDEF_ABANDON
+#if UNDEF_ABANDON
 					if(GLP_UNDEF == schedTest->get_status())
 					{
 		cout<<"Abandon cause GLP_UNDEF"<<endl;
@@ -185,7 +185,7 @@ int main(int argc,char** argv)
 						delete(schedTest);
 						break;
 					}
-		#endif				
+#endif				
 					delete(schedTest);
 				}
 				sendbuf = buf.str();
@@ -204,6 +204,9 @@ int main(int argc,char** argv)
 			}
 			else
 			{
+#if UNDEF_ABANDON
+	GLPKSolution::set_time_limit(TIME_LIMIT_INIT);
+#endif
 				cout<<sendbuf<<endl;	
 				if(send(socketfd, sendbuf.data(), strlen(sendbuf.data()), 0) < 0)
 				{
