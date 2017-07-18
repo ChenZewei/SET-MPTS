@@ -128,18 +128,18 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 			if(nready <= 0)
 				continue;
 		}
-
+/*
 		foreach(clients, client)
 		{
 				cout<<"client:"<<client->get_socket()<<endl;
 		}
-
+*/
 		foreach(clients, client)
 		{
 			if(FD_ISSET(client->get_socket(), &rset))
 			{
 
-				cout<<"waiting for client:"<<client->get_socket()<<endl;
+//				cout<<"waiting for client:"<<client->get_socket()<<endl;
 				string recvbuf = client->recvbuf();
 				
 
@@ -176,7 +176,7 @@ cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 				}
 				else if(0 == strcmp(elements[0].data(), "2"))//result
 				{
-					cout<<"Extract result..."<<endl;
+//					cout<<"Extract result..."<<endl;
 					for(uint i = 0; i < param->test_attributes.size(); i++)
 					{
 						string test_name;
@@ -215,7 +215,7 @@ cout<<exp_time<<" "<<param->exp_times<<endl;
 		}
 
 //		output.export_result_append(utilization);
-//		output.Export(PNG);		
+		output.Export(PNG);		
 
 		exp_time = output.get_exp_time_by_utilization(utilization);
 
@@ -223,6 +223,7 @@ cout<<exp_time<<" "<<param->exp_times<<endl;
 		if(exp_time == param->exp_times)
 		{
 			utilization += param->step;
+			
 		}
 	}
 	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
