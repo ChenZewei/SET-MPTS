@@ -278,6 +278,12 @@ cout<<endl;
 		{
 			Task& task = tasks.get_task_by_index(i);
 cout<<"/===========Task "<<i<<"===========/"<<endl;
+
+cout<<"Res:";
+
+			foreach(task.get_requests(), request)
+				cout<<request->get_resource_id()<<"\t";
+cout<<endl;
 			LinearExpression *exp = new LinearExpression();
 			double result;
 
@@ -685,7 +691,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_10(LinearProgram& lp, ILPDPCPMapper_3& vars)
 
 				uint bound = ceiling(pi + px, px);
 
-				var_id = vars.lookup(ILPDPCPMapper_3::TBT_PREEMPT_NUM, i, x);
+				var_id = vars.lookup(ILPDPCPMapper_3::PREEMPT_NUM, i, x);
 				exp->add_term(var_id, N_x_v);
 
 				var_id = vars.lookup(ILPDPCPMapper_3::RBT_PREEMPT_NUM, i, x, t_num + v);
@@ -731,7 +737,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_11(LinearProgram& lp, ILPDPCPMapper_3& vars)
 
 					uint bound = ceiling(pi + px, px);
 
-					var_id = vars.lookup(ILPDPCPMapper_3::TBT_PREEMPT_NUM, i, x);
+					var_id = vars.lookup(ILPDPCPMapper_3::PREEMPT_NUM, i, x);
 					exp->add_term(var_id, N_x_v);
 
 					var_id = vars.lookup(ILPDPCPMapper_3::RBR_PREEMPT_NUM, i, x, t_num + u, t_num + v);
