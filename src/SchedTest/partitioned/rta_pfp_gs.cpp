@@ -489,7 +489,7 @@ cout<<"=====fail====="<<endl;
 
 		}
 	}
-/*
+
 cout<<"=====success====="<<endl;
 	foreach(tasks.get_tasks(), task)
 	{
@@ -507,7 +507,7 @@ cout<<"=====success====="<<endl;
 		}
 		cout<<endl;
 	}
-*/
+
 	return true;
 }
 

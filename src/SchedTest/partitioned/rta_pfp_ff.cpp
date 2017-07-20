@@ -100,11 +100,31 @@ bool RTA_PFP_FF::is_schedulable()
 	}
 */
 
+	uint p_num = processors.get_processor_num();
 	foreach(tasks.get_tasks(), ti)
 	{
 //		cout<<"<==========Task"<<ti->get_id()<<"==========>"<<endl;
 		if(!BinPacking_FF((*ti), tasks, processors, resources, TEST))
+		{
+			cout<<"=====fail====="<<endl;
+			foreach(tasks.get_tasks(), task)
+			{
+				cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<" U:"<<task->get_utilization().get_d()<<endl;
+				cout<<"----------------------------"<<endl;
+			}
+
+			for(uint k = 0; k < p_num; k++)
+			{
+				cout<<"Processor "<<k<<" utilization:"<<processors.get_processors()[k].get_utilization().get_d()<<endl;
+				foreach(processors.get_processors()[k].get_taskqueue(), t_id)
+				{
+					Task& task = tasks.get_task_by_id(*t_id);
+					cout<<"task"<<task.get_id()<<"\t";
+				}
+				cout<<endl;
+			}
 			return false;
+		}
 	}
 	return true;
 }
