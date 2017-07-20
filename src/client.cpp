@@ -178,7 +178,7 @@ int main(int argc,char** argv)
 					{
 		cout<<"Abandon cause GLP_UNDEF"<<endl;
 						long current_lmt = GLPKSolution::get_time_limit();
-						long new_lmt = (current_lmt+TIME_LIMIT_GAP <= TIME_LIMIT_UPPER_BOUND)?current_lmt+TIME_LIMIT_GAP:TIME_LIMIT_UPPER_BOUND;
+						long new_lmt = (current_lmt*2 <= TIME_LIMIT_UPPER_BOUND)?current_lmt*2:TIME_LIMIT_UPPER_BOUND;
 		cout<<"Set GLPK time limit to:"<<new_lmt/1000<<" s"<<endl;
 						GLPKSolution::set_time_limit(new_lmt);
 						abandon = true;
@@ -204,9 +204,12 @@ int main(int argc,char** argv)
 			}
 			else
 			{
+
+/*
 #if UNDEF_ABANDON
 	GLPKSolution::set_time_limit(TIME_LIMIT_INIT);
 #endif
+*/
 				cout<<sendbuf<<endl;	
 				if(send(socketfd, sendbuf.data(), strlen(sendbuf.data()), 0) < 0)
 				{
