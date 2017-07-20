@@ -106,6 +106,7 @@ bool RTA_PFP_FF::is_schedulable()
 //		cout<<"<==========Task"<<ti->get_id()<<"==========>"<<endl;
 		if(!BinPacking_FF((*ti), tasks, processors, resources, TEST))
 		{
+/*
 			cout<<"=====fail====="<<endl;
 			foreach(tasks.get_tasks(), task)
 			{
@@ -123,6 +124,7 @@ bool RTA_PFP_FF::is_schedulable()
 				}
 				cout<<endl;
 			}
+*/
 			return false;
 		}
 	}
