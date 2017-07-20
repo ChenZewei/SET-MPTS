@@ -73,7 +73,8 @@
 
 		<data RENAME="ILP-3"  STYLE="">ILP-RTA-PFP-DPCP-3</data>
 <!-->
-		<data RENAME="LP-GFP-FMLP" 	STYLE="{x000000}2o">LP-RTA-GFP-FMLP</data>
+		<data RENAME="PFP-FF" 		STYLE="{x000000}2o">RTA-PFP-FF</data>
+		<data RENAME="LP-GFP-FMLP" 	STYLE="{xED7D31}2o">LP-RTA-GFP-FMLP</data>
 		<data RENAME="LP-GFP-DPCP"	STYLE="{x5B9BD5}2d">LP-RTA-PFP-DPCP</data>
 		<data RENAME="LP-GFP-MPCP" 	STYLE="{xEB5B5B}2x">LP-RTA-PFP-MPCP</data>
 		<data RENAME="GS-MSRP" 	    STYLE="{x8080FF}2*">RTA-PFP-GS</data>
@@ -124,7 +125,7 @@
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.1</data>
+		<data>0.5</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>3</data>
