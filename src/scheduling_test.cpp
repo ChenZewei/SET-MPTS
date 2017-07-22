@@ -145,6 +145,8 @@ int main(int argc,char** argv)
 						}
 						else
 						{
+							
+		exit(EXIT_SUCCESS);
 							time(&e);
 
 							ulong gap = difftime(e, s);

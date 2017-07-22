@@ -182,9 +182,8 @@ bool ILP_RTA_PFP_DPCP_3::is_schedulable()
 {
 	if(0 == tasks.get_tasks().size())
 		return true;
-	else if(fabs(tasks.get_utilization_sum().get_d()-processors.get_processor_num())<=_EPS)
+	else if(tasks.get_utilization_sum().get_d()-processors.get_processor_num() >= _EPS)
 		return false;
-
 
 	ILPDPCPMapper_3 vars;
 	LinearProgram response_bound;
@@ -317,6 +316,21 @@ cout<<"D_"<<i<<":"<<tasks.get_tasks()[i].get_deadline()<<endl;
 	}
 	else
 	{
+
+		uint t_num = tasks.get_taskset_size();
+		for(uint i = 0; i < t_num; i++)
+		{
+			Task& task = tasks.get_task_by_index(i);
+cout<<"/===========Task "<<i<<"===========/"<<endl;
+cout<<"Res:";
+
+			foreach(task.get_requests(), request)
+				cout<<request->get_resource_id()<<"\t";
+cout<<endl;
+cout<<"C_"<<i<<":"<<tasks.get_tasks()[i].get_wcet()<<endl;
+cout<<"D_"<<i<<":"<<tasks.get_tasks()[i].get_deadline()<<endl;
+		}
+
 		rb_solution->show_error();
 		cout<<rb_solution->get_status()<<endl;
 		set_status(rb_solution->get_status());
