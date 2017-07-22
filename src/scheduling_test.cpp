@@ -217,7 +217,7 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 #endif
 					//sleep(1);
 				}
-
+				
 				result.utilization = utilization;
 			}//exp_times
 cout<<endl;
