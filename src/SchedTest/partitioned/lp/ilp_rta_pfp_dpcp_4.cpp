@@ -597,7 +597,7 @@ void ILP_RTA_PFP_DPCP_4::constraint_7_1(LinearProgram& lp, ILPDPCPMapper_4& vars
 
 			long L_i_u = request_u->get_max_length();
 			
-			var_id = vars.lookup(ILPDPCPMapper_4::RESPONSE_TIME_CS, i);
+			var_id = vars.lookup(ILPDPCPMapper_4::RESPONSE_TIME_CS, i, t_num + u);
 			exp->add_term(var_id, 1);
 			lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
@@ -728,7 +728,7 @@ void ILP_RTA_PFP_DPCP_4::constraint_8_2(LinearProgram& lp, ILPDPCPMapper_4& vars
 					lp.declare_variable_integer(var_id);
 					lp.declare_variable_bounds(var_id, true, 0, true, bound);
 
-					var_id = vars.lookup(ILPDPCPMapper_4::PREEMPT_NUM_CS, i, x);
+					var_id = vars.lookup(ILPDPCPMapper_4::PREEMPT_NUM_CS, i, t_num + u);
 					exp->add_term(var_id, 1.0/px);
 
 					var_id = vars.lookup(ILPDPCPMapper_4::RESPONSE_TIME, x);
