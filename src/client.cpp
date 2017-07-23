@@ -60,6 +60,8 @@ int main(int argc,char** argv)
 	vector<Param> parameters = get_parameters();
 	Param* param = &(parameters[0]);
 	SchedTestFactory STFactory;
+	Random_Gen::uniform_integral_gen(0,10);
+	Random_Gen::exponential_gen(10);
 #if UNDEF_ABANDON
 	GLPKSolution::set_time_limit(TIME_LIMIT_INIT);
 #endif

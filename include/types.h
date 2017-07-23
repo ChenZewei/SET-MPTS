@@ -72,8 +72,8 @@
 #define ILP_SOLUTION_VAR_CHECK 1
 #define UNDEF_ABANDON 1
 #define TIME_LIMIT_INIT 30000 //30 sec
-#define TIME_LIMIT_GAP	10000 //0 sec
-#define TIME_LIMIT_UPPER_BOUND 120000 //1 hour
+#define TIME_LIMIT_GAP	0 //0 sec
+#define TIME_LIMIT_UPPER_BOUND 3600000 //1 hour
 
 //CFG
 
