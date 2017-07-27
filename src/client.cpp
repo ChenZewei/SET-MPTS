@@ -58,7 +58,7 @@ int main(int argc,char** argv)
 */
 
 	vector<Param> parameters = get_parameters();
-	Param* param = &(parameters[0]);
+//	Param* param = &(parameters[0]);
 	SchedTestFactory STFactory;
 	Random_Gen::uniform_integral_gen(0,10);
 	Random_Gen::exponential_gen(10);
@@ -133,7 +133,11 @@ int main(int argc,char** argv)
 		}
 		else if(0 == strcmp(elements[0].data(), "1"))//work
 		{
-			floating_t utilization(elements[1]);
+			int param_index = atoi(elements[1].data());
+			floating_t utilization(elements[2]);
+			Param* param = &(parameters[param_index]);
+
+cout<<"param id:"<<param->id<<endl;
 
 			vector<int> success;
 			for(uint i = 0; i < param->test_attributes.size(); i++)
@@ -148,6 +152,7 @@ int main(int argc,char** argv)
 				abandon = false;
 				stringstream buf;
 				buf<<"2,";
+				buf<<param->id<<",";
 				buf<<utilization.get_d();
 
 				TaskSet taskset = TaskSet();

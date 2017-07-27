@@ -36,12 +36,14 @@ int main(int argc,char** argv)
 {	
 //Experiment parameters
 	vector<Param> parameters = get_parameters();
+/*
 	Param* param = &(parameters[0]);
 	Result_Set results[MAX_METHOD];
 	Output output(*param);
 	SchedResultSet srs;
 	XML::SaveConfig((output.get_path() + "config.xml").data());
 	output.export_param();
+*/
 
 //Network parameters
 	int maxi, maxfd;
@@ -84,167 +86,201 @@ int main(int argc,char** argv)
 	FD_ZERO(&allset);
 	FD_SET(listenfd, &allset);
 
-	double utilization = param->u_range.min;
-	time_t start, end;
-	start = time(NULL);
-cout<<endl<<"Strat at:"<<ctime(&start)<<endl;
 
 
-	do
-	{	
-		//cout<<"In the circle."<<endl;
-		uint exp_time;
-		//Network
-		rset = allset;
-		nready = select(maxfd+1, &rset,NULL,NULL,NULL);
-		if(FD_ISSET(listenfd,&rset))
-		{
-			cout<<"waiting for connect"<<endl;
-			if((connectfd=accept(listenfd,(struct sockaddr *)&client_addr, &sin_size))==-1)
+	foreach(parameters, param)
+	{
+		//Param* param = &(parameters[0]);
+		Result_Set results[MAX_METHOD];
+		Output output(*param);
+		SchedResultSet srs;
+		XML::SaveConfig((output.get_path() + "config.xml").data());
+		output.export_param();
+		
+		double utilization = param->u_range.min;
+		time_t start, end;
+		start = time(NULL);
+cout<<endl<<"Configuration "<<param->id<<" start at:"<<ctime(&start)<<endl;
+		
+		do
+		{	
+			//cout<<"In the circle."<<endl;
+cout<<"Utilization:"<<utilization<<endl;
+			uint exp_time;
+			//Network
+			rset = allset;
+			nready = select(maxfd+1, &rset,NULL,NULL,NULL);
+			if(FD_ISSET(listenfd,&rset))
 			{
-				printf("Accept error.");
-				continue;
-			}
-			
-			if(clients.size() < FD_SETSIZE)
-			{
-				NetWork client(connectfd, client_addr);
-				clients.push_back(client);
-				
-				cout<<"Connection from [ip:"<<inet_ntoa(client_addr.sin_addr)<<"] has already established."<<endl;
-			}	
-
-			if(clients.size() == FD_SETSIZE)
-				cout<<"Too many clients."<<endl;
-
-			FD_SET(connectfd,&allset);
-
-			if(connectfd > maxfd)
-				maxfd = connectfd;
-
-			if(clients.size() > maxi)
-				maxi = clients.size();
-
-			if(nready <= 0)
-				continue;
-		}
-/*
-		foreach(clients, client)
-		{
-				cout<<"client:"<<client->get_socket()<<endl;
-		}
-*/
-		foreach(clients, client)
-		{
-			if(FD_ISSET(client->get_socket(), &rset))
-			{
-
-//				cout<<"waiting for client:"<<client->get_socket()<<endl;
-				string recvbuf = client->recvbuf();
-				
-
-				if(client->get_status())
+				cout<<"waiting for connect"<<endl;
+				if((connectfd=accept(listenfd,(struct sockaddr *)&client_addr, &sin_size))==-1)
 				{
-					cout<<"Disconnected."<<endl;
-					FD_CLR(client->get_socket(),&allset);
-					clients.erase(client);
-					client = clients.begin();
+					printf("Accept error.");
 					continue;
 				}
-				else
+			
+				if(clients.size() < FD_SETSIZE)
 				{
-					cout<<recvbuf<<endl;
-				}
+					NetWork client(connectfd, client_addr);
+					clients.push_back(client);
+				
+					cout<<"Connection from [ip:"<<inet_ntoa(client_addr.sin_addr)<<"] has already established."<<endl;
+				}	
 
-				vector<string> elements;
+				if(clients.size() == FD_SETSIZE)
+					cout<<"Too many clients."<<endl;
 
-				extract_element(elements, recvbuf);
+				FD_SET(connectfd,&allset);
 
-//				foreach(elements, element)
-//					cout<<"element:"<<*element<<endl;
+				if(connectfd > maxfd)
+					maxfd = connectfd;
 
+				if(clients.size() > maxi)
+					maxi = clients.size();
 
-				if(0 == strcmp(elements[0].data(), "3"))//heartbeat
+				if(nready <= 0)
+					continue;
+			}
+	/*
+			foreach(clients, client)
+			{
+					cout<<"client:"<<client->get_socket()<<endl;
+			}
+	*/
+			foreach(clients, client)
+			{
+				if(FD_ISSET(client->get_socket(), &rset))
 				{
-					//do nothing
-				}
-				else if(0 == strcmp(elements[0].data(), "0"))//connection
-				{
-					sendbuffer = "1,";
-					sendbuffer += to_string(utilization);
-					client->sendbuf(sendbuffer);
-				}
-				else if(0 == strcmp(elements[0].data(), "2"))//result
-				{
-//					cout<<"Extract result..."<<endl;
-					for(uint i = 0; i < param->test_attributes.size(); i++)
+
+	//				cout<<"waiting for client:"<<client->get_socket()<<endl;
+					string recvbuf = client->recvbuf();
+				
+
+					if(client->get_status())
 					{
-						string test_name;
-						if(!param->test_attributes[i].rename.empty())
-						{
-							test_name = param->test_attributes[i].rename;
-						}
-						else
-						{
-							test_name = param->test_attributes[i].test_name;
-						}
-
-						floating_t u(elements[1]);
-
-						if(output.add_result(test_name, param->test_attributes[i].style, u.get_d(), 1, atoi(elements[i+2].data())))
-						{
-							stringstream buf;
-							buf<<test_name;
-							buf<<"\t"<<u.get_d()<<"\t"<<1<<"\t"<<elements[i+2];
-							cout<<buf.str()<<endl;
-							output.append2file("result-logs.csv", buf.str());
-						}
-						
+						cout<<"Disconnected."<<endl;
+						FD_CLR(client->get_socket(),&allset);
+						clients.erase(client);
+						client = clients.begin();
+						continue;
+					}
+					else
+					{
+						cout<<recvbuf<<endl;
 					}
 
-cout<<exp_time<<" "<<param->exp_times<<endl;
+					vector<string> elements;
 
-					sendbuffer = "1,";
-					sendbuffer += to_string(utilization);
-					client->sendbuf(sendbuffer);
+					extract_element(elements, recvbuf);
+
+
+	//				foreach(elements, element)
+	//					cout<<"element:"<<*element<<endl;
+
+
+					if(0 == strcmp(elements[0].data(), "3"))//heartbeat
+					{
+						//do nothing
+					}
+					else if(0 == strcmp(elements[0].data(), "0"))//connection
+					{
+						sendbuffer = "1,";
+						sendbuffer += to_string(param->id) + ",";
+						sendbuffer += to_string(utilization);
+						client->sendbuf(sendbuffer);
+					}
+					else if(0 == strcmp(elements[0].data(), "2"))//result
+					{
+						
+						if(param->id != atoi(elements[1].data()))
+						{
+							sendbuffer = "1,";
+							sendbuffer += to_string(param->id) + ",";
+							sendbuffer += to_string(utilization);
+							client->sendbuf(sendbuffer);
+							continue;
+						}
+						
+						floating_t u(elements[2]);
+	
+//						if(!(fabs(u.get_d() - utilization)<_EPS))
+//							continue;
+	//					cout<<"Extract result..."<<endl;
+						for(uint i = 0; i < param->test_attributes.size(); i++)
+						{
+							string test_name;
+							if(!param->test_attributes[i].rename.empty())
+							{
+								test_name = param->test_attributes[i].rename;
+							}
+							else
+							{
+								test_name = param->test_attributes[i].test_name;
+							}
+
+
+							if(output.add_result(test_name, param->test_attributes[i].style, u.get_d(), 1, atoi(elements[i+3].data())))
+							{
+								stringstream buf;
+								buf<<test_name;
+								buf<<"\t"<<u.get_d()<<"\t"<<1<<"\t"<<elements[i+3];
+								cout<<buf.str()<<endl;
+								output.append2file("result-logs.csv", buf.str());
+							}
+						
+						}
+
+	cout<<exp_time<<" "<<param->exp_times<<endl;
+
+						sendbuffer = "1,";
+						sendbuffer += to_string(param->id) + ",";
+						sendbuffer += to_string(utilization);
+						client->sendbuf(sendbuffer);
+					}
+
+					if(nready <=0)
+						break;
 				}
+			}
 
-				if(nready <=0)
-					break;
+	//		output.export_result_append(utilization);
+			output.Export(PNG);		
+
+			exp_time = output.get_exp_time_by_utilization(utilization);
+
+cout<<exp_time<<endl;
+
+			if(exp_time == param->exp_times)
+			{
+				utilization += param->step;
+			
 			}
 		}
+		while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);	
 
-//		output.export_result_append(utilization);
-		output.Export(PNG);		
+		time(&end);
+cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
 
-		exp_time = output.get_exp_time_by_utilization(utilization);
+		ulong gap = difftime(end, start);
+		uint hour = gap/3600;
+		uint min = (gap%3600)/60;																				
+		uint sec = (gap%3600)%60;
 
-
-		if(exp_time == param->exp_times)
-		{
-			utilization += param->step;
-			
-		}
+cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;	
+	
+		output.export_csv();
+		output.Export(PNG|EPS|SVG|TGA|JSON);
 	}
-	while(utilization < param->u_range.max || fabs(param->u_range.max - utilization) < _EPS);
+
+	
 
 	foreach(clients, client)
 	{
 		client->sendbuf("-1");
 	}
 
-	output.export_csv();
-	output.Export(PNG|EPS|SVG|TGA|JSON);
 
-	time(&end);
-cout<<endl<<"Finish at:"<<ctime(&end)<<endl;
-
-	ulong gap = difftime(end, start);
-	uint hour = gap/3600;
-	uint min = (gap%3600)/60;																				
-	uint sec = (gap%3600)%60;
-
-cout<<"Duration:"<<hour<<" hour "<<min<<" min "<<sec<<" sec."<<endl;
+	
 /*
 	output.export_csv();
 	output.Export(PNG|EPS|SVG|TGA|JSON);

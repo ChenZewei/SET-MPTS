@@ -72,7 +72,7 @@ uint Output::get_exp_time_by_utilization(double utilization)
 string Output::output_filename()
 {
 	stringstream buf;
-	buf<<"id:"<<param.id<<"-l:"<<param.lambda<<"-"<<"s:"<<param.step<<"-"<<"P:"<<param.p_num<<"-"<<fixed<<setprecision(0)<<"u:["<<param.u_range.min<<","<<param.u_range.max<<"]-"<<"p:["<<param.p_range.min<<","<<param.p_range.max<<"]";
+	buf<<"id["<<param.id<<"]-l["<<param.lambda<<"]-"<<"P:"<<param.p_num<<"-"<<"rn["<<param.resource_num<<"]-"<<"rrn["<<param.rrn<<"]-"<<"rrp["<<param.rrp<<"]-"<<"rrr["<<param.rrr.min<<","<<param.rrr.max<<"]";
 	return buf.str();
 }
 
