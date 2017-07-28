@@ -27,6 +27,8 @@ ulong RTA_PFP_GS::pfp_gs_local_blocking(Task& ti)
 {
 	ulong blocking = 0;
 	uint p_id = ti.get_partition();
+//cout<<"Task "<<ti.get_id()<<endl;
+//cout<<"priority:"<<ti.get_priority()<<endl;
 
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tj)
 	{
@@ -34,9 +36,11 @@ ulong RTA_PFP_GS::pfp_gs_local_blocking(Task& ti)
 		{
 			uint q = request->get_resource_id();
 			Resource& resource_q = resources.get_resources()[q];
-
+//cout<<"Resource "<<q<<endl;
 			if(resource_q.is_global_resource())
 				continue;		
+//			cout<<"Local!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+//			cout<<"ceiling:"<<resource_q.get_ceiling()<<endl;
 			if(resource_q.get_ceiling() <= ti.get_priority())
 			{
 				ulong length = request->get_max_length();
@@ -166,7 +170,8 @@ ulong RTA_PFP_GS::response_time(Task& ti)
 				ulong wcet_h = th->get_wcet();
 				ulong period_h = th->get_period();
 				ulong jitter_h = th->get_jitter();
-				ulong remote_blocking_h = th->get_remote_blocking();
+				//ulong remote_blocking_h = th->get_remote_blocking();
+				ulong remote_blocking_h = pfp_gs_remote_blocking(*th);
 				ulong interference = ceiling(response_time + jitter_h, period_h)*(wcet_h + remote_blocking_h);
 				test_start += interference;
 //cout<<"Task:"<<th->get_id()<<" wcet:"<<th->get_wcet()<<" period:"<<th->get_period()<<" deadline:"<<th->get_deadline()<<" r_t:"<<th->get_response_time()<<" interference:"<<interference<<endl;
@@ -181,7 +186,7 @@ ulong RTA_PFP_GS::response_time(Task& ti)
 		else
 		{
 			//ti.set_response_time(response_time);
-//			cout<<"rt:"<<response_time<<endl;
+			//cout<<"rt:"<<response_time<<endl;
 			return response_time;
 		}	
 	}
@@ -493,7 +498,7 @@ cout<<"=====fail====="<<endl;
 cout<<"=====success====="<<endl;
 	foreach(tasks.get_tasks(), task)
 	{
-		cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<" U:"<<task->get_utilization().get_d()<<endl;
+		cout<<"Task:"<<task->get_id()<<" Partition:"<<task->get_partition()<<" priority:"<<task->get_priority()<<" U:"<<task->get_utilization().get_d()<<" local_blocking:"<<task->get_local_blocking()<<" remote blocking:"<<task->get_remote_blocking()<<endl;
 		cout<<"----------------------------"<<endl;
 	}
 

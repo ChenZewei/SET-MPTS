@@ -99,6 +99,36 @@ int main(int argc,char** argv)
 				ResourceSet resourceset = ResourceSet();
 				resource_gen(&resourceset, *param);
 				tast_gen(taskset, resourceset, *param, utilization);
+				resourceset.update(&taskset);
+/*
+				foreach(taskset.get_tasks(), task)
+				{
+					cout<<"/===========Task "<<task->get_id()<<"===========/"<<endl;
+
+					cout<<"Res:";
+					foreach(task->get_requests(), request)
+						cout<<request->get_resource_id()<<"\t";
+					cout<<endl;
+				}
+
+				foreach(resourceset.get_resources(), resource)
+				{
+					cout<<"/===========Resource "<<resource->get_resource_id()<<"===========/"<<endl;
+					cout<<"task queue size:"<<resource->get_taskqueue().size()<<endl;
+
+					foreach(resource->get_taskqueue(), id)
+						cout<<(*id)<<"\t";
+					cout<<endl;
+
+				}
+
+				foreach(resourceset.get_resources(), resource)
+				{
+					cout<<"/===========Resource "<<resource->get_resource_id()<<"===========/"<<endl;
+
+					resource->display_task_queue();
+				}
+*/
 				for(uint j = 0; j < param->get_method_num(); j++)
 				{
 					taskset.init();

@@ -60,11 +60,21 @@ bool Resource::is_global_resource()
 		return false;
 
 	global_resource = false;
+
+	uint first_id = MAX_INT;
 	
 	foreach(queue, id)
 	{
 		Task& task = tasks->get_task_by_id(*id);
-		if(tasks->get_task_by_id(*(queue.begin())).get_partition() != task.get_partition())
+//		cout<<"Task "<<*id<<" partition:"<<task.get_partition()<<endl;
+
+		if(MAX_INT == task.get_partition())
+			continue;
+
+		if(MAX_INT == first_id)
+			first_id = *id;
+
+		if(tasks->get_task_by_id(first_id).get_partition() != task.get_partition())
 		{
 			global_resource = true;
 			break;
@@ -83,7 +93,7 @@ TaskSet* Resource::get_tasks()
 	return tasks;
 }
 
-set<uint> Resource::get_taskqueue()
+set<uint>& Resource::get_taskqueue()
 {
 	return queue;
 }
@@ -100,6 +110,9 @@ uint Resource::get_ceiling()
 	foreach(queue, id)
 	{
 		Task& task = tasks->get_task_by_id(*id);
+//		cout<<"Task "<<*id<<" priority:"<<task.get_priority()<<endl;
+		if(MAX_INT == task.get_priority())
+			continue;
 		if(ceiling > task.get_priority())
 			ceiling = task.get_priority();
 	}

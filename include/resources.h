@@ -39,7 +39,7 @@ class Resource
 		bool is_processor_local_resource() const;
 		//Request_Tasks get_tasks() const;
 		TaskSet* get_tasks();
-		set<uint> get_taskqueue();
+		set<uint>& get_taskqueue();
 		void add_task(uint id);
 		uint get_ceiling();
 		void update(const TaskSet* tasks);
