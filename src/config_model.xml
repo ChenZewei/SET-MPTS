@@ -74,7 +74,7 @@
 		<data RENAME="R-PCP"     	STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
 		<data RENAME="ILP"  		STYLE="{x44546A}2s">ILP-RTA-PFP-DPCP-4</data>
 	</schedulability_test>
-	<experiment_times>500</experiment_times>
+	<experiment_times>300</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->
