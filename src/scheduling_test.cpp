@@ -100,14 +100,14 @@ int main(int argc,char** argv)
 				resource_gen(&resourceset, *param);
 				tast_gen(taskset, resourceset, *param, utilization);
 				resourceset.update(&taskset);
-/*
+
 				foreach(taskset.get_tasks(), task)
 				{
 					cout<<"/===========Task "<<task->get_id()<<"===========/"<<endl;
-
+					cout<<"WCET:"<<task->get_wcet()<<" NCS-WCET:"<<task->get_wcet_non_critical_sections()<<" CS-WCET:"<<task->get_wcet_critical_sections()<<endl;
 					cout<<"Res:";
 					foreach(task->get_requests(), request)
-						cout<<request->get_resource_id()<<"\t";
+						cout<<"\t"<<request->get_resource_id()<<": A_"<<task->get_id()<<"_"<<request->get_resource_id()<<"="<<request->get_num_requests()*request->get_max_length()<<endl;;
 					cout<<endl;
 				}
 
@@ -128,7 +128,7 @@ int main(int argc,char** argv)
 
 					resource->display_task_queue();
 				}
-*/
+
 				for(uint j = 0; j < param->get_method_num(); j++)
 				{
 					taskset.init();
