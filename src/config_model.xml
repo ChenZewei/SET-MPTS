@@ -125,8 +125,8 @@
 	</rrn>
 	<rrr>//resource_request_range
 		<data>
-			<min>200</min>
-			<max>500</max>
+			<min>100</min>
+			<max>200</max>
 		</data>
 	</rrr>
 	<total_len_factor>
