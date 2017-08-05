@@ -85,7 +85,7 @@
 <!-->
 	</output>
 	<lambda>
-		<data>4</data>
+		<data>10</data>
 	</lambda>
 	<step>
 		<data>0.5</data>
@@ -93,11 +93,11 @@
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>6</max>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>6</data>	
+		<data>4</data>	
 	</processor_num>
 	<period_range>
 		<data>
