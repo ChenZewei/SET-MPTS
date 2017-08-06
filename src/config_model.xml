@@ -74,7 +74,7 @@
 		<data RENAME="R-PCP"     	STYLE="{x0080FF}2v">RTA-PFP-RO-ML</data>
 		<data RENAME="ILP"  		STYLE="{x44546A}2s">ILP-RTA-PFP-DPCP-4</data>
 	</schedulability_test>
-	<experiment_times>100</experiment_times>
+	<experiment_times>200</experiment_times>
 	<output>
 		<data FORMAT="PNG" BLACK_ONLY="true" >LineChart</data>
 <!-->
@@ -85,15 +85,15 @@
 <!-->
 	</output>
 	<lambda>
-		<data>10</data>
+		<data>4</data>
 	</lambda>
 	<step>
-		<data>0.2</data>
+		<data>0.4</data>
 	</step>
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>4</max>
+			<max>8</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
@@ -112,18 +112,22 @@
 		</data>
 	</deadline_propotion>
 	<resource_num>
-		<data>2</data>
+		<data>4</data>
 	</resource_num>
 	<mcsn>//max_critical_section_number
 		<data>100</data>
 	</mcsn>
 	<rrp>//resource_request_probability
-		<data>0.5</data>
+		<data>0.25</data>
 	</rrp>
 	<rrn>//resource_request_number
 		<data>5</data>
 	</rrn>
 	<rrr>//resource_request_range
+		<data>
+			<min>100</min>
+			<max>200</max>
+		</data>
 		<data>
 			<min>200</min>
 			<max>500</max>
