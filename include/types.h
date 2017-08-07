@@ -71,9 +71,9 @@
 #define GLPK_TERM_OUT 0
 #define ILP_SOLUTION_VAR_CHECK 0
 #define UNDEF_ABANDON 1
-#define TIME_LIMIT_INIT 30000 //30 sec
+#define TIME_LIMIT_INIT 3600000 //30 sec
 #define TIME_LIMIT_GAP	0 //0 sec
-#define TIME_LIMIT_UPPER_BOUND 30000 //1 hour
+#define TIME_LIMIT_UPPER_BOUND 3600000 //1 hour
 
 //CFG
 
