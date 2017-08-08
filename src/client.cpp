@@ -36,15 +36,16 @@ using namespace std;
 struct ARG
 {
 	int connectfd;
-	struct sockaddr_in server;
-	double utilization;
-	Param param;
+//	struct sockaddr_in server;
+//	double utilization;
+//	Param param;
 }typedef ARG;
 
 void getFiles(string path, string dir);
 void read_line(string path, vector<string>& files);
 vector<Param> get_parameters();
 unsigned int alarm(unsigned int seconds);
+void *func(void *arg);
 
 int main(int argc,char** argv)
 {	
@@ -57,6 +58,7 @@ int main(int argc,char** argv)
 	int port = atoi(argv[1]);
 */
 
+	pthread_t tid;
 	vector<Param> parameters = get_parameters();
 //	Param* param = &(parameters[0]);
 	SchedTestFactory STFactory;
@@ -94,10 +96,18 @@ int main(int argc,char** argv)
 		sleep(10);
 	}
 
+	ARG *arg = (ARG *)malloc(sizeof(ARG));
+	arg->connectfd = socketfd;
+
 	if(send(socketfd, "0", sizeof("0"), 0) < 0) 
 	{
 		cout<<"Send failed!"<<endl;
 		//sleep(1);
+	}
+
+	if(pthread_create(&tid, NULL, func, (void *)arg))
+	{
+		printf("Thread create failed.");
 	}
 
 	while(1)
@@ -106,6 +116,7 @@ int main(int argc,char** argv)
 		if((recvlen = recv(socketfd, recvbuffer,sizeof(recvbuffer),0))==-1)
 		{
 			printf("Recieve error.\n");
+			pthread_cancel(tid);
 			exit(EXIT_SUCCESS);	
 		}
 		else if(0 == recvlen)
@@ -138,6 +149,7 @@ int main(int argc,char** argv)
 			Param* param = &(parameters[param_index]);
 
 cout<<"param id:"<<param->id<<endl;
+
 
 			vector<int> success;
 			for(uint i = 0; i < param->test_attributes.size(); i++)
@@ -385,4 +397,30 @@ vector<Param> get_parameters()
 cout<<"param num:"<<parameters.size()<<endl;
 	return parameters;
 }
+
+/*
+int connectfd;
+struct sockaddr_in server;
+double utilization;
+Param param;
+*/
+
+void *func(void *arg)
+{
+	struct ARG *info = (ARG *)arg;
+	string sendbuf = "3";
+	while(1)
+	{
+		cout<<"Send heartbeat..."<<endl;
+		if(send(info->connectfd, sendbuf.data(), strlen(sendbuf.data()), 0) < 0)
+		{
+			cout<<"Send failed!"<<endl;
+			//sleep(1);
+		}
+		sleep(30);
+	}
+}
+
+
+
 
