@@ -1,7 +1,8 @@
 #include "random_gen.h"
 #include <iostream>
 
-default_random_engine Random_Gen::generator(time(NULL));
+//default_random_engine Random_Gen::generator(std::chrono::system_clock::now().time_since_epoch().count());
+mt19937 Random_Gen::generator(std::chrono::system_clock::now().time_since_epoch().count());
 
 double Random_Gen::exponential_gen(double lambda)
 {

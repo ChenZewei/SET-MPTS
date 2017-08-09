@@ -8,4 +8,5 @@ fi
 for((n=0;n<$default_num;n++))
 do
 	nohup ./client &
+	sleep 1
 done

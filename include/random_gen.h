@@ -2,13 +2,15 @@
 #define RAMDOM_GEN_H
 
 #include <random>
+#include <chrono>
 #include "types.h"
 using namespace std;
 
 class Random_Gen
 {
 	private:
-		static default_random_engine generator;
+		//static default_random_engine generator;
+		static mt19937 generator;
 	public:
 		//Random_Gen();
 		static double exponential_gen(double lambda);
