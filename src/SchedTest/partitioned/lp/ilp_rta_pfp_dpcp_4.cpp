@@ -1086,8 +1086,8 @@ void ILP_RTA_PFP_DPCP_4::constraint_17(LinearProgram& lp, ILPDPCPMapper_4& vars)
 
 					int term = ceiling(pi + px, px);
 
-					var_id = vars.lookup(ILPDPCPMapper_4::SAME_LOCALITY, i, t_num +u);
-					exp->add_term(var_id, -1*term*N_x_v*L_x_v);
+					//var_id = vars.lookup(ILPDPCPMapper_4::SAME_LOCALITY, i, t_num +u);
+					//exp->add_term(var_id, -1*term*N_x_v*L_x_v);
 				}
 			}
 
