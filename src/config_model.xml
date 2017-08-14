@@ -88,16 +88,16 @@
 		<data>4</data>
 	</lambda>
 	<step>
-		<data>0.5</data>
+		<data>0.2</data>
 	</step>
 	<init_utilization_range>
 		<data>
 			<min>0</min>
-			<max>8</max>
+			<max>4</max>
 		</data>
 	</init_utilization_range>
 	<processor_num>
-		<data>8</data>	
+		<data>4</data>	
 	</processor_num>
 	<period_range>
 		<data>
@@ -127,10 +127,6 @@
 		<data>
 			<min>100</min>
 			<max>200</max>
-		</data>
-		<data>
-			<min>200</min>
-			<max>500</max>
 		</data>
 	</rrr>
 	<total_len_factor>
