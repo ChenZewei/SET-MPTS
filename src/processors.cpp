@@ -109,7 +109,7 @@ const set<uint>& Processor::get_resourcequeue()
 
 bool Processor::add_resource(uint r_id)
 {
-	Resource& resource = resources->get_resources()[r_id];
+	Resource& resource = resources->get_resource_by_id(r_id);
 	if(1 < resource_utilization + resource.get_utilization())
 			return false;
 

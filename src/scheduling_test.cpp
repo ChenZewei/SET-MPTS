@@ -125,7 +125,7 @@ int main(int argc,char** argv)
 				foreach(resourceset.get_resources(), resource)
 				{
 					cout<<"/===========Resource "<<resource->get_resource_id()<<"===========/"<<endl;
-
+					cout<<"utilization:"<<resource->get_utilization().get_d()<<endl;
 					resource->display_task_queue();
 				}
 
@@ -228,6 +228,12 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 				for(uint t = 0; t < param->test_attributes.size(); t++)
 				{
 					success[t] += temp_success[t];
+				}
+
+				if(temp_success[0]==1&&temp_success[1]==0)
+				{
+					
+					exit(0);
 				}
 
 				if(1 == s_n)

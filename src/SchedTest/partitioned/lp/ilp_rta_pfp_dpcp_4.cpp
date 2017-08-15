@@ -325,8 +325,7 @@ cout<<"/===========Task "<<i<<"===========/"<<endl;
 cout<<"Res:";
 
 			foreach(task.get_requests(), request)
-				cout<<request->get_resource_id()<<"\t";
-cout<<endl;
+				cout<<request->get_resource_id()<<"\t"<<request->get_num_requests()<<"\t"<<request->get_max_length()<<endl;
 cout<<"C_"<<i<<":"<<tasks.get_tasks()[i].get_wcet()<<endl;
 cout<<"D_"<<i<<":"<<tasks.get_tasks()[i].get_deadline()<<endl;
 		}

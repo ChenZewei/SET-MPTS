@@ -236,6 +236,17 @@ Resources& ResourceSet::get_resources()
 	return resources;
 }
 
+
+Resource& ResourceSet::get_resource_by_id(uint r_id)
+{
+	foreach(resources, resource)
+	{
+		if(r_id == resource->get_resource_id())
+			return (*resource);
+	}
+	return *(Resource*)(0);
+}
+
 uint ResourceSet::get_resourceset_size() const
 {
 	return resources.size();
