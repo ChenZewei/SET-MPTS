@@ -99,8 +99,8 @@ int main(int argc,char** argv)
 				ResourceSet resourceset = ResourceSet();
 				resource_gen(&resourceset, *param);
 				tast_gen(taskset, resourceset, *param, utilization);
+/*
 				resourceset.update(&taskset);
-
 				foreach(taskset.get_tasks(), task)
 				{
 					cout<<"/===========Task "<<task->get_id()<<"===========/"<<endl;
@@ -128,11 +128,12 @@ int main(int argc,char** argv)
 					cout<<"utilization:"<<resource->get_utilization().get_d()<<endl;
 					resource->display_task_queue();
 				}
+*/
 
 				for(uint j = 0; j < param->get_method_num(); j++)
 				{
 					taskset.init();
-					processorset.init();	
+					processorset.init();
 					resourceset.init();
 					exp[j]++;
 
@@ -145,7 +146,8 @@ int main(int argc,char** argv)
 							return -1;
 						}
 
-						if(!param->test_attributes[i].rename.empty())
+//cout<<""<<endl;
+						if(!param->test_attributes[j].rename.empty())
 						{
 							cout<<param->test_attributes[j].rename<<":";
 						}
@@ -153,7 +155,7 @@ int main(int argc,char** argv)
 						{
 							cout<<param->test_attributes[j].test_name<<":";
 						}
-					
+				
 						time_t s, e;
 						s = time(NULL);
 
@@ -229,13 +231,13 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 				{
 					success[t] += temp_success[t];
 				}
-
+/*
 				if(temp_success[0]==1&&temp_success[1]==0)
 				{
 					
 					exit(0);
 				}
-
+*/
 				if(1 == s_n)
 				{
 					exc[s_i]++;
