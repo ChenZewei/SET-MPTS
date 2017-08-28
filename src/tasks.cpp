@@ -999,6 +999,12 @@ cout<<"////////////////////////////////////////////"<<endl;
 
 		for(int index = 0; index < tasks.size(); index++)
 		{
+/*
+#if SORT_DEBUG
+			cout<<"//////////////////////STEP//////////////////////"<<endl;
+			display();
+#endif
+*/
 			bool is_continue = false;
 			min_id = 0;
 			min_slack = MAX_LONG;
@@ -1033,21 +1039,23 @@ cout<<"////////////////////////////////////////////"<<endl;
 				if(min_id == tasks[index2].get_id())
 				{
 					vector<Task>::iterator task1 = (tasks.begin() + index2);
+//cout<<"min slack task:"<<task1->get_id()<<endl;
 					for(int index3 = index2 - 1; index3 >= 0; index3--)
 					{
 						vector<Task>::iterator task2 = (tasks.begin() + index3);
+//cout<<"task"<<task2->get_id()<<" oa:"<<task2->get_other_attr()<<endl;
 						if((p_num - 1) <= task2->get_other_attr())
 						{
 							is_continue = true;
 							break;
 						}
-
 						if(task1->get_slack() < task2->get_slack())
 						{
 							Task temp = (*task1);
 							tasks.erase((task1));
-							tasks.insert(task2, temp);
 							task2->set_other_attr(task2->get_other_attr() + 1);
+//cout<<"\ttask"<<task2->get_id()<<" oa:"<<task2->get_other_attr()<<endl;
+							tasks.insert(task2, temp);
 							task1 = (tasks.begin() + index3);
 						}
 					}
@@ -1841,8 +1849,26 @@ void tast_gen(TaskSet& taskset, ResourceSet& resourceset, Param param, double ut
 	while(taskset.get_utilization_sum() < utilization)//generate tasks
 	{
 		ulong period = Random_Gen::uniform_integral_gen(int(param.p_range.min),int(param.p_range.max));
-		//fraction_t u = Random_Gen::exponential_gen(param.lambda);
-		fraction_t u = Random_Gen::uniform_real_gen(0.5, 0.5);
+		//fraction_t u_b = utilization;
+		//u_b /= param.p_num;
+		//fraction_t u;
+		//ulong wcet;
+/*
+		if(0 == taskset.get_taskset_size())
+		{
+			u = u_b;
+			period = param.p_range.min;
+			wcet = 1;
+		}
+		else
+		{
+			u = Random_Gen::uniform_real_gen(0, utilization/param.p_num);
+			wcet = period*u.get_d();
+		}
+*/
+			//fraction_t u = Random_Gen::uniform_real_gen(0.2, 0.5);
+		fraction_t u = Random_Gen::exponential_gen(param.lambda);
+		//fraction_t u = Random_Gen::uniform_real_gen(0.2, 0.5);
 		ulong wcet = period*u.get_d();
 		if(0 == wcet)
 			wcet++;

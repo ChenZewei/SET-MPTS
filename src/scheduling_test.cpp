@@ -100,6 +100,13 @@ int main(int argc,char** argv)
 				resource_gen(&resourceset, *param);
 				tast_gen(taskset, resourceset, *param, utilization);
 /*
+				taskset.add_task(resourceset, *param, 50, 100);
+				taskset.add_task(resourceset, *param, 50, 100);
+				taskset.add_task(resourceset, *param, 50, 100);
+				taskset.add_task(resourceset, *param, 50, 100);
+				taskset.add_task(resourceset, *param, 1, 60);
+*/
+/*
 				resourceset.update(&taskset);
 				foreach(taskset.get_tasks(), task)
 				{
@@ -241,6 +248,7 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 				if(1 == s_n)
 				{
 					exc[s_i]++;
+				cout<<"======================================================"<<endl;
 #if SORT_DEBUG
 					cout<<"Exclusive Success TaskSet:"<<endl;
 					cout<<"/////////////////"<<param->test_attributes[s_i].test_name<<"////////////////"<<endl;
