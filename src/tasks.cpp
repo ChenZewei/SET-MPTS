@@ -1053,7 +1053,8 @@ cout<<"////////////////////////////////////////////"<<endl;
 						{
 							Task temp = (*task1);
 							tasks.erase((task1));
-							task2->set_other_attr(task2->get_other_attr() + 1);
+							if(task2->get_deadline() < task1->get_wcet() + task2->get_wcet())
+								task2->set_other_attr(task2->get_other_attr() + 1);
 //cout<<"\ttask"<<task2->get_id()<<" oa:"<<task2->get_other_attr()<<endl;
 							tasks.insert(task2, temp);
 							task1 = (tasks.begin() + index3);

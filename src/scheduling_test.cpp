@@ -99,12 +99,16 @@ int main(int argc,char** argv)
 				ResourceSet resourceset = ResourceSet();
 				resource_gen(&resourceset, *param);
 				tast_gen(taskset, resourceset, *param, utilization);
-/*
-				taskset.add_task(resourceset, *param, 50, 100);
-				taskset.add_task(resourceset, *param, 50, 100);
-				taskset.add_task(resourceset, *param, 50, 100);
-				taskset.add_task(resourceset, *param, 50, 100);
-				taskset.add_task(resourceset, *param, 1, 60);
+/*		
+				taskset.add_task(resourceset, *param, 51, 100);
+				taskset.add_task(resourceset, *param, 51, 100);
+				taskset.add_task(resourceset, *param, 51, 100);
+				taskset.add_task(resourceset, *param, 51, 100);	
+				for(uint x = 0; x < 1; x++)
+					taskset.add_task(resourceset, *param, 1, 51);
+
+
+				cout<<"Utilization:"<<taskset.get_utilization_sum().get_d()<<endl;
 */
 /*
 				resourceset.update(&taskset);
