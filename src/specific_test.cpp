@@ -110,7 +110,6 @@ int main(int argc,char** argv)
 					processorset.init();	
 					resourceset.init();
 					exp[j]++;
-
 					SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
 					if(NULL == schedTest)
 					{
@@ -122,7 +121,6 @@ int main(int argc,char** argv)
 					{
 						success[j]++;
 					}
-
 					delete(schedTest);
 				}
 
@@ -169,7 +167,7 @@ int main(int argc,char** argv)
 			else
 			{
 				extract_element(elements, buf);
-				
+
 				ulong ncs_wcet = (elements[1].get_d() + elements[2].get_d())*(param->p_range.min);
 				ulong cs_wcet = elements[4].get_d()*(param->p_range.min);
 				ulong period = elements[0].get_d()*(param->p_range.min);

@@ -53,11 +53,9 @@
 		<data RENAME="" REMARK="">RTA-GSMP4-NG</data>
 
 
+		<data RENAME="" REMARK="">RTA-GFP-NG</data>
 <!-->
-		<data RENAME="LP-FMLP" REMARK="">LP-RTA-GFP-FMLP</data>
-		<data RENAME="LP-DPCP" REMARK="">LP-RTA-PFP-DPCP</data>
-		<data RENAME="LP-MPCP" REMARK="">LP-RTA-PFP-MPCP</data>
-		<data RENAME="GS" REMARK="">RTA-PFP-GS</data>
+		<data RENAME="LP-PIP" REMARK="">LP-RTA-GFP-PIP</data>
 	</schedulability_test>
 	<experiment_times>100</experiment_times>
 	<output>
