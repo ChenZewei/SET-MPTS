@@ -18,6 +18,10 @@ SET-MRTS: **S**chedulability **E**xperimental **T**ools for **M**ultiprocessors 
     TinyXML-2 is a simple, small, efficient, C++ XML parser that can be easily integrating into other programs.<br/>
     http://www.grinninglizard.com/tinyxml2/index.html<br/>
 
+  GLPK library:<br/>
+	The GLPK (GNU Linear Programming Kit) package is intended for solving large-scale linear programming (LP), mixed integer programming (MIP), and other related problems. It is a set of routines written in ANSI C and organized in the form of a callable library. <br/>
+	http://www.gnu.org/software/glpk/<br/>
+
 ## Compile
 enter src and make.(C++ 11 is needed)<br/>
 
@@ -56,7 +60,35 @@ example:<br/>
 2. Execute the program;
 3. Check the numeric results and graph in results folder.
 
-## Results
+## Supported Scheduling Test (including bu not limited)
+### Global Scheduling
+	RTA for global fixed priority(GFP)
+	RTA for GFP under FMLP (Linear Programming)
+	RTA for GFP under PIP (Linear Programming)
+### Partitioned Scheduling
+	RTA for partitioned fixed priority(PFP)
+	RTA for worst-fit PFP
+	RTA for first-fit PFP
+	RTA for worst-fit spinlock PFP
+	RTA for worst-fit semapore PFP
+	RTA for PFP of Greedy Slack
+	RTA for Resource-Oriented Partitioned Scheduling
+	RTA for spinlock PFP (Integer Linear Programming)
+	RTA for worst-fit spinlock PFP (Linear Programming)
+	RTA for worst-fit DPCP PFP (Linear Programming)
+	RTA for worst-fit MPCP PFP (Linear Programming)
+	RTA for Resource-Oriented Partitioned Scheduling (Integer Linear Programming)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
