@@ -1,11 +1,11 @@
-#include "rta_pfp_ro_ml.h"
+#include "rta_pfp_rop.h"
 #include <assert.h>
 #include "iteration-helper.h"
 #include "math-helper.h"
 
-RTA_PFP_RO_ML::RTA_PFP_RO_ML():PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented") {}
+RTA_PFP_ROP::RTA_PFP_ROP():PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented") {}
 
-RTA_PFP_RO_ML::RTA_PFP_RO_ML(TaskSet tasks, ProcessorSet processors, ResourceSet resources):PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented")
+RTA_PFP_ROP::RTA_PFP_ROP(TaskSet tasks, ProcessorSet processors, ResourceSet resources):PartitionedSched(false, RTA, FIX_PRIORITY, DPCP, "", "Resource-Oriented")
 {
 	this->tasks = tasks;
 	this->processors = processors;
@@ -17,9 +17,9 @@ RTA_PFP_RO_ML::RTA_PFP_RO_ML(TaskSet tasks, ProcessorSet processors, ResourceSet
 	this->processors.init();
 }
 
-RTA_PFP_RO_ML::~RTA_PFP_RO_ML() {}
+RTA_PFP_ROP::~RTA_PFP_ROP() {}
 
-ulong RTA_PFP_RO_ML::blocking_bound(Task& ti, uint r_id)
+ulong RTA_PFP_ROP::blocking_bound(Task& ti, uint r_id)
 {
 	ulong bound = 0;
 	Request& request_q = ti.get_request_by_id(r_id);
@@ -40,7 +40,7 @@ ulong RTA_PFP_RO_ML::blocking_bound(Task& ti, uint r_id)
 	return bound;
 }
 
-ulong RTA_PFP_RO_ML::request_bound(Task& ti, uint r_id)
+ulong RTA_PFP_ROP::request_bound(Task& ti, uint r_id)
 {
 	ulong deadline = ti.get_deadline();
 	Request& request_q = ti.get_request_by_id(r_id);
@@ -79,7 +79,7 @@ ulong RTA_PFP_RO_ML::request_bound(Task& ti, uint r_id)
 	return deadline + 100;
 }
 
-ulong RTA_PFP_RO_ML::formula_30(Task& ti, uint p_id, ulong interval)
+ulong RTA_PFP_ROP::formula_30(Task& ti, uint p_id, ulong interval)
 {
 	ulong miu = 0;
 
@@ -108,7 +108,7 @@ ulong RTA_PFP_RO_ML::formula_30(Task& ti, uint p_id, ulong interval)
 	return miu;
 }
 
-ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id, ulong interval)
+ulong RTA_PFP_ROP::angent_exec_bound(Task& ti, uint p_id, ulong interval)
 {
 	ulong deadline = ti.get_deadline();
 	ulong lambda = 0;
@@ -135,7 +135,7 @@ ulong RTA_PFP_RO_ML::angent_exec_bound(Task& ti, uint p_id, ulong interval)
 	return min(lambda, miu);
 }
 
-ulong RTA_PFP_RO_ML::NCS_workload(Task& ti, ulong interval)
+ulong RTA_PFP_ROP::NCS_workload(Task& ti, ulong interval)
 {
 	ulong e = ti.get_wcet_non_critical_sections();
 	ulong p = ti.get_period();
@@ -143,7 +143,7 @@ ulong RTA_PFP_RO_ML::NCS_workload(Task& ti, ulong interval)
 	return ceiling((interval + r - e), p) * e;
 }
 
-ulong RTA_PFP_RO_ML::CS_workload(Task& ti, uint resource_id, ulong interval)
+ulong RTA_PFP_ROP::CS_workload(Task& ti, uint resource_id, ulong interval)
 {
 	ulong p = ti.get_period();
 	ulong r = ti.get_response_time();
@@ -152,7 +152,7 @@ ulong RTA_PFP_RO_ML::CS_workload(Task& ti, uint resource_id, ulong interval)
 	return ceiling((interval + r - agent_length), p) * agent_length;
 }
 
-ulong RTA_PFP_RO_ML::response_time_AP(Task& ti)
+ulong RTA_PFP_ROP::response_time_AP(Task& ti)
 {
 	uint p_id = ti.get_partition();
 	ulong test_bound = ti.get_deadline();
@@ -224,7 +224,7 @@ ulong RTA_PFP_RO_ML::response_time_AP(Task& ti)
 	return test_bound + 100;
 }
 
-ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
+ulong RTA_PFP_ROP::response_time_SP(Task& ti)
 {
 	uint p_id = ti.get_partition();
 	ulong test_bound = ti.get_deadline();
@@ -327,7 +327,7 @@ ulong RTA_PFP_RO_ML::response_time_SP(Task& ti)
 	return test_bound + 100;
 }
 
-bool RTA_PFP_RO_ML::worst_fit_for_resources(uint active_processor_num)
+bool RTA_PFP_ROP::worst_fit_for_resources(uint active_processor_num)
 {
 /*
 foreach(resources.get_resources(), resource)
@@ -366,7 +366,7 @@ foreach(resources.get_resources(), resource)
 	return true;
 }
 
-bool RTA_PFP_RO_ML::is_first_fit_for_tasks_schedulable(uint start_processor)
+bool RTA_PFP_ROP::is_first_fit_for_tasks_schedulable(uint start_processor)
 {
 	bool schedulable;
 	uint p_num = processors.get_processor_num();
@@ -403,7 +403,7 @@ bool RTA_PFP_RO_ML::is_first_fit_for_tasks_schedulable(uint start_processor)
 	return schedulable;
 }
 
-bool RTA_PFP_RO_ML::alloc_schedulable()
+bool RTA_PFP_ROP::alloc_schedulable()
 {
 	ulong response_bound = 0;
 	foreach(tasks.get_tasks(), ti)
@@ -433,7 +433,7 @@ bool RTA_PFP_RO_ML::alloc_schedulable()
 	return true;
 }
 
-bool RTA_PFP_RO_ML::alloc_schedulable(Task& ti)
+bool RTA_PFP_ROP::alloc_schedulable(Task& ti)
 {
 	uint p_id = ti.get_partition();
 	if(MAX_INT == p_id)
@@ -462,7 +462,7 @@ bool RTA_PFP_RO_ML::alloc_schedulable(Task& ti)
 	}
 }
 
-bool RTA_PFP_RO_ML::is_schedulable()
+bool RTA_PFP_ROP::is_schedulable()
 {
 	bool schedulable = false;
 	uint p_num = processors.get_processor_num();

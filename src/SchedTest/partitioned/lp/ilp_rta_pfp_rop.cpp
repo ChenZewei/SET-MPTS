@@ -1,4 +1,4 @@
-#include "ilp_rta_pfp_dpcp_3.h"
+#include "ilp_rta_pfp_rop.h"
 #include <lp.h>
 #include <solution.h>
 #include <sstream>
@@ -7,8 +7,8 @@
 #include "iteration-helper.h"
 #include "math-helper.h"
 
-////////////////////ILPDPCPMapper_3////////////////////
-static uint64_t ILPDPCPMapper_3::encode_request(uint64_t type, uint64_t part_1, uint64_t part_2, uint64_t part_3, uint64_t part_4)
+////////////////////ILPROPMapper////////////////////
+static uint64_t ILPROPMapper::encode_request(uint64_t type, uint64_t part_1, uint64_t part_2, uint64_t part_3, uint64_t part_4)
 {
 	uint64_t one = 1;
 	uint64_t key = 0;
@@ -36,34 +36,34 @@ cout<<"key:"<<key<<endl;
 	return key;
 }
 
-static uint64_t ILPDPCPMapper_3::get_type(uint64_t var)
+static uint64_t ILPROPMapper::get_type(uint64_t var)
 {
 	return (var >> 40) & (uint64_t) 0x1f; //5 bits
 }
 
-static uint64_t ILPDPCPMapper_3::get_part_1(uint64_t var)
+static uint64_t ILPROPMapper::get_part_1(uint64_t var)
 {
 	return (var >> 30) & (uint64_t) 0x3ff; //10 bits
 }
 
-static uint64_t ILPDPCPMapper_3::get_part_2(uint64_t var)
+static uint64_t ILPROPMapper::get_part_2(uint64_t var)
 {
 	return (var >> 20) & (uint64_t) 0x3ff; //10 bits
 }
 
-static uint64_t ILPDPCPMapper_3::get_part_3(uint64_t var)
+static uint64_t ILPROPMapper::get_part_3(uint64_t var)
 {
 	return (var >> 10) & (uint64_t) 0x3ff; //10 bits
 }
 
-static uint64_t ILPDPCPMapper_3::get_part_4(uint64_t var)
+static uint64_t ILPROPMapper::get_part_4(uint64_t var)
 {
 	return var & (uint64_t) 0x3ff; //10 bits
 }
 
-ILPDPCPMapper_3::ILPDPCPMapper_3(uint start_var): VarMapperBase(start_var) {}
+ILPROPMapper::ILPROPMapper(uint start_var): VarMapperBase(start_var) {}
 
-uint ILPDPCPMapper_3::lookup(uint type, uint part_1, uint part_2, uint part_3, uint part_4)
+uint ILPROPMapper::lookup(uint type, uint part_1, uint part_2, uint part_3, uint part_4)
 {
 	uint64_t key = encode_request(type, part_1, part_2, part_3, part_4);
 	
@@ -72,7 +72,7 @@ uint ILPDPCPMapper_3::lookup(uint type, uint part_1, uint part_2, uint part_3, u
 	return var;
 }
 
-string ILPDPCPMapper_3::var2str(unsigned int var) const
+string ILPROPMapper::var2str(unsigned int var) const
 {
 	uint64_t key;
 
@@ -84,68 +84,68 @@ string ILPDPCPMapper_3::var2str(unsigned int var) const
 		return "<?>";
 }
 
-string ILPDPCPMapper_3::key2str(uint64_t key) const
+string ILPROPMapper::key2str(uint64_t key) const
 {
 	ostringstream buf;
 
 	switch (get_type(key))
 	{
-		case ILPDPCPMapper_3::SAME_LOCALITY:
+		case ILPROPMapper::SAME_LOCALITY:
 			buf << "S[";
 			break;
-/*		case ILPDPCPMapper_3::LOCALITY_ASSIGNMENT:
+/*		case ILPROPMapper::LOCALITY_ASSIGNMENT:
 			buf << "A[";
 			break;
-		case ILPDPCPMapper_3::RESOURCE_ASSIGNMENT:
+		case ILPROPMapper::RESOURCE_ASSIGNMENT:
 			buf << "Q[";
 			break;
-		case ILPDPCPMapper_3::SAME_TASK_LOCALITY:
+		case ILPROPMapper::SAME_TASK_LOCALITY:
 			buf << "U[";
 			break;
-		case ILPDPCPMapper_3::SAME_RESOURCE_LOCALITY:
+		case ILPROPMapper::SAME_RESOURCE_LOCALITY:
 			buf << "V[";
 			break;
-		case ILPDPCPMapper_3::SAME_TR_LOCALITY:
+		case ILPROPMapper::SAME_TR_LOCALITY:
 			buf << "W[";
 			break;
-//		case ILPDPCPMapper_3::APPLICATION_CORE:
+//		case ILPROPMapper::APPLICATION_CORE:
 //			buf << "AC[";
 //			break;
 */
-		case ILPDPCPMapper_3::PREEMPT_NUM:
+		case ILPROPMapper::PREEMPT_NUM:
 			buf << "P[";
 			break;
-		case ILPDPCPMapper_3::TBT_PREEMPT_NUM:
+		case ILPROPMapper::TBT_PREEMPT_NUM:
 			buf << "H[";
 			break;
-		case ILPDPCPMapper_3::RBT_PREEMPT_NUM:
+		case ILPROPMapper::RBT_PREEMPT_NUM:
 			buf << "H[";
 			break;
-		case ILPDPCPMapper_3::RBR_PREEMPT_NUM:
+		case ILPROPMapper::RBR_PREEMPT_NUM:
 			buf << "H[";
 			break;
-		case ILPDPCPMapper_3::RESPONSE_TIME:
+		case ILPROPMapper::RESPONSE_TIME:
 			buf << "R[";
 			break;
-		case ILPDPCPMapper_3::BLOCKING_TIME:
+		case ILPROPMapper::BLOCKING_TIME:
 			buf << "B[";
 			break;
-		case ILPDPCPMapper_3::REQUEST_BLOCKING_TIME:
+		case ILPROPMapper::REQUEST_BLOCKING_TIME:
 			buf << "b[";
 			break;
-		case ILPDPCPMapper_3::INTERFERENCE_TIME_R:
+		case ILPROPMapper::INTERFERENCE_TIME_R:
 			buf << "I_R[";
 			break;
-		case ILPDPCPMapper_3::INTERFERENCE_TIME_R_RESOURCE:
+		case ILPROPMapper::INTERFERENCE_TIME_R_RESOURCE:
 			buf << "I_R[";
 			break;
-		case ILPDPCPMapper_3::INTERFERENCE_TIME_C:
+		case ILPROPMapper::INTERFERENCE_TIME_C:
 			buf << "I_C[";
 			break;
-		case ILPDPCPMapper_3::INTERFERENCE_TIME_C_TASK:
+		case ILPROPMapper::INTERFERENCE_TIME_C_TASK:
 			buf << "I_C[";
 			break;
-		case ILPDPCPMapper_3::INTERFERENCE_TIME_C_RESOURCE:
+		case ILPROPMapper::INTERFERENCE_TIME_C_RESOURCE:
 			buf << "I_C[";
 			break;
 		default:
@@ -160,10 +160,10 @@ string ILPDPCPMapper_3::key2str(uint64_t key) const
 	return buf.str();
 }
 
-////////////////////ILP_RTA_PFP_DPCP_3////////////////////
-ILP_RTA_PFP_DPCP_3::ILP_RTA_PFP_DPCP_3(): PartitionedSched(true, RTA, FIX_PRIORITY, DPCP, "", "DPCP") {}
+////////////////////ILP_RTA_PFP_ROP////////////////////
+ILP_RTA_PFP_ROP::ILP_RTA_PFP_ROP(): PartitionedSched(true, RTA, FIX_PRIORITY, DPCP, "", "DPCP") {}
 
-ILP_RTA_PFP_DPCP_3::ILP_RTA_PFP_DPCP_3(TaskSet tasks, ProcessorSet processors, ResourceSet resources): PartitionedSched(true, RTA, FIX_PRIORITY, DPCP, "", "DPCP")
+ILP_RTA_PFP_ROP::ILP_RTA_PFP_ROP(TaskSet tasks, ProcessorSet processors, ResourceSet resources): PartitionedSched(true, RTA, FIX_PRIORITY, DPCP, "", "DPCP")
 {
 	this->tasks = tasks;
 	this->processors = processors;
@@ -176,16 +176,16 @@ ILP_RTA_PFP_DPCP_3::ILP_RTA_PFP_DPCP_3(TaskSet tasks, ProcessorSet processors, R
 	this->processors.init();
 }
 
-ILP_RTA_PFP_DPCP_3::~ILP_RTA_PFP_DPCP_3(){}
+ILP_RTA_PFP_ROP::~ILP_RTA_PFP_ROP(){}
 
-bool ILP_RTA_PFP_DPCP_3::is_schedulable()
+bool ILP_RTA_PFP_ROP::is_schedulable()
 {
 	if(0 == tasks.get_tasks().size())
 		return true;
 	else if(tasks.get_utilization_sum().get_d()-processors.get_processor_num() >= _EPS)
 		return false;
 
-	ILPDPCPMapper_3 vars;
+	ILPROPMapper vars;
 	LinearProgram response_bound;
 
 	set_objective(response_bound, vars);
@@ -230,7 +230,7 @@ cout<<"|===========SAME_LOCALITY===========|"<<endl;
 		{
 			if(j == t_num)
 				cout<<"|";
-			construct_exp(vars, exp, ILPDPCPMapper_3::SAME_LOCALITY, i, j);
+			construct_exp(vars, exp, ILPROPMapper::SAME_LOCALITY, i, j);
 			result = rb_solution->evaluate(*exp);
 cout<<result<<"  ";
 			if(j < t_num)
@@ -251,7 +251,7 @@ cout<<"|===========NOT_ALONE===========|"<<endl;
 		LinearExpression *exp = new LinearExpression();
 		double result;
 
-		construct_exp(vars, exp, ILPDPCPMapper_3::NOT_ALONE, i);
+		construct_exp(vars, exp, ILPROPMapper::NOT_ALONE, i);
 		result = rb_solution->evaluate(*exp);
 
 cout<<"Element "<<i<<":"<<result<<endl;
@@ -265,7 +265,7 @@ for(uint i = 0; i < t_num; i++)
 	double result;
 	for(uint j = 0; j < t_num; j++)
 	{
-		construct_exp(vars, exp, ILPDPCPMapper_3::TBT_PREEMPT_NUM, i, j);
+		construct_exp(vars, exp, ILPROPMapper::TBT_PREEMPT_NUM, i, j);
 		result = rb_solution->evaluate(*exp);
 cout<<result<<"  ";
 	}
@@ -286,19 +286,19 @@ cout<<endl;
 			LinearExpression *exp = new LinearExpression();
 			double result;
 
-			construct_exp(vars, exp, ILPDPCPMapper_3::RESPONSE_TIME, i);
+			construct_exp(vars, exp, ILPROPMapper::RESPONSE_TIME, i);
 			result = rb_solution->evaluate(*exp);
 cout<<"R_"<<i<<":"<<result<<endl;
 
-			construct_exp(vars, exp, ILPDPCPMapper_3::BLOCKING_TIME, i);
+			construct_exp(vars, exp, ILPROPMapper::BLOCKING_TIME, i);
 			result = rb_solution->evaluate(*exp);
 cout<<"B_"<<i<<":"<<result<<endl;
 
-			construct_exp(vars, exp, ILPDPCPMapper_3::INTERFERENCE_TIME_C, i);
+			construct_exp(vars, exp, ILPROPMapper::INTERFERENCE_TIME_C, i);
 			result = rb_solution->evaluate(*exp);
 cout<<"INCS_"<<i<<":"<<result<<endl;
 
-			construct_exp(vars, exp, ILPDPCPMapper_3::INTERFERENCE_TIME_R, i);
+			construct_exp(vars, exp, ILPROPMapper::INTERFERENCE_TIME_R, i);
 			result = rb_solution->evaluate(*exp);
 cout<<"ICS_"<<i<<":"<<result<<endl;
 
@@ -340,7 +340,7 @@ cout<<"D_"<<i<<":"<<tasks.get_tasks()[i].get_deadline()<<endl;
 	return false;
 }
 
-void ILP_RTA_PFP_DPCP_3::construct_exp(ILPDPCPMapper_3& vars, LinearExpression *exp, uint type, uint part_1, uint part_2, uint part_3, uint part_4)
+void ILP_RTA_PFP_ROP::construct_exp(ILPROPMapper& vars, LinearExpression *exp, uint type, uint part_1, uint part_2, uint part_3, uint part_4)
 {
 	exp->get_terms().clear();
 	uint var_id;
@@ -353,7 +353,7 @@ void ILP_RTA_PFP_DPCP_3::construct_exp(ILPDPCPMapper_3& vars, LinearExpression *
 #endif
 }
 
-void ILP_RTA_PFP_DPCP_3::set_objective(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::set_objective(LinearProgram& lp, ILPROPMapper& vars)
 {
 	//any objective function is okay.
 	//assert(0 < tasks.get_tasks().size());
@@ -362,13 +362,13 @@ void ILP_RTA_PFP_DPCP_3::set_objective(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	uint var_id;
 
 	uint i = tasks.get_taskset_size() - 1;
-	var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, i, 0, 0);
+	var_id = vars.lookup(ILPROPMapper::RESPONSE_TIME, i, 0, 0);
 	obj->add_term(var_id, 1);
 
 	lp.set_objective(obj);
 }
 
-void ILP_RTA_PFP_DPCP_3::add_constraints(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::add_constraints(LinearProgram& lp, ILPROPMapper& vars)
 {
 	constraint_1(lp, vars);
 	constraint_2(lp, vars);
@@ -377,8 +377,10 @@ void ILP_RTA_PFP_DPCP_3::add_constraints(LinearProgram& lp, ILPDPCPMapper_3& var
 	constraint_5(lp, vars);
 	constraint_6(lp, vars);
 	constraint_7(lp, vars);
+	constraint_7_1(lp, vars);
 	constraint_8(lp, vars);
 //	constraint_8_1(lp, vars);
+	constraint_8_2(lp, vars);
 	constraint_9(lp, vars);
 	constraint_10(lp, vars);
 	constraint_11(lp, vars);
@@ -399,7 +401,7 @@ void ILP_RTA_PFP_DPCP_3::add_constraints(LinearProgram& lp, ILPDPCPMapper_3& var
 
 ////////////////////Expressions////////////////////
 //C1
-void ILP_RTA_PFP_DPCP_3::constraint_1(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_1(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
@@ -410,7 +412,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_1(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 
-		var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, i);
+		var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, i, i);
 		exp->add_term(var_id, 1);
 		lp.declare_variable_binary(var_id);
 
@@ -419,7 +421,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_1(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C2
-void ILP_RTA_PFP_DPCP_3::constraint_2(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_2(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
@@ -432,11 +434,11 @@ void ILP_RTA_PFP_DPCP_3::constraint_2(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
 
-			var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, j);
+			var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, i, j);
 			exp->add_term(var_id, 1);
 			lp.declare_variable_binary(var_id);
 
-			var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, j, i);
+			var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, j, i);
 			exp->add_term(var_id, -1);
 			lp.declare_variable_binary(var_id);
 
@@ -446,7 +448,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_2(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C3
-void ILP_RTA_PFP_DPCP_3::constraint_3(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_3(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
@@ -461,13 +463,13 @@ void ILP_RTA_PFP_DPCP_3::constraint_3(LinearProgram& lp, ILPDPCPMapper_3& vars)
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
 
-				var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, j);
+				var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, i, j);
 				exp->add_term(var_id, -1);
 
-				var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, k, i);
+				var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, k, i);
 				exp->add_term(var_id, 1);
 
-				var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, k, j);
+				var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, k, j);
 				exp->add_term(var_id, 1);
 
 				lp.add_inequality(exp, 1);
@@ -477,7 +479,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_3(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C4
-void ILP_RTA_PFP_DPCP_3::constraint_4(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_4(LinearProgram& lp, ILPROPMapper& vars)
 {
 	int p_num = processors.get_processor_num();
 	int r_num = resources.get_resourceset_size();
@@ -488,13 +490,13 @@ void ILP_RTA_PFP_DPCP_3::constraint_4(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 		
-		var_id = vars.lookup(ILPDPCPMapper_3::NOT_ALONE, i);
+		var_id = vars.lookup(ILPROPMapper::NOT_ALONE, i);
 		exp->add_term(var_id, 1);
 		lp.declare_variable_binary(var_id);
 
 		for(uint j = i + 1; j < r_num + t_num; j++)
 		{
-			var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, j);
+			var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, i, j);
 			exp->add_term(var_id, -1);
 		}
 
@@ -504,8 +506,9 @@ void ILP_RTA_PFP_DPCP_3::constraint_4(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	
 }
 
+
 //C5
-void ILP_RTA_PFP_DPCP_3::constraint_5(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_5(LinearProgram& lp, ILPROPMapper& vars)
 {
 	int p_num = processors.get_processor_num();
 	int r_num = resources.get_resourceset_size();
@@ -516,7 +519,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_5(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	
 	for(uint i = 0; i < r_num + t_num - 1; i++)
 	{
-		var_id = vars.lookup(ILPDPCPMapper_3::NOT_ALONE, i);
+		var_id = vars.lookup(ILPROPMapper::NOT_ALONE, i);
 		exp->add_term(var_id, -1);
 	}
 
@@ -524,7 +527,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_5(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C6
-void ILP_RTA_PFP_DPCP_3::constraint_6(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_6(LinearProgram& lp, ILPROPMapper& vars)
 {
 	foreach(tasks.get_tasks(), ti)
 	{
@@ -533,7 +536,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_6(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 		
-		var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, i);
+		var_id = vars.lookup(ILPROPMapper::RESPONSE_TIME, i);
 		exp->add_term(var_id, 1);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 		
@@ -542,7 +545,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_6(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C7
-void ILP_RTA_PFP_DPCP_3::constraint_7(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_7(LinearProgram& lp, ILPROPMapper& vars)
 {
 	foreach(tasks.get_tasks(), ti)
 	{
@@ -551,23 +554,23 @@ void ILP_RTA_PFP_DPCP_3::constraint_7(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 
-		var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, i);
+		var_id = vars.lookup(ILPROPMapper::RESPONSE_TIME, i);
 		exp->add_term(var_id, 1);
 		//lp.declare_variable_integer(var_id);
 
-		var_id = vars.lookup(ILPDPCPMapper_3::BLOCKING_TIME, i);
+		var_id = vars.lookup(ILPROPMapper::BLOCKING_TIME, i);
 		exp->add_term(var_id, -1);
 		//lp.declare_variable_integer(var_id);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
 
-		var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_C, i);
+		var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_C, i);
 		exp->add_term(var_id, -1);
 		//lp.declare_variable_integer(var_id);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
 
 
-		var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_R, i);
+		var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_R, i);
 		exp->add_term(var_id, -1);
 		//lp.declare_variable_integer(var_id);
 		lp.declare_variable_bounds(var_id, true, 0, false, -1);
@@ -576,8 +579,54 @@ void ILP_RTA_PFP_DPCP_3::constraint_7(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	}
 }
 
+//C7-1
+void ILP_RTA_PFP_ROP::constraint_7_1(LinearProgram& lp, ILPROPMapper& vars)
+{
+	uint t_num = tasks.get_taskset_size();
+
+	foreach(tasks.get_tasks(), ti)
+	{
+		uint i = ti->get_index();
+		ulong wcet = ti->get_wcet();
+
+		foreach(ti->get_requests(), request_u)
+		{
+			uint u = request_u->get_resource_id();
+
+			LinearExpression *exp = new LinearExpression();
+			uint var_id;
+
+			long L_i_u = request_u->get_max_length();
+			
+			var_id = vars.lookup(ILPROPMapper::RESPONSE_TIME_CS, i, t_num + u);
+			exp->add_term(var_id, 1);
+			lp.declare_variable_bounds(var_id, true, 0, false, -1);
+
+			var_id = vars.lookup(ILPROPMapper::REQUEST_BLOCKING_TIME, i, t_num + u);
+			exp->add_term(var_id, -1);
+
+			foreach_higher_priority_task(tasks.get_tasks(), (*ti), tx)
+			{
+				uint x = tx->get_index();
+
+				foreach(tx->get_requests(), request_v)
+				{
+					uint v = request_v->get_resource_id();
+
+					long A_x_v = request_v->get_num_requests()*request_v->get_max_length();
+
+					var_id = vars.lookup(ILPROPMapper::RBR_PREEMPT_NUM, i, x, t_num + u, t_num + v);
+					exp->add_term(var_id, -1*A_x_v);
+				}
+			}
+
+			lp.add_equality(exp, L_i_u);
+		}
+	}
+}
+
 //C8
-void ILP_RTA_PFP_DPCP_3::constraint_8(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_8(LinearProgram& lp, ILPROPMapper& vars)
 {
 	foreach(tasks.get_tasks(), ti)
 	{
@@ -594,15 +643,15 @@ void ILP_RTA_PFP_DPCP_3::constraint_8(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
 
-			var_id = vars.lookup(ILPDPCPMapper_3::PREEMPT_NUM, i, x);
+			var_id = vars.lookup(ILPROPMapper::PREEMPT_NUM, i, x);
 			exp->add_term(var_id, -1);
-			//lp.declare_variable_integer(var_id);
+			lp.declare_variable_integer(var_id);
 			lp.declare_variable_bounds(var_id, true, 0, true, bound);
 
-			var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, i);
+			var_id = vars.lookup(ILPROPMapper::RESPONSE_TIME, i);
 			exp->add_term(var_id, 1.0/px);
 
-			var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, x);
+			var_id = vars.lookup(ILPROPMapper::RESPONSE_TIME, x);
 			exp->add_term(var_id, 1.0/px);
 
 			double ux = cx;
@@ -613,7 +662,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_8(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	}
 }
 //C8_1
-void ILP_RTA_PFP_DPCP_3::constraint_8_1(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_8_1(LinearProgram& lp, ILPROPMapper& vars)
 {
 	foreach(tasks.get_tasks(), ti)
 	{
@@ -629,13 +678,13 @@ void ILP_RTA_PFP_DPCP_3::constraint_8_1(LinearProgram& lp, ILPDPCPMapper_3& vars
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
 
-			var_id = vars.lookup(ILPDPCPMapper_3::PREEMPT_NUM, i, x);
+			var_id = vars.lookup(ILPROPMapper::PREEMPT_NUM, i, x);
 			exp->add_term(var_id, -1);
 
-			var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, i);
+			var_id = vars.lookup(ILPROPMapper::RESPONSE_TIME, i);
 			exp->add_term(var_id, 1.0/px);
 
-			var_id = vars.lookup(ILPDPCPMapper_3::RESPONSE_TIME, x);
+			var_id = vars.lookup(ILPROPMapper::RESPONSE_TIME, x);
 			exp->add_term(var_id, 1.0/px);
 
 			double ux = cx;
@@ -646,8 +695,60 @@ void ILP_RTA_PFP_DPCP_3::constraint_8_1(LinearProgram& lp, ILPDPCPMapper_3& vars
 	}
 }
 
+//C8-2
+void ILP_RTA_PFP_ROP::constraint_8_2(LinearProgram& lp, ILPROPMapper& vars)
+{
+	uint t_num = tasks.get_taskset_size();
+
+	foreach(tasks.get_tasks(), ti)
+	{
+		uint i = ti->get_index();
+		ulong pi = ti->get_period();
+
+		foreach(ti->get_requests(), request_u)
+		{
+			uint u = request_u->get_resource_id();
+			
+			foreach(tasks.get_tasks(), tx)
+			{
+				uint x = tx->get_index();
+				ulong cx = tx->get_wcet();
+				ulong px = tx->get_period();
+
+				foreach(tx->get_requests(), request_v)
+				{
+					uint v = request_v->get_resource_id();
+					uint bound = ceiling(pi + px, px);
+					long A_x_v = request_v->get_num_requests()*request_v->get_max_length();
+
+					LinearExpression *exp = new LinearExpression();
+					uint var_id;
+
+					var_id = vars.lookup(ILPROPMapper::PREEMPT_NUM_CS, i, x, t_num + u, t_num + v);
+					exp->add_term(var_id, -1);
+					lp.declare_variable_integer(var_id);
+					lp.declare_variable_bounds(var_id, true, 0, true, bound);
+
+					var_id = vars.lookup(ILPROPMapper::PREEMPT_NUM_CS, i, t_num + u);
+					exp->add_term(var_id, 1.0/px);
+
+					var_id = vars.lookup(ILPROPMapper::RESPONSE_TIME, x);
+					exp->add_term(var_id, 1.0/px);
+
+					
+					double ux = A_x_v;
+					ux /= px;
+
+					lp.add_inequality(exp, ux);
+				}
+
+			}
+		}
+	}
+}
+
 //C9
-void ILP_RTA_PFP_DPCP_3::constraint_9(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_9(LinearProgram& lp, ILPROPMapper& vars)
 {
 	foreach(tasks.get_tasks(), ti)
 	{
@@ -664,15 +765,15 @@ void ILP_RTA_PFP_DPCP_3::constraint_9(LinearProgram& lp, ILPDPCPMapper_3& vars)
 
 			uint bound = ceiling(pi + px, px);
 
-			var_id = vars.lookup(ILPDPCPMapper_3::PREEMPT_NUM, i, x);
+			var_id = vars.lookup(ILPROPMapper::PREEMPT_NUM, i, x);
 			exp->add_term(var_id, 1);
 
-			var_id = vars.lookup(ILPDPCPMapper_3::TBT_PREEMPT_NUM, i, x);
+			var_id = vars.lookup(ILPROPMapper::TBT_PREEMPT_NUM, i, x);
 			exp->add_term(var_id, -1);
 			lp.declare_variable_integer(var_id);
 			lp.declare_variable_bounds(var_id, true, 0, true, bound);
 
-			var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, x);
+			var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, i, x);
 			exp->add_term(var_id, bound);
 
 			lp.add_inequality(exp, bound);
@@ -681,7 +782,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_9(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C10
-void ILP_RTA_PFP_DPCP_3::constraint_10(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_10(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint t_num = tasks.get_taskset_size();
 
@@ -705,15 +806,15 @@ void ILP_RTA_PFP_DPCP_3::constraint_10(LinearProgram& lp, ILPDPCPMapper_3& vars)
 
 				uint bound = ceiling(pi + px, px);
 
-				var_id = vars.lookup(ILPDPCPMapper_3::PREEMPT_NUM, i, x);
+				var_id = vars.lookup(ILPROPMapper::PREEMPT_NUM, i, x);
 				exp->add_term(var_id, N_x_v);
 
-				var_id = vars.lookup(ILPDPCPMapper_3::RBT_PREEMPT_NUM, i, x, t_num + v);
+				var_id = vars.lookup(ILPROPMapper::RBT_PREEMPT_NUM, i, x, t_num + v);
 				exp->add_term(var_id, -1);
 				lp.declare_variable_integer(var_id);
 				lp.declare_variable_bounds(var_id, true, 0, true, N_x_v*bound);
 
-				var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, t_num + v);
+				var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, i, t_num + v);
 				exp->add_term(var_id, N_x_v*bound);
 
 				lp.add_inequality(exp, N_x_v*bound);
@@ -723,7 +824,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_10(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C11
-void ILP_RTA_PFP_DPCP_3::constraint_11(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_11(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint t_num = tasks.get_taskset_size();
 
@@ -751,15 +852,15 @@ void ILP_RTA_PFP_DPCP_3::constraint_11(LinearProgram& lp, ILPDPCPMapper_3& vars)
 
 					uint bound = ceiling(pi + px, px);
 
-					var_id = vars.lookup(ILPDPCPMapper_3::PREEMPT_NUM, i, x);
+					var_id = vars.lookup(ILPROPMapper::PREEMPT_NUM_CS, i, x, t_num + u, t_num + v);
 					exp->add_term(var_id, N_x_v);
 
-					var_id = vars.lookup(ILPDPCPMapper_3::RBR_PREEMPT_NUM, i, x, t_num + u, t_num + v);
+					var_id = vars.lookup(ILPROPMapper::RBR_PREEMPT_NUM, i, x, t_num + u, t_num + v);
 					exp->add_term(var_id, -1);
 					lp.declare_variable_integer(var_id);
 					lp.declare_variable_bounds(var_id, true, 0, true, N_x_v*bound);
 
-					var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, t_num + u, t_num + v);
+					var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, t_num + u, t_num + v);
 					exp->add_term(var_id, N_x_v*bound);
 
 					lp.add_inequality(exp, N_x_v*bound);
@@ -770,7 +871,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_11(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C12
-void ILP_RTA_PFP_DPCP_3::constraint_12(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_12(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint t_num = tasks.get_taskset_size();
 
@@ -798,13 +899,13 @@ void ILP_RTA_PFP_DPCP_3::constraint_12(LinearProgram& lp, ILPDPCPMapper_3& vars)
 
 						long L_x_v = ru->get_max_length();
 
-						var_id = vars.lookup(ILPDPCPMapper_3::REQUEST_BLOCKING_TIME, i, t_num + u);
+						var_id = vars.lookup(ILPROPMapper::REQUEST_BLOCKING_TIME, i, t_num + u);
 						exp->add_term(var_id, -1);
 		
-						var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, t_num + u);
+						var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, i, t_num + u);
 						exp->add_term(var_id, -L_x_v);
 		
-						var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, t_num + u, t_num + v);
+						var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, t_num + u, t_num + v);
 						exp->add_term(var_id, L_x_v);
 
 						lp.add_inequality(exp, 0);
@@ -816,7 +917,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_12(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C13
-void ILP_RTA_PFP_DPCP_3::constraint_13(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_13(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint t_num = tasks.get_taskset_size();
 
@@ -826,7 +927,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_13(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 		
-		var_id = vars.lookup(ILPDPCPMapper_3::BLOCKING_TIME, i);
+		var_id = vars.lookup(ILPROPMapper::BLOCKING_TIME, i);
 		exp->add_term(var_id, 1);
 
 		foreach(ti->get_requests(), request)
@@ -835,7 +936,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_13(LinearProgram& lp, ILPDPCPMapper_3& vars)
 
 			int N_i_u = request->get_num_requests();
 		
-			var_id = vars.lookup(ILPDPCPMapper_3::REQUEST_BLOCKING_TIME, i, t_num + u);
+			var_id = vars.lookup(ILPROPMapper::REQUEST_BLOCKING_TIME, i, t_num + u);
 			exp->add_term(var_id, -N_i_u);
 			//lp.declare_variable_integer(var_id);
 			lp.declare_variable_bounds(var_id, true, 0, false, -1);
@@ -846,7 +947,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_13(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C14
-void ILP_RTA_PFP_DPCP_3::constraint_14(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_14(LinearProgram& lp, ILPROPMapper& vars)
 {
 	foreach(tasks.get_tasks(), ti)
 	{
@@ -861,12 +962,12 @@ void ILP_RTA_PFP_DPCP_3::constraint_14(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
 
-			var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_C_TASK, i, x);
+			var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_C_TASK, i, x);
 			exp->add_term(var_id, -1);
 
 			long NC_WCET_x = tx->get_wcet_non_critical_sections();
 
-			var_id = vars.lookup(ILPDPCPMapper_3::TBT_PREEMPT_NUM, i, x);
+			var_id = vars.lookup(ILPROPMapper::TBT_PREEMPT_NUM, i, x);
 			exp->add_term(var_id, NC_WCET_x);
 
 			lp.add_inequality(exp, 0);
@@ -875,7 +976,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_14(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C15
-void ILP_RTA_PFP_DPCP_3::constraint_15(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_15(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint t_num = tasks.get_taskset_size();
 
@@ -895,10 +996,10 @@ void ILP_RTA_PFP_DPCP_3::constraint_15(LinearProgram& lp, ILPDPCPMapper_3& vars)
 				LinearExpression *exp = new LinearExpression();
 				uint var_id;
 
-				var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_C_RESOURCE, i, y, t_num + u);
+				var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_C_RESOURCE, i, y, t_num + u);
 				exp->add_term(var_id, -1);
 
-				var_id = vars.lookup(ILPDPCPMapper_3::RBT_PREEMPT_NUM, i, y, t_num + u);
+				var_id = vars.lookup(ILPROPMapper::RBT_PREEMPT_NUM, i, y, t_num + u);
 				exp->add_term(var_id, L_y_u);
 
 				lp.add_inequality(exp, 0);
@@ -908,7 +1009,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_15(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C16
-void ILP_RTA_PFP_DPCP_3::constraint_16(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_16(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint t_num = tasks.get_taskset_size();
 
@@ -919,14 +1020,14 @@ void ILP_RTA_PFP_DPCP_3::constraint_16(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 
-		var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_C, i);
+		var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_C, i);
 		exp->add_term(var_id, 1);
 		
 		foreach_higher_priority_task(tasks.get_tasks(), (*ti), tx)
 		{
 			uint x = tx->get_index();
 
-			var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_C_TASK, i, x);
+			var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_C_TASK, i, x);
 			exp->add_term(var_id, -1);
 			//lp.declare_variable_integer(var_id);
 			lp.declare_variable_bounds(var_id, true, 0, false, -1);
@@ -939,7 +1040,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_16(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			{
 				uint u = request_u->get_resource_id();
 				
-				var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_C_RESOURCE, i, y, t_num + u);
+				var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_C_RESOURCE, i, y, t_num + u);
 				exp->add_term(var_id, -1);
 				lp.declare_variable_bounds(var_id, true, 0, false, -1);
 			}
@@ -950,7 +1051,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_16(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C17
-void ILP_RTA_PFP_DPCP_3::constraint_17(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_17(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint t_num = tasks.get_taskset_size();
 
@@ -966,7 +1067,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_17(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			LinearExpression *exp = new LinearExpression();
 			uint var_id;
 
-			var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_R_RESOURCE, i, t_num + u);
+			var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_R_RESOURCE, i, t_num + u);
 			exp->add_term(var_id, -1);
 			
 			foreach_higher_priority_task(tasks.get_tasks(), (*ti), tx)
@@ -980,13 +1081,13 @@ void ILP_RTA_PFP_DPCP_3::constraint_17(LinearProgram& lp, ILPDPCPMapper_3& vars)
 					int N_x_v = request_v->get_num_requests();
 					long L_x_v = request_v->get_max_length();
 
-					var_id = vars.lookup(ILPDPCPMapper_3::RBR_PREEMPT_NUM, i, x, t_num + u, t_num + v);
+					var_id = vars.lookup(ILPROPMapper::RBR_PREEMPT_NUM, i, x, t_num + u, t_num + v);
 					exp->add_term(var_id, L_x_v);
 
 					int term = ceiling(pi + px, px);
 
-					var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, t_num +u);
-					exp->add_term(var_id, -1*term*N_x_v*L_x_v);
+					//var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, i, t_num +u);
+					//exp->add_term(var_id, -1*term*N_x_v*L_x_v);
 				}
 			}
 
@@ -996,7 +1097,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_17(LinearProgram& lp, ILPDPCPMapper_3& vars)
 }
 
 //C18
-void ILP_RTA_PFP_DPCP_3::constraint_18(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_18(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint t_num = tasks.get_taskset_size();
 
@@ -1007,7 +1108,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_18(LinearProgram& lp, ILPDPCPMapper_3& vars)
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
 
-		var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_R, i);
+		var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_R, i);
 		exp->add_term(var_id, 1);
 
 		foreach(ti->get_requests(), request_u)
@@ -1015,7 +1116,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_18(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			uint u = request_u->get_resource_id();
 			int N_i_u = request_u->get_num_requests();
 
-			var_id = vars.lookup(ILPDPCPMapper_3::INTERFERENCE_TIME_R_RESOURCE, i, t_num + u);
+			var_id = vars.lookup(ILPROPMapper::INTERFERENCE_TIME_R_RESOURCE, i, t_num + u);
 			exp->add_term(var_id, -1*N_i_u);
 			//lp.declare_variable_integer(var_id);
 			lp.declare_variable_bounds(var_id, true, 0, false, -1);
@@ -1025,7 +1126,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_18(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	}
 }
 
-void ILP_RTA_PFP_DPCP_3::constraint_19(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_19(LinearProgram& lp, ILPROPMapper& vars)
 {
 	uint p_num = processors.get_processor_num();
 	uint r_num = resources.get_resourceset_size();
@@ -1041,7 +1142,7 @@ void ILP_RTA_PFP_DPCP_3::constraint_19(LinearProgram& lp, ILPDPCPMapper_3& vars)
 			Task& task = tasks.get_task_by_index(j);
 			fraction_t utilization = task.get_utilization();
 
-			var_id = vars.lookup(ILPDPCPMapper_3::SAME_LOCALITY, i, j);
+			var_id = vars.lookup(ILPROPMapper::SAME_LOCALITY, i, j);
 			exp->add_term(var_id, utilization.get_d());
 		}
 
@@ -1049,12 +1150,12 @@ void ILP_RTA_PFP_DPCP_3::constraint_19(LinearProgram& lp, ILPDPCPMapper_3& vars)
 	}
 }
 
-void ILP_RTA_PFP_DPCP_3::constraint_20(LinearProgram& lp, ILPDPCPMapper_3& vars)
+void ILP_RTA_PFP_ROP::constraint_20(LinearProgram& lp, ILPROPMapper& vars)
 {
 	
 }
 
-bool ILP_RTA_PFP_DPCP_3::alloc_schedulable() {}
+bool ILP_RTA_PFP_ROP::alloc_schedulable() {}
 
 
 
