@@ -3,6 +3,12 @@
 XML::XML()
 {
 	output = new XMLDocument();
+	initialization();
+}
+
+XML::~XML()
+{
+	delete(output);
 }
 
 XMLDocument XML::config;
@@ -15,6 +21,22 @@ void XML::LoadFile(const char* path)
 void XML::SaveConfig(const char* path)
 {
 	config.SaveFile(path);
+}
+
+char* XML::get_server_ip()
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("server_ip");
+	return title->GetText();
+}
+
+uint XML::get_server_port()
+{
+	const char* content;
+	XMLElement *root = config.RootElement();
+	XMLElement *title = root->FirstChildElement("server_port");
+	return atoi(title->GetText());
 }
 
 void XML::get_method(Test_Attribute_Set *t_set)
@@ -31,6 +53,7 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		int test_type = subtitle->IntAttribute("TEST_TYPE");
 		string remark;
 		string rename;
+		string style;
 		if(NULL == subtitle->Attribute("REMARK"))
 			remark = "";
 		else
@@ -39,6 +62,10 @@ void XML::get_method(Test_Attribute_Set *t_set)
 			rename = "";
 		else
 			rename = subtitle->Attribute("RENAME");
+		if(NULL == subtitle->Attribute("STYLE"))
+			style = "";
+		else
+			style = subtitle->Attribute("STYLE");
 		int transform = 0;
 		if(0 == strcmp(content,"P-EDF"))
 		{
@@ -101,6 +128,7 @@ void XML::get_method(Test_Attribute_Set *t_set)
 		ta.test_name = content;
 		ta.remark = remark;
 		ta.rename = rename;
+		ta.style = style;
 		t_set->push_back(ta);
 //		i_set->push_back(transform);
 		subtitle = subtitle->NextSiblingElement();
@@ -368,6 +396,23 @@ void XML::initialization()
 	output->InsertFirstChild(declaration);
 }
 
+XMLElement* XML::get_element(const char* parent)
+{
+	XMLElement *root = output->RootElement();
+	XMLElement *title = output->FirstChildElement(parent);
+	return title;
+}
+
+XMLElement* XML::get_element(const XMLElement* parent, const char* name, int index = 0)
+{
+	XMLElement *subtitle = parent->FirstChildElement(name);
+	while(index--)
+	{
+		subtitle = subtitle->NextSiblingElement();
+	}
+	return subtitle;
+}
+
 void XML::add_element(const char* name)
 {
 	XMLElement *root = output->NewElement(name);
@@ -384,6 +429,25 @@ void XML::add_element(const char* parent, const char* name, const char* text)
 	title->InsertEndChild(element);
 }
 
+void XML::add_element(const XMLElement* parent, const char* name, const char* text = "")
+{
+	XMLElement *element = output->NewElement(name);
+	element->SetText(text);
+	parent->InsertEndChild(element);
+}
+	
+void XML::add_element(const char* parent, int index, const char* name, const char* text)
+{
+	XMLElement *root = output->RootElement();
+	XMLElement *title = output->FirstChildElement(parent);
+	for(int i = 0; i < index; i++)
+		title = title->NextSiblingElement();
+	XMLElement *element = output->NewElement(name);
+	element->SetText(text);
+	title->InsertEndChild(element);
+
+}
+
 void XML::add_range(const char* parent, Range range)
 {
 	XMLElement *root = output->RootElement();
@@ -398,6 +462,11 @@ void XML::add_range(const char* parent, Range range)
 	max->SetText(transform.get_str().data());
 	data->InsertEndChild(max);
 	title->InsertFirstChild(data);
+}
+
+void XML::set_text(XMLElement* element, const char* text)
+{
+	element->SetText(text);
 }
 
 void XML::set_text(const char* parent, int index1, const char* element, int index2,const char* text)

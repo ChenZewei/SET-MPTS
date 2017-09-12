@@ -12,6 +12,7 @@ SchedTestBase::SchedTestBase(bool LinearProgramming, uint TestMethod, uint Sched
 	this->LockingProtocol = LockingProtocol;
 	this->name = name;
 	this->remark = remark;
+	this->status = INIT;
 }
 
 SchedTestBase::~SchedTestBase() {}
@@ -76,4 +77,14 @@ string SchedTestBase::get_test_name()
 	}
 
 	return test_name.str();
+}
+
+void SchedTestBase::set_status(int status)
+{
+	this->status = status;
+}
+
+int SchedTestBase::get_status()
+{
+	return status;
 }

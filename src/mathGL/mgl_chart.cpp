@@ -1,6 +1,7 @@
 #include "mgl_chart.h"
 #include "iteration-helper.h"
 #include "math-helper.h"
+#include "random_gen.h"
 
 Chart::Chart()
 {
@@ -13,16 +14,7 @@ Chart::Chart()
 	color.push_back("{x44546A}");//dark grey
 	color.push_back("{x954F72}");//pupil
 
-	width.push_back("0");
-	width.push_back("1");
-	width.push_back("2");
-	width.push_back("3");
-	width.push_back("4");
-	width.push_back("5");
-	width.push_back("6");
-	width.push_back("7");
-	width.push_back("8");
-	width.push_back("9");
+	width = "2";
 
 	dot.push_back("*");
 	dot.push_back("o");
@@ -36,16 +28,38 @@ Chart::Chart()
 
 string Chart::get_line_style(int index)
 {
+
+	if(color.size() <= index)
+	{	
+		stringstream buf;
+		buf<<"{x";
+		buf<<hex;
+		uint r, g, b;
+		r = Random_Gen::uniform_integral_gen(1, 255);
+		g = Random_Gen::uniform_integral_gen(1, 255);
+		b = Random_Gen::uniform_integral_gen(1, 255);
+		buf<<r<<g<<b;
+		buf<<"}";
+		color.push_back(buf.str());
+	}
+
 	string style = "";
 	style += color[index];
-	style += width[2];
-	style += dot[index];
+	style += width;
+	style += dot[index%8];
 	return style;
 }
 
 void Chart::AddColor(string newColor)
 {
 	color.push_back(newColor);
+}
+
+void Chart::SetLineWidth(uint w)
+{
+	if(9 < w)
+		w = 9;
+	width = std::to_string(w);
 }
 /*
 void Chart::AddData(string name, double* d, int size)
@@ -103,6 +117,7 @@ void Chart::ExportLineChart(string path, const char* title, double min, double m
 		uint num = (max - min)/step + 1;
 		Chart_Data c_data;
 		c_data.name = results->get_test_name();
+		c_data.style = results->get_line_style();
 		c_data.data = mglData(num);
 		{
 			double i = min; int j = 0;
@@ -127,10 +142,20 @@ void Chart::ExportLineChart(string path, const char* title, double min, double m
 		data_sets.push_back(c_data);
 	}
 
+	uint j = 0;
 	for(int i = 0; i < data_sets.size(); i++)
 	{
-		graph.Plot(data_sets[i].data, get_line_style(i).c_str());
-		graph.AddLegend(data_sets[i].name.c_str(), get_line_style(i).c_str());
+		if(!data_sets[i].style.empty())
+		{
+			graph.Plot(data_sets[i].data, data_sets[i].style.c_str());
+			graph.AddLegend(data_sets[i].name.c_str(), data_sets[i].style.c_str());
+		}
+		else
+		{
+			graph.Plot(data_sets[i].data, get_line_style(j).c_str());
+			graph.AddLegend(data_sets[i].name.c_str(), get_line_style(j).c_str());
+			j++;
+		}
 	}
 	
 	graph.Box();

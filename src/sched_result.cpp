@@ -8,15 +8,22 @@ int increase_order(TaskModel t1, TaskModel t2)
 	return t1.utilization < t2.utilization;
 }
 
-SchedResult::SchedResult(string name)
+SchedResult::SchedResult(string name, string style)
 {
 	test_name = name;
+	line_style = style;
 }
 
 
 string SchedResult::get_test_name()
 {
 	return test_name;
+}
+
+
+string SchedResult::get_line_style()
+{
+	return line_style;
 }
 
 void SchedResult::insert_result(double utilization, uint e_time, uint s_time)
@@ -77,7 +84,7 @@ uint SchedResultSet::size() {return sched_result_set.size();}
 
 vector<SchedResult>& SchedResultSet::get_sched_result_set() {return sched_result_set;}
 
-SchedResult& SchedResultSet::get_sched_result(string test_name)
+SchedResult& SchedResultSet::get_sched_result(string test_name, string line_style)
 {
 	foreach(sched_result_set, sched_result)
 	{
@@ -87,7 +94,7 @@ SchedResult& SchedResultSet::get_sched_result(string test_name)
 		}
 	}
 
-	SchedResult new_element(test_name);
+	SchedResult new_element(test_name, line_style);
 
 	sched_result_set.push_back(new_element);
 

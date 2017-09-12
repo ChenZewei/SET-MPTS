@@ -29,7 +29,9 @@ class Output
 		//void add_set();
 		uint get_sets_num() const;
 		//void add_result(uint index, double x, double y, uint e_num, uint s_num);
-		void add_result(string test_name, double utilization, uint e_num, uint s_num);
+		SchedResultSet& get_results();
+		bool add_result(string test_name, string line_style, double utilization, uint e_num, uint s_num);
+		uint get_exp_time_by_utilization(double utilization);
 		uint get_results_num(uint index) const;
 		string output_filename();
 		string get_method_name(Test_Attribute ta);
@@ -40,6 +42,7 @@ class Output
 		void finish();
 
 		//export to csv
+		void export_param();
 		void export_csv();
 		void export_table_head();
 		void export_result_append(double utilization);

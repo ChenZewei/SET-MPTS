@@ -10,10 +10,12 @@ class SchedResult
 {
 	private:
 		string test_name;
+		string line_style;
 		vector<Result> results;
 	public:
-		SchedResult(string name);
+		SchedResult(string name, string line_style = "");
 		string get_test_name();
+		string get_line_style();
 		void insert_result(double utilization, uint e_time, uint s_time);
 		vector<Result>& get_results();
 		Result get_result_by_utilization(double utilization);
@@ -29,7 +31,7 @@ class SchedResultSet
 
 		uint size();
 		vector<SchedResult>& get_sched_result_set();
-		SchedResult& get_sched_result(string test_name);
+		SchedResult& get_sched_result(string test_name, string line_style = "");
 };
 
 

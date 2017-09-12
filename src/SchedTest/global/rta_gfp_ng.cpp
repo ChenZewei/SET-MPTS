@@ -9,8 +9,12 @@ RTA_GFP_NG::RTA_GFP_NG(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
-	this->tasks.RM_Order();
+	this->processors.init();
+	this->tasks.display();
 }
 
 int RTA_GFP_NG::interference_gap_decrease(Carry_in t1, Carry_in t2)
@@ -49,17 +53,16 @@ ulong RTA_GFP_NG::total_interference(Task& task_k, ulong interval)
 {
 	//Task& task_k = tasks.get_task_by_id(t_id);
 	ulong I_nc_sum = 0, I_ci_sum = 0;
-	uint k = task_k.get_id();
+	uint k = task_k.get_priority();
 	uint p_num = processors.get_processor_num();
 	uint ci_num;
 	vector<Carry_in> carry_in;
-	
-	for(uint i = 0; i < k; i++)
+
+	foreach_higher_priority_task(tasks.get_tasks(), task_k, task_i)
 	{
-		Task& task_i = tasks.get_task_by_id(i);
 		Carry_in temp;
-		temp.id = i;
-		temp.gap = interference_ci(task_k, task_i, interval) - interference_nc(task_k, task_i, interval);
+		temp.priority = task_i->get_priority();
+		temp.gap = interference_ci(task_k, *task_i, interval) - interference_nc(task_k, *task_i, interval);
 		carry_in.push_back(temp);
 	}
 
@@ -78,28 +81,27 @@ ulong RTA_GFP_NG::total_interference(Task& task_k, ulong interval)
 
 	for(uint i = 0; i < ci_num; i++)
 	{
-		uint id = carry_in[i].id;
+		uint priority = carry_in[i].priority;
 
-		Task& task = tasks.get_task_by_id(id);
+		Task& task = tasks.get_task_by_priority(priority);
 		task.set_carry_in();
 	}
 
-	for(uint i = 0; i < k; i++)
+	foreach_higher_priority_task(tasks.get_tasks(), task_k, task_i)
 	{
-		Task& task_i = tasks.get_task_by_id(i);
-		
-		if(task_i.is_carry_in())
+		if(task_i->is_carry_in())
 		{
-			I_ci_sum += interference_ci(task_k, task_i, interval);
+			I_ci_sum += interference_ci(task_k, *task_i, interval);
 //			cout<<"carry_in id:"<<task_i.get_id()<<endl;
 		}		
 		else
-			I_nc_sum += interference_nc(task_k, task_i, interval);
+			I_nc_sum += interference_nc(task_k, *task_i, interval);
 	}
+
 	for(uint i = 0; i < ci_num; i++)
 	{
-		uint id = carry_in[i].id;
-		Task& task = tasks.get_task_by_id(id);
+		uint priority = carry_in[i].priority;
+		Task& task = tasks.get_task_by_priority(priority);
 		task.clear_carry_in();
 	}
 	return I_nc_sum + I_ci_sum;
@@ -116,17 +118,53 @@ ulong RTA_GFP_NG::response_time(Task& ti)
 	uint p_num = processors.get_processor_num();
 //cout<<"id:"<<t_id<<endl;
 //tasks.display();
-	while(response < test_end)
+	bool test = (wcet == test_end);
+/*
+if(test)
+{
+
+	foreach(tasks.get_tasks(), task)
+	{
+		cout<<"Task "<<task->get_id()<<":"<<endl;
+		cout<<"WCET:"<<task->get_wcet()<<" Deadline:"<<task->get_deadline()<<" Period:"<<task->get_period()<<" Gap:"<<task->get_deadline()-task->get_wcet()<<endl;
+		cout<<"-----------------------"<<endl;
+	}
+}
+*/
+	while(response <= test_end)
 	{
 		omega = total_interference(ti, response);
+
+/*
+	if(test)
+	{
+		cout<<"task:"<<t_id<<"total interference:"<<omega<<endl;
+	}
+*/
 //cout<<"omega:"<<omega<<endl; 
 		demand = floor(omega/p_num) + wcet;
 //cout<<response<<" "<<demand<<endl;
+	
+	
 		if(response == demand)
+		{
+/*
+if(test)
+{
+	cout<<"task:"<<t_id<<"response:"<<response<<endl;
+}
+*/
 			return 	response;
+		}
 		else
 			response = demand;
 	}
+/*
+if(test)
+{
+	cout<<"task:"<<t_id<<"response:"<<response<<endl;
+}
+*/
 	return test_end + 100;
 }
 
@@ -141,8 +179,11 @@ bool RTA_GFP_NG::is_schedulable()
 		ulong original_bound = ti->get_response_time();
 		response_bound = response_time((*ti));
 		if (response_bound > ti->get_deadline())
+		{
+//			cout<<"RTA failed on task:"<<ti->get_id()<<endl;
 			return false;
-		if(response_bound > original_bound)
+		}
+		if(response_bound != original_bound)
 		{
 			ti->set_response_time(response_bound);
 		}

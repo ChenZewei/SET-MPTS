@@ -10,6 +10,7 @@
 typedef struct
 {
 	string name;
+	string style;
 	mglData data;
 }Chart_Data;
 
@@ -24,14 +25,15 @@ class Chart
 		SchedResultSet srs;
 		mglGraph graph;
 		Color color;//already has 8 colors
-		Width width;//from 0-9
+		string width;//from 0-9
 		Dot dot;//already has 8 dots
 		string get_line_style(int index);
 	public:
 		Chart();
 		~Chart(){}
-
+		
 		void AddColor(string color);
+		void SetLineWidth(uint w);
 		//void AddData(string name, double* d, int size);
 		//void AddData(string name, Result_Set r_set);
 		void AddData(SchedResultSet srs);

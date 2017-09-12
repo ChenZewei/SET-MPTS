@@ -10,6 +10,7 @@
 #define UTI_BOUND	0
 #define RTA 		1
 #define NC			2	//Necessary Condition
+#define SB			3	//Speedup Bound
 
 //Scheduling Method
 #define GLOBAL		0
@@ -26,6 +27,12 @@
 #define	DPCP	3
 #define	MPCP	4
 #define	FMLP	5
+
+//Status
+#define INIT		-1
+#define SUCCESS 	0
+#define UNDEF		1
+#define UNSUCCESS	2
 
 class Task;
 class TaskSet;
@@ -47,11 +54,14 @@ class SchedTestBase
 		uint LockingProtocol;
 		string name;
 		string remark;
+		int status;
 	public:
 		SchedTestBase(bool LinearProgramming, uint TestMethod, uint SchedMethod, uint PriorityAssignment, uint LockingProtocol = NONE, string name = "", string remark = "");
 		virtual ~SchedTestBase();
 		string get_test_name();
 		virtual bool is_schedulable() = 0;
+		void set_status(int status);
+		int get_status();
 };
 
 

@@ -39,28 +39,48 @@ void Resource::init()
 uint Resource::get_resource_id() const { return resource_id; }
 void Resource::set_locality(uint locality) { this->locality = locality; }
 uint Resource::get_locality() const { return locality; }
-fraction_t Resource::get_utilization() const { return utilization; }
+fraction_t Resource::get_utilization()
+{
+	utilization = 0;
+	foreach(queue, id)
+	{
+		Task& task = tasks->get_task_by_id(*id);
+		Request& request = task.get_request_by_id(resource_id);
+		fraction_t u;
+		u = request.get_num_requests() * request.get_max_length();
+		u /= task.get_period();
+		utilization += u;
+	}
+	return utilization;
+}
 
 bool Resource::is_global_resource()
 {
-	global_resource = false;
-	uint partition;
-//cout<<"111"<<endl;
-	list<void*>::iterator it = queue.begin();
-//cout<<"222"<<endl;
-	if(queue.end() == it)
+	if(1 >= queue.size())
 		return false;
-	partition = ((Task*)(*it))->get_partition();
-//cout<<"333"<<endl;
-	for(uint i = 0; it != queue.end(); it++, i++)
+
+	global_resource = false;
+
+	uint first_id = MAX_INT;
+	
+	foreach(queue, id)
 	{
-		if(partition != ((Task*)(*it))->get_partition())
+		Task& task = tasks->get_task_by_id(*id);
+//		cout<<"Task "<<*id<<" partition:"<<task.get_partition()<<endl;
+
+		if(MAX_INT == task.get_partition())
+			continue;
+
+		if(MAX_INT == first_id)
+			first_id = *id;
+
+		if(tasks->get_task_by_id(first_id).get_partition() != task.get_partition())
 		{
 			global_resource = true;
 			break;
 		}
-//cout<<"444"<<endl;
 	}
+
 	return global_resource; 
 }
 
@@ -68,11 +88,53 @@ bool Resource::is_processor_local_resource() const { return processor_local_reso
 //Request_Tasks Resource::get_tasks() const { return tasks; }
 
 
-TaskQueue& Resource::get_taskqueue()
+TaskSet* Resource::get_tasks()
+{
+	return tasks;
+}
+
+set<uint>& Resource::get_taskqueue()
 {
 	return queue;
 }
 
+void Resource::add_task(uint id)
+{
+	queue.insert(id);
+}
+
+
+uint Resource::get_ceiling()
+{
+	uint ceiling = MAX_INT;
+	foreach(queue, id)
+	{
+		Task& task = tasks->get_task_by_id(*id);
+//		cout<<"Task "<<*id<<" priority:"<<task.get_priority()<<endl;
+		if(MAX_INT == task.get_priority())
+			continue;
+		if(ceiling > task.get_priority())
+			ceiling = task.get_priority();
+	}
+	return ceiling;
+}
+
+void Resource::update(const TaskSet* tasks)
+{
+	this->tasks = tasks;
+}
+
+void Resource::update(const DAG_TaskSet* dag_tasks)
+{
+	this->dag_tasks = dag_tasks;
+}
+
+/*
+
+TaskQueue& Resource::get_taskqueue()
+{
+	return queue;
+}
 
 void Resource::add_task(void* taskptr)
 {
@@ -104,12 +166,37 @@ uint Resource::get_ceiling()
 {
 	uint ceiling = 0xffffffff;	
 	list<void*>::iterator it = queue.begin();
-	for(uint i = 0; it != queue.end(); it++, i++)
+	//for(uint i = 0; it != queue.end(); it++, i++)
+	foreach(queue, task)
 	{
-		if(ceiling >= ((Task*)(*it))->get_id())
-			ceiling = ((Task*)(*it))->get_id();
+		if(ceiling >= ((Task*)(*task))->get_priority())
+			ceiling = ((Task*)(*task))->get_priority();
 	}
 	return ceiling;
+}
+
+
+void Resource::update(const TaskSet tasks)
+{
+	queue.clear();
+	utilization = 0;
+	foreach(tasks.get_tasks(), task)
+	{
+		if(task->is_request_exist(resource_id))
+			add_task((void*)task);
+	}
+}
+*/
+
+//for debug
+void Resource::display_task_queue()
+{
+	foreach(queue, id)
+	{
+		Task& task = tasks->get_task_by_id(*id);
+		cout<<"Task:"<<task.get_id()<<" partition:"<<task.get_partition()<<" priority:"<<task.get_priority()<<endl;
+	}
+	cout<<"X"<<endl;
 }
 
 /////////////////////////////ResourceSet///////////////////////////////
@@ -139,14 +226,25 @@ uint ResourceSet::size() const
 }
 
 
-void ResourceSet::add_task(uint resource_id, void* taskptr)
+void ResourceSet::add_task(uint resource_id, uint id)
 {
-	resources[resource_id].add_task(taskptr);
+	resources[resource_id].add_task(id);
 }
 
 Resources& ResourceSet::get_resources()
 {
 	return resources;
+}
+
+
+Resource& ResourceSet::get_resource_by_id(uint r_id)
+{
+	foreach(resources, resource)
+	{
+		if(r_id == resource->get_resource_id())
+			return (*resource);
+	}
+	return *(Resource*)(0);
 }
 
 uint ResourceSet::get_resourceset_size() const
@@ -158,6 +256,19 @@ uint ResourceSet::get_resourceset_size() const
 void ResourceSet::sort_by_utilization()
 {
 	sort(resources.begin(), resources.end(), utilization_decrease<Resource>);
+}
+
+
+void ResourceSet::update(const TaskSet* tasks)
+{
+	foreach(resources, resource)
+		resource->update(tasks);
+}
+
+void ResourceSet::update(const DAG_TaskSet* dag_tasks)
+{
+	foreach(resources, resource)
+		resource->update(dag_tasks);
 }
 
 /////////////////////////////Others///////////////////////////////

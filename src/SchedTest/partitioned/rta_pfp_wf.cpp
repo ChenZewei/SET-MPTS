@@ -9,8 +9,11 @@ RTA_PFP_WF::RTA_PFP_WF(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
-	this->tasks.RM_Order();
+	//this->tasks.RM_Order();
 	this->processors.init();
 }
 
@@ -54,7 +57,7 @@ bool RTA_PFP_WF::alloc_schedulable()
 {
 	ulong response_bound;
 
-	for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
+	//for (uint t_id = 0; t_id < tasks.get_taskset_size(); t_id ++)
 	foreach(tasks.get_tasks(), ti)
 	{
 

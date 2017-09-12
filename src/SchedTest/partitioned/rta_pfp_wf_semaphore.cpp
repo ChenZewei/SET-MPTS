@@ -9,8 +9,11 @@ RTA_PFP_WF_semaphore::RTA_PFP_WF_semaphore(TaskSet tasks, ProcessorSet processor
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
-	this->tasks.RM_Order();
+	//this->tasks.RM_Order();
 	this->processors.init();
 }
 
@@ -22,17 +25,16 @@ ulong RTA_PFP_WF_semaphore::transitive_preemption(Task& task_i, uint r_id)
 		return 0;
 
 	Processor& processor = processors.get_processors()[cpu];
-	TaskQueue& tq = processor.get_taskqueue();
 	Resource& resource = resources.get_resources()[r_id];
 	uint ceiling_k = resource.get_ceiling();
 	ulong sum = 0;
-	list<void*>::iterator it = tq.begin();
-	for(uint j = 0; it != tq.end(); it++, j++)
+
+	foreach(processor.get_taskqueue(), id)
 	{
-		Task* task_j = (Task*)*it;
-		if(t_id == task_j->get_id())
+		Task& task_j = tasks.get_task_by_id(*id);
+		if(t_id == task_j.get_id())
 			continue;
-		Resource_Requests& rr =  task_j->get_requests();
+		Resource_Requests& rr =  task_j.get_requests();
 		for(uint x = 0; x < rr.size(); x++)
 		{
 			Request& request_x = rr[x];
@@ -49,7 +51,6 @@ ulong RTA_PFP_WF_semaphore::DLB(Task& task_i)
 	uint t_id = task_i.get_id();
 	uint cpu = task_i.get_partition();
 	Processor& processor = processors.get_processors()[cpu];
-	TaskQueue& tq = processor.get_taskqueue();
 	Resource_Requests& rr_i =  task_i.get_requests();
 	uint num = 1;
 
@@ -62,15 +63,13 @@ ulong RTA_PFP_WF_semaphore::DLB(Task& task_i)
 
 	ulong max_length = 0;
 
-	list<void*>::iterator it = tq.begin();
-
-	for(uint j = 0; it != tq.end(); it++, j++)
+	foreach(processor.get_taskqueue(), id)
 	{
-		Task* task_j = (Task*)*it;
-		if(t_id >= task_j->get_id())
+		Task& task_j = tasks.get_task_by_id(*id);
+		if(t_id >= task_j.get_id())
 			continue;
 		
-		Resource_Requests& rr_j =  task_j->get_requests();
+		Resource_Requests& rr_j =  task_j.get_requests();
 		for(uint l = 0; l < rr_j.size(); l++)
 		{
 			Request& request_l = rr_j[l];

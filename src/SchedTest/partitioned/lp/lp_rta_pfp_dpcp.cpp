@@ -89,6 +89,9 @@ LP_RTA_PFP_DPCP::LP_RTA_PFP_DPCP(TaskSet tasks, ProcessorSet processors, Resourc
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->tasks.RM_Order();
 	this->processors.init();
@@ -104,7 +107,33 @@ bool LP_RTA_PFP_DPCP::is_schedulable()
 			return false;
 	}
 	if(!alloc_schedulable())
+	{
+/*
+		foreach(tasks.get_tasks(), task)
+		{
+			cout<<"Task"<<task->get_index()<<":"<<endl;
+			cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
+			foreach(task->get_requests(), request)
+			{
+				cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
+			}
+			cout<<"-------------------------------------------"<<endl;
+		}
+*/
 		return false;
+	}
+/*
+	foreach(tasks.get_tasks(), task)
+	{
+		cout<<"Task"<<task->get_index()<<":"<<endl;
+		cout<<"ncs-wcet:"<<task->get_wcet_non_critical_sections()<<" cs-wcet:"<<task->get_wcet_critical_sections()<<" wcet:"<<task->get_wcet()<<" response time:"<<task->get_response_time()<<" deadline:"<<task->get_deadline()<<" period:"<<task->get_period()<<endl;
+		foreach(task->get_requests(), request)
+		{
+			cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
+		}
+		cout<<"-------------------------------------------"<<endl;
+	}
+*/
 	return true;
 }
 
@@ -208,12 +237,12 @@ ulong LP_RTA_PFP_DPCP::response_time(Task& task_i)
 		demand = task_i.get_total_blocking() + task_i.get_wcet();
 
 		ulong total_interf = 0;
-		for (uint th = 0; th < task_i.get_id(); th ++)
+
+		foreach_higher_priority_task(tasks.get_tasks(), task_i, task_h)
 		{
-			Task& task_h = tasks.get_task_by_id(th);
-			if (task_i.get_partition() == task_h.get_partition())
+			if (task_i.get_partition() == task_h->get_partition())
 			{
-				total_interf += interference(task_h, response);
+				total_interf += interference(*task_h, response);
 			}
 		}
 
@@ -229,23 +258,30 @@ ulong LP_RTA_PFP_DPCP::response_time(Task& task_i)
 
 bool LP_RTA_PFP_DPCP::alloc_schedulable()
 {
-	for(uint t_id = 0; t_id < tasks.get_taskset_size(); t_id++)
+	bool update = false;
+	
+	do
 	{
-		Task& task = tasks.get_task_by_id(t_id);
-		ulong response_bound = task.get_response_time();
-		if(task.get_partition() == MAX_LONG)
-			continue;
+		update = false;
+		foreach(tasks.get_tasks(), task)
+		{
+			//ulong response_bound = task.get_response_time();
+			ulong old_response_time = task->get_response_time();
+			if(task->get_partition() == MAX_LONG)
+				continue;
 
-		ulong temp = response_time(task);
+			ulong response_bound = response_time(*task);
 
-		assert(temp >= response_bound);
-		response_bound = temp;
+			if(old_response_time != response_bound)
+				update = true;
 
-		if(response_bound <= task.get_deadline())
-			task.set_response_time(response_bound);
-		else
-			return false;
-	}
+			if(response_bound <= task->get_deadline())
+				task->set_response_time(response_bound);
+			else
+				return false;
+		}
+	}while(update);
+	
 	return true;
 }
 
@@ -314,7 +350,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_objective(Task& ti, LinearProgram& lp, DPCPMapper&
 	
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -357,7 +393,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_local_objective(Task& ti, LinearProgram& lp, DPCPM
 	
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach_local_request(ti, tx->get_requests(), request_iter)
 		{
 			uint q = request_iter->get_resource_id();
@@ -388,7 +424,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_remote_objective(Task& ti, LinearProgram& lp, DPCP
 	
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach_remote_request(ti, tx->get_requests(), request_iter)
 		{
 			uint q = request_iter->get_resource_id();
@@ -431,7 +467,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_constraint_1(Task& ti, LinearProgram& lp, DPCPMapp
 //cout<<"Constraint 1"<<endl;
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -462,7 +498,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_constraint_2(Task& ti, LinearProgram& lp, DPCPMapp
 
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach_remote_request(ti, tx->get_requests(), request_iter)
 		{
 			uint q = request_iter->get_resource_id();
@@ -479,7 +515,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_constraint_2(Task& ti, LinearProgram& lp, DPCPMapp
 
 void LP_RTA_PFP_DPCP::lp_dpcp_constraint_3(Task& ti, LinearProgram& lp, DPCPMapper& vars)
 {
-	uint t_id = ti.get_id();	
+	uint t_id = ti.get_index();	
 	uint max_arrival = 1;
 
 	foreach_remote_request(ti, ti.get_requests(), request)
@@ -490,7 +526,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_constraint_3(Task& ti, LinearProgram& lp, DPCPMapp
 	foreach_lower_priority_local_task(tasks.get_tasks(), ti, tx)
 	{
 		LinearExpression *exp = new LinearExpression();
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach_local_request(ti, tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -512,7 +548,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_constraint_4(Task& ti, LinearProgram& lp, DPCPMapp
 	
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -555,7 +591,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_constraint_5(Task& ti, LinearProgram& lp, DPCPMapp
 
 		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_index();
 			foreach(tx->get_requests(), request)
 			{
 				uint q = request->get_resource_id();
@@ -588,7 +624,7 @@ void LP_RTA_PFP_DPCP::lp_dpcp_constraint_6(Task& ti, LinearProgram& lp, DPCPMapp
 
 	foreach_higher_priority_task(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_index();
 		foreach(tx->get_requests(), request_y)
 		{
 			LinearExpression *exp = new LinearExpression();

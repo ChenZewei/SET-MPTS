@@ -1,12 +1,12 @@
-#ifndef RTA_PFP_RO_H
-#define RTA_PFP_RO_H
+#ifndef RTA_PDC_RO_H
+#define RTA_PDC_RO_H
 
 #include "p_sched.h"
 #include "tasks.h"
 #include "processors.h"
 #include "resources.h"
 
-class RTA_PFP_RO: public PartitionedSched
+class RTA_PDC_RO: public PartitionedSched
 {
 	private:
 		TaskSet tasks;
@@ -25,9 +25,9 @@ class RTA_PFP_RO: public PartitionedSched
 		bool is_first_fit_for_tasks_schedulable(uint start_processor);
 		bool alloc_schedulable();
 	public:
-		RTA_PFP_RO();
-		RTA_PFP_RO(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
-		~RTA_PFP_RO();
+		RTA_PDC_RO();
+		RTA_PDC_RO(TaskSet tasks, ProcessorSet processors, ResourceSet resources);
+		~RTA_PDC_RO();
 		bool is_schedulable();
 };
 

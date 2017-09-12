@@ -39,9 +39,21 @@
 		}							\
 	}
 
+#define foreach_task_assign_to_processor(collection, p_id, tx) \
+	foreach(collection, tx)						\
+		if(p_id == tx->get_partition())
+
+#define foreach_task_assign_to_other_processor(collection, p_id, tx) \
+	foreach(collection, tx)						\
+		if(p_id != tx->get_partition())
+
 #define foreach_task_except(collection, ti, tx) \
 	foreach(collection, tx)						\
 		if(tx->get_id() != ti.get_id())
+
+#define foreach_resource_except(collection, ru, rv) \
+	foreach(collection, rv)						\
+		if(ru.get_resource_id() != rv->get_resource_id())
 
 #define foreach_higher_priority_task(tasks, ti, tx) \
 	foreach(tasks, tx)				       \
@@ -75,7 +87,7 @@
 
 #define foreach_lower_priority_local_task(tasks, ti, tx) \
 		foreach(tasks, tx) \
-			if((tx->get_id() > ti.get_id()) && \
+			if((tx->get_priority() > ti.get_priority()) && \
 				(tx->get_partition() == ti.get_partition()))
 
 #endif

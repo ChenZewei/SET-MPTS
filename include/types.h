@@ -70,6 +70,15 @@
 #define GLPK_MEM_USAGE_CHECK 0
 #define GLPK_TERM_OUT 0
 #define ILP_SOLUTION_VAR_CHECK 0
+#define UNDEF_ABANDON 1
+#define TIME_LIMIT_INIT 3600000 //30 sec
+#define TIME_LIMIT_GAP	0 //0 sec
+#define TIME_LIMIT_UPPER_BOUND 3600000 //1 hour
+
+//CFG
+
+#define SORT_DEBUG 0
+#define RTA_DEBUG 0
 
 
 
@@ -110,6 +119,7 @@ typedef struct
 	string test_name;
 	string remark;
 	string rename;
+	string style;
 }Test_Attribute;
 
 typedef vector<int> Int_Set;
@@ -118,7 +128,7 @@ typedef vector<Range> Range_Set;
 typedef vector<Result> Result_Set;
 typedef vector<Result_Set> Result_Sets;
 typedef vector<Test_Attribute> Test_Attribute_Set;
-typedef list<void*> TaskQueue;//之所以用list是因为list是双向链表，适合增删比较频繁的情况
+typedef list<void*> TaskQueue;
 typedef list<void*> ResourceQueue;
 
 

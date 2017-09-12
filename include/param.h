@@ -11,6 +11,10 @@
 class Param
 {
 	public:
+		uint id;
+		//network
+		const char* server_ip;
+		uint port;
 		//basic parameters
 		int lambda;
 		int p_num;

@@ -106,10 +106,12 @@ LP_RTA_GFP_FMLP::LP_RTA_GFP_FMLP(TaskSet tasks, ProcessorSet processors, Resourc
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->tasks.RM_Order();
 	this->processors.init();
-
 }
 
 LP_RTA_GFP_FMLP::~LP_RTA_GFP_FMLP()
@@ -118,37 +120,30 @@ LP_RTA_GFP_FMLP::~LP_RTA_GFP_FMLP()
 }
 bool LP_RTA_GFP_FMLP::is_schedulable()
 {
-	bool update;
+	bool update = false;
+	
 	do
 	{
 		update = false;
 		foreach(tasks.get_tasks(), ti)
 		{
-			
-			ulong response_time = ti->get_response_time();
-//cout<<"original response time:"<<response_time<<endl;
-			ulong temp = fmlp_get_response_time(*ti);
+			ulong old_response_time = ti->get_response_time();
+			ulong response_time = fmlp_get_response_time(*ti);
 
-
-//cout<<"current response time:"<<temp<<endl;
-
-			//assert(temp >= response_time);
-			if(temp > response_time)
-			{
-//cout<<"last response time:"<<response_time<<" current response time:"<<temp<<endl;
-				response_time = temp;
+			if(old_response_time != response_time)
 				update = true;
-			}
 
-			if(response_time < ti->get_deadline())
+	//cout<<"current response time:"<<temp<<endl;
+
+			if(response_time <= ti->get_deadline())
 			{
 				ti->set_response_time(response_time);
 			}
 			else
 				return false;
 		}
-	}
-	while(update);
+	}while(update);
+
 	return true;
 }
 
@@ -225,15 +220,15 @@ ulong LP_RTA_GFP_FMLP::fmlp_workload_bound(Task& tx, ulong Ri)
 ulong LP_RTA_GFP_FMLP::fmlp_holding_bound(Task& ti, Task& tx, uint resource_id)
 {
 
-	uint x = tx.get_id(), q = resource_id;
+	uint x = tx.get_priority(), q = resource_id;
 	uint p_num = processors.get_processor_num();
 	ulong L_x_q = tx.get_request_by_id(q).get_max_length();
 	ulong holding_time = L_x_q;
 
-	if(p_num < tx.get_id())
+	if(p_num < tx.get_priority())
 	{
-		uint y = min(ti.get_id(), tx.get_id());
-		uint z = max(ti.get_id(), tx.get_id());	
+		uint y = min(ti.get_priority(), tx.get_priority());
+		uint z = max(ti.get_priority(), tx.get_priority());	
 		bool update;
 		do
 		{
@@ -247,7 +242,7 @@ ulong LP_RTA_GFP_FMLP::fmlp_holding_bound(Task& ti, Task& tx, uint resource_id)
 
 			foreach_lower_priority_task_then(tasks.get_tasks(), y, tl)
 			{
-				uint l = tl->get_id();
+				uint l = tl->get_priority();
 				if(z != l)
 				{
 					foreach(tl->get_requests(), request)
@@ -345,7 +340,7 @@ ulong LP_RTA_GFP_FMLP::fmlp_wait_time_bound(Task& ti, uint resource_id)
 void LP_RTA_GFP_FMLP::lp_fmlp_directed_blocking(Task& ti, Task& tx, FMLPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
-	uint x = tx.get_id();
+	uint x = tx.get_priority();
 //cout<<"task:"<<x<<endl
 	foreach(tx.get_requests(), request)
 	{
@@ -364,7 +359,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_directed_blocking(Task& ti, Task& tx, FMLPMapper& 
 void LP_RTA_GFP_FMLP::lp_fmlp_indirected_blocking(Task& ti, Task& tx, FMLPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
-	uint x = tx.get_id();
+	uint x = tx.get_priority();
 	foreach(tx.get_requests(), request)
 	{
 		uint q = request->get_resource_id();
@@ -382,7 +377,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_indirected_blocking(Task& ti, Task& tx, FMLPMapper
 void LP_RTA_GFP_FMLP::lp_fmlp_preemption_blocking(Task& ti, Task& tx, FMLPMapper& vars, LinearExpression *exp, double coef)
 {
 //cout<<"coef:"<<coef<<endl;
-	uint x = tx.get_id();
+	uint x = tx.get_priority();
 	foreach(tx.get_requests(), request)
 	{
 		uint q = request->get_resource_id();
@@ -406,7 +401,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_OD(Task& ti, FMLPMapper& vars, LinearExpression *e
 
 	foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 	{
-		uint h = th->get_id();
+		uint h = th->get_priority();
 		
 		var_id = vars.lookup(h, 0, 0, FMLPMapper::INTERF_REGULAR);
 		exp->add_term(var_id, coef*(1.0/p_num));
@@ -414,7 +409,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_OD(Task& ti, FMLPMapper& vars, LinearExpression *e
 
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
 	{
-		uint l = tl->get_id();
+		uint l = tl->get_priority();
 		
 		var_id = vars.lookup(l, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 		exp->add_term(var_id, coef*(1.0/p_num));
@@ -432,7 +427,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_declare_variable_bounds(Task& ti, LinearProgram& l
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		uint var_id;
 	
 		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_REGULAR);
@@ -450,18 +445,18 @@ void LP_RTA_GFP_FMLP::lp_fmlp_objective(Task& ti, LinearProgram& lp, FMLPMapper&
 {
 	uint p_num = processors.get_processor_num();
 	uint var_id;
-//cout<<"foreach higher priority task then:"<<ti.get_id()<<endl;
+//cout<<"foreach higher priority task then:"<<ti.get_priority()<<endl;
 	foreach_higher_priority_task(tasks.get_tasks(), ti, th)
 	{
-		uint h = th->get_id();
+		uint h = th->get_priority();
 //cout<<"task:"<<h<<endl;
 		var_id = vars.lookup(h, 0, 0, FMLPMapper::INTERF_REGULAR);
 		obj->add_term(var_id, 1.0/p_num);
 	}
-//cout<<"foreach lower priority task then:"<<ti.get_id()<<endl;
+//cout<<"foreach lower priority task then:"<<ti.get_priority()<<endl;
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tl)
 	{
-		uint l = tl->get_id();
+		uint l = tl->get_priority();
 //cout<<"task:"<<l<<endl;	
 		var_id = vars.lookup(l, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 		obj->add_term(var_id, 1.0/p_num);
@@ -505,7 +500,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_1(Task& ti, LinearProgram& lp, FMLPMapp
 		LinearExpression *exp = new LinearExpression();
 
 		uint var_id;
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 				
 		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_REGULAR);
 		exp->add_var(var_id);
@@ -532,7 +527,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_2(Task& ti, LinearProgram& lp, FMLPMapp
 	{
 		LinearExpression *exp = new LinearExpression();
 		uint var_id;
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 
 		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_REGULAR);
 		exp->add_var(var_id);
@@ -557,7 +552,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_3(Task& ti, LinearProgram& lp, FMLPMapp
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -588,7 +583,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_4(Task& ti, LinearProgram& lp, FMLPMapp
 		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 		{	
 			LinearExpression *exp = new LinearExpression();
-			uint x = tx->get_id();
+			uint x = tx->get_priority();
 			uint var_id;
 		
 			var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_STALLING);
@@ -605,7 +600,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_5(Task& ti, LinearProgram& lp, FMLPMapp
 	
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -632,7 +627,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_6(Task& ti, LinearProgram& lp, FMLPMapp
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 	{
 		uint var_id;
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 
 		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_CO_BOOSTING);
 		exp->add_var(var_id);
@@ -645,14 +640,14 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_7(Task& ti, LinearProgram& lp, FMLPMapp
 {
 	uint p_num = processors.get_processor_num();
 
-	if(p_num >= ti.get_id())
+	if(p_num >= ti.get_priority())
 	{
 		foreach_task_except(tasks.get_tasks(), ti, tx)
 		{
 			LinearExpression *exp = new LinearExpression();
 
 			uint var_id;
-			uint x = tx->get_id();
+			uint x = tx->get_priority();
 				
 			var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_REGULAR);
 			exp->add_var(var_id);
@@ -676,7 +671,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_8(Task& ti, LinearProgram& lp, FMLPMapp
 {
 	foreach_task_except(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		foreach(tx->get_requests(), request)
 		{
 			uint q = request->get_resource_id();
@@ -706,7 +701,7 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_9(Task& ti, LinearProgram& lp, FMLPMapp
 
 	foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 	{
-		uint x = tx->get_id();
+		uint x = tx->get_priority();
 		uint var_id;
 
 		var_id = vars.lookup(x, 0, 0, FMLPMapper::INTERF_STALLING);
@@ -725,11 +720,11 @@ void LP_RTA_GFP_FMLP::lp_fmlp_constraint_10(Task& ti, LinearProgram& lp, FMLPMap
 
 		foreach_lower_priority_task(tasks.get_tasks(), ti, tx)
 		{
-			uint x = tx->get_id();
+			uint x = tx->get_priority();
 			
 			if(tx->is_request_exist(q))
 			{
-				uint x = tx->get_id();
+				uint x = tx->get_priority();
 				LinearExpression *exp = new LinearExpression();
 
 				foreach_request_instance(ti, *tx, q, v)

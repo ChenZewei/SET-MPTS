@@ -22,8 +22,7 @@ Output::Output(Param param)
 		}
 		while(0 == access(string("results/" + output_filename() + "-" + to_string(suffix)).data(), 0));
 		if(0 == mkdir(string("results/" + output_filename() + "-" + to_string(suffix)).data(), S_IRWXU))
-			printf("result folder has been created.\n");
-		
+	
 		this->path = "results/" + output_filename() + "-" + to_string(suffix) + "/";
 	}
 	else
@@ -32,7 +31,9 @@ Output::Output(Param param)
 		if(0 == mkdir(string("results/" + output_filename()).data(), S_IRWXU))
 			printf("result folder has been created.\n");
 		this->path = "results/" + output_filename() + "/";
+		printf("result folder has been created.\n");
 	}
+	
 	chart.SetGraphSize(1280,640);
 	chart.SetGraphQual(3);
 }
@@ -42,16 +43,36 @@ string Output::get_path()
 	return path;
 }
 
-void Output::add_result(string test_name, double utilization, uint e_num, uint s_num)
+
+SchedResultSet& Output::get_results()
 {
-	SchedResult& sr = srs.get_sched_result(test_name);
-	sr.insert_result(utilization, e_num, s_num);
+	return srs;
+}
+
+bool Output::add_result(string test_name, string line_style, double utilization, uint e_num, uint s_num)
+{
+	SchedResult& sr = srs.get_sched_result(test_name, line_style);
+	if(sr.get_result_by_utilization(utilization).exp_num + e_num <= param.exp_times)
+	{
+		sr.insert_result(utilization, e_num, s_num);
+		return true;
+	}
+	return false;
+}
+
+uint Output::get_exp_time_by_utilization(double utilization)
+{
+	if(0 == srs.size())
+		return 0;
+
+	Result result = srs.get_sched_result_set()[0].get_result_by_utilization(utilization);
+	return result.exp_num;
 }
 
 string Output::output_filename()
 {
 	stringstream buf;
-	buf<<"l:"<<param.lambda<<"-"<<"s:"<<param.step<<"-"<<"P:"<<param.p_num<<"-"<<fixed<<setprecision(0)<<"u:["<<param.u_range.min<<","<<param.u_range.max<<"]-"<<"p:["<<param.p_range.min<<","<<param.p_range.max<<"]";
+	buf<<"id["<<param.id<<"]-l["<<param.lambda<<"]-"<<"P["<<param.p_num<<"]-"<<"rn["<<param.resource_num<<"]-"<<"rrn["<<param.rrn<<"]-"<<"rrp["<<param.rrp<<"]-"<<"rrr["<<param.rrr.min<<","<<param.rrr.max<<"]";
 	return buf.str();
 }
 
@@ -83,6 +104,26 @@ void Output::finish()
 }
 
 //export to csv
+void Output::export_param()
+{
+	string file_name = path + "parameters.txt";
+	ofstream output_file(file_name);
+
+	output_file<<"Lambda: "<<param.lambda<<"\n";
+	output_file<<"Processor num: "<<param.p_num<<"\n";
+	output_file<<"Period range: ["<<param.p_range.min<<"-"<<param.p_range.max<<"]"<<"\n";
+	output_file<<"Utilization range: ["<<param.u_range.min<<"-"<<param.u_range.max<<"]"<<"\n";
+	output_file<<"Deadline proportion range: ["<<param.d_range.min<<"-"<<param.d_range.max<<"]"<<"\n";
+	output_file<<"Resource num: "<<param.resource_num<<"\n";
+	output_file<<"Max critical section num: "<<param.mcsn<<"\n";
+	output_file<<"Resource request num: "<<param.rrn<<"\n";
+	output_file<<"Resource request probability: "<<param.rrp<<"\n";
+	output_file<<"Total length factor: "<<param.tlf<<"\n";
+	output_file<<"Resource request range: ["<<param.rrr.min<<"-"<<param.rrr.max<<"]"<<"\n";
+
+	output_file.flush();
+	output_file.close();
+}
 void Output::export_csv()
 {
 	string file_name = path + "result.csv";

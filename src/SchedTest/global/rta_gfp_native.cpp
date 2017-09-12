@@ -9,8 +9,11 @@ RTA_GFP_native::RTA_GFP_native(TaskSet tasks, ProcessorSet processors, ResourceS
 	this->tasks = tasks;
 	this->processors = processors;
 	this->resources = resources;
+
+	this->resources.update(&(this->tasks));
+	this->processors.update(&(this->tasks), &(this->resources));
 	
-	this->tasks.RM_Order();
+	this->processors.init();
 }
 
 ulong RTA_GFP_native::workload(Task& task, ulong interval)
@@ -56,7 +59,7 @@ bool RTA_GFP_native::is_schedulable()
 		response_bound = response_time((*ti));
 		if (response_bound > ti->get_deadline())
 			return false;
-		if(response_bound > original_bound)
+		if(response_bound != original_bound)
 		{
 			ti->set_response_time(response_bound);
 		}
