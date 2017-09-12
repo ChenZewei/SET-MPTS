@@ -338,10 +338,13 @@ foreach(resources.get_resources(), resource)
 */
 	resources.sort_by_utilization();
 
+	//processors.update(&tasks, &resources);
+
 	foreach(resources.get_resources(), resource)
 	{
-		if(abs(resource->get_utilization()) <= _EPS)
-			continue;
+		//cout<<"assign resource:"<<resource->get_resource_id()<<endl;
+		//if(abs(resource->get_utilization()) <= _EPS)
+		//	continue;
 		fraction_t r_utilization = 1;
 		uint assignment = 0;
 		for(uint i = 0; i < active_processor_num; i++)
@@ -477,11 +480,28 @@ bool RTA_PFP_ROP::is_schedulable()
 
 		if(!worst_fit_for_resources(i))
 			continue;
+/*
+		foreach(processors.get_processors(), processor)
+		{
+			cout<<"Processor:"<<processor->get_processor_id()<<endl;
+			cout<<"\t";
+			foreach(processor->get_resourcequeue(), id)
+				cout<<(*id)<<"\t";
+			cout<<endl;
+		}
+*/
+
+		foreach(resources.get_resources(), resource)
+		{
+			cout<<"Resource:"<<resource->get_resource_id()<<" locality:"<<resource->get_locality()<<endl;
+			if(p_num < resource->get_locality())
+				exit(0);
+		}
 
 		schedulable = is_first_fit_for_tasks_schedulable(i%p_num);
 		if(schedulable)
 		{
-/*
+
 			foreach(tasks.get_tasks(), task)
 			{
 				cout<<"Task"<<task->get_id()<<": partition:"<<task->get_partition()<<endl;
@@ -491,8 +511,10 @@ bool RTA_PFP_ROP::is_schedulable()
 					cout<<"request"<<request->get_resource_id()<<":"<<" num:"<<request->get_num_requests()<<" length:"<<request->get_max_length()<<" locality:"<<resources.get_resources()[request->get_resource_id()].get_locality()<<endl;
 				}
 				cout<<"-------------------------------------------"<<endl;
+				if(task->get_wcet()>task->get_response_time())
+					exit(0);
 			}
-*/
+
 			return schedulable;
 		}
 	}

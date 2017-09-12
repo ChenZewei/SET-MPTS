@@ -65,6 +65,7 @@ class ResourceSet
 		void add_resource();
 		uint size() const;
 		Resources& get_resources();
+		Resource& get_resource_by_id(uint r_id);
 		uint get_resourceset_size() const;
 		void add_task(uint resource_id, uint id);
 		void sort_by_utilization();

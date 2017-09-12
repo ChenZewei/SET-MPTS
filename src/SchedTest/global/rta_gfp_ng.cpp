@@ -14,6 +14,7 @@ RTA_GFP_NG::RTA_GFP_NG(TaskSet tasks, ProcessorSet processors, ResourceSet resou
 	this->processors.update(&(this->tasks), &(this->resources));
 	
 	this->processors.init();
+	this->tasks.display();
 }
 
 int RTA_GFP_NG::interference_gap_decrease(Carry_in t1, Carry_in t2)
