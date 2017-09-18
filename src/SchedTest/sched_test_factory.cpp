@@ -12,6 +12,7 @@
 #include "lp_rta_pfp_dpcp.h"
 #include "lp_rta_pfp_mpcp.h"
 #include "rta_pfp_rop.h"
+#include "rta_pfp_rop_heterogeneous.h"
 #include "rta_pfp_ro_np.h"
 #include "rta_pfp_ro_np_opa.h"
 #include "rta_pfp_ro_np_sm.h"
@@ -110,6 +111,11 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	{
 		tasks.RM_Order();
 		return new RTA_PFP_ROP(tasks, processors, resources);
+	}
+	else if(0 == strcmp(test_name.data(), "RTA-PFP-ROP-HETEROGENEOUS"))
+	{
+		tasks.RM_Order();
+		return new RTA_PFP_ROP_HETEROGENEOUS(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-DC"))
 	{

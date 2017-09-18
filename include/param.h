@@ -31,6 +31,8 @@ class Param
 		double rrp;
 		double tlf;
 		Range rrr;
+		//heterogenegous
+		Ratio ratio;
 		//graph task model parameters
 		Range job_num_range;
 		Range arc_num_range;

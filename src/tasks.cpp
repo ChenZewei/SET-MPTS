@@ -97,6 +97,14 @@ Task::Task(	uint id,
 
 	uint critical_section_num = 0;
 
+	for(int i = 0; i < param.p_num; i++)
+	{
+		if(i < param.ratio.size())
+			ratio.push_back(param.ratio[i]);
+		else
+			ratio.push_back(1);
+	}
+
 	for(int i = 0; i < resourceset.size(); i++)
 	{
 		if((param.mcsn > critical_section_num) && (param.rrr.min < wcet))
@@ -209,6 +217,13 @@ void Task::set_id(uint id) { this->id = id; };
 uint Task::get_index() const { return index; }
 void Task::set_index(uint index) { this->index = index; };
 ulong Task::get_wcet() const	{ return wcet; }
+ulong Task::get_wcet_heterogeneous() const	
+{
+	if(partition != 0XFFFFFFFF)
+		return ceiling(wcet, ratio[partition]);
+	else	
+		return wcet;
+}
 ulong Task::get_deadline() const { return deadline; }
 ulong Task::get_period() const { return period; }
 ulong Task::get_slack() const { return deadline - wcet; }
@@ -236,8 +251,22 @@ bool Task::is_request_exist(uint resource_id)
 	return false;
 }
 ulong Task::get_wcet_critical_sections() const { return wcet_critical_sections; }
+ulong Task::get_wcet_critical_sections_heterogeneous() const 
+{
+	if(partition != 0XFFFFFFFF)
+		return ceiling(wcet_critical_sections, ratio[partition]);
+	else
+		return wcet_critical_sections;
+}
 void Task::set_wcet_critical_sections(ulong csl) { wcet_critical_sections = csl; }
 ulong Task::get_wcet_non_critical_sections() const {	return wcet_non_critical_sections; }
+ulong Task::get_wcet_non_critical_sections_heterogeneous() const 
+{
+	if(partition != 0XFFFFFFFF)
+		return ceiling(wcet_non_critical_sections, ratio[partition]);
+	else
+		return wcet_non_critical_sections; 
+}
 void Task::set_wcet_non_critical_sections(ulong ncsl) { wcet_non_critical_sections = ncsl; }
 ulong Task::get_spin() const { return spin; }
 void Task::set_spin(ulong spining) { spin = spining; }
@@ -257,6 +286,8 @@ uint Task::get_priority() const { return priority; }
 void Task::set_priority(uint prio) { priority = prio; }
 uint Task::get_partition() const { return partition; }
 void Task::set_partition(uint cpu) { partition = cpu; }
+double Task::get_ratio(uint cpu_id) const { return ratio[cpu_id]; }
+void Task::set_ratio(uint cpu_id, double speed) { ratio[cpu_id] = speed; }
 uint Task::get_cluster() const { return cluster; }
 void Task::set_cluster(uint clu) { cluster = clu; }
 CPU_Set* Task::get_affinity() const { return affinity; }

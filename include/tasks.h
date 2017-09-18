@@ -14,7 +14,6 @@ class ResourceSet;
 class Param;
 class Random_Gen;
 
-typedef vector<fraction_t> Ratio;
 
 class Request
 {
@@ -96,6 +95,7 @@ class Task
 		uint get_index() const;
 		void set_index(uint index);
 		ulong get_wcet() const;
+		ulong get_wcet_heterogeneous() const;	
 		ulong get_deadline() const;
 		ulong get_period() const;
 		ulong get_slack() const;
@@ -106,8 +106,10 @@ class Task
 		bool is_request_exist(uint resource_id);
 
 		ulong get_wcet_critical_sections() const;
+		ulong get_wcet_critical_sections_heterogeneous() const;
 		void set_wcet_critical_sections(ulong csl);
 		ulong get_wcet_non_critical_sections() const;
+		ulong get_wcet_non_critical_sections_heterogeneous() const;
 		void set_wcet_non_critical_sections(ulong ncsl);
 		ulong get_spin() const;
 		void set_spin(ulong spining);
@@ -127,6 +129,8 @@ class Task
 		void set_priority(uint prio);
 		uint get_partition() const;
 		void set_partition(uint cpu);
+		double get_ratio(uint cpu_id) const;
+		void set_ratio(uint cpu_id, double speed);
 		uint get_cluster() const;
 		void set_cluster(uint clu);
 		CPU_Set* get_affinity() const;

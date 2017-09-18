@@ -8,14 +8,14 @@
 
 ///////////////////////////Processor/////////////////////////////
 
-Processor::Processor(uint id, fraction_t speedfactor)
+Processor::Processor(uint id, double speedfactor)
 {
-	processor_id = id;
-	speedfactor = speedfactor;
-	utilization = 0;
-	resource_utilization = 0;
-	density = 0;
-	tryed_assign = false;
+	this->processor_id = id;
+	this->speedfactor = speedfactor;
+	this->utilization = 0;
+	this->resource_utilization = 0;
+	this->density = 0;
+	this->tryed_assign = false;
 }
 
 Processor::~Processor()
@@ -29,7 +29,7 @@ uint Processor::get_processor_id() const
 	return processor_id;
 }
 
-fraction_t Processor::get_speedfactor() const
+double Processor::get_speedfactor() const
 {
 	return speedfactor;
 }
@@ -44,7 +44,7 @@ fraction_t Processor::get_utilization()
 		Task& task = tasks->get_task_by_id(*t_id);
 		utilization += task.get_utilization();
 	}
-	return utilization;
+	return utilization/speedfactor;
 }
 
 fraction_t Processor::get_density()
@@ -57,7 +57,7 @@ fraction_t Processor::get_density()
 		Task& task = tasks->get_task_by_id(*t_id);
 		density += task.get_density();
 	}
-	return density;
+	return density/speedfactor;
 }
 
 
@@ -71,7 +71,7 @@ fraction_t Processor::get_resource_utilization()
 		Resource& resource = resources->get_resources()[*r_id];
 		resource_utilization += resource.get_utilization();
 	}
-	return resource_utilization;
+	return resource_utilization/speedfactor;
 }
 
 bool Processor::get_tryed_assign() const
@@ -88,7 +88,7 @@ bool Processor::add_task(uint t_id)
 {
 	Task& task = tasks->get_task_by_id(t_id);
 //cout<<"utilization_sum:"<<utilization.get_d()<<" u_t:"<<task.get_utilization().get_d()<<endl;
-	if(1 < get_utilization() + task.get_utilization())
+	if(1*speedfactor < get_utilization() + task.get_utilization())
 		return false;
 
 	tQueue.insert(t_id);
@@ -110,7 +110,7 @@ const set<uint>& Processor::get_resourcequeue()
 bool Processor::add_resource(uint r_id)
 {
 	Resource& resource = resources->get_resource_by_id(r_id);
-	if(1 < resource_utilization + resource.get_utilization())
+	if(1*speedfactor < resource_utilization + resource.get_utilization())
 			return false;
 
 	rQueue.insert(r_id);
@@ -146,7 +146,12 @@ ProcessorSet::ProcessorSet() {}
 ProcessorSet::ProcessorSet(Param param)//for identical multiprocessor platform
 {
 	for(uint i = 0; i < param.p_num; i++)
-		processors.push_back(Processor(i));
+	{
+		if(i < param.ratio.size())
+			processors.push_back(Processor(i, param.ratio[i]));
+		else
+			processors.push_back(Processor(i));
+	}
 }
 
 uint ProcessorSet::get_processor_num() const 

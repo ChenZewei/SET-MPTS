@@ -85,7 +85,7 @@ int main(int argc,char** argv)
 	cout<<flush;
 				uint s_n = 0;
 				uint s_i = 0;
-
+cout<<"1"<<endl;
 				vector<int> temp_success;
 				bool abandon = false;
 
@@ -94,10 +94,15 @@ int main(int argc,char** argv)
 					temp_success.push_back(0);
 				}
 
+cout<<"2"<<endl;
 				TaskSet taskset = TaskSet();
+cout<<"3"<<endl;
 				ProcessorSet processorset = ProcessorSet(*param);
+cout<<"4"<<endl;
 				ResourceSet resourceset = ResourceSet();
+cout<<"5"<<endl;
 				resource_gen(&resourceset, *param);
+cout<<"6"<<endl;
 				tast_gen(taskset, resourceset, *param, utilization);
 /*		
 				taskset.add_task(resourceset, *param, 51, 100);
@@ -143,13 +148,17 @@ int main(int argc,char** argv)
 
 				for(uint j = 0; j < param->get_method_num(); j++)
 				{
+
+cout<<"11"<<endl;
 					taskset.init();
 					processorset.init();
 					resourceset.init();
 					exp[j]++;
 
+cout<<"22"<<endl;
 					if(0 != last_success[j])
 					{
+cout<<"111"<<endl;
 						SchedTestBase *schedTest = STFactory.createSchedTest(param->test_attributes[j].test_name, taskset, processorset, resourceset);
 						if(NULL == schedTest)
 						{
@@ -157,6 +166,7 @@ int main(int argc,char** argv)
 							return -1;
 						}
 
+cout<<"222"<<endl;
 //cout<<""<<endl;
 						if(!param->test_attributes[j].rename.empty())
 						{
@@ -166,7 +176,8 @@ int main(int argc,char** argv)
 						{
 							cout<<param->test_attributes[j].test_name<<":";
 						}
-				
+
+cout<<"333"<<endl;				
 						time_t s, e;
 						s = time(NULL);
 
@@ -225,6 +236,8 @@ cout<<"Abandon cause GLP_UNDEF"<<endl;
 							cout<<param->test_attributes[j].test_name<<": Abandoned!"<<endl;
 						}
 					}
+
+cout<<"33"<<endl;
 				}	
 
 #if UNDEF_ABANDON
@@ -364,7 +377,7 @@ vector<Param> get_parameters()
 	}
 
 	Int_Set lambdas, p_nums;
-	Double_Set steps;
+	Double_Set steps, ratio;
 	Range_Set p_ranges, u_ranges, d_ranges;
 	Test_Attribute_Set test_attributes;
 	uint exp_times;
@@ -378,6 +391,7 @@ vector<Param> get_parameters()
 	XML::get_deadline_propotion(&d_ranges);
 	XML::get_utilization_range(&u_ranges);
 	XML::get_step(&steps);	
+	XML::get_doubles(&ratio, "processor_ratio");	
 
 	//resource parameter
 	Int_Set resource_nums, rrns, mcsns;
@@ -437,6 +451,7 @@ vector<Param> get_parameters()
 		param.id = parameters.size();
 		param.lambda = *lambda;
 		param.p_num = *p_num;
+		param.ratio = ratio;
 		param.step = *step;
 		param.p_range = *p_range;
 		param.u_range = *u_range;

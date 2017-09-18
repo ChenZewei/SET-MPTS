@@ -17,7 +17,7 @@ class Processor
 {
 	private:
 		uint processor_id;
-		fraction_t speedfactor;
+		double speedfactor;
 		fraction_t utilization;
 		fraction_t resource_utilization;
 		fraction_t density;
@@ -29,10 +29,10 @@ class Processor
 		TaskSet* tasks;
 		ResourceSet* resources;
 	public:
-		Processor(uint id, fraction_t speedfactor = 1);
+		Processor(uint id, double speedfactor = 1);
 		~Processor();
 		uint get_processor_id() const;
-		fraction_t get_speedfactor() const;
+		double get_speedfactor() const;
 		fraction_t get_utilization();
 		fraction_t get_density();
 		fraction_t get_resource_utilization();

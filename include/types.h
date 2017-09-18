@@ -130,6 +130,7 @@ typedef vector<Result_Set> Result_Sets;
 typedef vector<Test_Attribute> Test_Attribute_Set;
 typedef list<void*> TaskQueue;
 typedef list<void*> ResourceQueue;
+typedef vector<double> Ratio;
 
 
 

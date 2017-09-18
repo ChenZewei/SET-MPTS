@@ -99,6 +99,12 @@
 	<processor_num>
 		<data>4</data>	
 	</processor_num>
+	<processor_ratio>
+		<data>1.2</data>	
+		<data>1.2</data>	
+		<data>1</data>	
+		<data>1</data>	
+	<processor_ratio>
 	<period_range>
 		<data>
 			<min>10000</min>
