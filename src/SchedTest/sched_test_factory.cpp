@@ -7,10 +7,6 @@
 #include "rta_pfp_ff_opa.h"
 #include "rta_pfp_wf_spinlock.h"
 #include "rta_pfp_wf_semaphore.h"
-#include "lp_rta_gfp_pip.h"
-#include "lp_rta_gfp_fmlp.h"
-#include "lp_rta_pfp_dpcp.h"
-#include "lp_rta_pfp_mpcp.h"
 #include "rta_pfp_rop.h"
 #include "rta_pfp_rop_heterogeneous.h"
 #include "rta_pfp_ro_np.h"
@@ -18,9 +14,6 @@
 #include "rta_pfp_ro_np_sm.h"
 #include "rta_pfp_ro_np_sm_opa.h"
 #include "rta_pfp_ro_feasible.h"
-#include "ilp_rta_pfp_spinlock.h"
-#include "ilp_rta_pfp_rop.h"
-#include "rta_pfp_gs.h"
 #include "nc_lp_ee_vpr.h"
 #include "rta_gdc_native.h"
 #include "rta_pdc_ro.h"
@@ -91,22 +84,6 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 		tasks.DC_Order();
 		return new RTA_PFP_WF_semaphore(tasks, processors, resources);
 	}
-	else if(0 == strcmp(test_name.data(), "LP-RTA-GFP-PIP"))
-	{
-		return new LP_RTA_GFP_PIP(tasks, processors, resources);
-	}
-	else if(0 == strcmp(test_name.data(), "LP-RTA-GFP-FMLP"))
-	{
-		return new LP_RTA_GFP_FMLP(tasks, processors, resources);
-	}
-	else if(0 == strcmp(test_name.data(), "LP-RTA-PFP-DPCP"))
-	{
-		return new LP_RTA_PFP_DPCP(tasks, processors, resources);
-	}
-	else if(0 == strcmp(test_name.data(), "LP-RTA-PFP-MPCP"))
-	{
-		return new LP_RTA_PFP_MPCP(tasks, processors, resources);
-	}
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-ROP"))
 	{
 		tasks.RM_Order();
@@ -160,18 +137,6 @@ SchedTestBase* SchedTestFactory::createSchedTest(string test_name, TaskSet& task
 	else if(0 == strcmp(test_name.data(), "RTA-PFP-RO-FEASIBLE"))
 	{
 		return new RTA_PFP_RO_FEASIBLE(tasks, processors, resources);
-	}
-	else if(0 == strcmp(test_name.data(), "ILP-RTA-PFP-spinlock"))
-	{
-		return new ILP_RTA_PFP_spinlock(tasks, processors, resources);
-	}
-	else if(0 == strcmp(test_name.data(), "ILP-RTA-PFP-ROP"))
-	{
-		return new ILP_RTA_PFP_ROP(tasks, processors, resources);
-	}
-	else if(0 == strcmp(test_name.data(), "RTA-PFP-GS"))
-	{
-		return new RTA_PFP_GS(tasks, processors, resources);
 	}
 	else if(0 == strcmp(test_name.data(), "NC-LP-EE-VPR"))
 	{
