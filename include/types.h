@@ -1,33 +1,34 @@
-#ifndef TYPES_H
-#define TYPES_H
+// Copyright [2016] <Zewei Chen>
+#ifndef INCLUDE_TYPES_H_
+#define INCLUDE_TYPES_H_
 
 #include <string.h>
-//including GNU Multiple Precision Arithmetic Library
-#include <gmpxx.h>
-#include <vector>
-#include <list>
-#include <set>
+#include <gmpxx.h>  // including GNU Multiple Precision Arithmetic Library
 #include <math.h>
 #include <time.h>
 #include <assert.h>
-//#include "iteration-helper.h"
-//#include "math-helper.h"
+#include <vector>
+#include <list>
+#include <set>
+#include <string>
+// #include "iteration-helper.h"
+// #include "math-helper.h"
 
-#define uint unsigned int
-#define ulong unsigned long
+#define uint uint16_t
+#define ulong uint32_t
 
 #define MAX_LONG 0xffffffffffffffff
 #define MAX_INT  0xffffffff
 #define _EPS 0.000001
 
-//output file format
-#define PNG 	0x01
-#define EPS 	0x02
-#define SVG 	0x04
-#define TGA 	0x08
-#define JSON 	0x10
+// output file format
+#define PNG    0x01
+#define EPS    0x02
+#define SVG    0x04
+#define TGA    0x08
+#define JSON   0x10
 
-//VNode type
+// VNode type
 #define P_NODE 0x02
 #define C_NODE 0x04
 #define J_NODE 0x08
@@ -35,9 +36,9 @@
 #define S_NODE 0x00
 #define E_NODE 0x01
 
-//Graph type
-#define G_TYPE_P 0 //Paralleled
-#define G_TYPE_C 1 //Conditional
+// Graph type
+#define G_TYPE_P 0  // Paralleled
+#define G_TYPE_C 1  // Conditional
 
 #define P_EDF 0
 #define BCL_FTP 1
@@ -54,7 +55,7 @@
 #define PFP_GS 12
 
 
-#define TPS_TASK_MODEL 0 //Three Parameters Sporadic Task Model
+#define TPS_TASK_MODEL 0  // Three Parameters Sporadic Task Model
 #define DAG_TASK_MODEL 1
 
 #define PRIORITY 0
@@ -62,31 +63,32 @@
 #define INCREASE 0
 #define DECREASE 1
 
-#define INTERFERENCE	0
-#define BLOCKING		1
+#define INTERFERENCE    0
+#define BLOCKING        1
 
-//GLPK
+// GLPK
 
 #define GLPK_MEM_USAGE_CHECK 0
 #define GLPK_TERM_OUT 0
 #define ILP_SOLUTION_VAR_CHECK 0
 #define UNDEF_ABANDON 1
-#define TIME_LIMIT_INIT 3600000 //30 sec
-#define TIME_LIMIT_GAP	0 //0 sec
-#define TIME_LIMIT_UPPER_BOUND 3600000 //1 hour
+#define TIME_LIMIT_INIT 3600000  // 30 sec
+#define TIME_LIMIT_GAP  0  // 0 sec
+#define TIME_LIMIT_UPPER_BOUND 3600000  // 1 hour
 
-//CFG
+// CFG
 
 #define SORT_DEBUG 0
 #define RTA_DEBUG 0
 
+using std::string;
+using std::vector;
+using std::list;
+using std::set;
 
-
-using namespace std;
-
-typedef mpz_class int_t;		//multiple precision integer
-typedef mpq_class fraction_t;		//multiple precision rational number
-typedef mpf_class floating_t;		//multiple precision float number
+typedef mpz_class int_t;        // multiple precision integer
+typedef mpq_class fraction_t;   // multiple precision rational number
+typedef mpf_class floating_t;   // multiple precision float number
 
 class Task;
 class TaskSet;
@@ -95,31 +97,28 @@ class ProcessorSet;
 class Resource;
 class ResourceSet;
 
-typedef struct
-{
-	double min;
-	double max;
+typedef struct {
+    double min;
+    double max;
 }Range;
 
-typedef struct
-{
-	double utilization;
-	uint exp_num;
-	uint success_num;
+typedef struct {
+    double utilization;
+    uint exp_num;
+    uint success_num;
 }Result;
 
-typedef struct
-{
-	bool LP;
-	uint test_type;
-	uint test_method;
-	string sched_method;
-	string priority_assignment;
-	string locking_protocol;
-	string test_name;
-	string remark;
-	string rename;
-	string style;
+typedef struct {
+    bool LP;
+    uint test_type;
+    uint test_method;
+    string sched_method;
+    string priority_assignment;
+    string locking_protocol;
+    string test_name;
+    string remark;
+    string rename;
+    string style;
 }Test_Attribute;
 
 typedef vector<int> Int_Set;
@@ -134,4 +133,4 @@ typedef vector<double> Ratio;
 
 
 
-#endif
+#endif  // INCLUDE_TYPES_H_
