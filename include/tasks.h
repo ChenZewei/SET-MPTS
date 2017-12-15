@@ -1,4 +1,6 @@
 // Copyright [2016] <Zewei Chen>
+// ------By Zewei Chen------
+// Email:czwking1991@gmail.com
 #ifndef INCLUDE_TASKS_H_
 #define INCLUDE_TASKS_H_
 
@@ -69,18 +71,18 @@ class Task {
 
  public:
     Task(uint id,
-        ulong wcet,
-        ulong period,
-        ulong deadline = 0,
-        uint priority = MAX_INT);
+         ulong wcet,
+         ulong period,
+         ulong deadline = 0,
+         uint priority = MAX_INT);
 
     Task(uint id,
-        const ResourceSet& resourceset,
-        Param param,
-        ulong wcet,
-        ulong period,
-        ulong deadline = 0,
-        uint priority = MAX_INT);
+         ResourceSet *resourceset,
+         Param param,
+         ulong wcet,
+         ulong period,
+         ulong deadline = 0,
+         uint priority = MAX_INT);
 
     ~Task();
 
@@ -154,8 +156,8 @@ class Task {
     void DBF();
     fraction_t get_utilization() const;
     fraction_t get_density() const;
-    void get_utilization(const fraction_t &utilization);
-    void get_density(const fraction_t &density);
+    // void get_utilization(fraction_t &utilization);
+    // void get_density(fraction_t &density);
 };
 
 typedef vector<Task> Tasks;
@@ -174,16 +176,16 @@ class TaskSet {
 
         void init();
 
-        void calculate_spin(const ResourceSet& resourceset,
-                            const ProcessorSet& processorset);
-        void calculate_local_blocking(const ResourceSet& resourceset);
+        void calculate_spin(ResourceSet *resourceset,
+                            ProcessorSet *processorset);
+        void calculate_local_blocking(ResourceSet *resourceset);
 
-        void add_task(int32_t wcet, int32_t period, int32_t deadline = 0);
-        void add_task(const ResourceSet& resourceset,
+        void add_task(ulong wcet, ulong period, ulong deadline = 0);
+        void add_task(ResourceSet *resourceset,
                       Param param,
-                      int32_t wcet,
-                      int32_t period,
-                      int32_t deadline = 0);
+                      ulong wcet,
+                      ulong period,
+                      ulong deadline = 0);
 
         Tasks& get_tasks();
         Task& get_task_by_id(uint id);
@@ -205,10 +207,10 @@ class TaskSet {
         fraction_t get_utilization_max() const;
         fraction_t get_density_sum() const;
         fraction_t get_density_max() const;
-        void get_utilization_sum(const fraction_t &utilization_sum) const;
-        void get_utilization_max(const fraction_t &utilization_max) const;
-        void get_density_sum(const fraction_t &density_sum) const;
-        void get_density_max(const fraction_t &density_max) const;
+        // void get_utilization_sum(const fraction_t &utilization_sum) const;
+        // void get_utilization_max(const fraction_t &utilization_max) const;
+        // void get_density_sum(const fraction_t &density_sum) const;
+        // void get_density_max(const fraction_t &density_max) const;
 
         void sort_by_id();
         void sort_by_index();

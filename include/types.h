@@ -14,8 +14,8 @@
 // #include "iteration-helper.h"
 // #include "math-helper.h"
 
-#define uint uint16_t
-#define ulong uint32_t
+#define uint uint32_t
+#define ulong uint64_t
 
 #define MAX_LONG 0xffffffffffffffff
 #define MAX_INT  0xffffffff
