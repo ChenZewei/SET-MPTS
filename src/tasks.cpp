@@ -1524,8 +1524,7 @@ bool DAG_Task::is_arc_exist(const vector<ArcNode> &a, uint tail, uint head) {
     return false;
 }
 
-void DAG_Task::display_vertices()
-{
+void DAG_Task::display_vertices() {
     cout << "display main vertices:" << endl;
     for (uint i = 0; i < vnodes.size(); i++) {
         cout << vnodes[i].job_id
@@ -1538,8 +1537,7 @@ void DAG_Task::display_vertices()
     }
 }
 
-void DAG_Task::display_vertices(const vector<VNode> &v)
-{
+void DAG_Task::display_vertices(const vector<VNode> &v) {
     cout << "display vertices:" << endl;
     for (uint i = 0; i < v.size(); i++) {
         cout << v[i].job_id << ":" << v[i].type;
