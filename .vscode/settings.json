@@ -1,5 +1,6 @@
 {
     "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "editor.rulers":[80, 120],
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "editor.detectIndentation": false,

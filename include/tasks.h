@@ -295,25 +295,25 @@ class DAG_Task:public Task {
     DAG_Task(const DAG_Task &dt);
     DAG_Task(uint task_id, ulong period, ulong deadline = 0, uint priority = 0);
     DAG_Task(uint task_id,
-             const ResourceSet& resourceset,
+             ResourceSet *resourceset,
              Param param,
              ulong wcet,
              ulong period,
              ulong deadline = 0,
              uint priority = 0);
-    void graph_gen(const vector<VNode> &v,
-                   const vector<ArcNode> &a,
+    void graph_gen(vector<VNode> *v,
+                   vector<ArcNode> *a,
                    Param param, uint n_num,
                    double arc_density = 0.6);
-    void sub_graph_gen(const vector<VNode> &v,
-                       const vector<ArcNode> &a,
+    void sub_graph_gen(vector<VNode> *v,
+                       vector<ArcNode> *a,
                        uint n_num,
                        int G_TYPE = G_TYPE_P);
-    void sequential_graph_gen(const vector<VNode> &v,
-                              const vector<ArcNode> &a,
+    void sequential_graph_gen(vector<VNode> *v,
+                              vector<ArcNode> *a,
                               uint n_num);
-    void graph_insert(const vector<VNode> &v,
-                      const vector<ArcNode> &a,
+    void graph_insert(vector<VNode> *v,
+                      vector<ArcNode> *a,
                       uint replace_node);
 
     uint task_model();
@@ -331,19 +331,19 @@ class DAG_Task:public Task {
     fraction_t get_utilization() const;
     fraction_t get_density() const;
     void add_job(ulong wcet, ulong deadline = 0);
-    void add_job(const vector<VNode> &v, ulong wcet, ulong deadline = 0);
+    void add_job(vector<VNode> *v, ulong wcet, ulong deadline = 0);
     void add_arc(uint tail, uint head);
-    void add_arc(const vector<ArcNode> &a, uint tail, uint head);
+    void add_arc(vector<ArcNode> *a, uint tail, uint head);
     void delete_arc(uint tail, uint head);
     void refresh_relationship();
-    void refresh_relationship(const vector<VNode> &v, const vector<ArcNode> &a);
+    void refresh_relationship(vector<VNode> *v, vector<ArcNode> *a);
     void update_vol();
     void update_len();
     bool is_acyclic();
     uint DBF(uint time);  // Demand Bound Function
     void DBF();
-    void get_utilization(const fraction_t &utilization);
-    void get_density(const fraction_t &density);
+    // void get_utilization(const fraction_t &utilization);
+    // void get_density(const fraction_t &density);
 
     ulong DFS(VNode vnode);  // Depth First Search
     ulong BFS(VNode vnode);  // Breath First Search
@@ -352,9 +352,9 @@ class DAG_Task:public Task {
     bool is_arc_exist(const vector<ArcNode> &a, uint tail, uint head);
 
     void display_vertices();
-    void display_vertices(vector<VNode> v);
+    void display_vertices(const vector<VNode> &v);
     void display_arcs();
-    void display_arcs(vector<ArcNode> a);
+    void display_arcs(const vector<ArcNode> &a);
     void display_follow_ups(uint job_id);
     void display_precedences(uint job_id);
     uint get_indegrees(uint job_id) const;
@@ -375,7 +375,7 @@ class DAG_TaskSet {
     DAG_TaskSet();
     ~DAG_TaskSet();
 
-    void add_task(const ResourceSet& resourceset,
+    void add_task(ResourceSet *resourceset,
                   Param param,
                   ulong wcet,
                   ulong period,
@@ -394,17 +394,16 @@ class DAG_TaskSet {
     void sort_by_period();
 };
 
-void tast_gen(const TaskSet& taskset,
-              const ResourceSet& resourceset,
+void tast_gen(TaskSet *taskset,
+              ResourceSet *resourceset,
               Param param,
               double utilization);
 
-void dag_task_gen(const DAG_TaskSet& dag_taskset,
-                  const ResourceSet& resourceset,
+void dag_task_gen(DAG_TaskSet *dag_taskset,
+                  ResourceSet *resourceset,
                   Param param,
                   double utilization);
 ulong gcd(ulong a, ulong b);
 ulong lcm(ulong a, ulong b);
-
 
 #endif  // INCLUDE_TASKS_H_
