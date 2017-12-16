@@ -2,16 +2,16 @@
 #ifndef INCLUDE_TYPES_H_
 #define INCLUDE_TYPES_H_
 
-#include <string.h>
+#include <assert.h>
 #include <gmpxx.h>  // including GNU Multiple Precision Arithmetic Library
 #include <math.h>
+#include <string.h>
 #include <time.h>
-#include <assert.h>
-#include <vector>
+#include <iostream>
 #include <list>
 #include <set>
 #include <string>
-#include <iostream>
+#include <vector>
 // #include "iteration-helper.h"
 // #include "math-helper.h"
 
@@ -19,15 +19,17 @@
 #define ulong uint64_t
 
 #define MAX_LONG 0xffffffffffffffff
-#define MAX_INT  0xffffffff
+#define MAX_INT 0xffffffff
+#define MAX_ULONG 0xffffffffffffffff
+#define MAX_UINT 0xffffffff
 #define _EPS 0.000001
 
 // output file format
-#define PNG    0x01
-#define EPS    0x02
-#define SVG    0x04
-#define TGA    0x08
-#define JSON   0x10
+#define PNG 0x01
+#define EPS 0x02
+#define SVG 0x04
+#define TGA 0x08
+#define JSON 0x10
 
 // VNode type
 #define P_NODE 0x02
@@ -55,7 +57,6 @@
 #define GEDF_NON_PREEMPT 11
 #define PFP_GS 12
 
-
 #define TPS_TASK_MODEL 0  // Three Parameters Sporadic Task Model
 #define DAG_TASK_MODEL 1
 
@@ -64,8 +65,8 @@
 #define INCREASE 0
 #define DECREASE 1
 
-#define INTERFERENCE    0
-#define BLOCKING        1
+#define INTERFERENCE 0
+#define BLOCKING 1
 
 // GLPK
 
@@ -73,8 +74,8 @@
 #define GLPK_TERM_OUT 0
 #define ILP_SOLUTION_VAR_CHECK 0
 #define UNDEF_ABANDON 1
-#define TIME_LIMIT_INIT 3600000  // 30 sec
-#define TIME_LIMIT_GAP  0  // 0 sec
+#define TIME_LIMIT_INIT 3600000         // 30 sec
+#define TIME_LIMIT_GAP 0                // 0 sec
 #define TIME_LIMIT_UPPER_BOUND 3600000  // 1 hour
 
 // CFG
@@ -82,16 +83,16 @@
 #define SORT_DEBUG 0
 #define RTA_DEBUG 0
 
-using std::string;
-using std::vector;
-using std::list;
-using std::set;
 using std::cout;
 using std::endl;
+using std::list;
+using std::set;
+using std::string;
+using std::vector;
 
-typedef mpz_class int_t;        // multiple precision integer
-typedef mpq_class fraction_t;   // multiple precision rational number
-typedef mpf_class floating_t;   // multiple precision float number
+typedef mpz_class int_t;       // multiple precision integer
+typedef mpq_class fraction_t;  // multiple precision rational number
+typedef mpf_class floating_t;  // multiple precision float number
 
 class Task;
 class TaskSet;
@@ -101,28 +102,28 @@ class Resource;
 class ResourceSet;
 
 typedef struct {
-    double min;
-    double max;
-}Range;
+  double min;
+  double max;
+} Range;
 
 typedef struct {
-    double utilization;
-    uint exp_num;
-    uint success_num;
-}Result;
+  double utilization;
+  uint exp_num;
+  uint success_num;
+} Result;
 
 typedef struct {
-    bool LP;
-    uint test_type;
-    uint test_method;
-    string sched_method;
-    string priority_assignment;
-    string locking_protocol;
-    string test_name;
-    string remark;
-    string rename;
-    string style;
-}Test_Attribute;
+  bool LP;
+  uint test_type;
+  uint test_method;
+  string sched_method;
+  string priority_assignment;
+  string locking_protocol;
+  string test_name;
+  string remark;
+  string rename;
+  string style;
+} Test_Attribute;
 
 typedef vector<int> Int_Set;
 typedef vector<double> Double_Set;
@@ -133,7 +134,5 @@ typedef vector<Test_Attribute> Test_Attribute_Set;
 typedef list<void*> TaskQueue;
 typedef list<void*> ResourceQueue;
 typedef vector<double> Ratio;
-
-
 
 #endif  // INCLUDE_TYPES_H_

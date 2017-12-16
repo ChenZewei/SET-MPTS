@@ -1,18 +1,25 @@
-#ifndef SCHED_TEST_FACTORY_H
-#define SCHED_TEST_FACTORY_H
+// Copyright [2017] <Zewei Chen>
+// ------By Zewei Chen------
+// Email:czwking1991@gmail.com
+#ifndef INCLUDE_SCHEDTEST_SCHED_TEST_FACTORY_H_
+#define INCLUDE_SCHEDTEST_SCHED_TEST_FACTORY_H_
 
-#include "types.h"
-//#include "sched_test_base.h"
+#include <types.h>
+#include <string>
+// #include "sched_test_base.h"
+
+using std::string;
 
 class TaskSet;
 class ProcessorSet;
 class ResourceSet;
 class SchedTestBase;
 
-class SchedTestFactory
-{
-	public:
-		SchedTestBase* createSchedTest(string test_name, TaskSet& tasks, ProcessorSet& processors, ResourceSet& resources);
+class SchedTestFactory {
+ public:
+  SchedTestBase* createSchedTest(string test_name, TaskSet tasks,
+                                 ProcessorSet processors,
+                                 ResourceSet resources);
 };
 
-#endif
+#endif  // INCLUDE_SCHEDTEST_SCHED_TEST_FACTORY_H_
