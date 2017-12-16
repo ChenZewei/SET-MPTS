@@ -11,6 +11,7 @@
 #include <list>
 #include <set>
 #include <string>
+#include <iostream>
 // #include "iteration-helper.h"
 // #include "math-helper.h"
 
@@ -85,6 +86,8 @@ using std::string;
 using std::vector;
 using std::list;
 using std::set;
+using std::cout;
+using std::endl;
 
 typedef mpz_class int_t;        // multiple precision integer
 typedef mpq_class fraction_t;   // multiple precision rational number
