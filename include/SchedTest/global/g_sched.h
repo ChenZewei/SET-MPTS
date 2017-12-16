@@ -16,7 +16,6 @@ class ResourceSet;
 
 class GlobalSched : public SchedTestBase {
  public:
-
   // enum
   // {
   //         UNTEST,
