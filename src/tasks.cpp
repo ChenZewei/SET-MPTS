@@ -3,6 +3,7 @@
 // Email:czwking1991@gmail.com
 #include <iteration-helper.h>
 #include <math-helper.h>
+#include <math.h>
 #include <param.h>
 #include <processors.h>
 #include <random_gen.h>
@@ -10,6 +11,11 @@
 #include <sort.h>
 #include <tasks.h>
 #include <xml.h>
+#include <string>
+
+using std::max;
+using std::min;
+using std::to_string;
 
 /** Class Request */
 
@@ -85,19 +91,19 @@ Task::Task(uint id, ResourceSet *resourceset, Param param, ulong wcet,
 
   uint critical_section_num = 0;
 
-  for (int i = 0; i < param.p_num; i++) {
+  for (uint i = 0; i < param.p_num; i++) {
     if (i < param.ratio.size())
       ratio.push_back(param.ratio[i]);
     else
       ratio.push_back(1);
   }
 
-  for (int i = 0; i < resourceset->size(); i++) {
+  for (uint i = 0; i < resourceset->size(); i++) {
     if ((param.mcsn > critical_section_num) && (param.rrr.min < wcet)) {
       if (Random_Gen::probability(param.rrp)) {
         uint num = Random_Gen::uniform_integral_gen(
             1, min(param.rrn,
-                   static_cast<int>(param.mcsn - critical_section_num)));
+                   static_cast<uint>(param.mcsn - critical_section_num)));
         uint max_len = Random_Gen::uniform_integral_gen(
             param.rrr.min, min(static_cast<double>(wcet), param.rrr.max));
         ulong length = num * max_len;
@@ -161,7 +167,7 @@ uint Task::get_max_job_num(ulong interval) {
 
 uint Task::get_max_request_num(uint resource_id, ulong interval) {
   if (is_request_exist(resource_id)) {
-    Request &request = get_request_by_id(resource_id);
+    const Request &request = get_request_by_id(resource_id);
     return get_max_job_num(interval) * request.get_num_requests();
   } else {
     return 0;
@@ -201,8 +207,8 @@ bool Task::is_feasible() const {
   return deadline >= wcet && period >= wcet && wcet > 0;
 }
 
-Resource_Requests &Task::get_requests() { return requests; }
-Request &Task::get_request_by_id(uint id) {
+const Resource_Requests &Task::get_requests() const { return requests; }
+const Request &Task::get_request_by_id(uint id) const {
   Request *result = NULL;
   for (uint i = 0; i < requests.size(); i++) {
     if (id == requests[i].get_resource_id()) return requests[i];
@@ -332,7 +338,7 @@ void TaskSet::calculate_spin(ResourceSet *resourceset,
     Task &task_i = tasks[i];
     // cout << "request num:" << task_i.get_requests().size() << endl;
     for (uint j = 0; j < task_i.get_requests().size(); j++) {
-      Request &request = task_i.get_requests()[j];
+      const Request &request = task_i.get_requests()[j];
       uint id = request.get_resource_id();
       uint num = request.get_num_requests();
       ulong Sum = 0;
@@ -343,7 +349,7 @@ void TaskSet::calculate_spin(ResourceSet *resourceset,
           foreach(processor.get_taskqueue(), t_id) {
             Task &task_k = get_task_by_id(*t_id);
             if (task_k.is_request_exist(id)) {
-              Request &request_k = task_k.get_request_by_id(id);
+              const Request &request_k = task_k.get_request_by_id(id);
               if (max_length < request_k.get_max_length())
                 max_length = request_k.get_max_length();
             }
@@ -362,12 +368,12 @@ void TaskSet::calculate_local_blocking(ResourceSet *resourceset) {
     Task &task_i = tasks[i];
     ulong lb = 0;
     for (uint j = 0; j < task_i.get_requests().size(); j++) {
-      Request &request_i = task_i.get_requests()[j];
+      const Request &request_i = task_i.get_requests()[j];
       uint id = request_i.get_resource_id();
       if (resourceset->get_resources()[id].get_ceiling() <= i) {
         for (uint k = task_i.get_id() + 1; k < tasks.size(); k++) {
           Task &task_k = tasks[k];
-          Request &request_k = task_k.get_request_by_id(id);
+          const Request &request_k = task_k.get_request_by_id(id);
           if (&request_k) {
             lb = max(lb, request_k.get_max_length());
           }
@@ -382,7 +388,7 @@ void TaskSet::calculate_local_blocking(ResourceSet *resourceset) {
 // {
 // fraction_t temp;
 // utilization_sum = 0;
-// for (int i = 0; i < tasks.size(); i++)
+// for (uint i = 0; i < tasks.size(); i++)
 // {
 // temp = tasks[i].get_wcet();
 // temp /= tasks[i].get_period();
@@ -392,7 +398,7 @@ void TaskSet::calculate_local_blocking(ResourceSet *resourceset) {
 // void TaskSet::get_utilization_max(fraction_t &utilization_max) const
 // {
 // utilization_max = tasks[0].get_utilization();
-// for (int i = 1; i < tasks.size(); i++)
+// for (uint i = 1; i < tasks.size(); i++)
 // if (tasks[i].get_utilization() > utilization_max)
 // utilization_max = tasks[i].get_utilization();
 // }
@@ -400,7 +406,7 @@ void TaskSet::calculate_local_blocking(ResourceSet *resourceset) {
 // {
 // fraction_t temp;
 // density_sum = 0;
-// for (int i = 0; i < tasks.size(); i++)
+// for (uint i = 0; i < tasks.size(); i++)
 // {
 // temp = tasks[i].get_wcet();
 // temp /= std::min(tasks[i].get_deadline(),tasks[i].get_period());
@@ -410,7 +416,7 @@ void TaskSet::calculate_local_blocking(ResourceSet *resourceset) {
 // void TaskSet::get_density_max(fraction_t &density_max) const
 // {
 // density_max = tasks[0].get_density();
-// for (int i = 1; i < tasks.size(); i++)
+// for (uint i = 1; i < tasks.size(); i++)
 // if (tasks[i].get_density() > density_max)
 // density_max = tasks[i].get_density();
 // }
@@ -481,42 +487,42 @@ void TaskSet::sort_by_index() {
 
 void TaskSet::sort_by_period() {
   std::sort(tasks.begin(), tasks.end(), period_increase<Task>);
-  for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+  for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_deadline() {
   std::sort(tasks.begin(), tasks.end(), deadline_increase<Task>);
-  for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+  for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_utilization() {
   std::sort(tasks.begin(), tasks.end(), utilization_decrease<Task>);
-  for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+  for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_density() {
   std::sort(tasks.begin(), tasks.end(), density_decrease<Task>);
-  for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+  for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_DC() {
   std::sort(tasks.begin(), tasks.end(), task_DC_increase<Task>);
-  for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+  for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_DCC() {
   std::sort(tasks.begin(), tasks.end(), task_DCC_increase<Task>);
-  for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+  for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_DDC() {
   std::sort(tasks.begin(), tasks.end(), task_DDC_increase<Task>);
-  for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+  for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
 }
 
 void TaskSet::sort_by_UDC() {
   std::sort(tasks.begin(), tasks.end(), task_UDC_increase<Task>);
-  for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+  for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
 }
 
 void TaskSet::RM_Order() {
@@ -602,13 +608,13 @@ void TaskSet::SM_PLUS_Order() {
     for (uint i = 0; i < tasks.size(); i++) {
       accum.push_back(0);
     }
-    for (int index = 0; index < tasks.size() - 1; index++) {
+    for (uint index = 0; index < tasks.size() - 1; index++) {
       vector<Task>::iterator it = (tasks.begin() + index);
       ulong c = (it)->get_wcet();
       ulong gap = (it)->get_deadline() - (it)->get_wcet();
       ulong d = (it)->get_deadline();
 
-      for (int index2 = index + 1; index2 < tasks.size(); index2++) {
+      for (uint index2 = index + 1; index2 < tasks.size(); index2++) {
         vector<Task>::iterator it2 = (tasks.begin() + index2);
         ulong c2 = (it2)->get_wcet();
         ulong gap2 = (it2)->get_deadline() - (it2)->get_wcet();
@@ -627,7 +633,7 @@ void TaskSet::SM_PLUS_Order() {
       }
     }
 
-    for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+    for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
 
     // cout << "after plus:" << endl;
     // cout << "-----------------------" << endl;
@@ -655,13 +661,13 @@ void TaskSet::SM_PLUS_2_Order() {
     for (uint i = 0; i < tasks.size(); i++) {
       accum.push_back(0);
     }
-    for (int index = 0; index < tasks.size() - 1; index++) {
+    for (uint index = 0; index < tasks.size() - 1; index++) {
       vector<Task>::iterator it = (tasks.begin() + index);
       ulong c = (it)->get_wcet();
       ulong gap = (it)->get_deadline() - (it)->get_wcet();
       ulong d = (it)->get_deadline();
 
-      for (int index2 = index + 1; index2 < tasks.size(); index2++) {
+      for (uint index2 = index + 1; index2 < tasks.size(); index2++) {
         vector<Task>::iterator it2 = (tasks.begin() + index2);
         ulong c2 = (it2)->get_wcet();
         ulong gap2 = (it2)->get_deadline() - (it2)->get_wcet();
@@ -680,7 +686,7 @@ void TaskSet::SM_PLUS_2_Order() {
       }
     }
 
-    for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+    for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
   }
 
   for (uint i = 0; i < tasks.size(); i++) {
@@ -709,14 +715,14 @@ void TaskSet::SM_PLUS_3_Order() {
     for (uint i = 0; i < tasks.size(); i++) {
       accum.push_back(0);
     }
-    for (int index = 0; index < tasks.size() - 1; index++) {
+    for (uint index = 0; index < tasks.size() - 1; index++) {
       vector<Task>::iterator it = (tasks.begin() + index);
       ulong c = (it)->get_wcet();
       ulong gap = (it)->get_deadline() - (it)->get_wcet();
       ulong d = (it)->get_deadline();
       ulong p = (it)->get_period();
 
-      for (int index2 = index + 1; index2 < tasks.size(); index2++) {
+      for (uint index2 = index + 1; index2 < tasks.size(); index2++) {
         vector<Task>::iterator it2 = (tasks.begin() + index2);
         ulong c2 = (it2)->get_wcet();
         ulong gap2 = (it2)->get_deadline() - (it2)->get_wcet();
@@ -736,7 +742,7 @@ void TaskSet::SM_PLUS_3_Order() {
       }
     }
 
-    for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+    for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
   }
 
   for (uint i = 0; i < tasks.size(); i++) {
@@ -761,10 +767,10 @@ void TaskSet::Leisure_Order() {
   Tasks NewSet;
   sort_by_id();
 
-  for (int i = tasks.size() - 1; i >= 0; i--) {
+  for (uint i = tasks.size() - 1; i >= 0; i--) {
     int64_t l_max = 0xffffffffffffffff;
     uint index = i;
-    for (int j = i; j >= 0; j--) {
+    for (uint j = i; j >= 0; j--) {
       vector<Task>::iterator it = (tasks.begin() + j);
       Task temp = (*it);
       tasks.erase((it));
@@ -829,7 +835,7 @@ void TaskSet::SM_PLUS_4_Order(uint p_num) {
       task->set_other_attr(0);  // accumulative adjustment
     }
 
-    for (int index = 0; index < tasks.size(); index++) {
+    for (uint index = 0; index < tasks.size(); index++) {
       bool is_continue = false;
       min_id = 0;
       min_slack = MAX_LONG;
@@ -850,10 +856,10 @@ void TaskSet::SM_PLUS_4_Order(uint p_num) {
       is_continue = false;
 
       // locate minimum slack
-      for (int index2 = 0; index2 < tasks.size(); index2++) {
+      for (uint index2 = 0; index2 < tasks.size(); index2++) {
         if (min_id == tasks[index2].get_id()) {
           vector<Task>::iterator task1 = (tasks.begin() + index2);
-          for (int index3 = index2 - 1; index3 >= 0; index3--) {
+          for (uint index3 = index2 - 1; index3 >= 0; index3--) {
             vector<Task>::iterator task2 = (tasks.begin() + index3);
             if ((p_num - 1) <= task2->get_other_attr()) {
               is_continue = true;
@@ -875,7 +881,7 @@ void TaskSet::SM_PLUS_4_Order(uint p_num) {
       }
     }
 
-    for (int i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
+    for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
   }
 
   for (uint i = 0; i < tasks.size(); i++) {
@@ -909,7 +915,7 @@ ulong TaskSet::leisure(uint index) {
 }
 
 void TaskSet::display() {
-  for (int i = 0; i < tasks.size(); i++) {
+  for (uint i = 0; i < tasks.size(); i++) {
     cout << "Task index:" << tasks[i].get_index()
          << " Task id:" << tasks[i].get_id()
          << " Task priority:" << tasks[i].get_priority() << endl;
@@ -1052,8 +1058,8 @@ DAG_Task::DAG_Task(uint task_id, ResourceSet *resourceset, Param param,
   // Insert conditional branches
   for (uint i = 1; i < vnodes.size() - 1; i++) {
     if (Random_Gen::probability(param.cond_prob)) {
-      uint cond_job_num =
-          Random_Gen::uniform_integral_gen(2, max(2, param.max_cond_branch));
+      uint cond_job_num = Random_Gen::uniform_integral_gen(
+          2, max(2, static_cast<int>(param.max_cond_branch)));
       vector<VNode> v;
       vector<ArcNode> a;
       sub_graph_gen(&v, &a, cond_job_num, G_TYPE_C);
@@ -1340,7 +1346,7 @@ void DAG_Task::refresh_relationship(vector<VNode> *v, vector<ArcNode> *a) {
 
 void DAG_Task::update_vol() {
   vol = 0;
-  for (int i = 0; i < vnodes.size(); i++) vol += vnodes[i].wcet;
+  for (uint i = 0; i < vnodes.size(); i++) vol += vnodes[i].wcet;
 }
 
 void DAG_Task::update_len() {
@@ -1502,7 +1508,7 @@ fraction_t DAG_TaskSet::get_density_max() const { return density_max; }
 
 void DAG_TaskSet::sort_by_period() {
   std::sort(dag_tasks.begin(), dag_tasks.end(), period_increase<DAG_Task>);
-  // for (int i = 0; i < dag_tasks.size(); i++)
+  // for (uint i = 0; i < dag_tasks.size(); i++)
   //  dag_tasks[i].set_id(i);
 }
 

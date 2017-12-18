@@ -15,8 +15,8 @@ class GLPKSolution {
  private:
   glp_prob *glpk;
   const LinearProgram &lp;
-  const uint row_num;
   const uint col_num;
+  const uint row_num;
   uint coeff_num;
   const bool is_mip;  // mixed integer programing
   const uint dir;
@@ -43,7 +43,7 @@ class GLPKSolution {
   double evaluate(const LinearExpression &exp) const;
   bool is_solved() const;
   static void set_time_limit(int64_t time);
-  static const int64_t get_time_limit();
+  static int64_t get_time_limit();
 };
 
 #endif  // INCLUDE_LP_SOLUTION_H_

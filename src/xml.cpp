@@ -17,14 +17,12 @@ void XML::LoadFile(const char *path) { config.LoadFile(path); }
 void XML::SaveConfig(const char *path) { config.SaveFile(path); }
 
 const char *XML::get_server_ip() {
-  const char *content;
   XMLElement *root = config.RootElement();
   XMLElement *title = root->FirstChildElement("server_ip");
   return title->GetText();
 }
 
 uint XML::get_server_port() {
-  const char *content;
   XMLElement *root = config.RootElement();
   XMLElement *title = root->FirstChildElement("server_port");
   return atoi(title->GetText());
@@ -97,7 +95,6 @@ void XML::get_method(Test_Attribute_Set *t_set) {
 }
 
 uint XML::get_experiment_times() {
-  const char *content;
   XMLElement *root = config.RootElement();
   XMLElement *title = root->FirstChildElement("experiment_times");
   return atoi(title->GetText());
@@ -328,13 +325,12 @@ void XML::initialization() {
 }
 
 XMLElement *XML::get_element(const char *parent) {
-  XMLElement *root = output->RootElement();
   XMLElement *title = output->FirstChildElement(parent);
   return title;
 }
 
 XMLElement *XML::get_element(XMLElement *parent, const char *name,
-                             int index = 0) {
+                             int index) {
   XMLElement *subtitle = parent->FirstChildElement(name);
   while (index--) {
     subtitle = subtitle->NextSiblingElement();
@@ -349,7 +345,6 @@ void XML::add_element(const char *name) {
 }
 
 void XML::add_element(const char *parent, const char *name, const char *text) {
-  XMLElement *root = output->RootElement();
   XMLElement *title = output->FirstChildElement(parent);
   XMLElement *element = output->NewElement(name);
   element->SetText(text);
@@ -357,7 +352,7 @@ void XML::add_element(const char *parent, const char *name, const char *text) {
 }
 
 void XML::add_element(XMLElement *parent, const char *name,
-                      const char *text = "") {
+                      const char *text) {
   XMLElement *element = output->NewElement(name);
   element->SetText(text);
   parent->InsertEndChild(element);
@@ -365,7 +360,6 @@ void XML::add_element(XMLElement *parent, const char *name,
 
 void XML::add_element(const char *parent, int index, const char *name,
                       const char *text) {
-  XMLElement *root = output->RootElement();
   XMLElement *title = output->FirstChildElement(parent);
   for (int i = 0; i < index; i++) title = title->NextSiblingElement();
   XMLElement *element = output->NewElement(name);
@@ -394,7 +388,6 @@ void XML::set_text(XMLElement *element, const char *text) {
 
 void XML::set_text(const char *parent, int index1, const char *element,
                    int index2, const char *text) {
-  XMLElement *root = output->RootElement();
   XMLElement *title = output->FirstChildElement(parent);
   for (int i = 0; i < index1; i++) title = title->NextSiblingElement();
   XMLElement *subtitle = title->FirstChildElement(element);

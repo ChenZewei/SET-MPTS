@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
     }
 
     do {
-      Result result;
+      // Result result;
       cout << "Utilization:" << utilization << endl;
       vector<int> success;
       vector<int> exp;
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
         success.push_back(0);
         exc.push_back(0);
       }
-      for (int i = 0; i < param->exp_times; i++) {
+      for (uint i = 0; i < param->exp_times; i++) {
         cout << "EXP: " << i + 1 << " of " << param->exp_times << endl;
         cout << std::flush;
         uint s_n = 0;
@@ -231,7 +231,7 @@ int main(int argc, char** argv) {
           // sleep(1);
         }
 
-        result.utilization = utilization;
+        // result.utilization = utilization;
       }  // exp_times
       cout << endl;
       for (uint j = 0; j < param->test_attributes.size(); j++) {
@@ -291,7 +291,7 @@ int main(int argc, char** argv) {
 
 void getFiles(string path, string dir) {
   string cmd = "ls " + path + " > " + path + dir;
-  system(cmd.data());
+  int ret = system(cmd.data());
 }
 
 void read_line(string path, vector<string> *files) {

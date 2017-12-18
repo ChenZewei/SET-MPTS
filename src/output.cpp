@@ -88,8 +88,8 @@ string Output::get_method_name(Test_Attribute ta) {
 // output to console
 void Output::proceeding() {}
 
-void Output::proceeding(string test_name, double utilization, uint e_num,
-                        uint s_num) {}
+// void Output::proceeding(string test_name, double utilization, uint e_num,
+//                         uint s_num) {}
 
 void Output::finish() {}
 

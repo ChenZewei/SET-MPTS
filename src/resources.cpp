@@ -44,7 +44,7 @@ fraction_t Resource::get_utilization() {
   utilization = 0;
   foreach(queue, id) {
     Task& task = tasks->get_task_by_id(*id);
-    Request& request = task.get_request_by_id(resource_id);
+    const Request& request = task.get_request_by_id(resource_id);
     fraction_t u;
     u = request.get_num_requests() * request.get_max_length();
     u /= task.get_period();
@@ -216,7 +216,7 @@ void ResourceSet::update(DAG_TaskSet* dag_tasks) {
 /** Others */
 
 void resource_gen(ResourceSet* resourceset, Param param) {
-  for (int i = 0; i < param.resource_num; i++) resourceset->add_resource();
+  for (uint i = 0; i < param.resource_num; i++) resourceset->add_resource();
   resource_alloc(resourceset, param.p_num);
   /*
           foreach(resourceset->get_resources(), resource)

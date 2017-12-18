@@ -17,8 +17,8 @@ class Param {
   const char* server_ip;
   uint port;
   // basic parameters
-  int lambda;
-  int p_num;
+  uint lambda;
+  uint p_num;
   double step;
   Range p_range;
   Range u_range;
@@ -26,9 +26,9 @@ class Param {
   Test_Attribute_Set test_attributes;
   uint exp_times;
   // resource parameters
-  int resource_num;
-  int mcsn;
-  int rrn;
+  uint resource_num;
+  uint mcsn;
+  uint rrn;
   double rrp;
   double tlf;
   Range rrr;
@@ -38,19 +38,19 @@ class Param {
   Range job_num_range;
   Range arc_num_range;
   bool is_cyclic;
-  int max_indegree;
-  int max_outdegree;
+  uint max_indegree;
+  uint max_outdegree;
   double para_prob;
   double cond_prob;
   double arc_density;
-  int max_para_job;
-  int max_cond_branch;
+  uint max_para_job;
+  uint max_cond_branch;
 
  public:
   void set_lambda(int lambda);
-  int get_lambda() const;
+  uint get_lambda() const;
   void set_processor_num(int num);
-  int get_processor_num() const;
+  uint get_processor_num() const;
   void set_step(double step);
   double get_step() const;
   void set_period_range(Range p_range);
@@ -62,12 +62,12 @@ class Param {
   void set_test_attribute_set(Test_Attribute_Set test_attributes);
   Test_Attribute_Set get_test_attribute_set() const;
   void set_experiment_times(uint times);
-  int get_experiment_times() const;
+  uint get_experiment_times() const;
 
   void set_resource_num(int resource_num);
-  int get_resource_num() const;
+  uint get_resource_num() const;
   void set_request_num(int rrn);
-  int get_request_num() const;
+  uint get_request_num() const;
   void set_request_probability(double rrp);
   double get_request_probability() const;
   void set_total_length_factor(double tlf);
@@ -82,13 +82,13 @@ class Param {
   void set_is_cyclic(bool is_cyclic);
   bool get_is_cyclic() const;
   void set_max_indegree(int max_indegree);
-  int get_max_indegree() const;
+  uint get_max_indegree() const;
   void set_max_outdegree(int max_outdegree);
-  int get_ax_outdegree() const;
+  uint get_ax_outdegree() const;
 
   uint get_method_num();
-  int get_test_method(uint index);
-  int get_test_type(uint index);
+  uint get_test_method(uint index);
+  uint get_test_type(uint index);
 };
 
 #endif  // INCLUDE_PARAM_H_

@@ -34,7 +34,7 @@ class Chart {
   Color color;   // already has 8 colors
   string width;  // from 0-9
   Dot dot;       // already has 8 dots
-  string get_line_style(int index);
+  string get_line_style(uint index);
 
  public:
   Chart();
@@ -45,8 +45,8 @@ class Chart {
   // void AddData(string name, double* d, int size);
   // void AddData(string name, Result_Set r_set);
   void AddData(SchedResultSet srs);
-  void SetGraphSize(int width, int height);
-  void SetGraphQual(int quality);
+  void SetGraphSize(uint width, uint height);
+  void SetGraphQual(uint quality);
   void ExportLineChart(string path, const char* title, double min, double max,
                        double step, int format = 0);
   void ExportJSON(string path);

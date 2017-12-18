@@ -28,7 +28,7 @@ Chart::Chart() {
   dot.push_back("x");
 }
 
-string Chart::get_line_style(int index) {
+string Chart::get_line_style(uint index) {
   if (color.size() <= index) {
     stringstream buf;
     buf << "{x";
@@ -80,11 +80,11 @@ void Chart::AddData(string name, Result_Set r_set)
 
 void Chart::AddData(SchedResultSet srs) { this->srs = srs; }
 
-void Chart::SetGraphSize(int width, int height) {
+void Chart::SetGraphSize(uint width, uint height) {
   graph.SetSize(width, height);
 }
 
-void Chart::SetGraphQual(int quality) { graph.SetQuality(quality); }
+void Chart::SetGraphQual(uint quality) { graph.SetQuality(quality); }
 
 void Chart::ExportLineChart(string path, const char* title, double min,
                             double max, double step, int format) {
@@ -123,7 +123,7 @@ void Chart::ExportLineChart(string path, const char* title, double min,
   }
 
   uint j = 0;
-  for (int i = 0; i < data_sets.size(); i++) {
+  for (uint i = 0; i < data_sets.size(); i++) {
     if (!data_sets[i].style.empty()) {
       graph.Plot(data_sets[i].data, data_sets[i].style.c_str());
       graph.AddLegend(data_sets[i].name.c_str(), data_sets[i].style.c_str());

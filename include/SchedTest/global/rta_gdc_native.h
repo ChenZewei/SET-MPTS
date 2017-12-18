@@ -27,7 +27,7 @@ class RTA_GDC_native : public GlobalSched {
   ProcessorSet processors;
   ResourceSet resources;
 
-  ulong workload(const Task& task, ulong interval) const;
+  ulong workload(const Task& task, ulong interval);
   ulong response_time(const Task& ti);
 
  public:

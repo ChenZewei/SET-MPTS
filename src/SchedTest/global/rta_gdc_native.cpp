@@ -24,12 +24,12 @@ RTA_GDC_native::RTA_GDC_native(TaskSet tasks, ProcessorSet processors,
   this->processors.init();
 }
 
-ulong RTA_GDC_native::workload(Task& task, ulong interval) {
+ulong RTA_GDC_native::workload(const Task& task, ulong interval) {
   return min(interval, task.get_wcet() * ceiling(interval, task.get_period()) +
                            task.get_wcet());
 }
 
-ulong RTA_GDC_native::response_time(Task& ti) {
+ulong RTA_GDC_native::response_time(const Task& ti) {
   ulong wcet = ti.get_wcet();
   ulong test_end = ti.get_deadline();
   ulong test_start = ti.get_wcet();

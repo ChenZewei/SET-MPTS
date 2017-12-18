@@ -17,9 +17,9 @@ GLPKSolution::GLPKSolution(const LinearProgram &lp, unsigned int max_var_num,
       row_num(lp.get_equalities().size() + lp.get_inequalities().size()),
       coeff_num(0),
       is_mip(lp.has_binary_variables() || lp.has_integer_variables()),
-      solved(false),
       dir(dir),
-      aim(aim) {
+      aim(aim),
+      solved(false) {
   if (col_num)
     solve(var_lb, var_ub);
   else
@@ -218,7 +218,7 @@ bool GLPKSolution::is_solved() const { return solved; }
 void GLPKSolution::solve(double var_lb, double var_ub) {
 #if GLPK_TERM_OUT == 0
   glp_term_out(GLP_OFF);
-#else if GLPK_TERM_OUT == 1
+#else
   glp_term_out(GLP_ON);
 #endif
 
@@ -441,4 +441,4 @@ void GLPKSolution::set_column_types() {
 
 void GLPKSolution::set_time_limit(int64_t time) { t_limit = time; }
 
-const int64_t GLPKSolution::get_time_limit() { return t_limit; }
+int64_t GLPKSolution::get_time_limit() { return t_limit; }

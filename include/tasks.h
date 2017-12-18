@@ -94,8 +94,8 @@ class Task {
   ulong get_slack() const;
   bool is_feasible() const;
 
-  Resource_Requests &get_requests();
-  Request &get_request_by_id(uint id);
+  const Resource_Requests &get_requests() const;
+  const Request &get_request_by_id(uint id) const;
   bool is_request_exist(uint resource_id);
 
   ulong get_wcet_critical_sections() const;
