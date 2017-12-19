@@ -8,9 +8,9 @@
 #include <algorithm>
 #include <vector>
 
-using std::vector;
 using std::cout;
 using std::endl;
+using std::vector;
 
 class Processor;
 class ProcessorSet;
@@ -96,7 +96,7 @@ class Task {
 
   const Resource_Requests &get_requests() const;
   const Request &get_request_by_id(uint id) const;
-  bool is_request_exist(uint resource_id);
+  bool is_request_exist(uint resource_id) const;
 
   ulong get_wcet_critical_sections() const;
   ulong get_wcet_critical_sections_heterogeneous() const;
@@ -140,14 +140,12 @@ class Task {
                    uint locality = MAX_INT);
 
   // max number of jobs in an arbitrary length of interval
-  uint get_max_job_num(ulong interval);
-  uint get_max_request_num(uint resource_id, ulong interval);
+  uint get_max_job_num(ulong interval) const;
+  uint get_max_request_num(uint resource_id, ulong interval) const;
   ulong DBF(ulong interval);  // Demand Bound Function
   void DBF();
   fraction_t get_utilization() const;
   fraction_t get_density() const;
-  // void get_utilization(fraction_t &utilization);
-  // void get_density(fraction_t &density);
 };
 
 typedef vector<Task> Tasks;
@@ -166,11 +164,11 @@ class TaskSet {
 
   void init();
 
-  void calculate_spin(ResourceSet *resourceset, ProcessorSet *processorset);
-  void calculate_local_blocking(ResourceSet *resourceset);
+  void calculate_spin(ResourceSet* resourceset, ProcessorSet* processorset);
+  void calculate_local_blocking(ResourceSet* resourceset);
 
   void add_task(ulong wcet, ulong period, ulong deadline = 0);
-  void add_task(ResourceSet *resourceset, Param param, ulong wcet, ulong period,
+  void add_task(ResourceSet* resourceset, Param param, ulong wcet, ulong period,
                 ulong deadline = 0);
 
   Tasks &get_tasks();
@@ -193,10 +191,6 @@ class TaskSet {
   fraction_t get_utilization_max() const;
   fraction_t get_density_sum() const;
   fraction_t get_density_max() const;
-  // void get_utilization_sum(const fraction_t &utilization_sum) const;
-  // void get_utilization_max(const fraction_t &utilization_max) const;
-  // void get_density_sum(const fraction_t &density_sum) const;
-  // void get_density_max(const fraction_t &density_max) const;
 
   void sort_by_id();
   void sort_by_index();
@@ -231,8 +225,8 @@ class TaskSet {
 typedef struct ArcNode {
   uint tail;  // i
   uint head;  // j
-  //    ArcPtr headlink;
-  //    ArcPtr taillink;
+  // ArcPtr headlink;
+  // ArcPtr taillink;
 } ArcNode, *ArcPtr;
 
 typedef struct VNode {
@@ -315,8 +309,6 @@ class DAG_Task : public Task {
   bool is_acyclic();
   uint DBF(uint time);  // Demand Bound Function
   void DBF();
-  // void get_utilization(const fraction_t &utilization);
-  // void get_density(const fraction_t &density);
 
   ulong DFS(VNode vnode);  // Depth First Search
   ulong BFS(VNode vnode);  // Breath First Search

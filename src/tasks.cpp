@@ -1,4 +1,4 @@
-// Copyright [2016] <Zewei Chen>
+// Copyright [2017] <Zewei Chen>
 // ------By Zewei Chen------
 // Email:czwking1991@gmail.com
 #include <iteration-helper.h>
@@ -159,13 +159,13 @@ ulong Task::DBF(ulong time) {
     return 0;
 }
 
-uint Task::get_max_job_num(ulong interval) {
+uint Task::get_max_job_num(ulong interval) const {
   uint num_jobs;
   num_jobs = ceiling(interval + get_response_time(), get_period());
   return num_jobs;
 }
 
-uint Task::get_max_request_num(uint resource_id, ulong interval) {
+uint Task::get_max_request_num(uint resource_id, ulong interval) const {
   if (is_request_exist(resource_id)) {
     const Request &request = get_request_by_id(resource_id);
     return get_max_job_num(interval) * request.get_num_requests();
@@ -177,17 +177,6 @@ uint Task::get_max_request_num(uint resource_id, ulong interval) {
 fraction_t Task::get_utilization() const { return utilization; }
 
 fraction_t Task::get_density() const { return density; }
-
-// void Task::get_utilization(fraction_t &utilization) {
-//     utilization = wcet;
-//     utilization /= period;
-// }
-
-// void Task::get_density(fraction_t &density)
-// {
-//  density = wcet;
-//  density /= std::min(deadline,period);
-// }
 
 uint Task::get_id() const { return id; }
 void Task::set_id(uint id) { this->id = id; }
@@ -216,7 +205,7 @@ const Request &Task::get_request_by_id(uint id) const {
   return *result;
 }
 
-bool Task::is_request_exist(uint resource_id) {
+bool Task::is_request_exist(uint resource_id) const {
   for (uint i = 0; i < requests.size(); i++) {
     if (resource_id == requests[i].get_resource_id()) return true;
   }
@@ -384,43 +373,6 @@ void TaskSet::calculate_local_blocking(ResourceSet *resourceset) {
   }
 }
 
-// void TaskSet::get_utilization_sum(fraction_t &utilization_sum) const
-// {
-// fraction_t temp;
-// utilization_sum = 0;
-// for (uint i = 0; i < tasks.size(); i++)
-// {
-// temp = tasks[i].get_wcet();
-// temp /= tasks[i].get_period();
-// utilization_sum += temp;
-// }
-// }
-// void TaskSet::get_utilization_max(fraction_t &utilization_max) const
-// {
-// utilization_max = tasks[0].get_utilization();
-// for (uint i = 1; i < tasks.size(); i++)
-// if (tasks[i].get_utilization() > utilization_max)
-// utilization_max = tasks[i].get_utilization();
-// }
-// void TaskSet::get_density_sum(fraction_t &density_sum) const
-// {
-// fraction_t temp;
-// density_sum = 0;
-// for (uint i = 0; i < tasks.size(); i++)
-// {
-// temp = tasks[i].get_wcet();
-// temp /= std::min(tasks[i].get_deadline(),tasks[i].get_period());
-// density_sum += temp;
-// }
-// }
-// void TaskSet::get_density_max(fraction_t &density_max) const
-// {
-// density_max = tasks[0].get_density();
-// for (uint i = 1; i < tasks.size(); i++)
-// if (tasks[i].get_density() > density_max)
-// density_max = tasks[i].get_density();
-// }
-
 Tasks &TaskSet::get_tasks() { return tasks; }
 
 Task &TaskSet::get_task_by_id(uint id) {
@@ -439,17 +391,6 @@ Task &TaskSet::get_task_by_priority(uint pi) {
   return *reinterpret_cast<Task *>(0);
 }
 
-/*
-Task& TaskSet::get_task_by_id(uint id)
-{
-        foreach(tasks, task)
-        {
-                if (id == task->get_id())
-                        return (*task);
-        }
-        return *(Task*)0;
-}
-*/
 bool TaskSet::is_implicit_deadline() {
   foreach_condition(tasks, tasks[i].get_deadline() != tasks[i].get_period());
   return true;
@@ -634,18 +575,6 @@ void TaskSet::SM_PLUS_Order() {
     }
 
     for (uint i = 0; i < tasks.size(); i++) tasks[i].set_index(i);
-
-    // cout << "after plus:" << endl;
-    // cout << "-----------------------" << endl;
-    // foreach(tasks, task) {
-    //     cout << " Task " << task->get_id() << ":" << endl;
-    //     cout << " WCET:" << task->get_wcet()
-    //          << " Deadline:" << task->get_deadline()
-    //          << " Period:" << task->get_period()
-    //          << " Gap:" << task->get_deadline()-task->get_wcet()
-    //          << " Leisure:" << leisure(task->get_id()) << endl;
-    //     cout << "-----------------------" << endl;
-    // }
   }
 
   for (uint i = 0; i < tasks.size(); i++) {
